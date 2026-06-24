@@ -16,21 +16,31 @@ const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'ccsm-super-secret-key-2026';
 
 // ── DATABASE CONNECTION ──────────────────────────────────
-const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 5432,
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || 'postgres',
-  database: process.env.DB_NAME || 'ccsm',
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
+// On Railway, the Postgres plugin provides a single DATABASE_URL var.
+// Locally, falls back to individual DB_* vars (e.g. from a .env file).
+const pool = process.env.DATABASE_URL
+  ? new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false },
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 2000,
+    })
+  : new Pool({
+      host: process.env.DB_HOST || 'localhost',
+      port: process.env.DB_PORT || 5432,
+      user: process.env.DB_USER || 'postgres',
+      password: process.env.DB_PASSWORD || 'postgres',
+      database: process.env.DB_NAME || 'ccsm',
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 2000,
+    });
 
 // ── MIDDLEWARE ────────────────────────────────────────────
 app.use(helmet());
 app.use(cors({
-  origin: ['http://localhost:5500', 'http://127.0.0.1:5500', 'http://localhost:3000'],
+  origin: true, // reflects the request's Origin — allows any frontend (file://, static host, etc.) to call this API
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
@@ -198,7 +208,7 @@ async function initDatabase() {
 
     console.log('✅ Database initialized');
   } catch (error) {
-    console.error('❌ Database init error:', error.message);
+    console.error('❌ Database init error:', error);
   }
 }
 
@@ -356,7 +366,7 @@ async function seedData() {
 
     console.log('✅ Seed data complete');
   } catch (error) {
-    console.error('❌ Seed error:', error.message);
+    console.error('❌ Seed error:', error);
   }
 }
 
