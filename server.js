@@ -38,7 +38,18 @@ const pool = process.env.DATABASE_URL
     });
 
 // ── MIDDLEWARE ────────────────────────────────────────────
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://cdn.jsdelivr.net", "https://fonts.gstatic.com", "data:"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "https:"],
+    },
+  },
+}));
 app.use(cors({
   origin: true, // reflects the request's Origin — allows any frontend (file://, static host, etc.) to call this API
   credentials: true
@@ -627,7 +638,7 @@ const path = require('path');
 app.use(express.static(__dirname));
 app.get('*', (req, res, next) => {
   if (req.path.startsWith('/api/')) return next();
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'E-Tech CCSM Prototype.html'));
 });
 
 // ── ERROR HANDLER ──────────────────────────────────────
