@@ -622,6 +622,14 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// ── SERVE FRONTEND ───────────────────────────────────────
+const path = require('path');
+app.use(express.static(__dirname));
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api/')) return next();
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // ── ERROR HANDLER ──────────────────────────────────────
 app.use((err, req, res, next) => {
   console.error('❌ Error:', err.stack);
