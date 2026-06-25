@@ -594,11 +594,11 @@ async function seedData() {
 ];
 
     for (const cam of cameras) {
-      await pool.query(
-        `INSERT INTO cameras (name, zone, status, ip_address, username, model, comments)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-        cam
-      );
+await pool.query(
+  `INSERT INTO cameras (name, zone, status, ip_address, username, model, resolution, comments)
+   VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+  cam
+);
     }
 
     const doors = [
