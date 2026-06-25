@@ -9,10 +9,11 @@ const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
-app.set('trust proxy', 1); 
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'ccsm-super-secret-key-2026';
 
@@ -52,10 +53,12 @@ app.use(helmet({
     },
   },
 }));
+
 app.use(cors({
-  origin: true, // reflects the request's Origin — allows any frontend (file://, static host, etc.) to call this API
+  origin: true,
   credentials: true
 }));
+
 app.use(express.json({ limit: '10mb' }));
 
 const limiter = rateLimit({
@@ -210,6 +213,7 @@ async function initDatabase() {
       CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_logs(created_at);
     `);
 
+    // Check if admin exists
     const adminCheck = await pool.query("SELECT * FROM users WHERE username = 'admin'");
     if (adminCheck.rows.length === 0) {
       const hashed = await bcrypt.hash('admin123', 10);
@@ -239,22 +243,22 @@ async function seedData() {
       ['HM10 PTZ', 'NORTH', 'Defective', '10.19.1.158', 'root', 'Pelco P2820-ESR', 'Keeps resetting'],
       ['HM11 PTZ', 'NORTH', 'Defective', '10.19.1.159', 'root', 'Pelco P2820-ESR', 'Keeps resetting'],
       ['N25 PTZ', 'NORTH', 'Defective', '10.19.1.175', 'root', 'Pelco P2820-ESR', 'Defective'],
-      ['B3 PTZ', 'SOUTH', 'Online', '10.19.1.110', 'root', 'Axis', 'Confirmed June 8th'],
-      ['D4 PTZ', 'SOUTH', 'Online', '10.19.1.120', 'root', 'Axis', 'Confirmed June 8th'],
-      ['A7 PTZ', 'SOUTH', 'Defective', '10.19.1.130', 'root', 'Axis', 'Defective'],
-      ['A8 PTZ', 'SOUTH', 'Defective', '10.19.1.131', 'root', 'Axis', 'Defective'],
-      ['A9 PTZ Context Stream', 'SOUTH', 'Defective', '10.19.1.132', 'root', 'Axis', 'Defective'],
-      ['A13 PTZ Stream 1', 'SOUTH', 'Defective', '10.19.1.136', 'root', 'Axis', 'Defective'],
-      ['C1 PTZ (243)', 'SOUTH', 'Defective', '10.19.1.140', 'root', 'Axis', 'Defective'],
-      ['W1', 'WEST', 'No Power', '10.19.1.180', 'root', 'Axis', 'No power/network at Pole'],
-      ['W2', 'WEST', 'No Power', '10.19.1.182', 'root', 'Axis', 'Connected to W1'],
-      ['WB1 PTZ', 'WEST', 'Defective', '10.19.1.185', 'root', 'Axis', 'Replace with P-series'],
+      ['B3 PTZ', 'SOUTH', 'Online', '10.19.1.110', 'root', 'Axis Q6128-E', 'Confirmed June 8th'],
+      ['D4 PTZ', 'SOUTH', 'Online', '10.19.1.120', 'root', 'Axis Q6128-E', 'Confirmed June 8th'],
+      ['A7 PTZ', 'SOUTH', 'Defective', '10.19.1.130', 'root', 'Axis Q6128-E', 'Defective'],
+      ['A8 PTZ', 'SOUTH', 'Defective', '10.19.1.131', 'root', 'Axis Q6128-E', 'Defective'],
+      ['A9 PTZ Context Stream', 'SOUTH', 'Defective', '10.19.1.132', 'root', 'Axis Q6128-E', 'Defective'],
+      ['A13 PTZ Stream 1', 'SOUTH', 'Defective', '10.19.1.136', 'root', 'Axis Q6128-E', 'Defective'],
+      ['C1 PTZ (243)', 'SOUTH', 'Defective', '10.19.1.140', 'root', 'Axis Q6128-E', 'Defective'],
+      ['W1', 'WEST', 'No Power', '10.19.1.180', 'root', 'Axis Q3515-LVE', 'No power/network at Pole'],
+      ['W2', 'WEST', 'No Power', '10.19.1.182', 'root', 'Axis Q3515-LVE', 'Connected to W1'],
+      ['WB1 PTZ', 'WEST', 'Defective', '10.19.1.185', 'root', 'Axis P3267-LVE', 'Replace with P-series'],
       ['Manager Car Park PTZ', 'NORTH', 'Defective', '10.19.1.50', 'root', 'Pelco P2820-ESR', 'Defective'],
       ['Visitor Car Park PTZ 2', 'NORTH', 'Defective', '10.19.1.52', 'root', 'Pelco P2820-ESR', 'Defective'],
       ['SW Corner Perim PTZ', 'NORTH', 'Defective', '10.19.1.53', 'root', 'Pelco P2820-ESR', 'To be replaced'],
       ['A1 PTZ', 'NORTH', 'Online', '172.17.103.30', 'admin', 'Pelco P2820-ESR', 'Active PTZ camera'],
       ['A2 PTZ', 'NORTH', 'Online', '172.17.103.31', 'admin', 'Pelco P2820-ESR', 'Active PTZ camera'],
-      ['A3 PTZ', 'NORTH', 'Online', '172.17.103.32', 'root', 'Axis PTZ', 'Active PTZ camera'],
+      ['A3 PTZ', 'NORTH', 'Online', '172.17.103.32', 'root', 'Axis P5655-E', 'Active PTZ camera'],
       ['B1', 'WEST', 'Online', '172.17.103.43', 'administrator', 'Avigilon 5.0C-H5A-DP2', 'Avigilon fixed camera'],
       ['B2', 'WEST', 'Online', '172.17.103.45', 'administrator', 'Avigilon 5.0C-H5A-DP2', 'Avigilon fixed camera'],
       ['C1', 'SOUTH', 'Online', '172.17.103.71', 'administrator', 'Avigilon 5.0C-H5A-DP2', 'Avigilon fixed camera'],
@@ -437,20 +441,26 @@ app.get('/api/cameras', authenticate, async (req, res) => {
 app.put('/api/cameras/:name', authenticate, async (req, res) => {
   try {
     const { name } = req.params;
-    const { comments, status } = req.body;
+    const { comments, status, model } = req.body;
 
-    if (comments !== undefined) {
+    const fields = [];
+    const values = [];
+    let counter = 1;
+
+    if (comments !== undefined) { fields.push(`comments = $${counter}`); values.push(comments); counter++; }
+    if (status !== undefined) { fields.push(`status = $${counter}`); values.push(status); counter++; }
+    if (model !== undefined) { fields.push(`model = $${counter}`); values.push(model); counter++; }
+
+    fields.push(`updated_at = CURRENT_TIMESTAMP`);
+    values.push(name);
+
+    if (fields.length > 0) {
       await pool.query(
-        'UPDATE cameras SET comments = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2',
-        [comments, name]
+        `UPDATE cameras SET ${fields.join(', ')} WHERE name = $${counter}`,
+        values
       );
     }
-    if (status !== undefined) {
-      await pool.query(
-        'UPDATE cameras SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2',
-        [status, name]
-      );
-    }
+
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -637,11 +647,13 @@ app.get('/api/health', (req, res) => {
 });
 
 // ── SERVE FRONTEND ───────────────────────────────────────
-const path = require('path');
+// Serve static files from the current directory
 app.use(express.static(__dirname));
+
+// For any non-API route, serve the frontend
 app.get('*', (req, res, next) => {
   if (req.path.startsWith('/api/')) return next();
-  res.sendFile(path.join(__dirname, 'E-Tech CCSM Prototype.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // ── ERROR HANDLER ──────────────────────────────────────
