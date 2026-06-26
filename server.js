@@ -12,6 +12,9 @@ const helmet = require('helmet');
 const path = require('path');
 require('dotenv').config();
 
+// ── SEED FLAG ─────────────────────────────────────────────
+let seedCompleted = false; 
+
 const app = express();
 app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
