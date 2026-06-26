@@ -1867,19 +1867,16 @@ function checkLogin() {
 // ============================================================
 
 function renderDashboard() {
-  const problemCameras = CAMERAS.filter(c => c.status === 'Defective' || c.status === 'Offline' || c.status === 'No Power').length;
+  const defective = CAMERAS.filter(c => c.status === 'Defective','Offline').length;
   const acOffline = DOORS.filter(d => d.status === 'Offline').length;
   const srvOnline = SERVERS.filter(s => s.status === 'ONLINE').length;
   const swOnline = SWITCHES.filter(s => !isSwitchOffline(s)).length;
 
-  document.getElementById('dash-cam-defective').textContent = problemCameras;
+  document.getElementById('dash-cam-defective').textContent = defective;
   document.getElementById('dash-ac-offline').textContent = acOffline;
   document.getElementById('dash-srv-online').textContent = srvOnline;
   document.getElementById('dash-sw-online').textContent = swOnline + '/' + SWITCHES.length;
   document.getElementById('dash-sw-note').textContent = (SWITCHES.length - swOnline) + ' offline';
-
-  // ... rest of function
-}
 
   renderTimeline();
   renderClientCards();
