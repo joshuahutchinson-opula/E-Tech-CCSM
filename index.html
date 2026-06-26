@@ -1419,7 +1419,14 @@ const CAMERA_IPS = {
   'D1': '172.17.103.87', 'D2': '172.17.103.88', 'HM4 PTZ': '172.17.102.219'
 };
 
-function getCameraIP(name) { return CAMERA_IPS[name] || null; }
+function getCameraIP(cam) {
+  // cam may be a camera object (preferred) or a legacy name string.
+  if (cam && typeof cam === 'object') {
+    if (cam.ip_address) return cam.ip_address;
+    return CAMERA_IPS[cam.name] || null;
+  }
+  return CAMERA_IPS[cam] || null;
+}
 
 // ── SWITCH OFFLINE MAP ─────────────────────────────────
 const SWITCH_OFFLINE_SINCE = {
@@ -1468,6 +1475,19 @@ function toast(m, type = 'info') {
 
 function copyText(t) {
   navigator.clipboard.writeText(t).then(() => toast('Copied', 'success')).catch(() => toast('Copy failed', 'error'));
+}
+
+async function revealAndCopySwitchPassword(switchId) {
+  try {
+    const result = await get(`/switches/${switchId}/reveal-password`);
+    if (result && result.password) {
+      copyText(result.password);
+    } else {
+      toast('No password on file', 'warning');
+    }
+  } catch (e) {
+    // apiCall() already toasts the error
+  }
 }
 
 function acknowledgeAlarm() {
@@ -1867,7 +1887,7 @@ function checkLogin() {
 // ============================================================
 
 function renderDashboard() {
-  const defective = CAMERAS.filter(c => c.status === 'Defective','Offline').length;
+  const defective = CAMERAS.filter(c => c.status === 'Defective' || c.status === 'Offline').length;
   const acOffline = DOORS.filter(d => d.status === 'Offline').length;
   const srvOnline = SERVERS.filter(s => s.status === 'ONLINE').length;
   const swOnline = SWITCHES.filter(s => !isSwitchOffline(s)).length;
@@ -2021,7 +2041,7 @@ function getFilteredCameras() {
     const q = camSearchQuery.toLowerCase();
     filtered = filtered.filter(c =>
       c.name.toLowerCase().includes(q) ||
-      (getCameraIP(c.name) || '').includes(q) ||
+      (getCameraIP(c) || '').includes(q) ||
       c.comments.toLowerCase().includes(q)
     );
   }
@@ -2035,8 +2055,8 @@ function getSortedCameras(filtered) {
   sorted.sort((a, b) => {
     let valA, valB;
     if (col === 'ip') {
-      valA = getCameraIP(a.name) || '';
-      valB = getCameraIP(b.name) || '';
+      valA = getCameraIP(a) || '';
+      valB = getCameraIP(b) || '';
     } else if (col === 'name') {
       valA = a.name;
       valB = b.name;
@@ -2119,7 +2139,7 @@ function renderCamerasOptimized() {
           html += `</tr></thead><tbody>`;
 
           pageCameras.forEach((c, index) => {
-            const ip = getCameraIP(c.name);
+            const ip = getCameraIP(c);
             const globalIndex = CAMERAS.indexOf(c);
             html += `<tr class="clickable" onclick="openCameraDetail(${globalIndex})">`;
             html += `<td style="color:var(--text-primary);">${c.zone}</td>`;
@@ -2270,7 +2290,7 @@ function openCameraDetail(index) {
   const camera = CAMERAS[index];
   if (!camera) return;
 
-  const ip = getCameraIP(camera.name) || 'N/A';
+  const ip = getCameraIP(camera) || 'N/A';
   const client = getClient(camera.zone);
   
   document.getElementById('camera-detail-title').textContent = camera.name;
@@ -2976,7 +2996,7 @@ function renderSwitchesEnhanced() {
               <button class="switch-action-btn success" data-tooltip="Ping switch" onclick="event.stopPropagation();pingSwitchDetailFromTable(${realIndex})"><i class="ti ti-network"></i></button>
               <button class="switch-action-btn accent" data-tooltip="Open admin panel" onclick="event.stopPropagation();window.open('http://${s.ip_address}','_blank')"><i class="ti ti-external-link"></i></button>
               <button class="switch-action-btn" data-tooltip="Copy IP" onclick="event.stopPropagation();copyText('${s.ip_address}')"><i class="ti ti-copy"></i></button>
-              <button class="switch-action-btn" data-tooltip="Copy password" onclick="event.stopPropagation();copyText('${s.password.replace(/\$/g,'\\$').replace(/@/g,'\\@')}')"><i class="ti ti-key"></i></button>
+              <button class="switch-action-btn" data-tooltip="Copy password" onclick="event.stopPropagation();revealAndCopySwitchPassword(${s.id})"><i class="ti ti-key"></i></button>
               <button class="btn btn-xs" data-tooltip="View details" onclick="event.stopPropagation();openSwitchDetail(${realIndex})"><i class="ti ti-eye"></i></button>
             </div>
           </td>`;
