@@ -167,9 +167,63 @@ async function seedData() {
       const cameras = [
         ['HM3 PTZ','NORTH','Defective','172.17.102.218','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
         ['HM4 PTZ','NORTH','Online','172.17.102.219','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['B3 PTZ','SOUTH','Online','10.19.1.110','root','AXIS Q6075-E','1080p',''],
-        ['D4 PTZ','SOUTH','Online','10.19.1.120','root','AXIS Q6075-E','1080p',''],
-        ['A7 PTZ','SOUTH','Online','10.19.1.130','root','AXIS Q6075-E','1080p','']
+        ['HM5 PTZ','NORTH','Online','172.17.102.223','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['HM8 PTZ','NORTH','Online','172.17.102.221','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['HM10 PTZ','NORTH','Online','172.17.102.224','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['HM11 PTZ','NORTH','Offline','172.17.102.225','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['HM23 PTZ','NORTH','Offline','172.17.102.200','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['HM28 PTZ','NORTH','Online','172.17.102.202','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['N25 PTZ','NORTH','Offline','172.17.102.216','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['N30 PTZ','NORTH','Online','172.17.102.210','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['A1 PTZ','NORTH','Online','172.17.103.30','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['A2 PTZ','NORTH','Online','172.17.103.31','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['A4 PTZ','SOUTH','Online','172.17.103.33','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['A5 PTZ','SOUTH','Online','172.17.103.34','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['A6 PTZ','SOUTH','Offline','172.17.103.35','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['A7 PTZ','SOUTH','Offline','172.17.103.36','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['A8 PTZ','SOUTH','Offline','172.17.103.37','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['A10 PTZ','SOUTH','Online','172.17.103.39','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['A11 PTZ','SOUTH','Online','172.17.103.40','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['A12 PTZ','SOUTH','Offline','172.17.103.41','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['B1 PTZ','WEST','Online','172.17.103.60','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['B2 PTZ','WEST','Online','172.17.103.61','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['B5 PTZ','WEST','Offline','172.17.103.63','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['B6 PTZ','WEST','Online','172.17.103.64','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['B8 PTZ','WEST','Online','172.17.103.66','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['B9 PTZ','WEST','Online','172.17.103.67','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['B10 PTZ','WEST','Online','172.17.103.68','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['B11 PTZ','WEST','Offline','172.17.103.69','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['B12 PTZ','WEST','Offline','172.17.103.70','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['C1 PTZ','SOUTH','Offline','172.17.103.81','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['C2 PTZ','SOUTH','Online','172.17.103.82','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['C4 PTZ','SOUTH','Online','172.17.103.83','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['C9 PTZ','SOUTH','Online','172.17.103.143','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['C11 PTZ','SOUTH','Offline','172.17.103.85','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['D4 PTZ','EAST','Online','172.17.103.99','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['D5 PTZ','EAST','Online','172.17.103.100','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['D10 PTZ','EAST','Online','172.17.103.104','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['D12 PTZ','EAST','Online','172.17.103.105','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['Manager Car Park PTZ','NORTH','Offline','172.17.102.186','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['Visitor Car Park Ptz 1','NORTH','Online','172.17.102.184','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['Visitor Car Park Ptz 2','NORTH','Online','172.17.102.185','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['SW Corner Perim PTZ','NORTH','Online','172.17.102.155','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['South Perim PTZ','SOUTH','Offline','172.17.103.86','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['Toll Gate Entry PTZ','NORTH','Online','172.17.102.182','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['Wharfage Perim N Exit Gate PTZ','NORTH','Online','172.17.102.183','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['PPE Store Perim PTZ','NORTH','Online','172.17.102.203','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['W2 PTZ','WEST','Offline','172.17.102.244','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['W6 PTZ','WEST','Online','172.17.102.248','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
+        ['B1','WEST','Online','172.17.103.43','administrator','Avigilon 5.0C-H5A-DP2','2560x1920 (5MP)',''],
+        ['B3','SOUTH','Online','172.17.103.46','administrator','Avigilon 5.0C-H5A-DP2','2560x1920 (5MP)',''],
+        ['W1','WEST','Online','172.17.103.155','admin','Avigilon 5.0C-H5A-DP2','2560x1920 (5MP)',''],
+        ['A3 PTZ','NORTH','Online','172.17.103.32','root','Axis P5655-E','1920x1080 (2MP)',''],
+        ['B3 PTZ','SOUTH','Online','172.17.103.62','root','Axis P3267-LVE','1920x1080 (2MP)',''],
+        ['D1 PTZ','EAST','Online','172.17.103.97','root','Axis P5655-E','1920x1080 (2MP)',''],
+        ['D2 PTZ','EAST','Online','172.17.103.98','root','Axis P5655-E','1920x1080 (2MP)',''],
+        ['WB1 PTZ','WEST','Offline','172.17.102.198','root','Axis P3267-LVE','1920x1080 (2MP)',''],
+        ['Tollgate Entry LPR','NORTH','Online','172.17.102.188','admin','AutoVu SharpOS','1920x1080 (2MP)',''],
+        ['Tollgate Exit LPR','NORTH','Online','172.17.102.189','admin','AutoVu SharpOS','1920x1080 (2MP)',''],
+        ['SE Tower PTZ','SOUTH','Online','172.17.103.165','admin','Opgal OP94-1200-0000','1920x1080 (2MP)','']
       ];
       for (const cam of cameras) {
         await pool.query(`INSERT INTO cameras (name, zone, status, ip_address, username, model, resolution, comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT (name, ip_address) DO NOTHING`, cam);
@@ -197,7 +251,13 @@ async function seedData() {
       console.log('🌱 Seeding servers...');
       const servers = [
         ['Kingport','J1013DDR','6.11TB','1.4TB','Good (23%)','Ocularis DM5, LPR','ONLINE'],
+        ['Kingport','9B0F842','930GB','74GB','Good','Ocularis, LPR','ONLINE'],
         ['Kingport','J1013DDV','6.11TB','1.4TB','Good, Failed drive','Ocularis DM6, Eyelock','ONLINE'],
+        ['Kingport','J1013N50','32TB','—','Good','—','ONLINE'],
+        ['Kingport','J1013DDW','6.11TB','1.4TB','Good (23%)','Ocularis DM4, Access Control','ONLINE'],
+        ['Kingport','J1013N4Z','32TB','—','Good','—','ONLINE'],
+        ['Kingport','J1013DDT','6.11TB','1.37TB','Good (23%)','Node in Failure','ONLINE'],
+        ['Kingport','J1013N4Y','—','32TB','Good','—','ONLINE'],
         ['Kingport','J1013DDX','45TB','178GB','Excellent','—','ONLINE']
       ];
       for (const srv of servers) {
@@ -211,7 +271,20 @@ async function seedData() {
       console.log('🌱 Seeding switches...');
       const switches = [
         ['Main Entrance','Security Office','AXIS T8508','10.19.1.21','6.54.2739','root','$upp@rt@202O','AC:CC:8E:FA:4B:1B'],
-        ['2nd entrance','SAL Duty Office','AXIS T8516','10.19.1.23','6.54.2739','root','$upp@rt@202O','AC:CC:8E:B6:DF:99']
+        ['2nd entrance','SAL Duty Office','AXIS T8516','10.19.1.23','6.54.2739','root','$upp@rt@202O','AC:CC:8E:B6:DF:99'],
+        ['Exit gate','Gate Pass Office','AXIS T8516','10.19.1.22','6.54.2739','root','$upp@rt@202O','AC:CC:8E:B6:DD:5F'],
+        ['LPR Overview','Gate Pass Office','AXIS T8516','10.19.1.32','6.54.2739','root','$upp@rt@202O','AC:CC:8E:B6:DD:26'],
+        ['CarPark 4/Berth 4','Car Park 4 wall','AXIS T8508','10.19.1.38','6.54.2739','root','$upp@rt@202O','AC:CC:8E:FA:4F:A9'],
+        ['Berth 5 Warehouse A','Upstairs','AXIS T8516','10.19.1.26','6.54.2739','root','$upp@rt@202O','AC:CC:8E:D7:8D:13'],
+        ['Berth 5 Warehouse B','Stripping Office','AXIS T8508','10.19.1.37','6.54.2739','root','$upp@rt@202O','AC:CC:8E:FA:4B:10'],
+        ['Berth 5 rear east','rear of warehouse','AXIS T8504-R','10.19.1.119','7.10.1595','root','$upp@rt@202O','AC:CC:8E:FA:E2:DF'],
+        ['Berth 1 perimeter-A','Berth 1 Corner Wall','AXIS T8508','10.19.1.35','6.54.2739','root','$upp@rt@202O','AC:CC:8E:FA:4B:31'],
+        ['Berth 1 perimeter-B','Berth 1 Middle Wall','AXIS T8508','10.19.1.36','6.54.2739','root','$upp@rt@202O','AC:CC:8E:FA:4F:B4'],
+        ['Warehouse 2 A','Upstairs','AXIS T8516','10.19.1.27','6.54.2739','root','$upp@rt@202O','AC:CC:8E:B6:DD:39'],
+        ['Warehouse 2 B','Down stairs','AXIS T8508','10.19.1.30','6.54.2739','root','$upp@rt@202O','AC:CC:8E:FA:49:9A'],
+        ['Warehouse 1','Warehouse1/Spectrum','AXIS T8516','10.19.1.20','6.54.2739','root','$upp@rt@202O','AC:CC:8E:B6:DD:72'],
+        ['Berth 8 B','Berth 8 East/West','AXIS T8504-R','10.19.1.33','7.10.1595','root','$upp@rt@202O','AC:CC:8E:FA:E3:1E'],
+        ['Berth 8 A','Berth 8 Perimeter','TL-SG2210P','10.19.1.39','5.20.20','admin','$upp@rt@2020','BO:19:21::20:FF:F2']
       ];
       for (const sw of switches) {
         await pool.query(`INSERT INTO switches (name, location, model, ip_address, firmware, username, password, mac) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT (name) DO NOTHING`, sw);
@@ -223,10 +296,10 @@ async function seedData() {
     if (parseInt(ticketsCheck.rows[0].count) === 0) {
       console.log('🌱 Seeding tickets...');
       const tickets = [
-        ['SR-1847','KFTL','NORTH Zone','Replace defective cameras','facilities@kftl.com','Camera','High','Open','Shanice Vernon','Jun 13, 2026','Camera replacements needed.','','[]','[{"time":"14:22","msg":"Created"}]','[]'],
-        ['SR-1848','KWL','Tinson Pen','Firmware check needed','security@kwl.com','Network','Medium','Open','Shanice Vernon','Jun 15, 2026','Firmware check needed.','','[]','[{"time":"11:05","msg":"Created"}]','[]'],
-        ['SR-1849','KFTL','Second Entrance','Turnstiles offline','it@kftl.com','Access Control','High','In Progress','Marvin Grant','Jun 10, 2026','All turnstiles offline.','','[]','[{"time":"16:48","msg":"Created"}]','[]'],
-        ['SR-1850','KFTL','Kingport','Server failed drive','marvin.grant@etechsystems.com','Server','Medium','Open','Shavine','Jun 8, 2026','Failed drive on J1013DDV.','','[]','[{"time":"09:12","msg":"Created"}]','[]']
+        ['SR-1847','KFTL','NORTH Zone','Replace defective cameras - NORTH zone','facilities@kftl.com','Camera','High','Open','Shanice Vernon','Jun 13, 2026','We need camera replacements in NORTH zone.','','[]','[{"time":"14:22","msg":"Created — assigned to Shanice (day shift)"}]','[]'],
+        ['SR-1848','KWL','Tinson Pen','Tinson Pen switches need firmware check','security@kwl.com','Network','Medium','Open','Shanice Vernon','Jun 15, 2026','Tinson Pen switches need firmware check.','','[]','[{"time":"11:05","msg":"Created — assigned to Shanice (day shift)"}]','[]'],
+        ['SR-1849','KFTL','Second Entrance','All 4 turnstiles offline','it@kftl.com','Access Control','High','In Progress','Marvin Grant','Jun 10, 2026','All turnstiles offline.','','[]','[{"time":"16:48","msg":"Created — assigned to Shavine (night shift)"},{"time":"17:00","msg":"Escalated to Marvin Grant for on-site repair"}]','[]'],
+        ['SR-1850','KFTL','Kingport','Server J1013DDV failed drive','marvin.grant@etechsystems.com','Server','Medium','Open','Shavine','Jun 8, 2026','Server J1013DDV has failed drive.','','[]','[{"time":"09:12","msg":"Created — assigned to Shavine (night shift)"}]','[]']
       ];
       for (const ticket of tickets) {
         await pool.query(`INSERT INTO tickets (id, client, site, subject, from_email, category, priority, status, assigned, received, body, notes, hardware, history, attachments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13::jsonb,$14::jsonb,$15::jsonb)`, ticket);
@@ -239,7 +312,7 @@ async function seedData() {
       console.log('🌱 Seeding audit logs...');
       const auditEntries = [
         ['14:32','Shanice Vernon','updated','SR-1847 → In Progress'],
-        ['13:50','Marvin Grant','updated','HM3 PTZ comment → Defective'],
+        ['13:50','Marvin Grant','updated','HM3 PTZ comment → "Defective"'],
         ['12:00','System','converted','David Chen → SR-1848'],
         ['11:30','System','sync','Camera_Maintenance_2025.csv ✅'],
         ['10:45','System','sync','Access_Control_Survey.csv ⚠️']
@@ -254,10 +327,14 @@ async function seedData() {
     if (parseInt(emailsCheck.rows[0].count) === 0) {
       console.log('🌱 Seeding emails...');
       const emails = [
-        ['e1','David Chen','facilities@kftl.com','support@etechsystems.com','Replace defective cameras - NORTH zone','We need camera replacements in NORTH zone.','Jun 15, 2026 14:22','[]',true,'SR-1847',true,'KFTL'],
-        ['e2','Andrea Williams','security@kwl.com','support@etechsystems.com','URGENT: 5 Cameras Offline','5 cameras down at Tinson Pen.','Jun 15, 2026 11:05','[]',true,'SR-1848',true,'KWL'],
-        ['e3','IT Department','it@kftl.com','support@etechsystems.com','ASAP: Access Doors Offline','All turnstiles offline.','Jun 14, 2026 16:48','[]',true,'SR-1849',true,'KFTL'],
-        ['e4','Marvin Grant','marvin.grant@etechsystems.com','support@etechsystems.com','Server drive failure follow-up','Swapped bad drive on J1013DDV.','Jun 8, 2026 09:30','[]',true,'SR-1850',false,'KFTL']
+        ['e1','David Chen','facilities@kftl.com','support@etechsystems.com','Replace defective cameras - NORTH zone','Hi team,\n\nWe did a walk-through of the NORTH zone yesterday and counted at least 8 cameras showing as defective on the wall display, including HM3, HM11, HM23, and N25. A few of these have been down for over a week now and we are getting questions from the warehouse supervisors about blind spots near the loading bays.\n\nCan someone confirm a timeline for replacement or repair? Happy to provide access to the affected areas whenever a technician is available.\n\nThanks,\nDavid','Jun 15, 2026 14:22','[]',true,'SR-1847',true,'KFTL'],
+        ['e2','Andrea Williams','security@kwl.com','support@etechsystems.com','URGENT: 5 Cameras Offline - Tinson Pen','This is urgent — we have 5 cameras down simultaneously at Tinson Pen as of this morning, all on the same switch it looks like. Given the recent perimeter alarm activity in that area, we need eyes back up there as soon as possible.\n\nPlease advise on ETA and let me know if you need anyone on-site to assist.\n\nAndrea Williams\nSecurity Manager, KWL','Jun 15, 2026 11:05','[]',true,'SR-1848',true,'KWL'],
+        ['e3','IT Department','it@kftl.com','support@etechsystems.com','ASAP: Access Doors - Second Entrance Offline','All four turnstiles at the Second Entrance (staff entry/exit 1 and 2) are showing offline on our side and staff are being let in manually by the guard on duty, which is not sustainable for a full shift.\n\nCan you escalate this for an on-site technician visit today? Let us know what time works.\n\nIT Department','Jun 14, 2026 16:48','[]',true,'SR-1849',true,'KFTL'],
+        ['e4','Marvin Grant','marvin.grant@etechsystems.com','support@etechsystems.com','Server J1013DDV - drive failure follow-up','Following up on the failed drive alert for J1013DDV at Kingport. I swapped the bad drive on-site this morning and the array is rebuilding now — should be back to full redundancy within a few hours. Will update once it is confirmed healthy.\n\nNo action needed from support right now, just wanted it on record.\n\nMarvin','Jun 8, 2026 09:30','[]',true,'SR-1850',false,'KFTL'],
+        ['e5','Patricia Lowe','plowe@kwl.com','support@etechsystems.com','Question about camera coverage report','Good afternoon,\n\nOur ops manager asked for a coverage summary of all cameras at the Tinson Pen and Warehouse 2 sites for an upcoming insurance review. Is this something your team can pull together, and if so what is the usual turnaround?\n\nNo rush on this one — end of month would be perfectly fine.\n\nBest,\nPatricia Lowe','Jun 12, 2026 10:15','[]',false,null,false,'KWL'],
+        ['e6','Gate Pass Office','gatepass@kftl.com','support@etechsystems.com','Switch firmware update window - LPR Overview','We noticed the LPR Overview switch at Gate Pass Office is showing firmware 6.54.2739 still, while I believe a newer version was rolled out to most other switches last month. Is this one scheduled for update, or did it get missed?\n\nLet us know if there is anything needed from our side to schedule a maintenance window.','Jun 17, 2026 08:50','[]',false,null,false,'KFTL'],
+        ['e7','Shanice Vernon','shanice.vernon@etechsystems.com','support@etechsystems.com','Heads up - recurring issue on HM3 PTZ','Just flagging that HM3 PTZ has now gone defective for the third time this quarter. Each time it has been a different symptom (no signal, then power, now showing defective again with no obvious cause). Might be worth a full unit swap instead of another spot repair next time someone is on-site.\n\nLogged as part of SR-1847 for now.','Jun 16, 2026 13:05','[]',false,null,false,'KFTL'],
+        ['e8','Wharfage Office','wharfage@kftl.com','support@etechsystems.com','Cashier window cameras - picture quality','The cameras covering Cashier Windows 1-3 at the Wharfage Office have looked noticeably grainy/low quality on the live feed for the past few days, even though they are reporting Online. Could be a settings or firmware thing rather than a hardware fault. Can someone take a look when they get a chance? Not urgent.','Jun 19, 2026 15:40','[]',false,null,false,'KFTL']
       ];
       for (const email of emails) {
         await pool.query(`INSERT INTO emails (id, from_name, from_email, to_email, subject, body, date, attachments, is_sr, sr_linked, urgent, client) VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb,$9,$10,$11,$12) ON CONFLICT (id) DO NOTHING`, email);
@@ -295,25 +372,31 @@ app.post('/api/auth/login', async (req, res) => {
 // ── MICROSOFT OAUTH TOKEN EXCHANGE ──────────────────────
 app.post('/api/auth/microsoft', async (req, res) => {
   try {
-    const { code } = req.body;
+    const { code, code_verifier } = req.body;
     if (!code) return res.status(400).json({ error: 'Authorization code required' });
 
     const clientId = process.env.MS_CLIENT_ID || 'e87a6592-aaa5-4a13-9c85-8dbc8e9cd7b2';
     const redirectUri = process.env.MS_REDIRECT_URI || 'https://e-tech-ccsm-production-19f0.up.railway.app';
     const tenantId = process.env.MS_TENANT_ID || '799ae988-9d3d-40d3-bf5c-93197f5d8d44';
 
+    const params = new URLSearchParams({
+      client_id: clientId,
+      scope: 'https://graph.microsoft.com/Sites.Read.All Files.Read.All User.Read',
+      code: code,
+      redirect_uri: redirectUri,
+      grant_type: 'authorization_code'
+    });
+
+    if (code_verifier) {
+      params.append('code_verifier', code_verifier);
+    }
+
     const tokenResponse = await fetch(
       `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          client_id: clientId,
-          scope: 'https://graph.microsoft.com/Sites.Read.All Files.Read.All User.Read',
-          code: code,
-          redirect_uri: redirectUri,
-          grant_type: 'authorization_code'
-        }).toString()
+        body: params.toString()
       }
     );
 
@@ -482,9 +565,10 @@ app.get('/api/doors', authenticate, async (req, res) => {
 app.put('/api/doors/:name', authenticate, async (req, res) => {
   try {
     const { name } = req.params;
-    const { status, tech } = req.body;
+    const { status, tech, comments } = req.body;
     if (status !== undefined) await pool.query('UPDATE doors SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [status, name]);
     if (tech !== undefined) await pool.query('UPDATE doors SET tech = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [tech, name]);
+    if (comments !== undefined) await pool.query('UPDATE doors SET comments = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [comments, name]);
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -496,6 +580,17 @@ app.get('/api/servers', authenticate, async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM servers ORDER BY location, serial');
     res.json({ data: result.rows });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/servers/:serial', authenticate, async (req, res) => {
+  try {
+    const { serial } = req.params;
+    const { comments } = req.body;
+    if (comments !== undefined) await pool.query('UPDATE servers SET comments = $1, updated_at = CURRENT_TIMESTAMP WHERE serial = $2', [comments, serial]);
+    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -521,6 +616,17 @@ app.get('/api/switches/:id/reveal-password', authenticate, async (req, res) => {
     const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     await pool.query('INSERT INTO audit_logs (time, username, action, target) VALUES ($1, $2, $3, $4)', [timeStr, req.user.username, 'revealed credential', 'Switch ' + result.rows[0].name + ' password']);
     res.json({ password: result.rows[0].password });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/switches/:name', authenticate, async (req, res) => {
+  try {
+    const { name } = req.params;
+    const { comments } = req.body;
+    if (comments !== undefined) await pool.query('UPDATE switches SET comments = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [comments, name]);
+    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
