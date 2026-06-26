@@ -1319,6 +1319,13 @@
   <div class="modal-footer"><button class="btn" onclick="closeCameraDetailModal()">Close</button></div>
 </div></div>
 
+<div class="modal-overlay" id="client-detail-modal"><div class="modal wide"><button class="modal-close" onclick="closeClientDetailModal()"><i class="ti ti-x"></i></button><div class="modal-title" id="client-detail-title"></div><div class="modal-sub" id="client-detail-sub"></div>
+  <div class="modal-section"><div class="modal-section-title">Sites — Device Health</div>
+    <table class="tbl" id="client-detail-sites-table"><thead><tr><th>Site</th><th>Online</th><th>Offline</th><th>Health</th></tr></thead><tbody id="client-detail-sites-tbody"></tbody></table>
+  </div>
+  <div class="modal-footer"><button class="btn" onclick="closeClientDetailModal()">Close</button></div>
+</div></div>
+
 <!-- Confirm Overlay -->
 <div class="confirm-overlay" id="confirm-overlay">
   <div class="confirm-dialog">
@@ -1373,6 +1380,7 @@ let SERVICE_REQUESTS = [];
 let AUDIT_LOG = [];
 let EMAILS = [];
 let PINNED_FILES = JSON.parse(localStorage.getItem('ccsm_pinned') || '[]');
+let CLIENT_HEALTH_DATA = {}; // populated by renderClientCards(), used by openClientModal()
 
 // ── SITE CLIENT MAP ────────────────────────────────────
 const SITE_CLIENT_MAP = {
@@ -1680,6 +1688,7 @@ document.addEventListener('keydown', e => {
     closeServerDetailModal();
     closeSwitchDetailModal();
     closeCameraDetailModal();
+    closeClientDetailModal();
   }
   const tabs = ['dashboard', 'inbox', 'service', 'cameras', 'doors', 'servers', 'switches', 'topology', 'files'];
   const num = parseInt(e.key);
@@ -1954,7 +1963,6 @@ function renderTimeline() {
 
 function renderClientCards() {
   const clients = { KFTL: { on: 0, off: 0, sites: {} }, KWL: { on: 0, off: 0, sites: {} } };
-
   CAMERAS.forEach(c => {
     const cl = getClient(c.zone);
     if (!clients[cl]) return;
@@ -1988,6 +1996,10 @@ function renderClientCards() {
     if (isSwitchOffline(s)) { clients[cl].off++; clients[cl].sites[site].off++; }
     else { clients[cl].on++; clients[cl].sites[site].on++; }
   });
+
+  // Keep this around so openClientModal() can show real per-site data
+  // instead of being a placeholder.
+  CLIENT_HEALTH_DATA = clients;
 
   document.getElementById('dash-client-grid').innerHTML = Object.entries(clients).map(([name, d]) => {
     const total = d.on + d.off;
@@ -2042,7 +2054,44 @@ async function renderTrends() {
 }
 
 function openClientModal(client) {
-  toast(`Opening ${client} details...`, 'info');
+  const data = CLIENT_HEALTH_DATA[client];
+  if (!data) {
+    toast(`No device data available for ${client}`, 'warning');
+    return;
+  }
+
+  const total = data.on + data.off;
+  const overallScore = total > 0 ? Math.round((data.on / total) * 100) : 100;
+
+  document.getElementById('client-detail-title').textContent = client;
+  document.getElementById('client-detail-sub').textContent =
+    `${data.on} online · ${data.off} offline across ${Object.keys(data.sites).length} site(s) · ${overallScore}% overall health`;
+
+  const siteNames = Object.keys(data.sites).sort();
+  const tbody = document.getElementById('client-detail-sites-tbody');
+
+  if (siteNames.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:16px;">No sites found for this client.</td></tr>`;
+  } else {
+    tbody.innerHTML = siteNames.map(site => {
+      const s = data.sites[site];
+      const siteTotal = s.on + s.off;
+      const score = siteTotal > 0 ? Math.round((s.on / siteTotal) * 100) : 100;
+      const color = score >= 90 ? '#4ade80' : score >= 70 ? '#fbbf24' : '#f87171';
+      return `<tr>
+        <td style="color:var(--text-primary);">${site}</td>
+        <td style="color:#4ade80;">${s.on}</td>
+        <td style="color:${s.off > 0 ? '#f87171' : 'var(--text-muted)'};">${s.off}</td>
+        <td style="color:${color};font-weight:600;">${score}%</td>
+      </tr>`;
+    }).join('');
+  }
+
+  document.getElementById('client-detail-modal').classList.add('open');
+}
+
+function closeClientDetailModal() {
+  document.getElementById('client-detail-modal').classList.remove('open');
 }
 
 // ============================================================
