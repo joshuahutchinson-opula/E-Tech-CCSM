@@ -18,7 +18,15 @@ let seedCompleted = false;
 const app = express();
 app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'ccsm-super-secret-key-2026';
+
+// SECURITY: no hardcoded fallback. A missing JWT_SECRET must stop the app
+// from booting rather than silently using a value visible in source control.
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error('❌ FATAL: JWT_SECRET environment variable is not set. Refusing to start.');
+  console.error('   Set JWT_SECRET in Railway → Variables before deploying.');
+  process.exit(1);
+}
 
 // ── DATABASE CONNECTION ──────────────────────────────────
 // On Railway, the Postgres plugin provides a single DATABASE_URL var.
@@ -88,6 +96,23 @@ const authenticate = async (req, res, next) => {
     return res.status(401).json({ error: 'Invalid token' });
   }
 };
+
+// ── ROLE-BASED ACCESS CONTROL (scaffolding for Phase 1) ──
+// Not yet wired into any route — applying it today would lock out the
+// only existing user if role logic had a bug. Wrap specific routes with
+// requireRole('Administrator') etc. once Entra-mapped roles exist beyond
+// the single seeded 'admin' account.
+function requireRole(...allowedRoles) {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) {
+      return res.status(403).json({ error: 'No role on token' });
+    }
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({ error: 'Insufficient permissions' });
+    }
+    next();
+  };
+}
 
 // ── DATABASE INIT ─────────────────────────────────────────
 async function initDatabase() {
@@ -844,7 +869,18 @@ app.put('/api/cameras/:name', authenticate, async (req, res) => {
 // ── DOORS ─────────────────────────────────────────────────
 app.get('/api/doors', authenticate, async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM doors ORDER BY site, name');
+    // ALIASED: frontend reads d.lock / d.ip / d.date (legacy field names).
+    // Backend columns are lock_type / ip_address / last_service.
+    // Aliasing here keeps both sides correct without touching every
+    // frontend call site (lower risk than renaming there).
+    const result = await pool.query(`
+      SELECT *,
+        lock_type AS lock,
+        ip_address AS ip,
+        last_service AS date
+      FROM doors
+      ORDER BY site, name
+    `);
     res.json({ data: result.rows });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -888,7 +924,32 @@ app.get('/api/servers', authenticate, async (req, res) => {
 app.get('/api/switches', authenticate, async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM switches ORDER BY location, name');
-    res.json({ data: result.rows });
+    // SECURITY: never send raw credentials in the list response — this
+    // payload lands directly in the page DOM/source. Mask here; the
+    // frontend calls /api/switches/:id/reveal-password on demand.
+    const masked = result.rows.map(row => ({ ...row, password: row.password ? '••••••••' : null }));
+    res.json({ data: masked });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Reveal a single switch's real password on demand, only to an
+// authenticated user, and only ever logged — never bulk-exposed.
+app.get('/api/switches/:id/reveal-password', authenticate, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query('SELECT id, name, password FROM switches WHERE id = $1', [id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Switch not found' });
+    }
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    await pool.query(
+      'INSERT INTO audit_logs (time, username, action, target) VALUES ($1, $2, $3, $4)',
+      [timeStr, req.user.username, 'revealed credential', `Switch ${result.rows[0].name} password`]
+    );
+    res.json({ password: result.rows[0].password });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
