@@ -233,6 +233,18 @@ async function initDatabase() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
+      CREATE TABLE IF NOT EXISTS dashboard_snapshots (
+        id SERIAL PRIMARY KEY,
+        snapshot_date DATE NOT NULL UNIQUE,
+        cameras_defective INT,
+        doors_offline INT,
+        servers_online INT,
+        servers_total INT,
+        switches_online INT,
+        switches_total INT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
       CREATE INDEX IF NOT EXISTS idx_cameras_zone ON cameras(zone);
       CREATE INDEX IF NOT EXISTS idx_cameras_status ON cameras(status);
       CREATE INDEX IF NOT EXISTS idx_doors_site ON doors(site);
@@ -241,6 +253,7 @@ async function initDatabase() {
       CREATE INDEX IF NOT EXISTS idx_tickets_client ON tickets(client);
       CREATE INDEX IF NOT EXISTS idx_audit_username ON audit_logs(username);
       CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_logs(created_at);
+      CREATE INDEX IF NOT EXISTS idx_snapshots_date ON dashboard_snapshots(snapshot_date);
     `);
 
     // Check if admin exists
@@ -770,15 +783,45 @@ if (parseInt(camerasCheck.rows[0].count) === 0) {
       console.log('🌱 Seeding emails...');
 
       const emails = [
-        ['e1', 'David Chen', 'facilities@kftl.com', 'support@etechsystems.com', 'Replace defective cameras - NORTH zone', 'We need camera replacements.', 'Jun 15, 2026 14:22', '[]', true, 'SR-1847', true, 'KFTL'],
-        ['e2', 'Andrea Williams', 'security@kwl.com', 'support@etechsystems.com', 'URGENT: 5 Cameras Offline - Tinson Pen', '5 cameras down at Tinson Pen.', 'Jun 15, 2026 11:05', '[]', true, 'SR-1848', true, 'KWL'],
-        ['e3', 'IT Department', 'it@kftl.com', 'support@etechsystems.com', 'ASAP: Access Doors - Second Entrance Offline', 'Turnstiles offline.', 'Jun 14, 2026 16:48', '[]', true, 'SR-1849', true, 'KFTL']
+        ['e1', 'David Chen', 'facilities@kftl.com', 'support@etechsystems.com',
+          'Replace defective cameras - NORTH zone',
+          "Hi team,\n\nWe did a walk-through of the NORTH zone yesterday and counted at least 8 cameras showing as defective on the wall display, including HM3, HM11, HM23, and N25. A few of these have been down for over a week now and we're getting questions from the warehouse supervisors about blind spots near the loading bays.\n\nCan someone confirm a timeline for replacement or repair? Happy to provide access to the affected areas whenever a technician is available.\n\nThanks,\nDavid",
+          'Jun 15, 2026 14:22', '[]', true, 'SR-1847', true, 'KFTL'],
+        ['e2', 'Andrea Williams', 'security@kwl.com', 'support@etechsystems.com',
+          'URGENT: 5 Cameras Offline - Tinson Pen',
+          "This is urgent — we have 5 cameras down simultaneously at Tinson Pen as of this morning, all on the same switch it looks like. Given the recent perimeter alarm activity in that area, we need eyes back up there as soon as possible.\n\nPlease advise on ETA and let me know if you need anyone on-site to assist.\n\nAndrea Williams\nSecurity Manager, KWL",
+          'Jun 15, 2026 11:05', '[]', true, 'SR-1848', true, 'KWL'],
+        ['e3', 'IT Department', 'it@kftl.com', 'support@etechsystems.com',
+          'ASAP: Access Doors - Second Entrance Offline',
+          "All four turnstiles at the Second Entrance (staff entry/exit 1 and 2) are showing offline on our side and staff are being let in manually by the guard on duty, which isn't sustainable for a full shift.\n\nCan you escalate this for an on-site technician visit today? Let us know what time works.\n\nIT Department",
+          'Jun 14, 2026 16:48', '[]', true, 'SR-1849', true, 'KFTL'],
+        ['e4', 'Marvin Grant', 'marvin.grant@etechsystems.com', 'support@etechsystems.com',
+          'Server J1013DDV - drive failure follow-up',
+          "Following up on the failed drive alert for J1013DDV at Kingport. I swapped the bad drive on-site this morning and the array is rebuilding now — should be back to full redundancy within a few hours. Will update once it's confirmed healthy.\n\nNo action needed from support right now, just wanted it on record.\n\nMarvin",
+          'Jun 8, 2026 09:30', '[]', true, 'SR-1850', false, 'KFTL'],
+        ['e5', 'Patricia Lowe', 'plowe@kwl.com', 'support@etechsystems.com',
+          'Question about camera coverage report',
+          "Good afternoon,\n\nOur ops manager asked for a coverage summary of all cameras at the Tinson Pen and Warehouse 2 sites for an upcoming insurance review. Is this something your team can pull together, and if so what's the usual turnaround?\n\nNo rush on this one — end of month would be perfectly fine.\n\nBest,\nPatricia Lowe",
+          'Jun 12, 2026 10:15', '[]', false, null, false, 'KWL'],
+        ['e6', 'Gate Pass Office', 'gatepass@kftl.com', 'support@etechsystems.com',
+          'Switch firmware update window - LPR Overview',
+          "We noticed the LPR Overview switch at Gate Pass Office is showing firmware 6.54.2739 still, while I believe a newer version was rolled out to most other switches last month. Is this one scheduled for update, or did it get missed?\n\nLet us know if there's anything needed from our side to schedule a maintenance window.",
+          'Jun 17, 2026 08:50', '[]', false, null, false, 'KFTL'],
+        ['e7', 'Shanice Vernon', 'shanice.vernon@etechsystems.com', 'support@etechsystems.com',
+          'Heads up - recurring issue on HM3 PTZ',
+          "Just flagging that HM3 PTZ has now gone defective for the third time this quarter. Each time it's been a different symptom (no signal, then power, now showing 'defective' again with no obvious cause). Might be worth a full unit swap instead of another spot repair next time someone's on-site.\n\nLogged as part of SR-1847 for now.",
+          'Jun 16, 2026 13:05', '[]', false, null, false, 'KFTL'],
+        ['e8', 'Wharfage Office', 'wharfage@kftl.com', 'support@etechsystems.com',
+          'Cashier window cameras - picture quality',
+          "The cameras covering Cashier Windows 1-3 at the Wharfage Office have looked noticeably grainy/low quality on the live feed for the past few days, even though they're reporting Online. Could be a settings or firmware thing rather than a hardware fault. Can someone take a look when they get a chance? Not urgent.",
+          'Jun 19, 2026 15:40', '[]', false, null, false, 'KFTL']
       ];
 
       for (const email of emails) {
         await pool.query(
           `INSERT INTO emails (id, from_name, from_email, to_email, subject, body, date, attachments, is_sr, sr_linked, urgent, client)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, $10, $11, $12)`,
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, $10, $11, $12)
+           ON CONFLICT (id) DO NOTHING`,
           email
         );
       }
@@ -1076,6 +1119,62 @@ app.post('/api/seed', authenticate, async (req, res) => {
   try {
     await seedData();
     res.json({ success: true, message: 'Database seeded' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ── DASHBOARD TRENDS ─────────────────────────────────────
+// Computes today's live counts, stores a daily snapshot, and returns
+// real percent-change vs. the snapshot from ~7 days ago. If no snapshot
+// exists yet for that comparison point, returns trend: null rather than
+// fabricating a number — the frontend should hide the badge in that case.
+app.get('/api/dashboard/trends', authenticate, async (req, res) => {
+  try {
+    const [camRes, doorRes, srvRes, swRes] = await Promise.all([
+      pool.query("SELECT COUNT(*) FROM cameras WHERE status IN ('Defective','Offline')"),
+      pool.query("SELECT COUNT(*) FROM doors WHERE status = 'Offline'"),
+      pool.query("SELECT COUNT(*) FILTER (WHERE status = 'ONLINE') AS online, COUNT(*) AS total FROM servers"),
+      pool.query("SELECT COUNT(*) AS total FROM switches")
+    ]);
+
+    const camerasDefective = parseInt(camRes.rows[0].count);
+    const doorsOffline = parseInt(doorRes.rows[0].count);
+    const serversOnline = parseInt(srvRes.rows[0].online);
+    const serversTotal = parseInt(srvRes.rows[0].total);
+    const switchesTotal = parseInt(swRes.rows[0].total);
+    // Switch online/offline state is currently simulated client-side
+    // (no real SNMP polling yet — see Phase 6), so we snapshot total only.
+
+    await pool.query(`
+      INSERT INTO dashboard_snapshots (snapshot_date, cameras_defective, doors_offline, servers_online, servers_total, switches_total)
+      VALUES (CURRENT_DATE, $1, $2, $3, $4, $5)
+      ON CONFLICT (snapshot_date) DO UPDATE SET
+        cameras_defective = $1, doors_offline = $2, servers_online = $3, servers_total = $4, switches_total = $5
+    `, [camerasDefective, doorsOffline, serversOnline, serversTotal, switchesTotal]);
+
+    const baseline = await pool.query(`
+      SELECT * FROM dashboard_snapshots
+      WHERE snapshot_date <= CURRENT_DATE - INTERVAL '7 days'
+      ORDER BY snapshot_date DESC LIMIT 1
+    `);
+
+    function pctChange(current, past) {
+      if (past === null || past === undefined || past === 0) return null;
+      return Math.round(((current - past) / past) * 100);
+    }
+
+    const base = baseline.rows[0] || null;
+    res.json({
+      data: {
+        camerasDefective: { value: camerasDefective, trendPct: base ? pctChange(camerasDefective, base.cameras_defective) : null },
+        doorsOffline: { value: doorsOffline, trendPct: base ? pctChange(doorsOffline, base.doors_offline) : null },
+        serversOnline: { value: serversOnline, total: serversTotal, trendPct: base ? pctChange(serversOnline, base.servers_online) : null },
+        switchesTotal: { value: switchesTotal, trendPct: base ? pctChange(switchesTotal, base.switches_total) : null },
+        comparisonAvailable: !!base,
+        comparisonPeriodDays: 7
+      }
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
