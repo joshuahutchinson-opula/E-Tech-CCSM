@@ -991,11 +991,12 @@
       <div class="tab active" id="tab-dashboard">
         <div class="emergency-banner active" id="emergency-banner"><i class="ti ti-alert-triangle em-icon"></i><div class="em-text"><div class="em-title">🚨 ALARM — Tinson Pen Perimeter Breach</div><div class="em-detail">Cam 282-TP Pole 21 — Motion detection · 172.16.19.91</div></div><span class="em-time">Today, 14:32</span><button class="btn btn-danger btn-sm" onclick="acknowledgeAlarm()"><i class="ti ti-check"></i> Ack</button></div>
         <div class="stats-grid">
-          <div class="stat-card"><div class="stat-label">Cameras Defective <span class="trend-badge"><i class="ti ti-trending-up"></i> +12%</span></div><div class="stat-val" style="color:var(--danger)" id="dash-cam-defective">18</div><div class="stat-note note-danger">Across all zones</div></div>
-          <div class="stat-card"><div class="stat-label">Access Control Offline <span class="trend-badge down"><i class="ti ti-trending-down"></i> -5%</span></div><div class="stat-val" style="color:var(--danger)" id="dash-ac-offline">4</div><div class="stat-note note-danger">Across all sites</div></div>
-          <div class="stat-card"><div class="stat-label">Servers Online <span class="trend-badge"><i class="ti ti-trending-up"></i> +2%</span></div><div class="stat-val" style="color:var(--success)" id="dash-srv-online">9</div><div class="stat-note note-success">Across all locations</div></div>
-          <div class="stat-card"><div class="stat-label">Switch Status <span class="trend-badge down"><i class="ti ti-trending-down"></i> -3%</span></div><div class="stat-val" style="color:var(--info)" id="dash-sw-online">49/52</div><div class="stat-note note-info" id="dash-sw-note">3 offline</div></div>
+          <div class="stat-card"><div class="stat-label">Cameras Defective <span class="trend-badge" id="trend-cam" style="display:none;" data-tooltip="vs. previous 7 days"></span></div><div class="stat-val" style="color:var(--danger)" id="dash-cam-defective">18</div><div class="stat-note note-danger">Across all zones · vs. last 7 days</div></div>
+          <div class="stat-card"><div class="stat-label">Access Control Offline <span class="trend-badge" id="trend-door" style="display:none;" data-tooltip="vs. previous 7 days"></span></div><div class="stat-val" style="color:var(--danger)" id="dash-ac-offline">4</div><div class="stat-note note-danger">Across all sites · vs. last 7 days</div></div>
+          <div class="stat-card"><div class="stat-label">Servers Online <span class="trend-badge" id="trend-srv" style="display:none;" data-tooltip="vs. previous 7 days"></span></div><div class="stat-val" style="color:var(--success)" id="dash-srv-online">9/9</div><div class="stat-note note-success">Across all locations · vs. last 7 days</div></div>
+          <div class="stat-card"><div class="stat-label">Switch Status <span class="trend-badge" id="trend-sw" style="display:none;" data-tooltip="vs. previous 7 days"></span></div><div class="stat-val" style="color:var(--info)" id="dash-sw-online">49/52</div><div class="stat-note note-info" id="dash-sw-note">3 offline · vs. last 7 days</div></div>
         </div>
+        <div id="trend-baseline-note" style="display:none;font-size:11px;color:var(--text-muted);margin:-10px 0 16px;">Trend comparisons will appear once 7 days of history have been recorded.</div>
         <div class="panel"><div class="panel-header"><span class="panel-title">Today's Activity</span></div><div class="timeline" id="dash-timeline"></div></div>
         <div class="panel"><div class="panel-header"><span class="panel-title">Clients — Device Health</span></div><div class="client-grid-simple" id="dash-client-grid"></div></div>
         <div class="panel"><div class="panel-header"><span class="panel-title">Urgent Service Requests</span><button class="link-btn" onclick="switchTab('service')">View all →</button></div><table class="tbl" id="dash-sr-table"><thead><tr><th>ID</th><th>Client</th><th>Site</th><th>Subject</th><th>SLA</th><th>Priority</th><th>Status</th></tr></thead><tbody id="dash-sr-tbody"></tbody></table></div>
@@ -1304,6 +1305,9 @@
     <div class="modal-grid" id="camera-detail-grid">
       <!-- Populated by JavaScript -->
     </div>
+  </div>
+  <div class="modal-section" id="cam-detail-comments-section">
+    <!-- Populated by JavaScript: editable comments textarea -->
   </div>
   <div class="modal-section"><div class="modal-section-title">Quick Actions</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -1754,6 +1758,7 @@ async function loadData() {
     document.getElementById('door-badge').textContent = DOORS.length;
     document.getElementById('sw-badge').textContent = SWITCHES.length;
     document.getElementById('sr-badge').textContent = SERVICE_REQUESTS.filter(r => r.status !== 'Resolved').length;
+    document.getElementById('inbox-badge').textContent = EMAILS.filter(e => e.urgent || e.is_sr).length;
 
     renderDashboard();
     renderSR();
@@ -1796,8 +1801,17 @@ function loadMockData() {
     ];
   }
   EMAILS = [
-    {id:"e1",from_name:"David Chen",from_email:"facilities@kftl.com",to_email:"support@etechsystems.com",subject:"Replace defective cameras",body:"We need camera replacements.",date:"Jun 15, 2026 14:22",attachments:[],is_sr:true,sr_linked:"SR-1847",urgent:true,client:"KFTL"}
+    {id:"e1",from_name:"David Chen",from_email:"facilities@kftl.com",to_email:"support@etechsystems.com",subject:"Replace defective cameras - NORTH zone",body:"We did a walk-through of the NORTH zone and counted at least 8 cameras showing as defective, including HM3, HM11, HM23, and N25. Can someone confirm a timeline for repair?",date:"Jun 15, 2026 14:22",attachments:[],is_sr:true,sr_linked:"SR-1847",urgent:true,client:"KFTL"},
+    {id:"e2",from_name:"Andrea Williams",from_email:"security@kwl.com",to_email:"support@etechsystems.com",subject:"URGENT: 5 Cameras Offline - Tinson Pen",body:"This is urgent — we have 5 cameras down simultaneously at Tinson Pen as of this morning. Given recent perimeter alarm activity, we need eyes back up there ASAP.",date:"Jun 15, 2026 11:05",attachments:[],is_sr:true,sr_linked:"SR-1848",urgent:true,client:"KWL"},
+    {id:"e3",from_name:"IT Department",from_email:"it@kftl.com",to_email:"support@etechsystems.com",subject:"ASAP: Access Doors - Second Entrance Offline",body:"All four turnstiles at the Second Entrance are showing offline and staff are being let in manually, which isn't sustainable for a full shift. Can you escalate for an on-site visit today?",date:"Jun 14, 2026 16:48",attachments:[],is_sr:true,sr_linked:"SR-1849",urgent:true,client:"KFTL"},
+    {id:"e4",from_name:"Marvin Grant",from_email:"marvin.grant@etechsystems.com",to_email:"support@etechsystems.com",subject:"Server J1013DDV - drive failure follow-up",body:"Swapped the bad drive on J1013DDV this morning, array is rebuilding now. Should be back to full redundancy within a few hours. No action needed, just for the record.",date:"Jun 8, 2026 09:30",attachments:[],is_sr:true,sr_linked:"SR-1850",urgent:false,client:"KFTL"},
+    {id:"e5",from_name:"Patricia Lowe",from_email:"plowe@kwl.com",to_email:"support@etechsystems.com",subject:"Question about camera coverage report",body:"Our ops manager asked for a coverage summary of all cameras at Tinson Pen and Warehouse 2 for an insurance review. Is this something your team can pull together? No rush, end of month is fine.",date:"Jun 12, 2026 10:15",attachments:[],is_sr:false,sr_linked:null,urgent:false,client:"KWL"},
+    {id:"e6",from_name:"Gate Pass Office",from_email:"gatepass@kftl.com",to_email:"support@etechsystems.com",subject:"Switch firmware update window - LPR Overview",body:"The LPR Overview switch is still showing an older firmware version. Is this one scheduled for update, or did it get missed?",date:"Jun 17, 2026 08:50",attachments:[],is_sr:false,sr_linked:null,urgent:false,client:"KFTL"},
+    {id:"e7",from_name:"Shanice Vernon",from_email:"shanice.vernon@etechsystems.com",to_email:"support@etechsystems.com",subject:"Heads up - recurring issue on HM3 PTZ",body:"HM3 PTZ has gone defective for the third time this quarter, different symptom each time. Might be worth a full unit swap next visit instead of another spot repair.",date:"Jun 16, 2026 13:05",attachments:[],is_sr:false,sr_linked:null,urgent:false,client:"KFTL"},
+    {id:"e8",from_name:"Wharfage Office",from_email:"wharfage@kftl.com",to_email:"support@etechsystems.com",subject:"Cashier window cameras - picture quality",body:"Cameras covering Cashier Windows 1-3 have looked grainy on the live feed for a few days even though they report Online. Could be a settings issue rather than hardware. Not urgent.",date:"Jun 19, 2026 15:40",attachments:[],is_sr:false,sr_linked:null,urgent:false,client:"KFTL"}
   ];
+
+  document.getElementById('inbox-badge').textContent = EMAILS.filter(e => e.urgent || e.is_sr).length;
 
   renderDashboard();
   renderSR();
@@ -1894,12 +1908,13 @@ function renderDashboard() {
 
   document.getElementById('dash-cam-defective').textContent = defective;
   document.getElementById('dash-ac-offline').textContent = acOffline;
-  document.getElementById('dash-srv-online').textContent = srvOnline;
+  document.getElementById('dash-srv-online').textContent = srvOnline + '/' + SERVERS.length;
   document.getElementById('dash-sw-online').textContent = swOnline + '/' + SWITCHES.length;
   document.getElementById('dash-sw-note').textContent = (SWITCHES.length - swOnline) + ' offline';
 
   renderTimeline();
   renderClientCards();
+  renderTrends();
 
   const active = SERVICE_REQUESTS.filter(r => r.status !== 'Resolved');
   const urgent = [...active].sort((a, b) =>
@@ -1991,6 +2006,41 @@ function renderClientCards() {
   }).join('');
 }
 
+async function renderTrends() {
+  const ids = ['trend-cam', 'trend-door', 'trend-srv', 'trend-sw'];
+  try {
+    const result = await get('/dashboard/trends');
+    const d = result.data;
+    if (!d || !d.comparisonAvailable) {
+      ids.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+      const note = document.getElementById('trend-baseline-note');
+      if (note) note.style.display = 'block';
+      return;
+    }
+    const note = document.getElementById('trend-baseline-note');
+    if (note) note.style.display = 'none';
+
+    const setBadge = (id, pct) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (pct === null || pct === undefined) { el.style.display = 'none'; return; }
+      el.style.display = '';
+      el.classList.toggle('down', pct < 0);
+      const icon = pct < 0 ? 'ti-trending-down' : 'ti-trending-up';
+      const sign = pct > 0 ? '+' : '';
+      el.innerHTML = `<i class="ti ${icon}"></i> ${sign}${pct}%`;
+    };
+
+    setBadge('trend-cam', d.camerasDefective.trendPct);
+    setBadge('trend-door', d.doorsOffline.trendPct);
+    setBadge('trend-srv', d.serversOnline.trendPct);
+    setBadge('trend-sw', d.switchesTotal.trendPct);
+  } catch (e) {
+    // No trend data available (e.g. offline/mock mode) — hide badges rather than guess.
+    ids.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  }
+}
+
 function openClientModal(client) {
   toast(`Opening ${client} details...`, 'info');
 }
@@ -1999,7 +2049,7 @@ function openClientModal(client) {
 // ── CAMERAS ─────────────────────────────────────────────────
 // ============================================================
 
-let camCurrentPage = 1;
+let camCurrentPage = {}; // per-zone: { 'NORTH': 1, 'SOUTH': 2, ... }
 let camPerPage = 10;
 let camStatusFilter = 'All';
 let camSortColumn = null;
@@ -2027,7 +2077,7 @@ function renderStatusFilters() {
 
 function setCamStatusFilter(status) {
   camStatusFilter = status;
-  camCurrentPage = 1;
+  camCurrentPage = {};
   renderStatusFilters();
   renderCamerasOptimized();
 }
@@ -2116,7 +2166,8 @@ function renderCamerasOptimized() {
         const totalInZone = cameras.length;
 
         const totalPages = Math.ceil(totalInZone / camPerPage);
-        const start = (camCurrentPage - 1) * camPerPage;
+        const zonePage = camCurrentPage[zone] || 1;
+        const start = (zonePage - 1) * camPerPage;
         const end = Math.min(start + camPerPage, totalInZone);
         const pageCameras = cameras.slice(start, end);
 
@@ -2146,7 +2197,7 @@ function renderCamerasOptimized() {
             html += `<td style="color:var(--text-primary);">${c.name}</td>`;
             html += `<td>${ip ? `<a class="ip-link" href="#" onclick="event.stopPropagation();openCameraDetail(${globalIndex})">${ip}</a>` : '<span style="color:var(--text-muted);">—</span>'}</td>`;
             html += `<td>${camBadge(c.status)}</td>`;
-            html += `<td><span class="comment-display ${!c.comments || c.comments === '' ? 'placeholder' : ''}" onclick="event.stopPropagation();editComment(${globalIndex})">${c.comments || 'Click to add note'}</span></td>`;
+            html += `<td><span class="comment-display ${!c.comments || c.comments === '' ? 'placeholder' : ''}" data-cam-index="${globalIndex}" onclick="event.stopPropagation();editComment(${globalIndex})">${c.comments || 'Click to add note'}</span></td>`;
             html += `<td style="font-size:11px;color:var(--text-primary);">${c.model || '—'}</td>`;
             html += `<td style="font-size:11px;color:var(--text-muted);">${c.resolution || '—'}</td>`;
             html += `</tr>`;
@@ -2156,11 +2207,11 @@ function renderCamerasOptimized() {
 
           if (totalPages > 1) {
             html += `<div class="cam-pagination">`;
-            html += `<button onclick="changePage(${camCurrentPage - 1})" ${camCurrentPage <= 1 ? 'disabled' : ''}>‹</button>`;
+            html += `<button onclick="changePage('${zone}', ${zonePage - 1})" ${zonePage <= 1 ? 'disabled' : ''}>‹</button>`;
             for (let i = 1; i <= totalPages; i++) {
-              html += `<button class="page-btn ${i === camCurrentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+              html += `<button class="page-btn ${i === zonePage ? 'active' : ''}" onclick="changePage('${zone}', ${i})">${i}</button>`;
             }
-            html += `<button onclick="changePage(${camCurrentPage + 1})" ${camCurrentPage >= totalPages ? 'disabled' : ''}>›</button>`;
+            html += `<button onclick="changePage('${zone}', ${zonePage + 1})" ${zonePage >= totalPages ? 'disabled' : ''}>›</button>`;
             html += `<span class="page-info">${start + 1}-${Math.min(end, totalInZone)} of ${totalInZone}</span>`;
             html += `</div>`;
           }
@@ -2202,11 +2253,13 @@ function toggleZone(zoneId) {
   localStorage.setItem(`cam_zone_${zone}`, body.classList.contains('hidden') ? 'collapsed' : 'expanded');
 }
 
-function changePage(page) {
+function changePage(zone, page) {
   const filtered = getFilteredCameras();
-  const totalPages = Math.ceil(filtered.length / camPerPage);
+  const sorted = getSortedCameras(filtered);
+  const inZone = sorted.filter(c => c.zone === zone).length;
+  const totalPages = Math.ceil(inZone / camPerPage);
   if (page < 1 || page > totalPages) return;
-  camCurrentPage = page;
+  camCurrentPage[zone] = page;
   renderCamerasOptimized();
 }
 
@@ -2224,52 +2277,94 @@ function editComment(index) {
   const camera = CAMERAS[index];
   if (!camera) return;
 
-  const row = document.querySelectorAll('.cam-zone-body tr.clickable')[index];
-  if (!row) return;
-
-  const commentCell = row.querySelector('.comment-display');
+  // Find the cell by its data attribute rather than by position in a
+  // filtered/sorted/paginated node list — positional indexing here was
+  // unreliable once any filter, sort, or page other than the default
+  // was active, since DOM order no longer matched the CAMERAS array order.
+  const commentCell = document.querySelector(`.comment-display[data-cam-index="${index}"]`);
   if (!commentCell) return;
 
   const currentComment = camera.comments || '';
+
+  const wrapper = document.createElement('div');
+  wrapper.style.display = 'flex';
+  wrapper.style.gap = '4px';
+  wrapper.style.alignItems = 'center';
+
   const input = document.createElement('input');
   input.type = 'text';
   input.className = 'edit-comment-input';
   input.value = currentComment;
   input.placeholder = 'Enter comment…';
+  input.style.flex = '1';
+  input.maxLength = 280;
 
-  commentCell.replaceWith(input);
+  const saveBtn = document.createElement('button');
+  saveBtn.className = 'btn btn-xs btn-success';
+  saveBtn.innerHTML = '<i class="ti ti-check"></i>';
+  saveBtn.title = 'Save (Enter)';
+  saveBtn.type = 'button';
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'btn btn-xs';
+  cancelBtn.innerHTML = '<i class="ti ti-x"></i>';
+  cancelBtn.title = 'Cancel (Esc)';
+  cancelBtn.type = 'button';
+
+  wrapper.appendChild(input);
+  wrapper.appendChild(saveBtn);
+  wrapper.appendChild(cancelBtn);
+  commentCell.replaceWith(wrapper);
   input.focus();
   input.select();
 
-  const saveComment = () => {
-    const newComment = input.value.trim();
-    if (newComment !== camera.comments) {
-      camera.comments = newComment;
-      put(`/cameras/${encodeURIComponent(camera.name)}`, { comments: newComment }).catch(() => {});
-      addAuditLogEntry('System', 'updated', `Camera ${camera.name} comment → "${newComment}"`);
-    }
+  let resolved = false;
 
+  const restoreSpan = (text) => {
     const span = document.createElement('span');
-    span.className = `comment-display ${!newComment || newComment === '' ? 'placeholder' : ''}`;
-    span.textContent = newComment || 'Click to add note';
+    span.className = `comment-display ${!text || text === '' ? 'placeholder' : ''}`;
+    span.setAttribute('data-cam-index', index);
+    span.textContent = text || 'Click to add note';
     span.onclick = (e) => {
       e.stopPropagation();
       editComment(index);
     };
-    input.replaceWith(span);
+    wrapper.replaceWith(span);
+  };
+
+  const doSave = () => {
+    if (resolved) return;
+    resolved = true;
+    const newComment = input.value.trim();
+    if (newComment !== camera.comments) {
+      camera.comments = newComment;
+      put(`/cameras/${encodeURIComponent(camera.name)}`, { comments: newComment })
+        .then(() => toast('Comment saved', 'success'))
+        .catch(() => toast('Saved locally — sync to server failed', 'warning'));
+      addAuditLogEntry('System', 'updated', `Camera ${camera.name} comment → "${newComment}"`);
+    }
+    restoreSpan(newComment);
     renderCamerasOptimized();
   };
 
-  input.addEventListener('blur', saveComment);
+  const doCancel = () => {
+    if (resolved) return;
+    resolved = true;
+    restoreSpan(currentComment);
+  };
+
+  saveBtn.addEventListener('click', (e) => { e.stopPropagation(); doSave(); });
+  cancelBtn.addEventListener('click', (e) => { e.stopPropagation(); doCancel(); });
   input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      input.blur();
-    }
-    if (e.key === 'Escape') {
-      input.value = currentComment;
-      input.blur();
-    }
+    if (e.key === 'Enter') { e.preventDefault(); doSave(); }
+    if (e.key === 'Escape') { e.preventDefault(); doCancel(); }
+  });
+  // Still save on blur (e.g. clicking elsewhere on the page) so the
+  // original "click away to save" behavior keeps working too.
+  input.addEventListener('blur', () => {
+    // Slight delay so a click on Save/Cancel registers first if that's
+    // what caused the blur.
+    setTimeout(() => { if (!resolved) doSave(); }, 120);
   });
 }
 
@@ -2308,10 +2403,23 @@ function openCameraDetail(index) {
     <div class="modal-field"><label>Client</label><span style="color:var(--text-primary);">${client}</span></div>
     <div class="modal-field"><label>Status</label>${camBadge(camera.status)}</div>
     <div class="modal-field"><label>IP Address</label><span class="mono">${ip}</span></div>
-    <div class="modal-field"><label>Comments</label><span style="font-size:11px;color:var(--text-secondary);">${camera.comments || 'No comments'}</span></div>
     <div class="modal-field"><label>Model</label><span style="color:var(--text-primary);">${camera.model || '—'}</span></div>
     <div class="modal-field"><label>Resolution</label><span style="color:var(--text-muted);">${camera.resolution || '—'}</span></div>
   `;
+
+  // Editable comments field — separate from the grid so it can span full width.
+  const commentsSection = document.getElementById('cam-detail-comments-section');
+  if (commentsSection) {
+    commentsSection.innerHTML = `
+      <div class="modal-section-title">Comments</div>
+      <textarea class="notes-area" id="cam-modal-comments" placeholder="Add a comment about this camera…" maxlength="280">${camera.comments || ''}</textarea>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;">
+        <span id="cam-modal-comments-status" style="font-size:11px;color:var(--text-muted);flex:1;"></span>
+        <button class="btn btn-sm btn-success" id="cam-modal-comments-save"><i class="ti ti-device-floppy"></i> Save Comment</button>
+      </div>
+    `;
+    document.getElementById('cam-modal-comments-save').onclick = () => saveCameraModalComment(index);
+  }
 
   document.getElementById('cam-ping-btn').onclick = () => pingCameraFromDetail(ip);
   document.getElementById('cam-open-btn').onclick = () => {
@@ -2321,6 +2429,39 @@ function openCameraDetail(index) {
   document.getElementById('cam-ping-result').innerHTML = '';
 
   document.getElementById('camera-detail-modal').classList.add('open');
+}
+
+function saveCameraModalComment(index) {
+  const camera = CAMERAS[index];
+  if (!camera) return;
+  const textarea = document.getElementById('cam-modal-comments');
+  const statusEl = document.getElementById('cam-modal-comments-status');
+  if (!textarea) return;
+
+  const newComment = textarea.value.trim();
+  const unchanged = newComment === (camera.comments || '');
+  if (unchanged) {
+    if (statusEl) { statusEl.textContent = 'No changes to save'; setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 1500); }
+    return;
+  }
+
+  camera.comments = newComment;
+  if (statusEl) statusEl.textContent = 'Saving…';
+
+  put(`/cameras/${encodeURIComponent(camera.name)}`, { comments: newComment })
+    .then(() => { if (statusEl) statusEl.textContent = 'Saved'; })
+    .catch(() => { if (statusEl) statusEl.textContent = 'Saved locally — sync to server failed'; });
+
+  addAuditLogEntry('System', 'updated', `Camera ${camera.name} comment → "${newComment}"`);
+  toast('Comment saved', 'success');
+
+  // Keep the table view's comment cell (if currently rendered) in sync,
+  // so reopening or glancing at the table doesn't show stale data.
+  const tableCell = document.querySelector(`.comment-display[data-cam-index="${index}"]`);
+  if (tableCell) {
+    tableCell.textContent = newComment || 'Click to add note';
+    tableCell.classList.toggle('placeholder', !newComment);
+  }
 }
 
 function pingCameraFromDetail(ip) {
@@ -3356,10 +3497,24 @@ function renderTopology() {
           }
 
           html += `<div class="topo-site-actions">`;
-          html += `<button class="btn btn-xs" onclick="event.stopPropagation();switchTab('cameras');document.getElementById('cam-search').value='${site}';renderCamerasOptimized();">📷 Cameras</button>`;
-          html += `<button class="btn btn-xs" onclick="event.stopPropagation();switchTab('doors');document.getElementById('door-search').value='${site}';renderDoorsEnhanced();">🚪 Doors</button>`;
-          html += `<button class="btn btn-xs" onclick="event.stopPropagation();switchTab('switches');document.getElementById('sw-search').value='${site}';renderSwitchesEnhanced();">🔌 Switches</button>`;
-          html += `<button class="btn btn-xs" onclick="event.stopPropagation();switchTab('servers');document.getElementById('srv-search').value='${site}';renderServersEnhanced();">🖥 Servers</button>`;
+          if (s.cameras.length > 0) {
+            const camQuery = s.cameras[0].zone; // cameras in this group share this zone exactly
+            html += `<button class="btn btn-xs" onclick="event.stopPropagation();switchTab('cameras');document.getElementById('cam-search').value='${camQuery.replace(/'/g, "\\'")}';renderCamerasOptimized();">📷 Cameras (${s.cameras.length})</button>`;
+          }
+          if (s.doors.length > 0) {
+            const doorQuery = s.doors[0].site; // doors in this group share this site exactly
+            html += `<button class="btn btn-xs" onclick="event.stopPropagation();switchTab('doors');document.getElementById('door-search').value='${doorQuery.replace(/'/g, "\\'")}';renderDoorsEnhanced();">🚪 Doors (${s.doors.length})</button>`;
+          }
+          if (s.switches.length > 0) {
+            // Switches use their own 'location' naming, unrelated to camera
+            // zone or door site strings — search using that, not 'site'.
+            const swQuery = s.switches[0].location;
+            html += `<button class="btn btn-xs" onclick="event.stopPropagation();switchTab('switches');document.getElementById('sw-search').value='${swQuery.replace(/'/g, "\\'")}';renderSwitchesEnhanced();">🔌 Switches (${s.switches.length})</button>`;
+          }
+          if (s.servers.length > 0) {
+            const srvQuery = s.servers[0].location; // servers in this group share this location exactly
+            html += `<button class="btn btn-xs" onclick="event.stopPropagation();switchTab('servers');document.getElementById('srv-search').value='${srvQuery.replace(/'/g, "\\'")}';renderServersEnhanced();">🖥 Servers (${s.servers.length})</button>`;
+          }
           html += `</div>`;
 
           html += `</div>`;
