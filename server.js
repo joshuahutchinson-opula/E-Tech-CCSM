@@ -139,12 +139,13 @@ async function initDatabase() {
         comments TEXT,
         last_seen TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(name, ip_address)
       );
 
       CREATE TABLE IF NOT EXISTS doors (
         id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
+        name VARCHAR(100) NOT NULL UNIQUE,
         site VARCHAR(100),
         client VARCHAR(20),
         reader VARCHAR(100),
@@ -163,7 +164,7 @@ async function initDatabase() {
       CREATE TABLE IF NOT EXISTS servers (
         id SERIAL PRIMARY KEY,
         location VARCHAR(100),
-        serial VARCHAR(50) NOT NULL,
+        serial VARCHAR(50) NOT NULL UNIQUE,
         capacity VARCHAR(20),
         used VARCHAR(20),
         health VARCHAR(100),
@@ -175,7 +176,7 @@ async function initDatabase() {
 
       CREATE TABLE IF NOT EXISTS switches (
         id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
+        name VARCHAR(100) NOT NULL UNIQUE,
         location VARCHAR(100),
         model VARCHAR(100),
         ip_address VARCHAR(15),
@@ -625,7 +626,8 @@ if (parseInt(camerasCheck.rows[0].count) === 0) {
   for (const cam of cameras) {
     await pool.query(
       `INSERT INTO cameras (name, zone, status, ip_address, username, model, resolution, comments)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       ON CONFLICT (name, ip_address) DO NOTHING`,
       cam
     );
   }
@@ -647,7 +649,8 @@ if (parseInt(camerasCheck.rows[0].count) === 0) {
       for (const door of doors) {
         await pool.query(
           `INSERT INTO doors (name, site, client, reader, lock_type, powered, status, tech, ip_address, controller, last_service, history)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12::jsonb)`,
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12::jsonb)
+           ON CONFLICT (name) DO NOTHING`,
           [...door.slice(0, 11), '[{"date":"Jun 18, 2026","event":"Reader replacement","tech":"Marvin Grant"}]']
         );
       }
@@ -674,7 +677,8 @@ if (parseInt(camerasCheck.rows[0].count) === 0) {
       for (const srv of servers) {
         await pool.query(
           `INSERT INTO servers (location, serial, capacity, used, health, apps, status)
-           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+           VALUES ($1, $2, $3, $4, $5, $6, $7)
+           ON CONFLICT (serial) DO NOTHING`,
           srv
         );
       }
@@ -707,7 +711,8 @@ if (parseInt(camerasCheck.rows[0].count) === 0) {
       for (const sw of switches) {
         await pool.query(
           `INSERT INTO switches (name, location, model, ip_address, firmware, username, password, mac)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+           ON CONFLICT (name) DO NOTHING`,
           sw
         );
       }
