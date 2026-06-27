@@ -155,6 +155,7 @@
   .toast.info { background: rgba(96,165,250,0.15); border-color: rgba(96,165,250,0.3); color: #93c5fd; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #0a0a0a; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: var(--font); }
+  :root.light-theme body { background: #e8ecf1 !important; }
   .panel, .stat-card, .client-card-simple, .analytics-card, .fl-panel, .modal { background: rgba(255, 255, 255, 0.02) !important; backdrop-filter: blur(16px) !important; -webkit-backdrop-filter: blur(16px) !important; border: 1px solid rgba(255, 255, 255, 0.06) !important; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important; transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
   .panel:hover, .stat-card:hover { border-color: rgba(79, 140, 247, 0.25) !important; box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6), 0 0 30px rgba(79, 140, 247, 0.05) !important; }
   .sidebar { background: rgba(10, 12, 26, 0.95) !important; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-right: 1px solid rgba(255, 255, 255, 0.05); }
@@ -717,7 +718,7 @@
     </div>
   </div>
   <div class="main">
-    <div class="topbar"><span class="page-title" id="page-title">Dashboard</span><div class="topbar-right"><button class="btn btn-xs theme-toggle-btn" onclick="toggleTheme()" title="Toggle theme" id="theme-toggle-btn"><i class="ti ti-sun"></i></button><span class="topbar-date" id="topbar-date"></span>
+    <div class="topbar"><span class="page-title" id="page-title">Dashboard</span><div class="topbar-right"><button class="btn btn-xs theme-toggle-btn" onclick="toggleTheme()" title="Toggle theme" id="theme-toggle-btn"><i class="ti ti-sun"></i></button><span class="topbar-date" id="topbar-date"></span><span class="unsaved-indicator" id="unsaved-indicator"><i class="ti ti-alert-circle"></i> Unsaved changes</span></div></div>
     <div class="content" id="main-content">
       <div class="tab active" id="tab-dashboard">
         <div class="emergency-banner active" id="emergency-banner"><i class="ti ti-alert-triangle em-icon"></i><div class="em-text"><div class="em-title">🚨 ALARM — Tinson Pen Perimeter Breach</div><div class="em-detail">Cam 282-TP Pole 21 — Motion detection · 172.16.19.91</div></div><span class="em-time">Today, 14:32</span><button class="btn btn-danger btn-sm" onclick="acknowledgeAlarm()"><i class="ti ti-check"></i> Ack</button></div>
@@ -1203,7 +1204,7 @@ function openCameraDetail(index) {
     '<div class="modal-field"><label>Status</label>' + camBadge(camera.status) + '</div>' +
     '<div class="modal-field"><label>IP Address</label><span class="mono">' + ip + '</span></div>' +
     '<div class="modal-field"><label>Model</label><span style="color:var(--text-primary);">' + (camera.model || '—') + '</span></div>' +
-    '<div class="modal-field"><label>Resolution</label><span style="color:var(--text-muted);">' + (camera.resolution || '—') + '</span></div>';
+        '<div class="modal-field"><label>Resolution</label><span style="color:var(--text-muted);">' + (camera.resolution || '—') + '</span></div>' +
     '<div class="modal-field"><label>Archiver</label><span style="color:var(--text-muted);">' + (camera.archiver || '—') + '</span></div>';
     var commentsSection = document.getElementById('cam-detail-comments-section');
   if (commentsSection) {
