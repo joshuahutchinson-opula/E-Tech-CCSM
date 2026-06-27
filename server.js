@@ -156,6 +156,7 @@ async function initDatabase() {
 }
 // ── SEED DATA ─────────────────────────────────────────────
 async function seedData() {
+  console.log('🌱 seedData() function starting...');
   try {
     const camerasCheck = await pool.query("SELECT COUNT(*) FROM cameras");
     if (parseInt(camerasCheck.rows[0].count) === 0) {
@@ -443,10 +444,11 @@ async function seedData() {
     }
 
     console.log('✅ Seed data complete');
-  } catch (error) {
-    console.error('❌ Seed error:', error);
+    } catch (error) {
+    console.error('❌ Seed error:', error.message);
+    console.error('❌ Full error:', JSON.stringify(error, null, 2));
+    console.error('❌ Stack:', error.stack);
   }
-}
 
 // ═══════════════════════════════════════════════════════════
 // ── ROUTES ────────────────────────────────────────────────
