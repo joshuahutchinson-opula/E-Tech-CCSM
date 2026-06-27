@@ -689,7 +689,15 @@ var inboxSelectedEmails = new Set();
 var inboxFolder = 'inbox';
 var inboxCtxEmailId = null;
 
-var SITE_CLIENT_MAP = {'Kingport':'KFTL','Port':'KFTL','TLF':'KFTL','KWC':'KFTL','Second Entrance':'KFTL','Maintenance':'KFTL','TLF-DM1':'KFTL','Security Office':'KFTL','SAL Duty Office':'KFTL','Gate Pass Office':'KFTL','Car Park':'KFTL','Berth':'KFTL','Warehouse 1':'KWL','Warehouse 2':'KWL','Carpark 6':'KWL','Tinson Pen':'KWL','KWL-TLF':'KFTL','NORTH':'KFTL','WEST':'KFTL','SOUTH':'KFTL','EAST':'KFTL'};
+var SITE_CLIENT_MAP = {
+  'Kingport':'KFTL','Port':'KFTL','TLF':'KFTL','KWC':'KFTL','Second Entrance':'KFTL','Maintenance':'KFTL','TLF-DM1':'KFTL',
+  'Security Office':'KFTL','SAL Duty Office':'KFTL','Gate Pass Office':'KFTL','Car Park':'KFTL','Berth':'KFTL',
+  'Warehouse 1':'KWL','Warehouse 2':'KWL','Carpark 6':'KWL','Tinson Pen':'KWL','KWL-TLF':'KFTL',
+  'NORTH':'KFTL','WEST':'KFTL','SOUTH':'KFTL','EAST':'KFTL',
+  'ADMIN/HR':'KFTL','ENGINEERING':'KFTL','HIGH MAST':'KFTL','NORTH TERMINAL PERIMETER':'KFTL','PTZ':'KFTL',
+  'Liquid Plant':'Lasco','LDL Warehouse':'Lasco','LML B Liquid Plant':'Lasco',
+  'GALC':'KWL','WH1':'KWL','PORT':'KFTL'
+};
 
 function getClient(site){for(var k in SITE_CLIENT_MAP){if(site&&site.indexOf(k)!==-1)return SITE_CLIENT_MAP[k];}return'Unknown';}
 function getCategoryIcon(cat){var icons={'Camera':'📷','Access Control':'🚪','Server':'🖥','Network':'🌐','Power':'⚡','Other':'📋'};return icons[cat]||'📋';}
