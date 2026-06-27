@@ -695,6 +695,82 @@
   .shortcuts-modal.open { display: block; }
   .shortcuts-modal kbd { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #fff; margin: 0 2px; }
   @media print { .sidebar,.topbar,.toast-container,.modal-overlay,.scroll-top,.ctx-menu,.bulk-bar { display: none !important; } .main { overflow: visible; } .content { overflow: visible; padding: 0; } body { background: #fff; } .app { border: none; height: auto; } .panel { break-inside: avoid; border: 1px solid #ccc; margin-bottom: 12px; } .tbl th,.tbl td { color: #000; border-color: #ccc; } }
+  /* ── RESPONSIVE: TABLET & SMALL SCREENS ── */
+@media (max-width: 1024px) {
+  .app { height: 100vh; border-radius: 0; max-width: 100%; }
+  .sidebar { width: 56px; }
+  .sidebar .logo-area { padding: 12px 8px; }
+  .sidebar .logo-img { width: 32px; }
+  .sidebar .nav-item span, .sidebar .nav-badge, .sidebar .nav-section, .sidebar .user-info { display: none; }
+  .sidebar .nav-item { justify-content: center; padding: 10px 0; }
+  .sidebar .nav-item i { margin: 0; }
+  .sidebar .sidebar-footer { justify-content: center; padding: 10px; }
+  .sidebar .user-av { width: 28px; height: 28px; font-size: 10px; }
+  .collapse-toggle { display: none; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .stat-card { padding: 12px 14px !important; }
+  .stat-card .stat-val { font-size: 24px !important; }
+  .content { padding: 12px 10px; }
+  .topbar { padding: 0 12px; height: 48px; }
+  .page-title { font-size: 13px; }
+  .topbar-date { font-size: 10px; }
+  .outlook-container { flex-direction: column; }
+  .outlook-folder-pane { width: 100%; flex-direction: row; flex-wrap: wrap; padding: 4px; border-right: none; border-bottom: 1px solid var(--card-border); gap: 2px; }
+  .outlook-folder-item { padding: 5px 8px; font-size: 10px; border-left: none; }
+  .outlook-folder-item i { font-size: 14px; width: 16px; }
+  .outlook-content { flex-direction: column; }
+  .outlook-list-pane { width: 100%; max-height: 40vh; border-right: none; border-bottom: 1px solid var(--card-border); }
+  .outlook-reading-pane { max-height: 50vh; }
+  .outlook-toolbar { gap: 2px; padding: 6px 8px; }
+  .outlook-toolbar .btn { font-size: 9px; padding: 4px 6px; }
+  .modal { width: 95% !important; max-width: 95% !important; padding: 16px; max-height: 90vh; }
+  .modal-grid { grid-template-columns: 1fr; }
+  .modal-close { top: 10px; right: 10px; font-size: 16px; }
+  .cam-preview-large { height: 180px; }
+  .search-bar { flex-direction: column; }
+  .search-bar input, .search-bar select { width: 100%; }
+  .tbl { font-size: 10px; }
+  .tbl th, .tbl td { padding: 5px 4px; }
+  .btn { font-size: 10px; padding: 5px 10px; }
+  .door-stats, .server-stats-grid, .switch-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .client-grid-simple { grid-template-columns: 1fr; }
+  .topo-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .topo-table { min-width: 600px; }
+  .topo-filter-bar { gap: 4px; }
+  .topo-filter-btn { padding: 4px 10px; font-size: 10px; }
+  .outlook-search input { font-size: 11px; padding: 6px 8px; }
+  .outlook-email { padding: 8px 10px; }
+  .oe-avatar { width: 28px; height: 28px; font-size: 10px; }
+  .oe-sender, .oe-subject { font-size: 10px; }
+  .oe-preview { font-size: 9px; }
+  .ore-header { padding: 12px 14px; }
+  .ore-subject { font-size: 14px; }
+  .ore-body { padding: 12px 14px; font-size: 11px; }
+  .ore-sender-avatar { width: 32px; height: 32px; font-size: 12px; }
+  .cam-zone-header, .door-zone-header, .server-zone-header, .switch-zone-header { padding: 8px 10px; }
+  .cam-zone-header .zone-name, .door-zone-header .zone-name { font-size: 11px; }
+  .ore-compose-modal { width: 95% !important; max-height: 90vh; }
+  .ore-compose-body textarea { min-height: 120px; }
+  .topo-expand-content { flex-direction: column; gap: 8px; }
+  .topo-switch-group { min-width: auto; }
+  .analytics-grid { grid-template-columns: 1fr; }
+  .file-search-bar { flex-direction: column; }
+  .file-search-bar input, .file-search-bar select { width: 100%; }
+}
+
+@media (max-width: 600px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .door-stats, .server-stats-grid, .switch-stats-grid { grid-template-columns: 1fr; }
+  .topbar { height: 44px; padding: 0 8px; }
+  .page-title { font-size: 12px; }
+  .content { padding: 8px 6px; }
+  .panel { padding: 12px 10px; }
+  .modal { padding: 12px; }
+  .modal-title { font-size: 13px; }
+  .cam-preview-large { height: 140px; }
+  .outlook-list-pane { max-height: 35vh; }
+  .outlook-reading-pane { max-height: 45vh; }
+}
 </style>
 </head>
 <body>
