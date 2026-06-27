@@ -443,12 +443,13 @@ async function seedData() {
       console.log('✅ Emails seeded');
     }
 
-    console.log('✅ Seed data complete');
-    } catch (error) {
+      console.log('✅ Seed data complete');
+  } catch (error) {
     console.error('❌ Seed error:', error.message);
     console.error('❌ Full error:', JSON.stringify(error, null, 2));
     console.error('❌ Stack:', error.stack);
   }
+}
 
 // ═══════════════════════════════════════════════════════════
 // ── ROUTES ────────────────────────────────────────────────
