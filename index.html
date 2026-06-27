@@ -29,6 +29,98 @@
     --skeleton-shine: rgba(255,255,255,0.08);
     --tooltip-bg: rgba(20, 22, 40, 0.95);
   }
+  :root.light-theme {
+  --sidebar-bg: rgba(245, 247, 250, 0.95);
+  --sidebar-border: rgba(0,0,0,0.08);
+  --main-bg: #f0f2f5;
+  --card-bg: rgba(255, 255, 255, 0.85);
+  --card-border: rgba(0, 0, 0, 0.08);
+  --text-primary: #1a1a2e;
+  --text-secondary: rgba(0, 0, 0, 0.6);
+  --text-muted: rgba(0, 0, 0, 0.35);
+  --accent-start: #4f8cf7;
+  --accent-end: #00d4ff;
+  --accent: #4f8cf7;
+  --accent-glow: rgba(79, 140, 247, 0.2);
+  --danger: #dc2626;
+  --warning: #d97706;
+  --success: #059669;
+  --info: #2563eb;
+  --skeleton-bg: rgba(0,0,0,0.06);
+  --skeleton-shine: rgba(0,0,0,0.1);
+  --tooltip-bg: rgba(255, 255, 255, 0.95);
+}
+:root.light-theme body { background: #e8ecf1; }
+:root.light-theme .panel, 
+:root.light-theme .stat-card, 
+:root.light-theme .client-card-simple, 
+:root.light-theme .analytics-card, 
+:root.light-theme .modal { 
+  background: rgba(255, 255, 255, 0.85) !important; 
+  border: 1px solid rgba(0, 0, 0, 0.08) !important; 
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important; 
+}
+:root.light-theme .panel:hover, 
+:root.light-theme .stat-card:hover { 
+  border-color: rgba(79, 140, 247, 0.3) !important; 
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 0 20px rgba(79, 140, 247, 0.08) !important; 
+}
+:root.light-theme .sidebar { background: rgba(245, 247, 250, 0.95) !important; border-right: 1px solid rgba(0,0,0,0.06); }
+:root.light-theme .nav-item:hover { background: rgba(0, 0, 0, 0.04) !important; }
+:root.light-theme .nav-item.active { background: rgba(79, 140, 247, 0.1) !important; }
+:root.light-theme .tbl th { color: rgba(0, 0, 0, 0.5) !important; }
+:root.light-theme .tbl td { border-bottom: 1px solid rgba(0,0,0,0.04) !important; }
+:root.light-theme .tbl tr:hover td { background: rgba(79, 140, 247, 0.03) !important; }
+:root.light-theme .modal { background: rgba(255, 255, 255, 0.95) !important; border: 1px solid rgba(0,0,0,0.1) !important; }
+:root.light-theme .search-bar input, 
+:root.light-theme .search-bar select { background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.1); color: var(--text-primary); }
+:root.light-theme .search-bar select { background: #fff; }
+:root.light-theme .search-bar select option { background: #fff; color: #000; }
+:root.light-theme .filter-pill { border: 1px solid rgba(0,0,0,0.1); color: rgba(0,0,0,0.6); }
+:root.light-theme .filter-pill.active { background: rgba(79,140,247,0.15); border-color: #4a9eff; color: #1a1a2e; }
+:root.light-theme .modal-field label { color: rgba(0,0,0,0.45); }
+:root.light-theme .modal-body-text { background: rgba(0,0,0,0.02); color: rgba(0,0,0,0.65); }
+:root.light-theme .notes-area { background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.1); color: var(--text-primary); }
+:root.light-theme .btn { border: 1px solid rgba(0,0,0,0.12); color: var(--text-primary); }
+:root.light-theme .btn:hover { background: rgba(0,0,0,0.04); }
+:root.light-theme .status-select, 
+:root.light-theme .priority-select { background: #fff; border: 1px solid rgba(0,0,0,0.12); color: var(--text-primary); }
+:root.light-theme .status-select option, 
+:root.light-theme .priority-select option { background: #fff; color: #000; }
+:root.light-theme .audit-log .audit-item { border-bottom: 1px solid rgba(0,0,0,0.04); color: rgba(0,0,0,0.6); }
+:root.light-theme .outlook-container { background: rgba(255,255,255,0.7); border: 1px solid rgba(0,0,0,0.08); }
+:root.light-theme .outlook-email { border-bottom: 1px solid rgba(0,0,0,0.04); }
+:root.light-theme .outlook-email:hover { background: rgba(0,0,0,0.02); }
+:root.light-theme .outlook-email.active { background: rgba(79,140,247,0.08); }
+:root.light-theme .outlook-folder-pane { border-right: 1px solid rgba(0,0,0,0.08); }
+:root.light-theme .outlook-folder-item:hover { background: rgba(0,0,0,0.03); }
+:root.light-theme .outlook-folder-item.active { background: rgba(79,140,247,0.1); }
+:root.light-theme .ore-header { border-bottom: 1px solid rgba(0,0,0,0.06); }
+:root.light-theme .topo-switch-box { background: rgba(0,0,0,0.03); border: 2px solid rgba(0,0,0,0.1); }
+:root.light-theme .topo-switch-box:hover { border-color: rgba(79,140,247,0.4); background: rgba(79,140,247,0.06); }
+:root.light-theme .topo-switch-label { background: rgba(0,0,0,0.03); }
+:root.light-theme .topo-device-chip.online { background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2); }
+:root.light-theme .topo-device-chip.offline { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2); }
+:root.light-theme .notes-inline { color: rgba(0,0,0,0.55); }
+:root.light-theme .notes-inline:focus { background: rgba(0,0,0,0.03); color: var(--text-primary); }
+:root.light-theme .file-explorer { background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.08); }
+:root.light-theme .file-explorer .file-item { border-bottom: 1px solid rgba(0,0,0,0.04); }
+:root.light-theme .file-explorer .file-item:hover { background: rgba(0,0,0,0.03); }
+:root.light-theme .breadcrumb { background: rgba(0,0,0,0.02); }
+:root.light-theme .breadcrumb .crumb:hover { background: rgba(0,0,0,0.05); }
+:root.light-theme .breadcrumb .back-btn { background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.06); }
+:root.light-theme .compose-overlay .ore-compose-modal { background: #fff; }
+:root.light-theme .compose-overlay input, 
+:root.light-theme .compose-overlay textarea { background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.1); }
+:root.light-theme .topbar { border-bottom: 1px solid rgba(0,0,0,0.06); }
+:root.light-theme .cam-zone-header, 
+:root.light-theme .door-zone-header, 
+:root.light-theme .server-zone-header, 
+:root.light-theme .switch-zone-header { background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.06); }
+:root.light-theme .cam-zone-header:hover, 
+:root.light-theme .door-zone-header:hover, 
+:root.light-theme .server-zone-header:hover, 
+:root.light-theme .switch-zone-header:hover { background: rgba(0,0,0,0.04); }
   .skeleton { background: var(--skeleton-bg); border-radius: 4px; height: 20px; position: relative; overflow: hidden; animation: shimmer 1.8s infinite; }
   .skeleton::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent); transform: translateX(-100%); animation: shimmer-slide 1.8s infinite; }
   @keyframes shimmer-slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
@@ -625,7 +717,7 @@
     </div>
   </div>
   <div class="main">
-    <div class="topbar"><span class="page-title" id="page-title">Dashboard</span><div class="topbar-right"><span class="topbar-date" id="topbar-date"></span><span class="unsaved-indicator" id="unsaved-indicator"><i class="ti ti-alert-circle"></i> Unsaved changes</span></div></div>
+    <div class="topbar"><span class="page-title" id="page-title">Dashboard</span><div class="topbar-right"><button class="btn btn-xs theme-toggle-btn" onclick="toggleTheme()" title="Toggle theme" id="theme-toggle-btn"><i class="ti ti-sun"></i></button><span class="topbar-date" id="topbar-date"></span>
     <div class="content" id="main-content">
       <div class="tab active" id="tab-dashboard">
         <div class="emergency-banner active" id="emergency-banner"><i class="ti ti-alert-triangle em-icon"></i><div class="em-text"><div class="em-title">🚨 ALARM — Tinson Pen Perimeter Breach</div><div class="em-detail">Cam 282-TP Pole 21 — Motion detection · 172.16.19.91</div></div><span class="em-time">Today, 14:32</span><button class="btn btn-danger btn-sm" onclick="acknowledgeAlarm()"><i class="ti ti-check"></i> Ack</button></div>
@@ -746,7 +838,19 @@ function fullDateTime(){return new Date().toLocaleDateString('en-JM',{weekday:'s
 function toast(m,type){type=type||'info';var c=document.getElementById('toast-container'),t=document.createElement('div');t.className='toast '+type;var icons={info:'ti ti-info-circle',success:'ti ti-check',warning:'ti ti-alert-triangle',error:'ti ti-x'};t.innerHTML='<i class="'+(icons[type]||icons.info)+'"></i> '+m;c.appendChild(t);setTimeout(function(){t.style.opacity='0';t.style.transition='opacity 0.3s';setTimeout(function(){t.remove();},300);},3000);}
 function copyText(t){navigator.clipboard.writeText(t).then(function(){toast('Copied','success');}).catch(function(){toast('Copy failed','error');});}
 async function revealAndCopySwitchPassword(switchId){try{var result=await get('/switches/'+switchId+'/reveal-password');if(result&&result.password){copyText(result.password);}else{toast('No password on file','warning');}}catch(e){}}
-function acknowledgeAlarm(){document.getElementById('emergency-banner').classList.remove('active');toast('Alarm acknowledged','success');}
+function toggleTheme() {
+  var root = document.documentElement;
+  var btn = document.getElementById('theme-toggle-btn');
+  if (root.classList.contains('light-theme')) {
+    root.classList.remove('light-theme');
+    btn.innerHTML = '<i class="ti ti-sun"></i>';
+    localStorage.setItem('ccsm_theme', 'dark');
+  } else {
+    root.classList.add('light-theme');
+    btn.innerHTML = '<i class="ti ti-moon"></i>';
+    localStorage.setItem('ccsm_theme', 'light');
+  }
+}
 
 function camBadge(s){if(s==='Online')return'<span class="badge b-done">Online</span>';if(s==='Defective')return'<span class="badge b-high">Defective</span>';if(s==='No Power')return'<span class="badge b-high">No Power</span>';if(s==='No Camera')return'<span class="badge b-open">No Camera</span>';return'<span class="badge b-info">Needs Check</span>';}
 function doorBadge(s){if(s==='Online')return'<span class="badge b-done">Online</span>';if(s==='Offline')return'<span class="badge b-high">Offline</span>';if(s==='Under Maintenance')return'<span class="badge b-under-maintenance">Under Maintenance</span>';return'<span class="badge b-open">Unknown</span>';}
@@ -2637,6 +2741,11 @@ function renderAnalytics() {
 
 document.getElementById('topbar-date').textContent = fullDateTime();
 setInterval(function() { document.getElementById('topbar-date').textContent = fullDateTime(); }, 30000);
+if (localStorage.getItem('ccsm_theme') === 'light') {
+  document.documentElement.classList.add('light-theme');
+  var themeBtn = document.getElementById('theme-toggle-btn');
+  if (themeBtn) themeBtn.innerHTML = '<i class="ti ti-moon"></i>';
+}
 checkLogin();
 if (localStorage.getItem('ccsm_sidebar') === '1') toggleSidebar();
 PINNED_FILES = JSON.parse(localStorage.getItem('ccsm_pinned') || '[]');
