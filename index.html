@@ -121,6 +121,28 @@
 :root.light-theme .door-zone-header:hover, 
 :root.light-theme .server-zone-header:hover, 
 :root.light-theme .switch-zone-header:hover { background: rgba(0,0,0,0.04); }
+:root.light-theme #login-page { background: #0a0a0a !important; }
+:root.light-theme #login-page .login-box { background: rgba(255,255,255,0.03) !important; border: 1px solid rgba(255,255,255,0.06) !important; }
+:root.light-theme #login-page .login-box h2 { color: #f0f4ff !important; }
+:root.light-theme #login-page .login-box p { color: rgba(255,255,255,0.25) !important; }
+:root.light-theme .login-divider { color: rgba(255,255,255,0.25); }
+:root.light-theme .login-divider::before, 
+:root.light-theme .login-divider::after { background: rgba(255,255,255,0.06); }
+:root.light-theme #login-page input { background: rgba(255,255,255,0.04) !important; border: 1px solid rgba(255,255,255,0.1) !important; color: #f0f4ff !important; }
+:root.light-theme .microsoft-btn { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); color: #f0f4ff; }
+:root.light-theme .microsoft-btn:hover { background: rgba(255,255,255,0.08); }
+:root.light-theme .stat-card .stat-val { 
+  -webkit-text-fill-color: #1a1a2e !important; 
+  background: none !important; 
+}
+:root.light-theme .emergency-banner { background: rgba(220, 38, 38, 0.12) !important; border: 1px solid rgba(220, 38, 38, 0.5) !important; }
+:root.light-theme .emergency-banner .em-title { color: #991b1b; }
+:root.light-theme .emergency-banner .em-detail { color: #dc2626; }
+:root.light-theme .page-title { color: #1a1a2e; }
+:root.light-theme .file-search-bar select { background: #fff; border: 1px solid rgba(0,0,0,0.1); color: var(--text-primary); }
+:root.light-theme .file-search-bar select option { background: #fff; color: #000; }
+:root.light-theme .audit-filters select { background: #fff; border: 1px solid rgba(0,0,0,0.1); color: var(--text-primary); }
+:root.light-theme .audit-filters select option { background: #fff; color: #000; }
   .skeleton { background: var(--skeleton-bg); border-radius: 4px; height: 20px; position: relative; overflow: hidden; animation: shimmer 1.8s infinite; }
   .skeleton::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent); transform: translateX(-100%); animation: shimmer-slide 1.8s infinite; }
   @keyframes shimmer-slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
@@ -842,13 +864,16 @@ async function revealAndCopySwitchPassword(switchId){try{var result=await get('/
 function toggleTheme() {
   var root = document.documentElement;
   var btn = document.getElementById('theme-toggle-btn');
+  var logo = document.getElementById('logo-img');
   if (root.classList.contains('light-theme')) {
     root.classList.remove('light-theme');
     btn.innerHTML = '<i class="ti ti-sun"></i>';
+    if (logo) logo.src = 'logo.png';
     localStorage.setItem('ccsm_theme', 'dark');
   } else {
     root.classList.add('light-theme');
     btn.innerHTML = '<i class="ti ti-moon"></i>';
+    if (logo) logo.src = 'logo-light.png';
     localStorage.setItem('ccsm_theme', 'light');
   }
 }
@@ -2746,6 +2771,8 @@ if (localStorage.getItem('ccsm_theme') === 'light') {
   document.documentElement.classList.add('light-theme');
   var themeBtn = document.getElementById('theme-toggle-btn');
   if (themeBtn) themeBtn.innerHTML = '<i class="ti ti-moon"></i>';
+  var logo = document.getElementById('logo-img');
+  if (logo) logo.src = 'logo-light.png';
 }
 checkLogin();
 if (localStorage.getItem('ccsm_sidebar') === '1') toggleSidebar();
