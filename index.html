@@ -578,7 +578,7 @@
     <nav class="nav" id="nav">
       <div class="nav-section">Main</div>
       <div class="nav-item active" data-tab="dashboard"><i class="ti ti-layout-dashboard"></i> <span>Dashboard</span></div>
-      <div class="nav-item" data-tab="inbox"><i class="ti ti-mail"></i> <span>Outlook Inbox</span> <span class="nav-badge" id="inbox-badge" style="background:#8b5cf6">8</span></div>
+      <div class="nav-item" data-tab="inbox"><i class="ti ti-mail"></i> <span>Support Inbox</span>
       <div class="nav-item" data-tab="service"><i class="ti ti-clipboard-list"></i> <span>Service Requests</span> <span class="nav-badge" id="sr-badge">4</span></div>
       <div class="nav-section">Assets</div>
       <div class="nav-item" data-tab="cameras"><i class="ti ti-video"></i> <span>Cameras</span> <span class="nav-badge" id="cam-badge">0</span></div>
@@ -750,7 +750,7 @@ function setUnsaved(show){var el=document.getElementById('unsaved-indicator');if
 function toggleSidebar(){sidebarCollapsed=!sidebarCollapsed;document.getElementById('sidebar').classList.toggle('collapsed',sidebarCollapsed);document.getElementById('collapse-icon').className='ti ti-chevron-'+(sidebarCollapsed?'right':'left');localStorage.setItem('ccsm_sidebar',sidebarCollapsed?'1':'0');}
 var sidebarCollapsed=localStorage.getItem('ccsm_sidebar')==='1';
 
-var titles={dashboard:'Dashboard',inbox:'Outlook Inbox',service:'Service Requests',cameras:'Cameras',doors:'Access Control',servers:'Servers',switches:'Switches',topology:'Network Map',files:'Files & Logs'};
+var titles={dashboard:'Dashboard',inbox:'Support Inbox',service:'Service Requests',
 var currentTab='dashboard';
 
 function switchTab(id){currentTab=id;document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});document.getElementById('tab-'+id).classList.add('active');var navItem=document.querySelector('[data-tab="'+id+'"]');if(navItem)navItem.classList.add('active');document.getElementById('page-title').textContent=titles[id];if(id==='inbox')renderInbox();if(id==='dashboard')renderDashboard();if(id==='files'){renderAuditLog();renderFileExplorer();}if(id==='topology'){renderTopology();}if(id==='cameras'){renderStatusFilters();renderCamerasOptimized();}if(id==='doors'){renderDoorsEnhanced();}if(id==='servers'){renderServersEnhanced();}if(id==='switches'){renderSwitchesEnhanced();}}
