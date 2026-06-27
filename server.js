@@ -320,10 +320,10 @@ async function seedData() {
       console.log('🌱 Seeding doors...');
       const doors = [
         // ── Original KFTL Doors ──
-        ['Second Entrance Staff Entrance 2','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.100','eyeLock Panel 2','6/3/2026','In'],
-        ['Second Entrance Staff Exit 1','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.101','eyeLock Panel 1','6/3/2026','Out'],
-        ['Second Entrance Staff Entrance 1','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.102','eyeLock Panel 3','6/3/2026','In'],
-        ['Second Entrance Staff Exit 2','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.103','eyeLock Panel 4','6/3/2026','Out'],
+               ['Second Entrance Staff Entrance 2','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.100','eyeLock Panel 2','6/3/2026','In','[{"date":"Jun 18, 2026","event":"Reader replacement","tech":"Marvin Grant"}]',''],
+        ['Second Entrance Staff Exit 1','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.101','eyeLock Panel 1','6/3/2026','Out','[{"date":"Jun 18, 2026","event":"Reader replacement","tech":"Marvin Grant"}]',''],
+        ['Second Entrance Staff Entrance 1','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.102','eyeLock Panel 3','6/3/2026','In','[{"date":"Jun 18, 2026","event":"Reader replacement","tech":"Marvin Grant"}]',''],
+        ['Second Entrance Staff Exit 2','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.103','eyeLock Panel 4','6/3/2026','Out','[{"date":"Jun 18, 2026","event":"Reader replacement","tech":"Marvin Grant"}]',''],
 
         // ── Lasco LML B Liquid Plant Doors ──
         ['Batching room','LML B Liquid Plant','Lasco','—','—','Not In Use','Offline','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]','No longer use, equipment has been removed'],
