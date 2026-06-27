@@ -386,6 +386,35 @@
   .topo-horizontal-line { height: 2px; background: rgba(255,255,255,0.08); flex: 1; min-width: 20px; align-self: center; }
   .topo-site-health-bar { width: 100%; height: 3px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; margin-top: 8px; }
   .topo-site-health-bar .topo-site-health-fill { height: 100%; border-radius: 2px; transition: width 0.4s; }
+  .topo-filter-bar { display: flex; gap: 6px; margin-bottom: 12px; align-items: center; flex-wrap: wrap; }
+.topo-filter-btn { padding: 5px 14px; border-radius: 16px; font-size: 11px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); color: var(--text-secondary); transition: all 0.15s; }
+.topo-filter-btn:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+.topo-filter-btn.active { background: rgba(79,140,247,0.2); border-color: #4a9eff; color: #fff; }
+.topo-table-wrap { overflow-x: auto; }
+.topo-table th { cursor: pointer; white-space: nowrap; }
+.topo-table th:hover { color: #fff; }
+.topo-health-cell { display: flex; align-items: center; gap: 8px; }
+.topo-health-bar { width: 80px; height: 5px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+.topo-health-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+.topo-devices-cell { display: flex; gap: 6px; flex-wrap: wrap; }
+.topo-dev-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; display: inline-flex; align-items: center; gap: 3px; }
+.topo-dev-badge.online { background: rgba(74,222,128,0.12); color: #4ade80; }
+.topo-dev-badge.offline { background: rgba(248,113,113,0.12); color: #f87171; }
+.topo-mini { display: flex; align-items: center; gap: 3px; font-size: 12px; }
+.topo-mini-sw { font-size: 12px; }
+.topo-mini-sw.off { opacity: 0.4; }
+.topo-mini-arrow { color: var(--text-muted); margin: 0 2px; font-size: 10px; }
+.topo-expand-row td { background: rgba(255,255,255,0.01); border-bottom: 1px solid rgba(255,255,255,0.04); }
+.topo-expand-content { display: flex; gap: 16px; flex-wrap: wrap; }
+.topo-switch-group { display: flex; flex-direction: column; gap: 6px; min-width: 200px; }
+.topo-switch-label { font-size: 11px; font-weight: 600; color: var(--text-primary); padding: 4px 10px; border-radius: 4px; background: rgba(255,255,255,0.03); display: flex; align-items: center; gap: 8px; }
+.topo-switch-label.online { border-left: 3px solid #4ade80; }
+.topo-switch-label.offline { border-left: 3px solid #f87171; opacity: 0.7; }
+.topo-switch-devices { display: flex; gap: 4px; flex-wrap: wrap; padding-left: 8px; }
+.topo-device-chip { font-size: 10px; padding: 3px 8px; border-radius: 12px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.topo-device-chip.online { background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2); color: var(--text-primary); }
+.topo-device-chip.offline { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2); color: var(--text-muted); }
+.topo-device-chip:hover { transform: translateY(-1px); border-color: rgba(255,255,255,0.3); }
   .outlook-container { display: flex; height: 100%; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; overflow: hidden; }
   .outlook-folder-pane { width: 160px; flex-shrink: 0; border-right: 1px solid var(--card-border); display: flex; flex-direction: column; padding: 8px 0; }
   .outlook-folder-item { display: flex; align-items: center; gap: 8px; padding: 7px 14px; font-size: 12px; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; border-left: 2px solid transparent; position: relative; }
@@ -1687,160 +1716,213 @@ function openSwitchAdmin() { var sw = SWITCHES[currentSwitchIndex]; if (sw) wind
 // ── TOPOLOGY (NETWORK MAP) ─────────────────────────────────
 // ============================================================
 
-var topoCollapsedClients = {};
+// ============================================================
+// ── TOPOLOGY (NETWORK MAP) — TABLE + MINI-DIAGRAM HYBRID ──
+// ============================================================
+
+var topoSortColumn = 'health';
+var topoSortDirection = 'desc';
+var topoClientFilter = 'All';
+var topoExpandedSites = {};
 
 function renderTopology() {
   var container = document.getElementById('topo-container');
   showLoading('topo-loading');
 
   setTimeout(function() {
-    var clientMap = {};
+    // Build site data from all device arrays
+    var siteMap = {};
 
-    SWITCHES.forEach(function(sw) {
-      var client = getClient(sw.location);
-      if (!clientMap[client]) clientMap[client] = { sites: {} };
-      if (!clientMap[client].sites[sw.location]) { clientMap[client].sites[sw.location] = { switches: [], cameras: [], doors: [], servers: [] }; }
-      clientMap[client].sites[sw.location].switches.push(sw);
+    CAMERAS.forEach(function(c) {
+      var site = c.zone;
+      var client = getClient(site);
+      if (!siteMap[site]) siteMap[site] = { site: site, client: client, cameras: [], doors: [], servers: [], switches: [] };
+      siteMap[site].cameras.push(c);
     });
 
-    CAMERAS.forEach(function(cam) {
-      var client = getClient(cam.zone);
-      if (!clientMap[client]) clientMap[client] = { sites: {} };
-      if (!clientMap[client].sites[cam.zone]) { clientMap[client].sites[cam.zone] = { switches: [], cameras: [], doors: [], servers: [] }; }
-      clientMap[client].sites[cam.zone].cameras.push(cam);
+    DOORS.forEach(function(d) {
+      var site = d.site;
+      var client = d.client || getClient(site);
+      if (!siteMap[site]) siteMap[site] = { site: site, client: client, cameras: [], doors: [], servers: [], switches: [] };
+      siteMap[site].doors.push(d);
     });
 
-    DOORS.forEach(function(door) {
-      var client = door.client || getClient(door.site);
-      if (!clientMap[client]) clientMap[client] = { sites: {} };
-      if (!clientMap[client].sites[door.site]) { clientMap[client].sites[door.site] = { switches: [], cameras: [], doors: [], servers: [] }; }
-      clientMap[client].sites[door.site].doors.push(door);
+    SERVERS.forEach(function(s) {
+      var site = s.location;
+      var client = getClient(site);
+      if (!siteMap[site]) siteMap[site] = { site: site, client: client, cameras: [], doors: [], servers: [], switches: [] };
+      siteMap[site].servers.push(s);
     });
 
-    SERVERS.forEach(function(srv) {
-      var client = getClient(srv.location);
-      if (!clientMap[client]) clientMap[client] = { sites: {} };
-      if (!clientMap[client].sites[srv.location]) { clientMap[client].sites[srv.location] = { switches: [], cameras: [], doors: [], servers: [] }; }
-      clientMap[client].sites[srv.location].servers.push(srv);
+    SWITCHES.forEach(function(s) {
+      var site = s.location;
+      var client = getClient(site);
+      if (!siteMap[site]) siteMap[site] = { site: site, client: client, cameras: [], doors: [], servers: [], switches: [] };
+      siteMap[site].switches.push(s);
     });
 
-    Object.keys(clientMap).forEach(function(client) {
-      var sites = clientMap[client].sites;
-      var totalDevices = 0, onlineDevices = 0;
-      Object.keys(sites).forEach(function(site) {
-        var s = sites[site];
-        s.totalDevices = s.switches.length + s.cameras.length + s.doors.length + s.servers.length;
-        s.onlineDevices = s.switches.filter(function(sw) { return !isSwitchOffline(sw); }).length + s.cameras.filter(function(c) { return c.status === 'Online'; }).length + s.doors.filter(function(d) { return d.status === 'Online'; }).length + s.servers.filter(function(srv) { return srv.status === 'ONLINE'; }).length;
-        s.healthScore = s.totalDevices > 0 ? Math.round((s.onlineDevices / s.totalDevices) * 100) : 100;
-        totalDevices += s.totalDevices; onlineDevices += s.onlineDevices;
-      });
-      clientMap[client].totalDevices = totalDevices;
-      clientMap[client].onlineDevices = onlineDevices;
-      clientMap[client].healthScore = totalDevices > 0 ? Math.round((onlineDevices / totalDevices) * 100) : 100;
+    // Calculate health per site
+    var sites = [];
+    Object.keys(siteMap).forEach(function(key) {
+      var s = siteMap[key];
+      var totalOn = 0, totalOff = 0;
+      s.cameras.forEach(function(c) { if (c.status === 'Online') totalOn++; else totalOff++; });
+      s.doors.forEach(function(d) { if (d.status === 'Online') totalOn++; else totalOff++; });
+      s.servers.forEach(function(srv) { if (srv.status === 'ONLINE') totalOn++; else totalOff++; });
+      s.switches.forEach(function(sw) { if (isSwitchOffline(sw)) totalOff++; else totalOn++; });
+      s.totalDevices = totalOn + totalOff;
+      s.onlineDevices = totalOn;
+      s.offlineDevices = totalOff;
+      s.healthScore = s.totalDevices > 0 ? Math.round((totalOn / s.totalDevices) * 100) : 100;
+      sites.push(s);
     });
 
-    var clientNames = Object.keys(clientMap).sort();
+    // Filter by client
+    if (topoClientFilter !== 'All') {
+      sites = sites.filter(function(s) { return s.client === topoClientFilter; });
+    }
+
+    // Sort
+    sites.sort(function(a, b) {
+      var valA, valB;
+      if (topoSortColumn === 'site') { valA = a.site.toLowerCase(); valB = b.site.toLowerCase(); }
+      else if (topoSortColumn === 'client') { valA = a.client.toLowerCase(); valB = b.client.toLowerCase(); }
+      else if (topoSortColumn === 'health') { valA = a.healthScore; valB = b.healthScore; }
+      else if (topoSortColumn === 'devices') { valA = a.totalDevices; valB = b.totalDevices; }
+      else { valA = a.healthScore; valB = b.healthScore; }
+      if (valA < valB) return topoSortDirection === 'asc' ? -1 : 1;
+      if (valA > valB) return topoSortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    // Get unique clients for filter bar
+    var allClients = [];
+    Object.keys(siteMap).forEach(function(key) {
+      var cl = siteMap[key].client;
+      if (allClients.indexOf(cl) === -1) allClients.push(cl);
+    });
+    allClients.sort();
+
+    // ── Build HTML ──
     var html = '';
 
-    if (clientNames.length === 0) {
-      html = '<div class="empty-state"><span class="empty-icon">🌐</span><div class="empty-title">No network data</div></div>';
+    // Client filter bar
+    html += '<div class="topo-filter-bar">';
+    html += '<span class="topo-filter-btn ' + (topoClientFilter === 'All' ? 'active' : '') + '" onclick="setTopoClientFilter(\'All\')">All</span>';
+    allClients.forEach(function(cl) {
+      html += '<span class="topo-filter-btn ' + (topoClientFilter === cl ? 'active' : '') + '" onclick="setTopoClientFilter(\'' + cl + '\')">' + cl + '</span>';
+    });
+    html += '<span style="flex:1;"></span>';
+    html += '<button class="btn btn-xs" onclick="topoExpandAll()" style="margin-right:4px;">📖 Expand All</button>';
+    html += '<button class="btn btn-xs" onclick="topoCollapseAll()">📕 Collapse All</button>';
+    html += '</div>';
+
+    // Table
+    html += '<div class="topo-table-wrap">';
+    html += '<table class="tbl topo-table">';
+    html += '<thead><tr>';
+    html += '<th onclick="sortTopo(\'site\')" style="min-width:160px;">Site <span class="sort-indicator">' + (topoSortColumn === 'site' ? (topoSortDirection === 'asc' ? '↑' : '↓') : '') + '</span></th>';
+    html += '<th onclick="sortTopo(\'client\')" style="width:80px;">Client <span class="sort-indicator">' + (topoSortColumn === 'client' ? (topoSortDirection === 'asc' ? '↑' : '↓') : '') + '</span></th>';
+    html += '<th onclick="sortTopo(\'health\')" style="width:140px;">Health <span class="sort-indicator">' + (topoSortColumn === 'health' ? (topoSortDirection === 'asc' ? '↑' : '↓') : '') + '</span></th>';
+    html += '<th style="width:200px;">Devices</th>';
+    html += '<th style="width:120px;">Topology</th>';
+    html += '</tr></thead><tbody>';
+
+    if (sites.length === 0) {
+      html += '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted);">No sites found for this client.</td></tr>';
     } else {
-      clientNames.forEach(function(client) {
-        var data = clientMap[client];
-        var sites = data.sites;
-        var siteNames = Object.keys(sites).sort();
-        var isCollapsed = topoCollapsedClients[client] || false;
-        var healthColor = data.healthScore >= 90 ? '#4ade80' : data.healthScore >= 70 ? '#fbbf24' : '#f87171';
+      sites.forEach(function(s) {
+        var healthColor = s.healthScore >= 90 ? '#4ade80' : s.healthScore >= 70 ? '#fbbf24' : '#f87171';
+        var siteId = s.site.replace(/[^a-zA-Z0-9]/g, '_');
+        var isExpanded = topoExpandedSites[s.site] || false;
 
-        html += '<div class="topo-client-block">';
-        html += '<div class="topo-client-bar" onclick="toggleTopoClient(\'' + client + '\')">';
-        html += '<div class="tcb-left"><span class="tcb-name">🏢 ' + client + '</span><span class="tcb-meta">' + siteNames.length + ' sites · ' + data.totalDevices + ' devices</span></div>';
-        html += '<div style="display:flex;align-items:center;gap:12px;"><span class="tcb-health" style="color:' + healthColor + '">' + data.healthScore + '%</span><i class="ti ti-chevron-down tcb-toggle ' + (isCollapsed ? 'collapsed' : '') + '" id="topo-toggle-' + client + '"></i></div>';
-        html += '</div>';
-        html += '<div class="topo-client-body ' + (isCollapsed ? 'hidden' : '') + '" id="topo-client-body-' + client + '">';
+        // Device badges
+        var camOnline = s.cameras.filter(function(c) { return c.status === 'Online'; }).length;
+        var camBadge = s.cameras.length > 0 ? '<span class="topo-dev-badge ' + (camOnline === s.cameras.length ? 'online' : 'offline') + '">📷 ' + s.cameras.length + '</span>' : '';
+        var doorOnline = s.doors.filter(function(d) { return d.status === 'Online'; }).length;
+        var doorBadge = s.doors.length > 0 ? '<span class="topo-dev-badge ' + (doorOnline === s.doors.length ? 'online' : 'offline') + '">🚪 ' + s.doors.length + '</span>' : '';
+        var srvOnline = s.servers.filter(function(srv) { return srv.status === 'ONLINE'; }).length;
+        var srvBadge = s.servers.length > 0 ? '<span class="topo-dev-badge ' + (srvOnline === s.servers.length ? 'online' : 'offline') + '">🖥 ' + s.servers.length + '</span>' : '';
+        var swOnline = s.switches.filter(function(sw) { return !isSwitchOffline(sw); }).length;
+        var swBadge = s.switches.length > 0 ? '<span class="topo-dev-badge ' + (swOnline === s.switches.length ? 'online' : 'offline') + '">🔌 ' + s.switches.length + '</span>' : '';
 
-        siteNames.forEach(function(site) {
-          var s = sites[site];
-          var siteHealthColor = s.healthScore >= 90 ? '#4ade80' : s.healthScore >= 70 ? '#fbbf24' : '#f87171';
-          var siteId = site.replace(/[^a-zA-Z0-9]/g, '_');
-
-          html += '<div class="topo-site-node">';
-          html += '<div class="topo-site-bar" onclick="toggleTopoSiteBody(\'' + client + '\',\'' + siteId + '\')">';
-          html += '<div class="tsb-left"><span class="tsb-name">📍 ' + site + '</span></div>';
-          html += '<div style="display:flex;align-items:center;gap:10px;">';
-          html += '<div class="tsb-stats"><span>🔌 ' + s.switches.length + '</span><span>📷 ' + s.cameras.length + '</span><span>🚪 ' + s.doors.length + '</span><span>🖥 ' + s.servers.length + '</span></div>';
-          html += '<span class="tsb-health" style="color:' + siteHealthColor + '">' + s.healthScore + '%</span>';
-          html += '<i class="ti ti-chevron-down tsb-toggle" id="topo-site-toggle-' + client + '-' + siteId + '"></i>';
-          html += '</div></div>';
-          html += '<div class="topo-site-body" id="topo-site-body-' + client + '-' + siteId + '">';
-          html += '<div class="topo-diagram"><div class="topo-switch-row">';
-
-          s.switches.forEach(function(sw, swIdx) {
-            var isOffline = isSwitchOffline(sw);
-            var portCount = Math.floor(Math.random() * 6) + 4;
-            var totalPorts = 8 + Math.floor(Math.random() * 3) * 8;
-            var usedPct = Math.round((portCount / totalPorts) * 100);
-            var swIdxGlobal = SWITCHES.indexOf(sw);
-
-            html += '<div class="topo-switch-node">';
-            html += '<div class="topo-switch-box ' + (isOffline ? 'offline' : 'online') + '" onclick="event.stopPropagation();if(' + swIdxGlobal + '>=0)openSwitchDetail(' + swIdxGlobal + ');">';
-            html += '<div class="tsw-name">' + sw.name + '</div>';
-            html += '<div class="tsw-ip">' + sw.ip_address + '</div>';
-            html += '<div class="tsw-ports">';
-            for (var i = 0; i < Math.min(8, totalPorts); i++) {
-              var used = i < portCount;
-              var cls = 'free';
-              if (isOffline) cls = 'offline';
-              else if (used && usedPct > 85) cls = 'used-warn';
-              else if (used) cls = 'used';
-              html += '<span class="tsw-port ' + cls + '"></span>';
-            }
-            html += '</div></div>';
-
-            var childDevices = [];
-            if (swIdx === 0) {
-              s.cameras.forEach(function(c) { childDevices.push({ type: 'cam', data: c }); });
-              s.doors.forEach(function(d) { childDevices.push({ type: 'door', data: d }); });
-              s.servers.forEach(function(srv) { childDevices.push({ type: 'server', data: srv }); });
-            }
-
-            if (childDevices.length > 0) {
-              html += '<div class="topo-vertical-line"></div>';
-              html += '<div class="topo-device-row">';
-              childDevices.slice(0, 12).forEach(function(dev) {
-                var icon, name, isOnline, ci, di, sri;
-                if (dev.type === 'cam') {
-                  icon = '📷'; name = dev.data.name; isOnline = dev.data.status === 'Online';
-                  ci = CAMERAS.indexOf(dev.data);
-                  html += '<div class="topo-device-dot ' + (isOnline ? 'online' : 'offline') + '" onclick="event.stopPropagation();if(' + ci + '>=0)openCameraDetail(' + ci + ');">' + icon + '<span class="topo-dot-tooltip">' + name + (isOnline ? ' ✅' : ' ❌') + '</span></div>';
-                } else if (dev.type === 'door') {
-                  icon = '🚪'; name = dev.data.name; isOnline = dev.data.status === 'Online';
-                  di = DOORS.indexOf(dev.data);
-                  html += '<div class="topo-device-dot ' + (isOnline ? 'online' : 'offline') + '" onclick="event.stopPropagation();if(' + di + '>=0)openDoorDetail(' + di + ');">' + icon + '<span class="topo-dot-tooltip">' + name + (isOnline ? ' ✅' : ' ❌') + '</span></div>';
-                } else {
-                  icon = '🖥'; name = 'Server ' + dev.data.serial; isOnline = dev.data.status === 'ONLINE';
-                  sri = SERVERS.indexOf(dev.data);
-                  html += '<div class="topo-device-dot ' + (isOnline ? 'online' : 'offline') + '" onclick="event.stopPropagation();if(' + sri + '>=0)openServerDetail(' + sri + ');">' + icon + '<span class="topo-dot-tooltip">' + name + (isOnline ? ' ✅' : ' ❌') + '</span></div>';
-                }
-              });
-              if (childDevices.length > 12) html += '<span style="font-size:8px;color:var(--text-muted);">+' + (childDevices.length - 12) + '</span>';
-              html += '</div>';
-            }
-            html += '</div>';
-            if (swIdx < s.switches.length - 1) {
-              html += '<div class="topo-horizontal-line"></div>';
-            }
+        // Mini topology preview
+        var miniTopo = '';
+        if (s.switches.length > 0) {
+          miniTopo = '<div class="topo-mini">';
+          s.switches.slice(0, 2).forEach(function(sw) {
+            var isOff = isSwitchOffline(sw);
+            miniTopo += '<span class="topo-mini-sw ' + (isOff ? 'off' : '') + '" title="' + sw.name + '">🔌</span>';
           });
+          if (s.switches.length > 2) miniTopo += '<span style="font-size:9px;">+' + (s.switches.length - 2) + '</span>';
+          miniTopo += '<span class="topo-mini-arrow">→</span>';
+          if (s.cameras.length > 0) miniTopo += '<span title="' + s.cameras.length + ' cameras">📷</span>';
+          if (s.doors.length > 0) miniTopo += '<span title="' + s.doors.length + ' doors">🚪</span>';
+          if (s.servers.length > 0) miniTopo += '<span title="' + s.servers.length + ' servers">🖥</span>';
+          miniTopo += '</div>';
+        } else {
+          miniTopo = '<span style="color:var(--text-muted);font-size:10px;">No switches</span>';
+        }
 
-          html += '</div>';
-          html += '<div class="topo-site-health-bar"><div class="topo-site-health-fill" style="width:' + s.healthScore + '%;background:' + siteHealthColor + '"></div></div>';
-          html += '</div>';
-          html += '</div></div>';
-        });
+        html += '<tr class="topo-site-row clickable" onclick="toggleTopoSiteRow(\'' + s.site + '\')">';
+        html += '<td style="color:var(--text-primary);font-weight:500;">' + s.site + '</td>';
+        html += '<td style="font-size:11px;">' + s.client + '</td>';
+        html += '<td><div class="topo-health-cell"><div class="topo-health-bar"><div class="topo-health-fill" style="width:' + s.healthScore + '%;background:' + healthColor + ';"></div></div><span style="color:' + healthColor + ';font-weight:600;font-size:13px;">' + s.healthScore + '%</span></div></td>';
+        html += '<td><div class="topo-devices-cell">' + camBadge + doorBadge + srvBadge + swBadge + '</div></td>';
+        html += '<td>' + miniTopo + '</td>';
+        html += '</tr>';
 
-        html += '</div></div>';
+        // Expanded topology row
+        if (isExpanded) {
+          html += '<tr class="topo-expand-row" id="topo-expand-' + siteId + '">';
+          html += '<td colspan="5" style="padding:12px 16px;">';
+          html += '<div class="topo-expand-content">';
+
+          if (s.switches.length > 0) {
+            s.switches.forEach(function(sw) {
+              var isOff = isSwitchOffline(sw);
+              html += '<div class="topo-switch-group">';
+              html += '<div class="topo-switch-label ' + (isOff ? 'offline' : 'online') + '">🔌 ' + sw.name + ' <span style="font-size:9px;color:var(--text-muted);">' + sw.ip_address + '</span></div>';
+              html += '<div class="topo-switch-devices">';
+
+              // Show connected devices (first switch gets all, others are shown too)
+              if (s.cameras.length > 0 || s.doors.length > 0 || s.servers.length > 0) {
+                s.cameras.slice(0, 6).forEach(function(c) {
+                  var isOnline = c.status === 'Online';
+                  html += '<span class="topo-device-chip ' + (isOnline ? 'online' : 'offline') + '" onclick="event.stopPropagation();var ci=CAMERAS.indexOf(' + JSON.stringify(c) + ');if(ci>=0)openCameraDetail(ci);" title="' + c.name + '">📷 ' + c.name.substring(0, 12) + '</span>';
+                });
+                s.doors.slice(0, 4).forEach(function(d) {
+                  var isOnline = d.status === 'Online';
+                  html += '<span class="topo-device-chip ' + (isOnline ? 'online' : 'offline') + '" onclick="event.stopPropagation();var di=DOORS.indexOf(' + JSON.stringify(d) + ');if(di>=0)openDoorDetail(di);" title="' + d.name + '">🚪 ' + d.name.substring(0, 12) + '</span>';
+                });
+                s.servers.slice(0, 4).forEach(function(srv) {
+                  var isOnline = srv.status === 'ONLINE';
+                  html += '<span class="topo-device-chip ' + (isOnline ? 'online' : 'offline') + '" onclick="event.stopPropagation();var sri=SERVERS.indexOf(' + JSON.stringify(srv) + ');if(sri>=0)openServerDetail(sri);" title="Server ' + srv.serial + '">🖥 ' + srv.serial.substring(0, 12) + '</span>';
+                });
+                if (s.cameras.length > 6) html += '<span style="font-size:9px;color:var(--text-muted);">+ ' + (s.cameras.length - 6) + ' cameras</span>';
+                if (s.doors.length > 4) html += '<span style="font-size:9px;color:var(--text-muted);">+ ' + (s.doors.length - 4) + ' doors</span>';
+                if (s.servers.length > 4) html += '<span style="font-size:9px;color:var(--text-muted);">+ ' + (s.servers.length - 4) + ' servers</span>';
+              }
+              html += '</div></div>';
+            });
+          } else {
+            // Devices without switches
+            html += '<div class="topo-switch-group"><div class="topo-switch-label">📡 Direct Connect (No Switch)</div><div class="topo-switch-devices">';
+            s.cameras.forEach(function(c) {
+              html += '<span class="topo-device-chip ' + (c.status === 'Online' ? 'online' : 'offline') + '">📷 ' + c.name + '</span>';
+            });
+            s.doors.forEach(function(d) {
+              html += '<span class="topo-device-chip ' + (d.status === 'Online' ? 'online' : 'offline') + '">🚪 ' + d.name + '</span>';
+            });
+            html += '</div></div>';
+          }
+
+          html += '</div></td></tr>';
+        }
       });
     }
+
+    html += '</tbody></table></div>';
 
     container.innerHTML = html;
     updateTopoLastUpdated();
@@ -1848,21 +1930,45 @@ function renderTopology() {
   }, 200);
 }
 
-function toggleTopoClient(client) {
-  var body = document.getElementById('topo-client-body-' + client);
-  var toggle = document.getElementById('topo-toggle-' + client);
-  if (!body || !toggle) return;
-  body.classList.toggle('hidden');
-  toggle.classList.toggle('collapsed');
-  topoCollapsedClients[client] = body.classList.contains('hidden');
+function setTopoClientFilter(client) {
+  topoClientFilter = client;
+  renderTopology();
 }
 
-function toggleTopoSiteBody(client, siteId) {
-  var body = document.getElementById('topo-site-body-' + client + '-' + siteId);
-  var toggle = document.getElementById('topo-site-toggle-' + client + '-' + siteId);
-  if (!body || !toggle) return;
-  body.classList.toggle('hidden');
-  toggle.classList.toggle('collapsed');
+function sortTopo(column) {
+  if (topoSortColumn === column) {
+    topoSortDirection = topoSortDirection === 'asc' ? 'desc' : 'asc';
+  } else {
+    topoSortColumn = column;
+    topoSortDirection = column === 'health' ? 'desc' : 'asc';
+  }
+  renderTopology();
+}
+
+function toggleTopoSiteRow(site) {
+  if (topoExpandedSites[site]) {
+    delete topoExpandedSites[site];
+  } else {
+    topoExpandedSites[site] = true;
+  }
+  renderTopology();
+}
+
+function topoExpandAll() {
+  // Expand all visible sites
+  // We need to get the current site list — simplest is to set a flag and re-render
+  var allSites = {};
+  CAMERAS.forEach(function(c) { allSites[c.zone] = true; });
+  DOORS.forEach(function(d) { allSites[d.site] = true; });
+  SERVERS.forEach(function(s) { allSites[s.location] = true; });
+  SWITCHES.forEach(function(s) { allSites[s.location] = true; });
+  topoExpandedSites = allSites;
+  renderTopology();
+}
+
+function topoCollapseAll() {
+  topoExpandedSites = {};
+  renderTopology();
 }
 
 function updateTopoLastUpdated() {
