@@ -93,12 +93,8 @@ async function initDatabase() {
   try {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        username VARCHAR(50) UNIQUE NOT NULL,
-        password_hash VARCHAR(255) NOT NULL,
-        role VARCHAR(20) DEFAULT 'Technician',
-        email VARCHAR(100),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        id SERIAL PRIMARY KEY, username VARCHAR(50) UNIQUE NOT NULL, password_hash VARCHAR(255) NOT NULL,
+        role VARCHAR(20) DEFAULT 'Technician', email VARCHAR(100), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
       CREATE TABLE IF NOT EXISTS cameras (
         id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL, zone VARCHAR(50), status VARCHAR(20) DEFAULT 'Unknown',
@@ -110,16 +106,17 @@ async function initDatabase() {
         id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL UNIQUE, site VARCHAR(100), client VARCHAR(20),
         reader VARCHAR(100), lock_type VARCHAR(50), powered VARCHAR(20), status VARCHAR(20) DEFAULT 'Offline',
         tech VARCHAR(50), ip_address VARCHAR(15), controller VARCHAR(100), last_service VARCHAR(50),
-        history JSONB DEFAULT '[]', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        access_direction VARCHAR(10) DEFAULT 'In', history JSONB DEFAULT '[]', comments TEXT DEFAULT '',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
       CREATE TABLE IF NOT EXISTS servers (
         id SERIAL PRIMARY KEY, location VARCHAR(100), serial VARCHAR(50) NOT NULL UNIQUE, capacity VARCHAR(20),
-        used VARCHAR(20), health VARCHAR(100), apps TEXT, status VARCHAR(20) DEFAULT 'ONLINE',
+        used VARCHAR(20), health VARCHAR(100), apps TEXT, status VARCHAR(20) DEFAULT 'ONLINE', comments TEXT DEFAULT '',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
       CREATE TABLE IF NOT EXISTS switches (
         id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL UNIQUE, location VARCHAR(100), model VARCHAR(100),
-        ip_address VARCHAR(15), firmware VARCHAR(20), username VARCHAR(50), password VARCHAR(100), mac VARCHAR(20),
+        ip_address VARCHAR(15), firmware VARCHAR(20), username VARCHAR(50), password VARCHAR(100), mac VARCHAR(20), comments TEXT DEFAULT '',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
       CREATE TABLE IF NOT EXISTS tickets (
@@ -157,7 +154,6 @@ async function initDatabase() {
     console.error('❌ Database init error:', error);
   }
 }
-
 // ── SEED DATA ─────────────────────────────────────────────
 async function seedData() {
   try {
@@ -165,87 +161,168 @@ async function seedData() {
     if (parseInt(camerasCheck.rows[0].count) === 0) {
       console.log('🌱 Seeding cameras...');
       const cameras = [
-        ['HM3 PTZ','NORTH','Defective','172.17.102.218','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['HM4 PTZ','NORTH','Online','172.17.102.219','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['HM5 PTZ','NORTH','Online','172.17.102.223','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['HM8 PTZ','NORTH','Online','172.17.102.221','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['HM10 PTZ','NORTH','Online','172.17.102.224','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['HM11 PTZ','NORTH','Offline','172.17.102.225','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['HM23 PTZ','NORTH','Offline','172.17.102.200','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['HM28 PTZ','NORTH','Online','172.17.102.202','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['N25 PTZ','NORTH','Offline','172.17.102.216','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['N30 PTZ','NORTH','Online','172.17.102.210','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['A1 PTZ','NORTH','Online','172.17.103.30','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['A2 PTZ','NORTH','Online','172.17.103.31','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['A4 PTZ','SOUTH','Online','172.17.103.33','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['A5 PTZ','SOUTH','Online','172.17.103.34','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['A6 PTZ','SOUTH','Offline','172.17.103.35','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['A7 PTZ','SOUTH','Offline','172.17.103.36','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['A8 PTZ','SOUTH','Offline','172.17.103.37','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['A10 PTZ','SOUTH','Online','172.17.103.39','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['A11 PTZ','SOUTH','Online','172.17.103.40','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['A12 PTZ','SOUTH','Offline','172.17.103.41','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['B1 PTZ','WEST','Online','172.17.103.60','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['B2 PTZ','WEST','Online','172.17.103.61','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['B5 PTZ','WEST','Offline','172.17.103.63','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['B6 PTZ','WEST','Online','172.17.103.64','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['B8 PTZ','WEST','Online','172.17.103.66','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['B9 PTZ','WEST','Online','172.17.103.67','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['B10 PTZ','WEST','Online','172.17.103.68','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['B11 PTZ','WEST','Offline','172.17.103.69','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['B12 PTZ','WEST','Offline','172.17.103.70','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['C1 PTZ','SOUTH','Offline','172.17.103.81','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['C2 PTZ','SOUTH','Online','172.17.103.82','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['C4 PTZ','SOUTH','Online','172.17.103.83','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['C9 PTZ','SOUTH','Online','172.17.103.143','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['C11 PTZ','SOUTH','Offline','172.17.103.85','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['D4 PTZ','EAST','Online','172.17.103.99','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['D5 PTZ','EAST','Online','172.17.103.100','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['D10 PTZ','EAST','Online','172.17.103.104','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['D12 PTZ','EAST','Online','172.17.103.105','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['Manager Car Park PTZ','NORTH','Offline','172.17.102.186','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['Visitor Car Park Ptz 1','NORTH','Online','172.17.102.184','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['Visitor Car Park Ptz 2','NORTH','Online','172.17.102.185','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['SW Corner Perim PTZ','NORTH','Online','172.17.102.155','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['South Perim PTZ','SOUTH','Offline','172.17.103.86','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['Toll Gate Entry PTZ','NORTH','Online','172.17.102.182','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['Wharfage Perim N Exit Gate PTZ','NORTH','Online','172.17.102.183','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['PPE Store Perim PTZ','NORTH','Online','172.17.102.203','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['W2 PTZ','WEST','Offline','172.17.102.244','administrator','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['W6 PTZ','WEST','Online','172.17.102.248','admin','Pelco P2820-ESR','1920x1080 (2MP)',''],
-        ['B1','WEST','Online','172.17.103.43','administrator','Avigilon 5.0C-H5A-DP2','2560x1920 (5MP)',''],
-        ['B3','SOUTH','Online','172.17.103.46','administrator','Avigilon 5.0C-H5A-DP2','2560x1920 (5MP)',''],
-        ['W1','WEST','Online','172.17.103.155','admin','Avigilon 5.0C-H5A-DP2','2560x1920 (5MP)',''],
-        ['A3 PTZ','NORTH','Online','172.17.103.32','root','Axis P5655-E','1920x1080 (2MP)',''],
-        ['B3 PTZ','SOUTH','Online','172.17.103.62','root','Axis P3267-LVE','1920x1080 (2MP)',''],
-        ['D1 PTZ','EAST','Online','172.17.103.97','root','Axis P5655-E','1920x1080 (2MP)',''],
-        ['D2 PTZ','EAST','Online','172.17.103.98','root','Axis P5655-E','1920x1080 (2MP)',''],
-        ['WB1 PTZ','WEST','Offline','172.17.102.198','root','Axis P3267-LVE','1920x1080 (2MP)',''],
-        ['Tollgate Entry LPR','NORTH','Online','172.17.102.188','admin','AutoVu SharpOS','1920x1080 (2MP)',''],
-        ['Tollgate Exit LPR','NORTH','Online','172.17.102.189','admin','AutoVu SharpOS','1920x1080 (2MP)',''],
-        ['SE Tower PTZ','SOUTH','Online','172.17.103.165','admin','Opgal OP94-1200-0000','1920x1080 (2MP)','']
+        // ── ADMIN/HR — Still Cameras ──
+        ['ATM Walkway','ADMIN/HR','Online','','admin','','',''],
+        ['Board N Ceo Secretary','ADMIN/HR','Online','','admin','','',''],
+        ['Executive 2nd Fl Exit Stair Lower Case','ADMIN/HR','Online','','admin','','',''],
+        ['Executive 2nd Fl Exit Stair Top Case','ADMIN/HR','Online','','admin','','',''],
+        ['HR Meeting Rm Passage','ADMIN/HR','Online','','admin','','','Camera refocused'],
+        ['HR Waiting Area','ADMIN/HR','Online','','admin','','',''],
+        ['Lobby HR','ADMIN/HR','Online','','admin','','',''],
+        ['Meeting RM Passage','ADMIN/HR','Online','','admin','','',''],
+        ['Payroll Walkway','ADMIN/HR','Online','','admin','','',''],
+        ['Planning Main Entry','ADMIN/HR','Online','','admin','','',''],
+        ['Procurement Passage','ADMIN/HR','Online','','admin','','',''],
+
+        // ── ENGINEERING — Still Cameras ──
+        ['Bathroom Passage 1','ENGINEERING','Online','','admin','','',''],
+        ['Bathroom Passage 2','ENGINEERING','Online','','admin','','',''],
+        ['Battery Shop','ENGINEERING','Online','','admin','','','Lift Required'],
+        ['Data Center A','ENGINEERING','Online','','admin','','',''],
+        ['F Changing Room Exit Passage','ENGINEERING','Online','','admin','','',''],
+        ['Eng Workshop 3','ENGINEERING','Online','','admin','','','Lift Required'],
+        ['Eng Rear Passage','ENGINEERING','Online','','admin','','',''],
+        ['Engineering East Stair','ENGINEERING','Online','','admin','','',''],
+        ['Engineering West Stair','ENGINEERING','Online','','admin','','',''],
+        ['IT Entry','ENGINEERING','Online','','admin','','',''],
+        ['IT Exit','ENGINEERING','Online','','admin','','',''],
+        ['IT Stairwell','ENGINEERING','Online','','admin','','',''],
+        ['Engineering Lunch Room','ENGINEERING','Online','','admin','','',''],
+        ['Engineering Entry','ENGINEERING','Online','','admin','','',''],
+        ['Engineering Gym','ENGINEERING','Online','','admin','','',''],
+        ['Training Room East','ENGINEERING','Online','','admin','','',''],
+        ['Training Room West','ENGINEERING','Online','','admin','','',''],
+        ['Eng Lunch RM Kitchen','ENGINEERING','Online','','admin','','',''],
+        ['Engineering Entry Passage','ENGINEERING','Online','','admin','','',''],
+        ['Tyre Shop','ENGINEERING','Online','','admin','','','Lift Required'],
+
+        // ── HIGH MAST — Still Cameras ──
+        ['HM5(11)','HIGH MAST','Online','','admin','','','Camera had default IP reconfigured'],
+        ['HM5(134)','HIGH MAST','Online','','admin','','','Camera lens damaged'],
+        ['HM8','HIGH MAST','Online','','admin','','',''],
+        ['HM14','HIGH MAST','Online','','admin','','',''],
+        ['HM23','HIGH MAST','Online','','admin','','',''],
+        ['HM24A','HIGH MAST','Defective','','admin','','','No Fibre link'],
+        ['Manager Car Park Dome','HIGH MAST','Online','','admin','','','Camera lens Damaged'],
+        ['N30','HIGH MAST','Online','','admin','','','Pole'],
+        ['N31','HIGH MAST','Online','','admin','','','Camera needs to be reset, POE replaced'],
+        ['N33','HIGH MAST','Online','','admin','','',''],
+        ['N34','HIGH MAST','Online','','admin','','',''],
+        ['HM14 PTZ 2','HIGH MAST','Online','','admin','','','To be added to genetec(172.17.103.200)'],
+
+        // ── NORTH TERMINAL PERIMETER — Still Cameras ──
+        ['N Fence','NORTH TERMINAL PERIMETER','Online','','admin','','','Analytics Applied'],
+        ['East West Corner Perimeter Rest Bay','NORTH TERMINAL PERIMETER','Online','','admin','','','Analytics Applied'],
+        ['N Terminal NW Corner','NORTH TERMINAL PERIMETER','Online','','admin','','','Analytics Applied'],
+        ['North South Corner Rest Bay','NORTH TERMINAL PERIMETER','Online','','admin','','','Analytics Applied'],
+        ['PPE Store Perim N','NORTH TERMINAL PERIMETER','Online','','admin','','','Analytics Applied'],
+        ['PPE Store Perim S','NORTH TERMINAL PERIMETER','Online','','admin','','','Analytics Applied'],
+        ['Wharfage Perim','NORTH TERMINAL PERIMETER','Defective','','admin','','','replacement needed'],
+
+        // ── NORTH TERMINAL PERIMETER — PTZ Cameras ──
+        ['HR Tower 1 PTZ','NORTH TERMINAL PERIMETER','Online','','admin','','',''],
+        ['HR Tower 2 PTZ','NORTH TERMINAL PERIMETER','Online','','admin','','',''],
+        ['PPE Store Perim PTZ','NORTH TERMINAL PERIMETER','Online','','admin','','',''],
+        ['Wharfage Perim N Exit Gate PTZ','NORTH TERMINAL PERIMETER','Online','','admin','','',''],
+
+        // ── PTZ CAMERAS ──
+        ['Berth 9 PTZ','PTZ','Online','','admin','','',''],
+        ['HM3 PTZ','PTZ','Defective','','admin','','','POE added, camera shows signs of being defective'],
+        ['HM4 PTZ','PTZ','Online','','admin','','',''],
+        ['HM5 PTZ','PTZ','Online','','admin','','',''],
+        ['HM8 PTZ','PTZ','Online','','admin','','',''],
+        ['HM10 PTZ','PTZ','Online','','admin','','','Camera is reconfigured, had default IP'],
+        ['HM11 PTZ','PTZ','Online','','admin','','',''],
+        ['HM14 PTZ','PTZ','Online','','admin','','',''],
+        ['HM23 PTZ','PTZ','Defective','','admin','','','Cables ends were corroded. Ends recrimped. Camera is online. Camera remained online for a week, second checks revealed the camera is over heating. Camera is deemed defective'],
+        ['HM24A PTZ','PTZ','Defective','','admin','','','No Fibre link'],
+        ['HM28 PTZ','PTZ','Online','','admin','','',''],
+        ['Manager Car Park PTZ','PTZ','Defective','','admin','','','Defective'],
+        ['N Terminal NW Corner PTZ','PTZ','Online','','admin','','',''],
+        ['N25 PTZ','PTZ','Defective','','admin','','','Defective'],
+        ['N30 PTZ','PTZ','Online','','admin','','','Reset needs to be done'],
+        ['N31 PTZ- Context','PTZ','Defective','','admin','','','POE injector changed, Camera needs reset, maybe defective'],
+        ['N34 PTZ - Context','PTZ','Defective','','admin','','','Defective'],
+        ['Visitor Car Park PTZ 1','PTZ','Online','','admin','','',''],
+        ['Visitor Car Park PTZ 2','PTZ','Defective','','admin','','','REPLACEMENT/AXIS Q6318-LE 60HZ to be installed'],
+
+        // ── LIQUID PLANT — Original Cameras (Rows 19-39) ──
+        ['Front Lobby','Liquid Plant','Online','10.1.7.64','Admin','Arecont Vision 2146DN','1.3 MP','Cleaned'],
+        ['Time Clock','Liquid Plant','Online','10.1.7.63','Admin','Arecont Vision 1145DN','1.3 MP','Cleaned'],
+        ['Finish Goods Staging Area','Liquid Plant','Online','10.1.7.62','Admin','Arecont Vision 5145DN','5 MP','Cleaned'],
+        ['Processing Room Cam 1','Liquid Plant','Online','10.1.7.61','Admin','Arecont Vision 1145DN','1.3 MP','View block by new machine'],
+        ['Processing Room Cam 2','Liquid Plant','Online','10.1.7.60','Admin','Arecont Vision 1145DN','1.3 MP','View block by new machine'],
+        ['RO Plant','Liquid Plant','Online','10.1.7.59','Admin','Arecont Vision 5145DN','1.3 MP','Cleaned'],
+        ['Filling Room Cam 1','Liquid Plant','Online','10.1.7.58','Admin','Arecont Vision 1145DN','1.3 MP','Cleaned'],
+        ['Filling Room Cam 2','Liquid Plant','Online','10.1.7.57','Admin','Arecont Vision 1145DN','1.3 MP','Cleaned'],
+        ['Large Bottle Line','Liquid Plant','Online','10.1.7.56','Admin','Arecont Vision 5145DN','5 MP','Cleaned'],
+        ['LML Shutter','Liquid Plant','Online','10.1.7.55','Admin','Arecont Vision 5145DN','1.3 MP','Cleaned'],
+        ['Blow Mold Fire Door & Shutter','Liquid Plant','Online','10.1.7.53','Admin','Arecont Vision 5145DN','1.3 MP','Cleaned'],
+        ['Utilies Room Emergency Exit','Liquid Plant','Online','10.1.7.52','Admin','Arecont Vision 5145DN','1.3 MP','Cleaned'],
+        ['Sacmi conveyor line','Liquid Plant','Online','10.1.7.50','Admin','Arecont Vision 5145DN','5 MP','Cleaned'],
+        ['Inside Stores','Liquid Plant','Online','10.1.7.70','Admin','Arecont Vision 5145DN','1.3 MP','Cleaned'],
+        ['Stores & Sacmi Entrance','Liquid Plant','Online','10.1.7.69','Admin','Arecont Vision 5145DN','1.3 MP','Cleaned'],
+        ['Emergency Exit Door','Liquid Plant','Online','10.1.7.68','Admin','Arecont Vision 5145DN','1.3 MP','Cleaned'],
+        ['Palletizing','Liquid Plant','Online','10.1.7.65','Admin','Arecont Vision 5145DN','1.3 MP','Cleaned'],
+
+        // ── LIQUID PLANT — Additions (Rows 129-134) ──
+        ['Sacmi combo','Liquid Plant','Online','10.1.7.154','root','Axis P1427','5 MP','Cleaned'],
+        ['Sacmi Paturizer','Liquid Plant','Online','10.1.7.155','root','Axis P1427','5 MP','Cleaned'],
+        ['SBO Blow mold','Liquid Plant','Online','10.1.7.156','root','Axis P1427','5 MP','Cleaned'],
+        ['Utilies Room','Liquid Plant','Online','10.1.7.157','root','Axis P1427','5 MP','Cleaned'],
+        ['Sacmi Palletizer','Liquid Plant','Online','10.1.7.158','root','Axis P1427','5 MP','Cleaned'],
+        ['Blow mold','Liquid Plant','Online','10.1.7.159','root','Axis P1427','5 MP','Cleaned'],
       ];
       for (const cam of cameras) {
         await pool.query(`INSERT INTO cameras (name, zone, status, ip_address, username, model, resolution, comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT (name, ip_address) DO NOTHING`, cam);
       }
-      console.log('✅ Cameras seeded');
+      console.log('✅ Cameras seeded (' + cameras.length + ' cameras)');
     }
-
+    
+    // ── SEED DOORS ──────────────────────────────────
     const doorsCheck = await pool.query("SELECT COUNT(*) FROM doors");
     if (parseInt(doorsCheck.rows[0].count) === 0) {
       console.log('🌱 Seeding doors...');
       const doors = [
-        ['Second Entrance Staff Entrance 2','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.100','eyeLock Panel 2','6/3/2026'],
-        ['Second Entrance Staff Exit 1','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.101','eyeLock Panel 1','6/3/2026'],
-        ['Second Entrance Staff Entrance 1','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.102','eyeLock Panel 3','6/3/2026'],
-        ['Second Entrance Staff Exit 2','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.103','eyeLock Panel 4','6/3/2026']
+        // ── Original KFTL Doors ──
+        ['Second Entrance Staff Entrance 2','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.100','eyeLock Panel 2','6/3/2026','In'],
+        ['Second Entrance Staff Exit 1','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.101','eyeLock Panel 1','6/3/2026','Out'],
+        ['Second Entrance Staff Entrance 1','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.102','eyeLock Panel 3','6/3/2026','In'],
+        ['Second Entrance Staff Exit 2','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.103','eyeLock Panel 4','6/3/2026','Out'],
+
+        // ── Lasco LML B Liquid Plant Doors ──
+        ['Batching room','LML B Liquid Plant','Lasco','—','—','Not In Use','Offline','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]','No longer use, equipment has been removed'],
+        ['Blow mold entrance 1','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]','Door needs repair, door drop'],
+        ['Blow mold entrance 2','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]','Door needs repair, door drop'],
+        ['Chemistry lab','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Electrical room to utilites','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 1200','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Utilites to electrical room','LML B Liquid Plant','Lasco','eyeLock (Biometric)','—','Yes','Online','Unassigned','','','','Out','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Entrance to upstairs offices - IN','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Entrance to upstairs offices - OUT','LML B Liquid Plant','Lasco','eyeLock (Biometric)','—','Yes','Online','Unassigned','','','','Out','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Filling room 1','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Filling room 2','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Filling room 3','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Filling room 4','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Guest access - IN','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Guest access - OUT','LML B Liquid Plant','Lasco','eyeLock (Biometric)','—','Yes','Online','Unassigned','','','','Out','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Lobby','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Microbiology lab','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Prep Room','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Processing room 1','LML B Liquid Plant','Lasco','—','—','Not In Use','Offline','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]','No longer use, equipment has been removed'],
+        ['Processing room 2','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Product dev lab','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Production floor - IN','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Production floor - OUT','LML B Liquid Plant','Lasco','eyeLock (Biometric)','—','Yes','Online','Unassigned','','','','Out','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['QA office','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Shop and spare parts','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]','']
       ];
       for (const door of doors) {
-        await pool.query(`INSERT INTO doors (name, site, client, reader, lock_type, powered, status, tech, ip_address, controller, last_service, history) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12::jsonb) ON CONFLICT (name) DO NOTHING`, [...door.slice(0,11), '[{"date":"Jun 18, 2026","event":"Reader replacement","tech":"Marvin Grant"}]']);
+        await pool.query(`INSERT INTO doors (name, site, client, reader, lock_type, powered, status, tech, ip_address, controller, last_service, access_direction, history, comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13::jsonb,$14) ON CONFLICT (name) DO NOTHING`, door);
       }
-      console.log('✅ Doors seeded');
+      console.log('✅ Doors seeded (' + doors.length + ' doors)');
     }
 
+    // ── SEED SERVERS ──────────────────────────────────
     const serversCheck = await pool.query("SELECT COUNT(*) FROM servers");
     if (parseInt(serversCheck.rows[0].count) === 0) {
       console.log('🌱 Seeding servers...');
@@ -266,6 +343,7 @@ async function seedData() {
       console.log('✅ Servers seeded');
     }
 
+    // ── SEED SWITCHES ──────────────────────────────────
     const switchesCheck = await pool.query("SELECT COUNT(*) FROM switches");
     if (parseInt(switchesCheck.rows[0].count) === 0) {
       console.log('🌱 Seeding switches...');
@@ -291,22 +369,52 @@ async function seedData() {
       }
       console.log('✅ Switches seeded');
     }
-
+    
+    // ── SEED TICKETS ──────────────────────────────────
     const ticketsCheck = await pool.query("SELECT COUNT(*) FROM tickets");
     if (parseInt(ticketsCheck.rows[0].count) === 0) {
       console.log('🌱 Seeding tickets...');
       const tickets = [
+        // ── Original Tickets ──
         ['SR-1847','KFTL','NORTH Zone','Replace defective cameras - NORTH zone','facilities@kftl.com','Camera','High','Open','Shanice Vernon','Jun 13, 2026','We need camera replacements in NORTH zone.','','[]','[{"time":"14:22","msg":"Created — assigned to Shanice (day shift)"}]','[]'],
         ['SR-1848','KWL','Tinson Pen','Tinson Pen switches need firmware check','security@kwl.com','Network','Medium','Open','Shanice Vernon','Jun 15, 2026','Tinson Pen switches need firmware check.','','[]','[{"time":"11:05","msg":"Created — assigned to Shanice (day shift)"}]','[]'],
         ['SR-1849','KFTL','Second Entrance','All 4 turnstiles offline','it@kftl.com','Access Control','High','In Progress','Marvin Grant','Jun 10, 2026','All turnstiles offline.','','[]','[{"time":"16:48","msg":"Created — assigned to Shavine (night shift)"},{"time":"17:00","msg":"Escalated to Marvin Grant for on-site repair"}]','[]'],
-        ['SR-1850','KFTL','Kingport','Server J1013DDV failed drive','marvin.grant@etechsystems.com','Server','Medium','Open','Shavine','Jun 8, 2026','Server J1013DDV has failed drive.','','[]','[{"time":"09:12","msg":"Created — assigned to Shavine (night shift)"}]','[]']
+        ['SR-1850','KFTL','Kingport','Server J1013DDV failed drive','marvin.grant@etechsystems.com','Server','Medium','Open','Shavine','Jun 8, 2026','Server J1013DDV has failed drive.','','[]','[{"time":"09:12","msg":"Created — assigned to Shavine (night shift)"}]','[]'],
+
+        // ── KWL Security Service Requests (from June 25, 2026 document) ──
+        ['SR-1851','KFTL','TLF','Cam 117 TLF Car Park PTZ — Pixelated Images','vincent@lascoja.com','Camera','High','Open','Unassigned','Dec 1, 2025','Camera needs to be physically checked. MANLIFT required.','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]'],
+        ['SR-1852','KFTL','KWC','Cam 280 Stripping Ramp 1 — Shifted Camera','vincent@lascoja.com','Camera','High','Open','Unassigned','May 19, 2026','Camera previously adjusted. Movement is from fan above.','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]'],
+        ['SR-1853','KFTL','TLF','Cam 068 TLF Warehouse Receival Bay 13 & 14 — Blurred Camera','vincent@lascoja.com','Camera','High','Resolved','Unassigned','Jun 25, 2026','Blurred — Resolved.','','[]','[{"time":"14:06","msg":"Created from KWL Security Control Centre log"},{"time":"14:06","msg":"Status → Resolved"}]','[]'],
+        ['SR-1854','KFTL','TLF','Cam 027 TLF Warehouse Aisles 10 & 11 — Blurred Camera','vincent@lascoja.com','Camera','High','Resolved','Unassigned','Jun 24, 2026','Blurred — Resolved.','','[]','[{"time":"15:40","msg":"Created from KWL Security Control Centre log"},{"time":"15:40","msg":"Status → Resolved"}]','[]'],
+        ['SR-1855','KFTL','KWC','Cam 248 KWC Stripping Ramp 5 — Out of Focus','vincent@lascoja.com','Camera','High','Open','Unassigned','Mar 17, 2026','Camera lens shows signs of being defective. Lens not responding to attempts to focus.','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]'],
+        ['SR-1856','KWL','GALC','Cam 263 TP Pole 47 Cam 1 — Out of Focus','vincent@lascoja.com','Camera','High','Open','Unassigned','Sep 16, 2025','Camera covering is crystalized. Camera dome needs to be replaced.','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]'],
+        ['SR-1857','KWL','GALC','Cam 235 TP Pole 42 Cam 2 — Out of Focus','vincent@lascoja.com','Camera','High','Open','Unassigned','Sep 16, 2025','Camera covering is crystalized. Camera dome needs to be replaced.','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]'],
+        ['SR-1858','KFTL','PORT','Cam 361 KWL Port Berth 1 Corner — Navigational Difficulty','vincent@lascoja.com','Camera','High','Open','Unassigned','Apr 28, 2026','Camera rebooted & settings changed. Camera will not accept configuration changes after reboot.','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]'],
+        ['SR-1859','KWL','GALC','Cam 246 TP Pole 11 PTZ — Intermittent Disconnections','vincent@lascoja.com','Camera','High','Open','Unassigned','Mar 14, 2026','Camera defective.','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]'],
+        ['SR-1860','KFTL','Port','Cam 402 Port Berth 1 OP South — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','Mar 22, 2026','CAMERA DEFECTIVE.','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]'],
+        ['SR-1861','KWL','GALC','Cam 282 TP Pole 21 Cam 1 — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','May 29, 2026','Camera defective needs to be replaced.','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]'],
+        ['SR-1862','KWL','GALC','Cam 209 TP Pole 2 Cam 2 — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','May 28, 2026','Cable needs to be replaced.','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]'],
+        ['SR-1863','KWL','GALC','Cam 215 TP Pole 37 Cam 2 — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','May 25, 2026','Cable needs to be replaced.','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]'],
+        ['SR-1864','KWL','GALC','Cam 208 TP Pole 6 Cam 2 — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','Feb 23, 2026','Switch only has 1 working port which cam 1 is plugged into (Previously updated).','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]'],
+        ['SR-1865','KFTL','Port','Cam 439 KWL Port Berth 4 Pylon East — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','Feb 3, 2026','Camera gets connection from Berth 5. Berth 5 is offline.','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]'],
+        ['SR-1866','KWL','GALC','Cam 219 TP Pole 25 cam 1 — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','Feb 1, 2026','Fibre damaged. Fibre needs to be repaired.','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]'],
+        ['SR-1867','KWL','GALC','Cam 310 TP Pole 25 cam 2 — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','Feb 1, 2026','Fibre damaged. Fibre needs to be repaired.','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]'],
+        ['SR-1868','KFTL','Port','Cam 254 TP Pole 33 Cam 1 — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','Jan 12, 2026','Switch Enclosure damaged, needs to be replaced. Switch damaged needs to be replaced. Camera tested okay.','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]'],
+        ['SR-1869','KFTL','KWC','Cam 279 KWC Stripping Ramp PTZ — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','Jan 6, 2025','Camera defective.','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]'],
+        ['SR-1870','KFTL','KWC','Cam 303 KWC Vehicular Exit — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','Nov 18, 2025','CABLE NEEDS TO BE CHANGED.','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]'],
+        ['SR-1871','KWL','GALC','Cam 237 TP Pole 8 Cam 1 — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','Oct 24, 2025','Water inside of camera.','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]'],
+        ['SR-1872','KFTL','TLF','Cam 090 TLF Receival External Perimeter PTZ — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','Sep 15, 2025','CABLE NEEDS TO BE CHANGED.','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]'],
+        ['SR-1873','KFTL','PORT','Cam 346 Port Exit Gate Lane 6 LPR — Colour Scale Issues','vincent@lascoja.com','Camera','High','Open','Unassigned','May 16, 2026','Camera defective.','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]'],
+        ['SR-1874','KWL','GALC','Cam 308 TP Pole 34 PTZ — Colour Scale Issues','vincent@lascoja.com','Camera','High','Open','Unassigned','Feb 8, 2026','Camera defective, lens defective.','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]'],
+        ['SR-1875','KWL','WH1','Cam 397 WH1 Receival Bay Door — Colour Scale Issues','vincent@lascoja.com','Camera','High','Open','Unassigned','Sep 30, 2025','IR lens defective.','','[]','[{"time":"07:00","msg":"Created from KWL Security Control Centre log"}]','[]']
       ];
       for (const ticket of tickets) {
         await pool.query(`INSERT INTO tickets (id, client, site, subject, from_email, category, priority, status, assigned, received, body, notes, hardware, history, attachments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13::jsonb,$14::jsonb,$15::jsonb)`, ticket);
       }
-      console.log('✅ Tickets seeded');
+      console.log('✅ Tickets seeded (' + tickets.length + ' tickets)');
     }
 
+    // ── SEED AUDIT LOGS ──────────────────────────────────
     const auditCheck = await pool.query("SELECT COUNT(*) FROM audit_logs");
     if (parseInt(auditCheck.rows[0].count) === 0) {
       console.log('🌱 Seeding audit logs...');
@@ -315,7 +423,8 @@ async function seedData() {
         ['13:50','Marvin Grant','updated','HM3 PTZ comment → "Defective"'],
         ['12:00','System','converted','David Chen → SR-1848'],
         ['11:30','System','sync','Camera_Maintenance_2025.csv ✅'],
-        ['10:45','System','sync','Access_Control_Survey.csv ⚠️']
+        ['10:45','System','sync','Access_Control_Survey.csv ⚠️'],
+        ['07:00','System','created','25 KWL Security Control Centre tickets imported']
       ];
       for (const entry of auditEntries) {
         await pool.query(`INSERT INTO audit_logs (time, username, action, target) VALUES ($1,$2,$3,$4)`, entry);
@@ -323,6 +432,7 @@ async function seedData() {
       console.log('✅ Audit logs seeded');
     }
 
+    // ── SEED EMAILS ──────────────────────────────────
     const emailsCheck = await pool.query("SELECT COUNT(*) FROM emails");
     if (parseInt(emailsCheck.rows[0].count) === 0) {
       console.log('🌱 Seeding emails...');
@@ -387,25 +497,15 @@ app.post('/api/auth/microsoft', async (req, res) => {
       grant_type: 'authorization_code'
     });
 
-    if (code_verifier) {
-      params.append('code_verifier', code_verifier);
-    }
+    if (code_verifier) { params.append('code_verifier', code_verifier); }
 
     const tokenResponse = await fetch(
       `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: params.toString()
-      }
+      { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString() }
     );
 
     const data = await tokenResponse.json();
-    if (data.error) {
-      console.error('Token exchange error:', data);
-      return res.status(400).json({ error: data.error_description || data.error });
-    }
-
+    if (data.error) { console.error('Token exchange error:', data); return res.status(400).json({ error: data.error_description || data.error }); }
     res.json(data);
   } catch (error) {
     console.error('Microsoft auth proxy error:', error);
@@ -419,7 +519,6 @@ function getFileType(filename) {
   const types = { csv: 'csv', xlsx: 'xlsx', xls: 'xlsx', docx: 'docx', doc: 'docx', pdf: 'pdf', txt: 'txt', jpg: 'image', jpeg: 'image', png: 'image' };
   return types[ext] || 'file';
 }
-
 function formatFileSize(bytes) {
   if (!bytes) return '—';
   if (bytes < 1024) return bytes + ' B';
@@ -429,66 +528,31 @@ function formatFileSize(bytes) {
 
 async function fetchSharePointFiles(accessToken) {
   try {
-    const siteResponse = await fetch(
-      'https://graph.microsoft.com/v1.0/sites/etechsystemsltd.sharepoint.com:/sites/Share',
-      { headers: { Authorization: 'Bearer ' + accessToken } }
-    );
+    const siteResponse = await fetch('https://graph.microsoft.com/v1.0/sites/etechsystemsltd.sharepoint.com:/sites/Share', { headers: { Authorization: 'Bearer ' + accessToken } });
     const siteData = await siteResponse.json();
-
-    const driveResponse = await fetch(
-      'https://graph.microsoft.com/v1.0/sites/' + siteData.id + '/drives',
-      { headers: { Authorization: 'Bearer ' + accessToken } }
-    );
+    const driveResponse = await fetch('https://graph.microsoft.com/v1.0/sites/' + siteData.id + '/drives', { headers: { Authorization: 'Bearer ' + accessToken } });
     const drives = await driveResponse.json();
     const documentsDrive = drives.value.find(function(d) { return d.name === 'Documents'; });
-
-    const folderPath = '/E-Tech Maintenance';
-    const childrenResponse = await fetch(
-      'https://graph.microsoft.com/v1.0/drives/' + documentsDrive.id + '/root:' + encodeURIComponent(folderPath) + ':/children',
-      { headers: { Authorization: 'Bearer ' + accessToken } }
-    );
+    const childrenResponse = await fetch('https://graph.microsoft.com/v1.0/drives/' + documentsDrive.id + '/root:/E-Tech%20Maintenance:/children', { headers: { Authorization: 'Bearer ' + accessToken } });
     const folderData = await childrenResponse.json();
-
     const allFiles = [];
     for (let i = 0; i < folderData.value.length; i++) {
       const item = folderData.value[i];
       if (item.folder) {
-        const subResponse = await fetch(
-          'https://graph.microsoft.com/v1.0/drives/' + documentsDrive.id + '/items/' + item.id + '/children',
-          { headers: { Authorization: 'Bearer ' + accessToken } }
-        );
+        const subResponse = await fetch('https://graph.microsoft.com/v1.0/drives/' + documentsDrive.id + '/items/' + item.id + '/children', { headers: { Authorization: 'Bearer ' + accessToken } });
         const subData = await subResponse.json();
         for (let j = 0; j < subData.value.length; j++) {
           const file = subData.value[j];
           if (!file.folder) {
-            allFiles.push({
-              name: file.name,
-              type: getFileType(file.name),
-              size: formatFileSize(file.size),
-              modified: new Date(file.lastModifiedDateTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-              downloadUrl: file['@microsoft.graph.downloadUrl'],
-              client: item.name,
-              status: 'synced'
-            });
+            allFiles.push({ name: file.name, type: getFileType(file.name), size: formatFileSize(file.size), modified: new Date(file.lastModifiedDateTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), downloadUrl: file['@microsoft.graph.downloadUrl'], client: item.name, status: 'synced' });
           }
         }
       } else {
-        allFiles.push({
-          name: item.name,
-          type: getFileType(item.name),
-          size: formatFileSize(item.size),
-          modified: new Date(item.lastModifiedDateTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-          downloadUrl: item['@microsoft.graph.downloadUrl'],
-          client: 'Root',
-          status: 'synced'
-        });
+        allFiles.push({ name: item.name, type: getFileType(item.name), size: formatFileSize(item.size), modified: new Date(item.lastModifiedDateTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), downloadUrl: item['@microsoft.graph.downloadUrl'], client: 'Root', status: 'synced' });
       }
     }
     return allFiles;
-  } catch (error) {
-    console.error('SharePoint fetch error:', error);
-    return null;
-  }
+  } catch (error) { console.error('SharePoint fetch error:', error); return null; }
 }
 
 app.get('/api/sharepoint/sync', authenticate, async (req, res) => {
@@ -496,104 +560,70 @@ app.get('/api/sharepoint/sync', authenticate, async (req, res) => {
     const authHeader = req.headers.authorization;
     const graphToken = authHeader ? authHeader.split(' ')[1] : null;
     if (!graphToken) return res.status(401).json({ error: 'Microsoft Graph token required' });
-
     const files = await fetchSharePointFiles(graphToken);
     if (!files) return res.status(500).json({ error: 'Failed to fetch SharePoint files' });
-
     res.json({ data: files, count: files.length });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 app.get('/api/sharepoint/file', authenticate, async (req, res) => {
   try {
     const { url } = req.query;
     if (!url) return res.status(400).json({ error: 'File URL required' });
-
     const authHeader = req.headers.authorization;
     const graphToken = authHeader ? authHeader.split(' ')[1] : null;
-
     const fileResponse = await fetch(url, { headers: { Authorization: 'Bearer ' + graphToken } });
     const contentType = fileResponse.headers.get('content-type') || '';
     const text = await fileResponse.text();
-
     res.json({ data: text, contentType });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 // ── CAMERAS ─────────────────────────────────────────────
 app.get('/api/cameras', authenticate, async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM cameras ORDER BY zone, name');
-    res.json({ data: result.rows });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  try { const result = await pool.query('SELECT * FROM cameras ORDER BY zone, name'); res.json({ data: result.rows }); }
+  catch (error) { res.status(500).json({ error: error.message }); }
 });
-
 app.put('/api/cameras/:name', authenticate, async (req, res) => {
   try {
-    const { name } = req.params;
-    const { comments, status, model, resolution } = req.body;
+    const { name } = req.params; const { comments, status, model, resolution } = req.body;
     const fields = []; const values = []; let counter = 1;
     if (comments !== undefined) { fields.push('comments = $' + counter); values.push(comments); counter++; }
     if (status !== undefined) { fields.push('status = $' + counter); values.push(status); counter++; }
     if (model !== undefined) { fields.push('model = $' + counter); values.push(model); counter++; }
     if (resolution !== undefined) { fields.push('resolution = $' + counter); values.push(resolution); counter++; }
-    fields.push('updated_at = CURRENT_TIMESTAMP');
-    values.push(name);
+    fields.push('updated_at = CURRENT_TIMESTAMP'); values.push(name);
     await pool.query('UPDATE cameras SET ' + fields.join(', ') + ' WHERE name = $' + counter, values);
     res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 // ── DOORS ─────────────────────────────────────────────────
 app.get('/api/doors', authenticate, async (req, res) => {
-  try {
-    const result = await pool.query('SELECT *, lock_type AS lock, ip_address AS ip, last_service AS date FROM doors ORDER BY site, name');
-    res.json({ data: result.rows });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  try { const result = await pool.query('SELECT *, lock_type AS lock, ip_address AS ip, last_service AS date FROM doors ORDER BY site, name'); res.json({ data: result.rows }); }
+  catch (error) { res.status(500).json({ error: error.message }); }
 });
-
 app.put('/api/doors/:name', authenticate, async (req, res) => {
   try {
-    const { name } = req.params;
-    const { status, tech, comments } = req.body;
+    const { name } = req.params; const { status, tech, comments } = req.body;
     if (status !== undefined) await pool.query('UPDATE doors SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [status, name]);
     if (tech !== undefined) await pool.query('UPDATE doors SET tech = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [tech, name]);
     if (comments !== undefined) await pool.query('UPDATE doors SET comments = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [comments, name]);
     res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 // ── SERVERS ──────────────────────────────────────────────
 app.get('/api/servers', authenticate, async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM servers ORDER BY location, serial');
-    res.json({ data: result.rows });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  try { const result = await pool.query('SELECT * FROM servers ORDER BY location, serial'); res.json({ data: result.rows }); }
+  catch (error) { res.status(500).json({ error: error.message }); }
 });
-
 app.put('/api/servers/:serial', authenticate, async (req, res) => {
   try {
-    const { serial } = req.params;
-    const { comments } = req.body;
+    const { serial } = req.params; const { comments } = req.body;
     if (comments !== undefined) await pool.query('UPDATE servers SET comments = $1, updated_at = CURRENT_TIMESTAMP WHERE serial = $2', [comments, serial]);
     res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 // ── SWITCHES ─────────────────────────────────────────────
@@ -602,109 +632,70 @@ app.get('/api/switches', authenticate, async (req, res) => {
     const result = await pool.query('SELECT * FROM switches ORDER BY location, name');
     const masked = result.rows.map(function(row) { return { ...row, password: row.password ? '••••••••' : null }; });
     res.json({ data: masked });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
-
 app.get('/api/switches/:id/reveal-password', authenticate, async (req, res) => {
   try {
     const { id } = req.params;
     const result = await pool.query('SELECT id, name, password FROM switches WHERE id = $1', [id]);
     if (result.rows.length === 0) return res.status(404).json({ error: 'Switch not found' });
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const now = new Date(); const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     await pool.query('INSERT INTO audit_logs (time, username, action, target) VALUES ($1, $2, $3, $4)', [timeStr, req.user.username, 'revealed credential', 'Switch ' + result.rows[0].name + ' password']);
     res.json({ password: result.rows[0].password });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
-
 app.put('/api/switches/:name', authenticate, async (req, res) => {
   try {
-    const { name } = req.params;
-    const { comments } = req.body;
+    const { name } = req.params; const { comments } = req.body;
     if (comments !== undefined) await pool.query('UPDATE switches SET comments = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [comments, name]);
     res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 // ── TICKETS ──────────────────────────────────────────────
 app.get('/api/tickets', authenticate, async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM tickets ORDER BY created_at DESC');
-    res.json({ data: result.rows });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  try { const result = await pool.query('SELECT * FROM tickets ORDER BY created_at DESC'); res.json({ data: result.rows }); }
+  catch (error) { res.status(500).json({ error: error.message }); }
 });
-
 app.post('/api/tickets', authenticate, async (req, res) => {
   try {
     const { id, client, site, subject, from_email, category, priority, status, assigned, received, body, notes, hardware, history, attachments } = req.body;
-    await pool.query(
-      'INSERT INTO tickets (id, client, site, subject, from_email, category, priority, status, assigned, received, body, notes, hardware, history, attachments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13::jsonb,$14::jsonb,$15::jsonb)',
-      [id, client, site, subject, from_email, category, priority, status, assigned, received, body, notes, JSON.stringify(hardware || []), JSON.stringify(history || []), JSON.stringify(attachments || [])]
-    );
+    await pool.query('INSERT INTO tickets (id, client, site, subject, from_email, category, priority, status, assigned, received, body, notes, hardware, history, attachments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13::jsonb,$14::jsonb,$15::jsonb)', [id, client, site, subject, from_email, category, priority, status, assigned, received, body, notes, JSON.stringify(hardware || []), JSON.stringify(history || []), JSON.stringify(attachments || [])]);
     res.json({ success: true, id });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
-
 app.put('/api/tickets/:id', authenticate, async (req, res) => {
   try {
-    const { id } = req.params;
-    const { status, assigned, notes, priority, category } = req.body;
+    const { id } = req.params; const { status, assigned, notes, priority, category } = req.body;
     const fields = []; const values = []; let counter = 1;
     if (status !== undefined) { fields.push('status = $' + counter); values.push(status); counter++; }
     if (assigned !== undefined) { fields.push('assigned = $' + counter); values.push(assigned); counter++; }
     if (notes !== undefined) { fields.push('notes = $' + counter); values.push(notes); counter++; }
     if (priority !== undefined) { fields.push('priority = $' + counter); values.push(priority); counter++; }
     if (category !== undefined) { fields.push('category = $' + counter); values.push(category); counter++; }
-    fields.push('updated_at = CURRENT_TIMESTAMP');
-    values.push(id);
+    fields.push('updated_at = CURRENT_TIMESTAMP'); values.push(id);
     await pool.query('UPDATE tickets SET ' + fields.join(', ') + ' WHERE id = $' + counter, values);
     res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 // ── AUDIT LOG ────────────────────────────────────────────
 app.get('/api/audit', authenticate, async (req, res) => {
-  try {
-    const limit = parseInt(req.query.limit) || 50;
-    const result = await pool.query('SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT $1', [limit]);
-    res.json({ data: result.rows });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  try { const limit = parseInt(req.query.limit) || 50; const result = await pool.query('SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT $1', [limit]); res.json({ data: result.rows }); }
+  catch (error) { res.status(500).json({ error: error.message }); }
 });
-
 app.post('/api/audit', authenticate, async (req, res) => {
   try {
-    const { user, action, target } = req.body;
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const { user, action, target } = req.body; const now = new Date(); const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     await pool.query('INSERT INTO audit_logs (time, username, action, target) VALUES ($1, $2, $3, $4)', [timeStr, user || req.user.username, action, target]);
     res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 // ── INBOX ────────────────────────────────────────────────
 app.get('/api/inbox', authenticate, async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM emails ORDER BY created_at DESC');
-    res.json({ data: result.rows });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  try { const result = await pool.query('SELECT * FROM emails ORDER BY created_at DESC'); res.json({ data: result.rows }); }
+  catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 // ── DASHBOARD TRENDS ─────────────────────────────────────
@@ -716,74 +707,37 @@ app.get('/api/dashboard/trends', authenticate, async (req, res) => {
       pool.query("SELECT COUNT(*) FILTER (WHERE status = 'ONLINE') AS online, COUNT(*) AS total FROM servers"),
       pool.query("SELECT COUNT(*) AS total FROM switches")
     ]);
-    const camerasDefective = parseInt(camRes.rows[0].count);
-    const doorsOffline = parseInt(doorRes.rows[0].count);
-    const serversOnline = parseInt(srvRes.rows[0].online);
-    const serversTotal = parseInt(srvRes.rows[0].total);
+    const camerasDefective = parseInt(camRes.rows[0].count); const doorsOffline = parseInt(doorRes.rows[0].count);
+    const serversOnline = parseInt(srvRes.rows[0].online); const serversTotal = parseInt(srvRes.rows[0].total);
     const switchesTotal = parseInt(swRes.rows[0].total);
 
-    await pool.query(
-      'INSERT INTO dashboard_snapshots (snapshot_date, cameras_defective, doors_offline, servers_online, servers_total, switches_total) VALUES (CURRENT_DATE, $1, $2, $3, $4, $5) ON CONFLICT (snapshot_date) DO UPDATE SET cameras_defective = $1, doors_offline = $2, servers_online = $3, servers_total = $4, switches_total = $5',
-      [camerasDefective, doorsOffline, serversOnline, serversTotal, switchesTotal]
-    );
+    await pool.query('INSERT INTO dashboard_snapshots (snapshot_date, cameras_defective, doors_offline, servers_online, servers_total, switches_total) VALUES (CURRENT_DATE, $1, $2, $3, $4, $5) ON CONFLICT (snapshot_date) DO UPDATE SET cameras_defective = $1, doors_offline = $2, servers_online = $3, servers_total = $4, switches_total = $5', [camerasDefective, doorsOffline, serversOnline, serversTotal, switchesTotal]);
 
     const baseline = await pool.query("SELECT * FROM dashboard_snapshots WHERE snapshot_date <= CURRENT_DATE - INTERVAL '7 days' ORDER BY snapshot_date DESC LIMIT 1");
-
-    function pctChange(current, past) {
-      if (past === null || past === undefined || past === 0) return null;
-      return Math.round(((current - past) / past) * 100);
-    }
-
+    function pctChange(current, past) { if (past === null || past === undefined || past === 0) return null; return Math.round(((current - past) / past) * 100); }
     const base = baseline.rows[0] || null;
-    res.json({
-      data: {
-        camerasDefective: { value: camerasDefective, trendPct: base ? pctChange(camerasDefective, base.cameras_defective) : null },
-        doorsOffline: { value: doorsOffline, trendPct: base ? pctChange(doorsOffline, base.doors_offline) : null },
-        serversOnline: { value: serversOnline, total: serversTotal, trendPct: base ? pctChange(serversOnline, base.servers_online) : null },
-        switchesTotal: { value: switchesTotal, trendPct: base ? pctChange(switchesTotal, base.switches_total) : null },
-        comparisonAvailable: !!base,
-        comparisonPeriodDays: 7
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    res.json({ data: { camerasDefective: { value: camerasDefective, trendPct: base ? pctChange(camerasDefective, base.cameras_defective) : null }, doorsOffline: { value: doorsOffline, trendPct: base ? pctChange(doorsOffline, base.doors_offline) : null }, serversOnline: { value: serversOnline, total: serversTotal, trendPct: base ? pctChange(serversOnline, base.servers_online) : null }, switchesTotal: { value: switchesTotal, trendPct: base ? pctChange(switchesTotal, base.switches_total) : null }, comparisonAvailable: !!base, comparisonPeriodDays: 7 } });
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 // ── HEALTH CHECK ────────────────────────────────────────
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+app.get('/api/health', (req, res) => { res.json({ status: 'ok', timestamp: new Date().toISOString() }); });
 
 // ── SERVE FRONTEND ───────────────────────────────────────
 app.use(express.static(__dirname));
-app.get('*', (req, res, next) => {
-  if (req.path.startsWith('/api/')) return next();
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
+app.get('*', (req, res, next) => { if (req.path.startsWith('/api/')) return next(); res.sendFile(path.join(__dirname, 'index.html')); });
 
 // ── ERROR HANDLER ──────────────────────────────────────
-app.use((err, req, res, next) => {
-  console.error('❌ Error:', err.stack);
-  res.status(500).json({ error: err.message || 'Internal server error' });
-});
+app.use((err, req, res, next) => { console.error('❌ Error:', err.stack); res.status(500).json({ error: err.message || 'Internal server error' }); });
 
 // ── START SERVER ────────────────────────────────────────
 async function startServer() {
   try {
     await initDatabase();
     await seedData();
-    app.listen(PORT, () => {
-      console.log('✅ CCSM Backend running on http://localhost:' + PORT);
-      console.log('📡 API endpoint: http://localhost:' + PORT + '/api');
-      console.log('🔑 Default login: admin / admin123');
-    });
-  } catch (error) {
-    console.error('❌ Failed to start server:', error.message);
-    process.exit(1);
-  }
+    app.listen(PORT, () => { console.log('✅ CCSM Backend running on http://localhost:' + PORT); console.log('📡 API endpoint: http://localhost:' + PORT + '/api'); console.log('🔑 Default login: admin / admin123'); });
+  } catch (error) { console.error('❌ Failed to start server:', error.message); process.exit(1); }
 }
-
 startServer();
 
 process.on('SIGTERM', async () => { console.log('🛑 Shutting down...'); await pool.end(); process.exit(0); });
