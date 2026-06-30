@@ -461,6 +461,9 @@
   .outlook-content { display: flex; flex: 1; overflow: hidden; }
   .outlook-list-pane { width: 300px; flex-shrink: 0; border-right: 1px solid var(--card-border); display: flex; flex-direction: column; overflow: hidden; }
   .outlook-list { flex: 1; overflow-y: auto; }
+  .outlook-list::-webkit-scrollbar { width: 4px; }
+  .outlook-list::-webkit-scrollbar-track { background: transparent; }
+  .outlook-list::-webkit-scrollbar-thumb { background: var(--accent-start); border-radius: 4px; }
   .outlook-email { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.03); cursor: pointer; display: flex; gap: 10px; align-items: flex-start; transition: background 0.1s; }
   .outlook-email:hover { background: rgba(255,255,255,0.03); }
   .outlook-email.active { background: rgba(0,64,128,0.2); border-left: 3px solid #4a9eff; }
