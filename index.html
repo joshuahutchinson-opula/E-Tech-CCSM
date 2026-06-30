@@ -29,6 +29,21 @@
     --skeleton-shine: rgba(255,255,255,0.08);
     --tooltip-bg: rgba(20, 22, 40, 0.95);
   }
+  /* Fix dropdown text colors in dark theme */
+select, select option {
+  color: #ffffff !important;
+  background-color: #1a1a2e !important;
+}
+
+#login-page select {
+  background-color: rgba(30, 30, 60, 0.95) !important;
+  color: #ffffff !important;
+}
+
+#login-page select option {
+  background-color: #1a1a2e !important;
+  color: #ffffff !important;
+}
   :root.light-theme {
     --sidebar-bg: rgba(245, 247, 250, 0.95); --sidebar-border: rgba(0,0,0,0.08); --main-bg: #f0f2f5;
     --card-bg: rgba(255, 255, 255, 0.85); --card-border: rgba(0, 0, 0, 0.08); --text-primary: #1a1a2e;
@@ -99,8 +114,7 @@
   :root.light-theme .login-divider { color: rgba(255,255,255,0.25); }
   :root.light-theme .login-divider::before, :root.light-theme .login-divider::after { background: rgba(255,255,255,0.06); }
 :root.light-theme #login-page input, :root.light-theme #login-page select { background: rgba(255,255,255,0.04) !important; border: 1px solid rgba(255,255,255,0.1) !important; color: #f0f4ff !important; }
-:root.light-theme #login-page select option { background: #1a1a2e !important; color: #f0f4ff !important; }
-#login-page select option { background: #1a1a2e !important; color: #f0f4ff !important; }
+:root.light-theme #login-page select option { background: #1a1a2e !important; color: #ffffff !important; }
   :root.light-theme .microsoft-btn { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); color: #f0f4ff; }
   :root.light-theme .microsoft-btn:hover { background: rgba(255,255,255,0.08); }
   .skeleton { background: var(--skeleton-bg); border-radius: 4px; height: 20px; position: relative; overflow: hidden; animation: shimmer 1.8s infinite; }
@@ -656,14 +670,14 @@
 <div style="margin-top:4px;">
   <input id="login-username" type="text" placeholder="Username" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:var(--text-primary);margin-bottom:10px;font-size:14px;font-family:var(--font);">
   <input id="login-password" type="password" placeholder="Password" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:var(--text-primary);margin-bottom:10px;font-size:14px;font-family:var(--font);">
- <select id="login-client" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#f0f4ff;margin-bottom:12px;font-size:14px;font-family:var(--font);">
-  <option value="" style="background:#1a1a2e;color:#f0f4ff;">Admin (Full Access)</option>
-  <option value="KFTL" style="background:#1a1a2e;color:#f0f4ff;">KFTL</option>
-  <option value="KWL" style="background:#1a1a2e;color:#f0f4ff;">KWL</option>
-  <option value="Lasco" style="background:#1a1a2e;color:#f0f4ff;">Lasco</option>
-  <option value="Nestle" style="background:#1a1a2e;color:#f0f4ff;">Nestle</option>
-  <option value="NIDS" style="background:#1a1a2e;color:#f0f4ff;">NIDS</option>
-  <option value="Nutrien" style="background:#1a1a2e;color:#f0f4ff;">Nutrien</option>
+<select id="login-client" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(30,30,60,0.95);color:#ffffff;margin-bottom:12px;font-size:14px;font-family:var(--font);">
+  <option value="" style="background:#1a1a2e;color:#ffffff;">Admin (Full Access)</option>
+  <option value="KFTL" style="background:#1a1a2e;color:#ffffff;">KFTL</option>
+  <option value="KWL" style="background:#1a1a2e;color:#ffffff;">KWL</option>
+  <option value="Lasco" style="background:#1a1a2e;color:#ffffff;">Lasco</option>
+  <option value="Nestle" style="background:#1a1a2e;color:#ffffff;">Nestle</option>
+  <option value="NIDS" style="background:#1a1a2e;color:#ffffff;">NIDS</option>
+  <option value="Nutrien" style="background:#1a1a2e;color:#ffffff;">Nutrien</option>
 </select>
     <option value="">Admin (Full Access)</option>
     <option value="KFTL">KFTL</option>
