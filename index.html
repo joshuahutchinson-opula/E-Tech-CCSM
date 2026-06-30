@@ -29,6 +29,32 @@
     --skeleton-shine: rgba(255,255,255,0.08);
     --tooltip-bg: rgba(20, 22, 40, 0.95);
   }
+  /* Force select to behave normally */
+select#login-client {
+  display: inline-block !important;
+  appearance: menulist !important;
+  -webkit-appearance: menulist !important;
+  -moz-appearance: menulist !important;
+  background: #1a1a2e !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: 8px !important;
+  padding: 10px 14px !important;
+  width: 100% !important;
+  font-size: 14px !important;
+  font-family: var(--font) !important;
+  cursor: pointer !important;
+}
+
+select#login-client option {
+  background: #1a1a2e !important;
+  color: #ffffff !important;
+}
+
+/* Hide options unless select is focused */
+select#login-client:not(:focus) option {
+  display: none;
+}
   /* Fix dropdown text colors in dark theme */
 select, select option {
   color: #ffffff !important;
