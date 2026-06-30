@@ -37,70 +37,89 @@
     --warning: #d97706; --success: #059669; --info: #2563eb; --skeleton-bg: rgba(0,0,0,0.06);
     --skeleton-shine: rgba(0,0,0,0.1); --tooltip-bg: rgba(255, 255, 255, 0.95);
   }
-  :root.light-theme body { background: #e8ecf1; }
-  :root.light-theme .panel, :root.light-theme .stat-card, :root.light-theme .analytics-card, :root.light-theme .modal { background: rgba(255, 255, 255, 0.85) !important; border: 1px solid rgba(0, 0, 0, 0.08) !important; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important; }
-  :root.light-theme .panel:hover, :root.light-theme .stat-card:hover { border-color: rgba(79, 140, 247, 0.3) !important; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 0 20px rgba(79, 140, 247, 0.08) !important; }
-  :root.light-theme .sidebar { background: rgba(245, 247, 250, 0.95) !important; border-right: 1px solid rgba(0,0,0,0.06); }
-  :root.light-theme .nav-item:hover { background: rgba(0, 0, 0, 0.04) !important; }
-  :root.light-theme .nav-item.active { background: rgba(79, 140, 247, 0.1) !important; }
-  :root.light-theme .nav-sub-item.active { background: rgba(79, 140, 247, 0.1) !important; }
-  :root.light-theme .tbl th { color: rgba(0, 0, 0, 0.5) !important; }
-  :root.light-theme .tbl td { border-bottom: 1px solid rgba(0,0,0,0.04) !important; }
-  :root.light-theme .tbl tr:hover td { background: rgba(79, 140, 247, 0.03) !important; }
-  :root.light-theme .modal { background: rgba(255, 255, 255, 0.95) !important; border: 1px solid rgba(0,0,0,0.1) !important; }
-  :root.light-theme .search-bar input, :root.light-theme .search-bar select { background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.1); color: var(--text-primary); }
-  :root.light-theme .search-bar select { background: #fff; }
-  :root.light-theme .search-bar select option { background: #fff; color: #000; }
-  :root.light-theme .filter-pill { border: 1px solid rgba(0,0,0,0.1); color: rgba(0,0,0,0.6); }
-  :root.light-theme .filter-pill.active { background: rgba(79,140,247,0.15); border-color: #4a9eff; color: #1a1a2e; }
-  :root.light-theme .modal-field label { color: rgba(0,0,0,0.45); }
-  :root.light-theme .modal-body-text { background: rgba(0,0,0,0.02); color: rgba(0,0,0,0.65); }
-  :root.light-theme .notes-area { background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.1); color: var(--text-primary); }
-  :root.light-theme .btn { border: 1px solid rgba(0,0,0,0.12); color: var(--text-primary); }
-  :root.light-theme .btn:hover { background: rgba(0,0,0,0.04); }
-  :root.light-theme .status-select, :root.light-theme .priority-select { background: #fff; border: 1px solid rgba(0,0,0,0.12); color: var(--text-primary); }
-  :root.light-theme .status-select option, :root.light-theme .priority-select option { background: #fff; color: #000; }
-  :root.light-theme .audit-log .audit-item { border-bottom: 1px solid rgba(0,0,0,0.04); color: rgba(0,0,0,0.6); }
-  :root.light-theme .outlook-container { background: rgba(255,255,255,0.7); border: 1px solid rgba(0,0,0,0.08); }
-  :root.light-theme .outlook-email { border-bottom: 1px solid rgba(0,0,0,0.04); }
-  :root.light-theme .outlook-email:hover { background: rgba(0,0,0,0.02); }
-  :root.light-theme .outlook-email.active { background: rgba(79,140,247,0.08); }
-  :root.light-theme .outlook-folder-pane { border-right: 1px solid rgba(0,0,0,0.08); }
-  :root.light-theme .outlook-folder-item:hover { background: rgba(0,0,0,0.03); }
-  :root.light-theme .outlook-folder-item.active { background: rgba(79,140,247,0.1); }
-  :root.light-theme .ore-header { border-bottom: 1px solid rgba(0,0,0,0.06); }
-  :root.light-theme .notes-inline { color: rgba(0,0,0,0.55); }
-  :root.light-theme .notes-inline:focus { background: rgba(0,0,0,0.03); color: var(--text-primary); }
-  :root.light-theme .file-explorer { background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.08); }
-  :root.light-theme .file-explorer .file-item { border-bottom: 1px solid rgba(0,0,0,0.04); }
-  :root.light-theme .file-explorer .file-item:hover { background: rgba(0,0,0,0.03); }
-  :root.light-theme .breadcrumb { background: rgba(0,0,0,0.02); }
-  :root.light-theme .breadcrumb .crumb:hover { background: rgba(0,0,0,0.05); }
-  :root.light-theme .breadcrumb .back-btn { background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.06); }
-  :root.light-theme .topbar { border-bottom: 1px solid rgba(0,0,0,0.06); }
-  :root.light-theme .cam-zone-header, :root.light-theme .door-zone-header, :root.light-theme .server-zone-header, :root.light-theme .switch-zone-header { background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.06); }
-  :root.light-theme .cam-zone-header:hover, :root.light-theme .door-zone-header:hover, :root.light-theme .server-zone-header:hover, :root.light-theme .switch-zone-header:hover { background: rgba(0,0,0,0.04); }
-  :root.light-theme .stat-card .stat-val { -webkit-text-fill-color: #1a1a2e !important; background: none !important; }
-  :root.light-theme .emergency-banner { background: rgba(220, 38, 38, 0.12) !important; border: 1px solid rgba(220, 38, 38, 0.5) !important; }
-  :root.light-theme .emergency-banner .em-title { color: #991b1b; }
-  :root.light-theme .emergency-banner .em-detail { color: #dc2626; }
-  :root.light-theme .page-title { color: #1a1a2e; }
-  :root.light-theme .file-search-bar select { background: #fff; border: 1px solid rgba(0,0,0,0.1); color: var(--text-primary); }
-  :root.light-theme .file-search-bar select option { background: #fff; color: #000; }
-  :root.light-theme .audit-filters select { background: #fff; border: 1px solid rgba(0,0,0,0.1); color: var(--text-primary); }
-  :root.light-theme .audit-filters select option { background: #fff; color: #000; }
-  :root.light-theme .app { background: var(--main-bg); }
-  :root.light-theme .content { background: transparent; }
-  :root.light-theme .main { background: transparent; }
-  :root.light-theme #login-page { background: #0a0a0a !important; }
-  :root.light-theme #login-page .login-box { background: rgba(255,255,255,0.03) !important; border: 1px solid rgba(255,255,255,0.06) !important; }
-  :root.light-theme #login-page .login-box h2 { color: #f0f4ff !important; }
-  :root.light-theme #login-page .login-box p { color: rgba(255,255,255,0.25) !important; }
-  :root.light-theme .login-divider { color: rgba(255,255,255,0.25); }
-  :root.light-theme .login-divider::before, :root.light-theme .login-divider::after { background: rgba(255,255,255,0.06); }
-  :root.light-theme #login-page input { background: rgba(255,255,255,0.04) !important; border: 1px solid rgba(255,255,255,0.1) !important; color: #f0f4ff !important; }
-  :root.light-theme .microsoft-btn { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); color: #f0f4ff; }
-  :root.light-theme .microsoft-btn:hover { background: rgba(255,255,255,0.08); }
+  :root.jet-black-theme {
+    --sidebar-bg: rgba(0, 0, 0, 0.98);
+    --sidebar-border: rgba(255,255,255,0.05);
+    --main-bg: #000000;
+    --card-bg: rgba(10, 10, 15, 0.98);
+    --card-border: rgba(255, 255, 255, 0.05);
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.6);
+    --text-muted: rgba(255, 255, 255, 0.25);
+    --accent-start: #00d4ff;
+    --accent-end: #7b2ffc;
+    --accent: #00d4ff;
+    --accent-glow: rgba(0, 212, 255, 0.2);
+    --danger: #ff0055;
+    --warning: #ffaa00;
+    --success: #00ff88;
+    --info: #00d4ff;
+  }
+  :root.jet-black-theme body { background: #000000; }
+  :root.jet-black-theme .panel, :root.jet-black-theme .stat-card, :root.jet-black-theme .analytics-card, :root.jet-black-theme .modal { background: rgba(10, 10, 15, 0.98) !important; border: 1px solid rgba(255, 255, 255, 0.05) !important; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8) !important; }
+  :root.jet-black-theme .panel:hover, :root.jet-black-theme .stat-card:hover { border-color: rgba(0, 212, 255, 0.2) !important; box-shadow: 0 12px 48px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 212, 255, 0.05) !important; }
+  :root.jet-black-theme .sidebar { background: rgba(0, 0, 0, 0.98) !important; border-right: 1px solid rgba(255, 255, 255, 0.05); }
+  :root.jet-black-theme .nav-item.active { background: linear-gradient(90deg, rgba(0, 212, 255, 0.15) 0%, rgba(123, 47, 252, 0.05) 100%) !important; border-left: 3px solid #00d4ff !important; color: #fff !important; }
+  :root.jet-black-theme .nav-item:hover { background: rgba(255, 255, 255, 0.03) !important; }
+  :root.jet-black-theme .tbl th { color: rgba(255, 255, 255, 0.4) !important; }
+  :root.jet-black-theme .tbl td { border-bottom: 1px solid rgba(255,255,255,0.03) !important; }
+  :root.jet-black-theme .tbl tr:hover td { background: rgba(0, 212, 255, 0.03) !important; }
+  :root.jet-black-theme .modal { background: rgba(10, 10, 15, 0.98) !important; border: 1px solid rgba(255,255,255,0.05) !important; box-shadow: 0 24px 80px rgba(0, 0, 0, 0.9) !important; }
+  :root.jet-black-theme .search-bar input, :root.jet-black-theme .search-bar select { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); color: #fff; }
+  :root.jet-black-theme .search-bar select { background: #0a0a0f; }
+  :root.jet-black-theme .search-bar select option { background: #0a0a0f; color: #fff; }
+  :root.jet-black-theme .filter-pill { border: 1px solid rgba(255,255,255,0.05); color: rgba(255,255,255,0.6); }
+  :root.jet-black-theme .filter-pill.active { background: rgba(0, 212, 255, 0.15); border-color: #00d4ff; color: #fff; }
+  :root.jet-black-theme .modal-field label { color: rgba(255,255,255,0.4); }
+  :root.jet-black-theme .modal-body-text { background: rgba(255,255,255,0.02); color: rgba(255,255,255,0.6); }
+  :root.jet-black-theme .notes-area { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); color: #fff; }
+  :root.jet-black-theme .btn { border: 1px solid rgba(255,255,255,0.08); color: #fff; }
+  :root.jet-black-theme .btn:hover { background: rgba(255,255,255,0.04); }
+  :root.jet-black-theme .status-select, :root.jet-black-theme .priority-select { background: #0a0a0f; border: 1px solid rgba(255,255,255,0.05); color: #fff; }
+  :root.jet-black-theme .status-select option, :root.jet-black-theme .priority-select option { background: #0a0a0f; color: #fff; }
+  :root.jet-black-theme .audit-log .audit-item { border-bottom: 1px solid rgba(255,255,255,0.03); color: rgba(255,255,255,0.6); }
+  :root.jet-black-theme .outlook-container { background: rgba(10,10,15,0.95); border: 1px solid rgba(255,255,255,0.05); }
+  :root.jet-black-theme .outlook-email { border-bottom: 1px solid rgba(255,255,255,0.03); }
+  :root.jet-black-theme .outlook-email:hover { background: rgba(255,255,255,0.02); }
+  :root.jet-black-theme .outlook-email.active { background: rgba(0, 212, 255, 0.05); }
+  :root.jet-black-theme .outlook-folder-pane { border-right: 1px solid rgba(255,255,255,0.05); }
+  :root.jet-black-theme .outlook-folder-item:hover { background: rgba(255,255,255,0.02); }
+  :root.jet-black-theme .outlook-folder-item.active { background: rgba(0, 212, 255, 0.08); }
+  :root.jet-black-theme .ore-header { border-bottom: 1px solid rgba(255,255,255,0.05); }
+  :root.jet-black-theme .notes-inline { color: rgba(255,255,255,0.5); }
+  :root.jet-black-theme .notes-inline:focus { background: rgba(255,255,255,0.02); color: #fff; }
+  :root.jet-black-theme .file-explorer { background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); }
+  :root.jet-black-theme .file-explorer .file-item { border-bottom: 1px solid rgba(255,255,255,0.03); }
+  :root.jet-black-theme .file-explorer .file-item:hover { background: rgba(255,255,255,0.02); }
+  :root.jet-black-theme .breadcrumb { background: rgba(255,255,255,0.01); }
+  :root.jet-black-theme .breadcrumb .crumb:hover { background: rgba(255,255,255,0.04); }
+  :root.jet-black-theme .topbar { border-bottom: 1px solid rgba(255,255,255,0.05); }
+  :root.jet-black-theme .cam-zone-header, :root.jet-black-theme .door-zone-header, :root.jet-black-theme .server-zone-header, :root.jet-black-theme .switch-zone-header { background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); }
+  :root.jet-black-theme .cam-zone-header:hover, :root.jet-black-theme .door-zone-header:hover, :root.jet-black-theme .server-zone-header:hover, :root.jet-black-theme .switch-zone-header:hover { background: rgba(255,255,255,0.03); }
+  :root.jet-black-theme .stat-card .stat-val { -webkit-text-fill-color: #ffffff !important; background: none !important; }
+  :root.jet-black-theme .emergency-banner { background: rgba(255, 0, 85, 0.08) !important; border: 1px solid rgba(255, 0, 85, 0.3) !important; }
+  :root.jet-black-theme .emergency-banner .em-title { color: #ff0055; }
+  :root.jet-black-theme .emergency-banner .em-detail { color: #ff0055; }
+  :root.jet-black-theme .page-title { color: #ffffff; }
+  :root.jet-black-theme .file-search-bar select { background: #0a0a0f; border: 1px solid rgba(255,255,255,0.05); color: #fff; }
+  :root.jet-black-theme .file-search-bar select option { background: #0a0a0f; color: #fff; }
+  :root.jet-black-theme .audit-filters select { background: #0a0a0f; border: 1px solid rgba(255,255,255,0.05); color: #fff; }
+  :root.jet-black-theme .audit-filters select option { background: #0a0a0f; color: #fff; }
+  :root.jet-black-theme .app { background: var(--main-bg); }
+  :root.jet-black-theme .content { background: transparent; }
+  :root.jet-black-theme .main { background: transparent; }
+  :root.jet-black-theme .stat-card .stat-val { background: linear-gradient(135deg, #00d4ff 0%, #7b2ffc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  :root.jet-black-theme .btn-accent { background: linear-gradient(135deg, #00d4ff, #7b2ffc) !important; border: none !important; color: #fff !important; box-shadow: 0 4px 16px rgba(0, 212, 255, 0.3); }
+  :root.jet-black-theme .btn-accent:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0, 212, 255, 0.5); }
+  :root.jet-black-theme .badge.b-done { background: rgba(0, 255, 136, 0.15) !important; color: #00ff88 !important; }
+  :root.jet-black-theme .badge.b-high { background: rgba(255, 0, 85, 0.15) !important; color: #ff0055 !important; }
+  :root.jet-black-theme .badge.b-open { background: rgba(255, 170, 0, 0.15) !important; color: #ffaa00 !important; }
+  :root.jet-black-theme .badge.b-info { background: rgba(0, 212, 255, 0.15) !important; color: #00d4ff !important; }
+  :root.jet-black-theme .badge.b-under-maintenance { background: rgba(255, 170, 0, 0.15) !important; color: #ffaa00 !important; }
+  :root.jet-black-theme .badge.b-in-progress { background: rgba(0, 212, 255, 0.15) !important; color: #00d4ff !important; }
+  :root.jet-black-theme .badge.b-pending { background: rgba(255, 170, 0, 0.15) !important; color: #ffaa00 !important; }
+  :root.jet-black-theme .filter-pill.active { background: linear-gradient(135deg, #00d4ff, #7b2ffc) !important; border-color: transparent !important; color: #fff !important; }
+
   .skeleton { background: var(--skeleton-bg); border-radius: 4px; height: 20px; position: relative; overflow: hidden; animation: shimmer 1.8s infinite; }
   .skeleton::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent); transform: translateX(-100%); animation: shimmer-slide 1.8s infinite; }
   @keyframes shimmer-slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
@@ -221,7 +240,7 @@
   .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; background: var(--main-bg); }
   .topbar { padding: 0 24px; height: 56px; border-bottom: 1px solid var(--sidebar-border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
   .page-title { font-size: 15px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 6px; }
-  .topbar-right { display: flex; align-items: center; gap: 10px; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; position: relative; }
   .topbar-date { font-size: 12px; color: var(--text-secondary); }
   .unsaved-indicator { display: none; align-items: center; gap: 6px; font-size: 11px; color: var(--warning); padding: 4px 10px; background: rgba(255,179,71,0.1); border-radius: 4px; border: 1px solid rgba(255,179,71,0.2); }
   .unsaved-indicator.visible { display: inline-flex; }
@@ -231,6 +250,15 @@
   .btn-danger { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: #f87171; }
   .btn-sm { font-size: 11px; padding: 5px 10px; } .btn-xs { font-size: 10px; padding: 3px 8px; }
   .btn-success { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.3); color: #4ade80; }
+  .add-btn { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-start), var(--accent-end)); color: #fff; border: none; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 2px 8px rgba(79, 140, 247, 0.3); }
+  .add-btn:hover { transform: scale(1.05); box-shadow: 0 4px 16px rgba(79, 140, 247, 0.5); }
+  .add-dropdown { display: none; position: absolute; right: 0; top: 100%; margin-top: 8px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; min-width: 200px; box-shadow: 0 12px 48px rgba(0,0,0,0.4); backdrop-filter: blur(20px); padding: 6px 0; z-index: 100; }
+  .add-dropdown.open { display: block; }
+  .add-dropdown .dd-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: var(--text-primary); cursor: pointer; font-size: 13px; transition: background 0.15s; border: none; background: none; width: 100%; font-family: var(--font); }
+  .add-dropdown .dd-item:hover { background: rgba(255,255,255,0.05); }
+  .add-dropdown .dd-item i { font-size: 16px; color: var(--text-secondary); }
+  .add-dropdown .dd-sep { height: 1px; background: var(--card-border); margin: 4px 12px; }
+  .add-dropdown .dd-item .dd-icon { width: 24px; text-align: center; }
   .content { flex: 1; overflow-y: auto; padding: 20px 24px; scroll-behavior: smooth; position: relative; }
   .content::-webkit-scrollbar { width: 6px; } .content::-webkit-scrollbar-track { background: transparent; } .content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
   .tab { display: none; } .tab.active { display: block; }
@@ -326,6 +354,10 @@
   .modal-field label { font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 3px; }
   .modal-field span { font-size: 12px; color: var(--text-primary); }
   .modal-field span.mono { font-family: monospace; font-size: 11px; color: #60a5fa; }
+  .modal-field input, .modal-field select, .modal-field textarea { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: var(--text-primary); padding: 6px 10px; border-radius: 4px; font-size: 12px; width: 100%; font-family: var(--font); }
+  .modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus { outline: none; border-color: #4a9eff; }
+  .modal-field textarea { min-height: 80px; resize: vertical; }
+  .modal-field select option { background: #0d1117; color: var(--text-primary); }
   .modal-field input[type="date"] { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: var(--text-primary); padding: 4px 8px; border-radius: 4px; font-size: 11px; width: 100%; font-family: var(--font); }
   .modal-field input[type="date"]:focus { outline: none; border-color: #4a9eff; }
   .cam-preview-large { width: 100%; height: 260px; border-radius: 8px; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; border: 1px solid var(--card-border); margin-bottom: 12px; overflow: hidden; }
@@ -697,7 +729,40 @@
     </div>
   </div>
   <div class="main">
-    <div class="topbar"><span class="page-title" id="page-title">Dashboard</span><div class="topbar-right"><button class="btn btn-xs theme-toggle-btn" onclick="toggleTheme()" title="Toggle theme" id="theme-toggle-btn"><i class="ti ti-sun"></i></button><span class="topbar-date" id="topbar-date"></span><span class="unsaved-indicator" id="unsaved-indicator"><i class="ti ti-alert-circle"></i> Unsaved changes</span></div></div>
+    <div class="topbar">
+      <span class="page-title" id="page-title">Dashboard</span>
+      <div class="topbar-right">
+        <button class="btn btn-xs theme-toggle-btn" onclick="toggleThemeDropdown()" title="Toggle theme" id="theme-toggle-btn">
+          <i class="ti ti-palette"></i>
+        </button>
+        <button class="add-btn" onclick="toggleAddDropdown()" title="Add New" id="add-btn">
+          <i class="ti ti-plus"></i>
+        </button>
+        <div class="add-dropdown" id="add-dropdown">
+          <button class="dd-item" onclick="openAddSRModal();closeAddDropdown();">
+            <span class="dd-icon">📋</span> Add Service Request
+          </button>
+          <button class="dd-item" onclick="openAddCameraModal();closeAddDropdown();">
+            <span class="dd-icon">📷</span> Add Camera
+          </button>
+          <button class="dd-item" onclick="openAddDoorModal();closeAddDropdown();">
+            <span class="dd-icon">🚪</span> Add Door
+          </button>
+          <button class="dd-item" onclick="openAddServerModal();closeAddDropdown();">
+            <span class="dd-icon">🖥</span> Add Server
+          </button>
+          <button class="dd-item" onclick="openAddSwitchModal();closeAddDropdown();">
+            <span class="dd-icon">🔌</span> Add Switch
+          </button>
+          <div class="dd-sep"></div>
+          <button class="dd-item" onclick="openAddClientModal();closeAddDropdown();">
+            <span class="dd-icon">👤</span> Add Client
+          </button>
+        </div>
+        <span class="topbar-date" id="topbar-date"></span>
+        <span class="unsaved-indicator" id="unsaved-indicator"><i class="ti ti-alert-circle"></i> Unsaved changes</span>
+      </div>
+    </div>
     <div class="content" id="main-content">
       <!-- Dashboard Tab -->
       <div class="tab active" id="tab-dashboard">
@@ -741,18 +806,18 @@
         <div class="sr-tab-bar"><button class="sr-tab-btn active" onclick="switchAnalyticsTab('tickets',this)"><i class="ti ti-clipboard-list"></i> Tickets</button><button class="sr-tab-btn" onclick="switchAnalyticsTab('analytics',this)"><i class="ti ti-chart-bar"></i> Performance Analytics</button></div>
         <div id="sr-tickets-view">
           <div class="bulk-bar" id="bulk-bar"><span id="bulk-count">0 selected</span><select class="status-select" id="bulk-status" style="font-size:11px;padding:4px 8px"><option value="">Bulk Status…</option><option>Open</option><option>In Progress</option><option>On-Site Review</option><option>Pending</option><option>Resolved</option></select><select class="status-select" id="bulk-assign" style="font-size:11px;padding:4px 8px"><option value="">Bulk Assign…</option><option>Shanice Vernon</option><option>Shavine</option><option>Marvin Grant</option><option>Ackeem</option><option>Unassigned</option></select><select class="status-select" id="bulk-priority" style="font-size:11px;padding:4px 8px"><option value="">Bulk Priority…</option><option>High</option><option>Medium</option><option>Low</option></select><button class="btn btn-xs btn-accent" onclick="bulkApply()">Apply</button><button class="btn btn-xs" onclick="clearSelection()">Clear</button><button class="btn btn-xs" onclick="mergeSelected()" id="merge-btn" style="display:none"><i class="ti ti-fold"></i> Merge</button></div>
-          <div class="panel"><div class="panel-header"><span class="panel-title" id="sr-count-label">Service Requests</span></div><div class="loading-overlay" id="sr-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading tickets...</span></div></div><table class="tbl" id="sr-table"><thead><tr><th style="width:24px"><input type="checkbox" id="sr-select-all" onchange="toggleSelectAll()" /></th><th>ID</th><th>Client</th><th>Site</th><th>Subject</th><th>Category</th><th>SLA</th><th>Priority</th><th>Assigned</th><th>Notes</th><th>Status</th></tr></thead><tbody id="sr-tbody"></tbody></table></div>
+          <div class="panel"><div class="panel-header"><span class="panel-title" id="sr-count-label">Service Requests</span><div style="display:flex;align-items:center;gap:8px;"><button class="btn btn-sm" onclick="exportSRsCSV()"><i class="ti ti-download"></i> Export CSV</button></div></div><div class="loading-overlay" id="sr-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading tickets...</span></div></div><table class="tbl" id="sr-table"><thead><tr><th style="width:24px"><input type="checkbox" id="sr-select-all" onchange="toggleSelectAll()" /></th><th>ID</th><th>Client</th><th>Site</th><th>Subject</th><th>Category</th><th>SLA</th><th>Priority</th><th>Assigned</th><th>Notes</th><th>Status</th></tr></thead><tbody id="sr-tbody"></tbody></table></div>
         </div>
         <div id="sr-analytics-view" style="display:none"><div class="analytics-grid"><div class="analytics-card"><div class="analytics-card-title">Resolution Time by Tech (Avg)</div><div id="analytics-tech-times"></div></div><div class="analytics-card"><div class="analytics-card-title">Issues by Client</div><div id="analytics-client-issues"></div></div><div class="analytics-card"><div class="analytics-card-title">Tickets Per Month</div><div id="analytics-monthly"></div></div><div class="analytics-card"><div class="analytics-card-title">Busiest Hours</div><div id="analytics-hours"></div></div></div></div>
       </div>
       <!-- Cameras Tab -->
-      <div class="tab" id="tab-cameras"><div class="panel"><div class="panel-header"><span class="panel-title">All Cameras</span><div style="display:flex;align-items:center;gap:8px;"><span class="last-updated" id="cam-last-updated" style="color:var(--text-secondary);">Last updated: Today 14:32</span><button class="btn btn-sm" onclick="refreshCameras()" title="Refresh"><i class="ti ti-refresh"></i></button></div></div><div class="cam-status-filters" id="cam-status-filters"></div><div class="search-bar"><input type="text" id="cam-search" placeholder="Search by camera name, IP, or comments…" oninput="debounceRenderCameras()" /><select id="cam-per-page" onchange="renderCamerasOptimized()" style="flex:0 0 120px;"><option value="10">10 per page</option><option value="25">25 per page</option><option value="50">50 per page</option><option value="999">All</option></select></div><div class="loading-overlay" id="cam-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading cameras...</span></div></div><div id="cam-groups-container"></div><div class="cam-pagination" id="cam-pagination"></div></div></div>
+      <div class="tab" id="tab-cameras"><div class="panel"><div class="panel-header"><span class="panel-title">All Cameras</span><div style="display:flex;align-items:center;gap:8px;"><button class="btn btn-sm" onclick="exportCamerasCSV()"><i class="ti ti-download"></i> Export CSV</button><span class="last-updated" id="cam-last-updated" style="color:var(--text-secondary);">Last updated: Today 14:32</span><button class="btn btn-sm" onclick="refreshCameras()" title="Refresh"><i class="ti ti-refresh"></i></button></div></div><div class="cam-status-filters" id="cam-status-filters"></div><div class="search-bar"><input type="text" id="cam-search" placeholder="Search by camera name, IP, or comments…" oninput="debounceRenderCameras()" /><select id="cam-per-page" onchange="renderCamerasOptimized()" style="flex:0 0 120px;"><option value="10">10 per page</option><option value="25">25 per page</option><option value="50">50 per page</option><option value="999">All</option></select></div><div class="loading-overlay" id="cam-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading cameras...</span></div></div><div id="cam-groups-container"></div><div class="cam-pagination" id="cam-pagination"></div></div></div>
       <!-- Doors Tab -->
-      <div class="tab" id="tab-doors"><div class="panel"><div class="panel-header"><span class="panel-title">Access Control — Doors</span><div style="display:flex;align-items:center;gap:8px;"><span class="last-updated" style="color:var(--text-secondary);" id="door-last-updated">Last updated: Today 14:32</span><button class="btn btn-sm" onclick="refreshDoors()" title="Refresh"><i class="ti ti-refresh"></i></button></div></div><div class="door-stats" id="door-stats"><div class="door-stat-card"><div class="ds-label">Total Doors</div><div class="ds-value" id="door-total">4</div></div><div class="door-stat-card"><div class="ds-label">Online</div><div class="ds-value online" id="door-online">0</div></div><div class="door-stat-card"><div class="ds-label">Offline</div><div class="ds-value offline" id="door-offline">4</div></div><div class="door-stat-card"><div class="ds-label">Under Maintenance</div><div class="ds-value under-maintenance" id="door-maintenance">0</div></div></div><div class="search-bar"><input type="text" id="door-search" placeholder="Search doors, readers, or technicians…" oninput="debounceRenderDoors()" /><select id="door-status-filter" onchange="renderDoorsEnhanced()" style="flex:0 0 150px;"><option value="All">All statuses</option><option value="Online">Online</option><option value="Offline">Offline</option><option value="Under Maintenance">Under Maintenance</option></select></div><div class="loading-overlay" id="door-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading doors...</span></div></div><div class="integration-note" id="door-integration-note"><i class="ti ti-info-circle"></i><span>Door activity logs are currently showing <strong>mock data</strong>. To enable live logs, provide: (1) Door management software name, (2) Log storage location (database/file/cloud).</span></div><div id="door-groups-container"></div></div></div>
+      <div class="tab" id="tab-doors"><div class="panel"><div class="panel-header"><span class="panel-title">Access Control — Doors</span><div style="display:flex;align-items:center;gap:8px;"><button class="btn btn-sm" onclick="exportDoorsCSV()"><i class="ti ti-download"></i> Export CSV</button><span class="last-updated" style="color:var(--text-secondary);" id="door-last-updated">Last updated: Today 14:32</span><button class="btn btn-sm" onclick="refreshDoors()" title="Refresh"><i class="ti ti-refresh"></i></button></div></div><div class="door-stats" id="door-stats"><div class="door-stat-card"><div class="ds-label">Total Doors</div><div class="ds-value" id="door-total">4</div></div><div class="door-stat-card"><div class="ds-label">Online</div><div class="ds-value online" id="door-online">0</div></div><div class="door-stat-card"><div class="ds-label">Offline</div><div class="ds-value offline" id="door-offline">4</div></div><div class="door-stat-card"><div class="ds-label">Under Maintenance</div><div class="ds-value under-maintenance" id="door-maintenance">0</div></div></div><div class="search-bar"><input type="text" id="door-search" placeholder="Search doors, readers, or technicians…" oninput="debounceRenderDoors()" /><select id="door-status-filter" onchange="renderDoorsEnhanced()" style="flex:0 0 150px;"><option value="All">All statuses</option><option value="Online">Online</option><option value="Offline">Offline</option><option value="Under Maintenance">Under Maintenance</option></select></div><div class="loading-overlay" id="door-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading doors...</span></div></div><div class="integration-note" id="door-integration-note"><i class="ti ti-info-circle"></i><span>Door activity logs are currently showing <strong>mock data</strong>. To enable live logs, provide: (1) Door management software name, (2) Log storage location (database/file/cloud).</span></div><div id="door-groups-container"></div></div></div>
       <!-- Servers Tab -->
-      <div class="tab" id="tab-servers"><div class="panel"><div class="panel-header"><span class="panel-title">Servers</span><div style="display:flex;align-items:center;gap:8px;"><span class="last-updated" style="color:var(--text-secondary);" id="srv-last-updated">Last updated: Today 14:32</span><button class="btn btn-sm" onclick="refreshServers()" title="Refresh"><i class="ti ti-refresh"></i></button></div></div><div class="server-stats-grid" id="server-stats-grid"><div class="server-stat-card"><div class="ss-label">Total Servers</div><div class="ss-value" id="srv-total">9</div><div class="ss-sub">All locations</div></div><div class="server-stat-card"><div class="ss-label">Total Storage</div><div class="ss-value" id="srv-total-storage">~102 TB</div><div class="ss-sub">Across all servers</div></div><div class="server-stat-card"><div class="ss-label">Health Score</div><div class="ss-value green" id="srv-health-score">94%</div><div class="ss-sub">Average</div></div><div class="server-stat-card"><div class="ss-label">Critical Alerts</div><div class="ss-value red" id="srv-critical-alerts">1</div><div class="ss-sub">Failed drive on J1013DDV</div></div></div><div class="search-bar"><input type="text" id="srv-search" placeholder="Search servers by location, serial, or app…" oninput="debounceRenderServers()" /></div><div class="loading-overlay" id="srv-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading servers...</span></div></div><div id="srv-groups-container"></div></div></div>
+      <div class="tab" id="tab-servers"><div class="panel"><div class="panel-header"><span class="panel-title">Servers</span><div style="display:flex;align-items:center;gap:8px;"><button class="btn btn-sm" onclick="exportServersCSV()"><i class="ti ti-download"></i> Export CSV</button><span class="last-updated" style="color:var(--text-secondary);" id="srv-last-updated">Last updated: Today 14:32</span><button class="btn btn-sm" onclick="refreshServers()" title="Refresh"><i class="ti ti-refresh"></i></button></div></div><div class="server-stats-grid" id="server-stats-grid"><div class="server-stat-card"><div class="ss-label">Total Servers</div><div class="ss-value" id="srv-total">9</div><div class="ss-sub">All locations</div></div><div class="server-stat-card"><div class="ss-label">Total Storage</div><div class="ss-value" id="srv-total-storage">~102 TB</div><div class="ss-sub">Across all servers</div></div><div class="server-stat-card"><div class="ss-label">Health Score</div><div class="ss-value green" id="srv-health-score">94%</div><div class="ss-sub">Average</div></div><div class="server-stat-card"><div class="ss-label">Critical Alerts</div><div class="ss-value red" id="srv-critical-alerts">1</div><div class="ss-sub">Failed drive on J1013DDV</div></div></div><div class="search-bar"><input type="text" id="srv-search" placeholder="Search servers by location, serial, or app…" oninput="debounceRenderServers()" /></div><div class="loading-overlay" id="srv-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading servers...</span></div></div><div id="srv-groups-container"></div></div></div>
       <!-- Switches Tab -->
-      <div class="tab" id="tab-switches"><div class="panel"><div class="panel-header"><span class="panel-title">Network Switches</span><div style="display:flex;align-items:center;gap:8px;"><span class="last-updated" style="color:var(--text-secondary);" id="sw-last-updated">Last updated: Today 14:32</span><button class="btn btn-sm" onclick="refreshSwitches()" title="Refresh"><i class="ti ti-refresh"></i></button></div></div><div class="switch-stats-grid" id="switch-stats-grid"><div class="switch-stat-card"><div class="ss-label">Total Switches</div><div class="ss-value" id="sw-total">52</div><div class="ss-sub">All locations</div></div><div class="switch-stat-card"><div class="ss-label">Online</div><div class="ss-value green" id="sw-online">49</div><div class="ss-sub">Operational</div></div><div class="switch-stat-card"><div class="ss-label">Offline</div><div class="ss-value red" id="sw-offline">3</div><div class="ss-sub">Need attention</div></div><div class="switch-stat-card"><div class="ss-label">Outdated Firmware</div><div class="ss-value yellow" id="sw-outdated">2</div><div class="ss-sub">Update recommended</div></div></div><div class="search-bar"><input type="text" id="sw-search" placeholder="Search switches by name, location, IP, or model…" oninput="debounceRenderSwitches()" /><select id="sw-model-filter" onchange="renderSwitchesEnhanced()" style="flex:0 0 150px;"><option value="All">All models</option><option value="AXIS T8508">AXIS T8508</option><option value="AXIS T8516">AXIS T8516</option><option value="AXIS T8504-R">AXIS T8504-R</option><option value="TL-SG2210P">TL-SG2210P</option><option value="NS3552-16P-2T-2S">NS3552-16P-2T-2S</option><option value="XS728T">XS728T</option><option value="XS716T">XS716T</option><option value="US-16-XG">US-16-XG</option><option value="M4300-24X">M4300-24X</option></select></div><div class="loading-overlay" id="sw-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading switches...</span></div></div><div id="sw-groups-container"></div></div></div>
+      <div class="tab" id="tab-switches"><div class="panel"><div class="panel-header"><span class="panel-title">Network Switches</span><div style="display:flex;align-items:center;gap:8px;"><button class="btn btn-sm" onclick="exportSwitchesCSV()"><i class="ti ti-download"></i> Export CSV</button><span class="last-updated" style="color:var(--text-secondary);" id="sw-last-updated">Last updated: Today 14:32</span><button class="btn btn-sm" onclick="refreshSwitches()" title="Refresh"><i class="ti ti-refresh"></i></button></div></div><div class="switch-stats-grid" id="switch-stats-grid"><div class="switch-stat-card"><div class="ss-label">Total Switches</div><div class="ss-value" id="sw-total">52</div><div class="ss-sub">All locations</div></div><div class="switch-stat-card"><div class="ss-label">Online</div><div class="ss-value green" id="sw-online">49</div><div class="ss-sub">Operational</div></div><div class="switch-stat-card"><div class="ss-label">Offline</div><div class="ss-value red" id="sw-offline">3</div><div class="ss-sub">Need attention</div></div><div class="switch-stat-card"><div class="ss-label">Outdated Firmware</div><div class="ss-value yellow" id="sw-outdated">2</div><div class="ss-sub">Update recommended</div></div></div><div class="search-bar"><input type="text" id="sw-search" placeholder="Search switches by name, location, IP, or model…" oninput="debounceRenderSwitches()" /><select id="sw-model-filter" onchange="renderSwitchesEnhanced()" style="flex:0 0 150px;"><option value="All">All models</option><option value="AXIS T8508">AXIS T8508</option><option value="AXIS T8516">AXIS T8516</option><option value="AXIS T8504-R">AXIS T8504-R</option><option value="TL-SG2210P">TL-SG2210P</option><option value="NS3552-16P-2T-2S">NS3552-16P-2T-2S</option><option value="XS728T">XS728T</option><option value="XS716T">XS716T</option><option value="US-16-XG">US-16-XG</option><option value="M4300-24X">M4300-24X</option></select></div><div class="loading-overlay" id="sw-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading switches...</span></div></div><div id="sw-groups-container"></div></div></div>
       <!-- Topology Tab -->
       <div class="tab" id="tab-topology"><div class="panel"><div class="panel-header"><span class="panel-title">Network Map</span><div style="display:flex;align-items:center;gap:8px;"><span class="last-updated" style="color:var(--text-secondary);" id="topo-last-updated">Last updated: Today 14:32</span><button class="btn btn-sm" onclick="refreshTopology()" title="Refresh"><i class="ti ti-refresh"></i></button></div></div><div class="loading-overlay" id="topo-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading network map...</span></div></div><div id="topo-container"></div></div></div>
       <!-- Files Tab -->
@@ -764,13 +829,30 @@
 <!-- Modals -->
 <div class="modal-overlay" id="sr-modal"><div class="modal xwide"><button class="modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button><div class="modal-title" id="m-title"></div><div class="modal-sub" id="m-sub"></div><div class="modal-section"><div class="modal-section-title">History</div><div class="ticket-timeline" id="m-timeline"></div></div><div class="modal-section"><div class="modal-section-title">Details</div><div class="modal-grid"><div class="modal-field"><label>Client</label><span id="m-client"></span></div><div class="modal-field"><label>Site</label><span id="m-site"></span></div><div class="modal-field"><label>Priority</label><select class="priority-select" id="m-priority-sel" onchange="autoSave()"><option value="High">🔴 High</option><option value="Medium">🟡 Medium</option><option value="Low">🟢 Low</option></select></div><div class="modal-field"><label>Category</label><span id="m-category"></span></div><div class="modal-field"><label>Assigned To</label><select class="status-select" id="m-assigned-sel" onchange="autoSave()"><option>Shanice Vernon</option><option>Shavine</option><option>Marvin Grant</option><option>Ackeem</option><option>Unassigned</option></select></div><div class="modal-field"><label>Received</label><span id="m-received"></span></div><div class="modal-field"><label>SLA</label><span id="m-sla"></span></div><div class="modal-field"><label>Status</label><select class="status-select" id="m-status-sel" onchange="autoSave()"><option>Open</option><option>In Progress</option><option>On-Site Review</option><option>Pending</option><option>Resolved</option></select></div></div></div><div class="modal-section"><div class="modal-section-title">Body</div><div class="modal-body-text" id="m-body"></div></div><div class="modal-section" id="m-hw-section"><div class="modal-section-title">Related Hardware</div><div id="m-hw-list"></div></div><div class="modal-section"><div class="modal-section-title">Attachments</div><div class="att-upload-zone" id="att-upload-zone"><input type="file" accept="image/*,.pdf,.docx,.xlsx" multiple onchange="handleAttachmentUpload(this.files)" /><i class="ti ti-camera" style="font-size:18px;color:var(--text-muted);display:block;margin-bottom:4px"></i><p>Click or drop photos/files here</p></div><div class="att-grid" id="m-att-grid"></div></div><div class="modal-section" id="m-recurring-section" style="display:none"><div class="modal-section-title">Problematic Device</div><div id="m-recurring-list"></div></div><div class="modal-section"><div class="modal-section-title">Notes</div><textarea class="notes-area" id="m-notes" placeholder="Add notes…" oninput="autoSave()"></textarea></div><div class="modal-footer"><button class="btn" onclick="closeModal()">Close</button><button class="btn btn-sm" onclick="printTicket()"><i class="ti ti-printer"></i> Print</button></div></div></div>
 
-<div class="modal-overlay" id="door-detail-modal"><div class="modal wide"><button class="modal-close" onclick="closeDoorDetailModal()"><i class="ti ti-x"></i></button><div class="modal-title" id="door-detail-title"></div><div class="modal-sub" id="door-detail-sub"></div><div class="modal-section"><div class="modal-section-title">Details</div><div class="modal-grid" id="door-detail-grid"></div></div><div class="modal-section"><div class="modal-section-title">Maintenance History</div><div id="door-history-list"></div></div><div class="modal-section" id="door-detail-comments-section"></div><div class="modal-section"><div class="modal-section-title">Quick Actions</div><div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn btn-sm" onclick="pingDoorReader()"><i class="ti ti-network"></i> Ping Reader</button><button class="btn btn-sm" onclick="openDoorController()"><i class="ti ti-external-link"></i> Open Controller</button></div><div id="door-ping-result" style="margin-top:8px;"></div></div><div class="modal-footer"><button class="btn" onclick="closeDoorDetailModal()">Close</button></div></div></div>
+<!-- ADD SR MODAL -->
+<div class="modal-overlay" id="add-sr-modal"><div class="modal"><button class="modal-close" onclick="closeAddModal('add-sr-modal')"><i class="ti ti-x"></i></button><div class="modal-title">📋 Add Service Request</div><div class="modal-sub">Create a new service request</div><div class="modal-section"><div class="modal-grid"><div class="modal-field"><label>Subject *</label><input type="text" id="sr-subject" placeholder="Brief description of the issue" /></div><div class="modal-field"><label>Client *</label><select id="sr-client"><option value="">Select Client</option></select></div><div class="modal-field"><label>Site</label><input type="text" id="sr-site" placeholder="Site location" /></div><div class="modal-field"><label>Category</label><select id="sr-category"><option value="Camera">Camera</option><option value="Access Control">Access Control</option><option value="Server">Server</option><option value="Network">Network</option><option value="Power">Power</option><option value="Other">Other</option></select></div><div class="modal-field"><label>Priority</label><select id="sr-priority"><option value="High">🔴 High</option><option value="Medium" selected>🟡 Medium</option><option value="Low">🟢 Low</option></select></div><div class="modal-field"><label>Assigned To</label><select id="sr-assigned"><option value="Shanice Vernon">Shanice Vernon</option><option value="Shavine">Shavine</option><option value="Marvin Grant">Marvin Grant</option><option value="Ackeem">Ackeem</option><option value="Unassigned">Unassigned</option></select></div></div></div><div class="modal-section"><div class="modal-section-title">Description</div><textarea id="sr-description" placeholder="Detailed description of the issue…" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text-primary);font-size:12px;padding:10px 12px;min-height:100px;font-family:var(--font);resize:vertical;"></textarea></div><div class="modal-footer"><button class="btn" onclick="closeAddModal('add-sr-modal')">Cancel</button><button class="btn btn-accent" onclick="saveNewSR()"><i class="ti ti-device-floppy"></i> Create SR</button></div></div></div>
 
-<div class="modal-overlay" id="server-detail-modal"><div class="modal wide"><button class="modal-close" onclick="closeServerDetailModal()"><i class="ti ti-x"></i></button><div class="modal-title" id="server-detail-title"></div><div class="modal-sub" id="server-detail-sub"></div><div class="modal-section"><div class="modal-section-title">Details</div><div class="modal-grid" id="server-detail-grid"></div></div><div class="modal-section"><div class="modal-section-title">Service Request History</div><div id="server-history-list"></div></div><div class="modal-section" id="server-detail-comments-section"></div><div class="modal-section"><div class="modal-section-title">Quick Actions</div><div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn btn-sm" onclick="pingServer()"><i class="ti ti-network"></i> Ping Server</button><button class="btn btn-sm" onclick="openServerConsole()"><i class="ti ti-terminal"></i> Console</button></div><div id="server-ping-result" style="margin-top:8px;"></div></div><div class="modal-footer"><button class="btn" onclick="closeServerDetailModal()">Close</button></div></div></div>
+<!-- ADD CAMERA MODAL -->
+<div class="modal-overlay" id="add-camera-modal"><div class="modal"><button class="modal-close" onclick="closeAddModal('add-camera-modal')"><i class="ti ti-x"></i></button><div class="modal-title">📷 Add Camera</div><div class="modal-sub">Add a new camera to the system</div><div class="modal-section"><div class="modal-grid"><div class="modal-field"><label>Camera Name *</label><input type="text" id="cam-name" placeholder="e.g., HM3 PTZ" /></div><div class="modal-field"><label>Client *</label><select id="cam-client"><option value="">Select Client</option></select></div><div class="modal-field"><label>Zone</label><input type="text" id="cam-zone" placeholder="e.g., NORTH" /></div><div class="modal-field"><label>IP Address</label><input type="text" id="cam-ip" placeholder="e.g., 10.19.1.150" /></div><div class="modal-field"><label>Model</label><input type="text" id="cam-model" placeholder="Camera model" /></div><div class="modal-field"><label>Resolution</label><input type="text" id="cam-resolution" placeholder="e.g., 1080p" /></div><div class="modal-field"><label>Archiver</label><input type="text" id="cam-archiver" placeholder="e.g., DM5" /></div><div class="modal-field"><label>Status</label><select id="cam-status"><option value="Online">Online</option><option value="Defective">Defective</option><option value="No Power">No Power</option><option value="No Camera">No Camera</option><option value="Needs Check">Needs Check</option></select></div></div></div><div class="modal-section"><div class="modal-section-title">Additional Info</div><div class="modal-grid"><div class="modal-field"><label>Purchase Date</label><input type="date" id="cam-purchase-date" /></div><div class="modal-field"><label>Warranty Expiry</label><input type="date" id="cam-warranty-expiry" /></div></div></div><div class="modal-section"><div class="modal-section-title">Comments</div><textarea id="cam-comments" placeholder="Any additional notes…" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text-primary);font-size:12px;padding:10px 12px;min-height:60px;font-family:var(--font);resize:vertical;"></textarea></div><div class="modal-footer"><button class="btn" onclick="closeAddModal('add-camera-modal')">Cancel</button><button class="btn btn-accent" onclick="saveNewCamera()"><i class="ti ti-device-floppy"></i> Add Camera</button></div></div></div>
 
-<div class="modal-overlay" id="switch-detail-modal"><div class="modal wide"><button class="modal-close" onclick="closeSwitchDetailModal()"><i class="ti ti-x"></i></button><div class="modal-title" id="switch-detail-title"></div><div class="modal-sub" id="switch-detail-sub"></div><div class="modal-section"><div class="modal-section-title">Details</div><div class="modal-grid" id="switch-detail-grid"></div></div><div class="modal-section"><div class="modal-section-title">Service Request History</div><div id="switch-history-list"></div></div><div class="modal-section" id="switch-detail-comments-section"></div><div class="modal-section"><div class="modal-section-title">Quick Actions</div><div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn btn-sm" onclick="pingSwitchDetail()"><i class="ti ti-network"></i> Ping</button><button class="btn btn-sm" onclick="openSwitchAdmin()"><i class="ti ti-external-link"></i> Open Admin</button></div><div id="switch-ping-result" style="margin-top:8px;"></div></div><div class="modal-footer"><button class="btn" onclick="closeSwitchDetailModal()">Close</button></div></div></div>
+<!-- ADD DOOR MODAL -->
+<div class="modal-overlay" id="add-door-modal"><div class="modal"><button class="modal-close" onclick="closeAddModal('add-door-modal')"><i class="ti ti-x"></i></button><div class="modal-title">🚪 Add Door</div><div class="modal-sub">Add a new access control door</div><div class="modal-section"><div class="modal-grid"><div class="modal-field"><label>Door Name *</label><input type="text" id="door-name" placeholder="e.g., Main Entrance" /></div><div class="modal-field"><label>Client *</label><select id="door-client"><option value="">Select Client</option></select></div><div class="modal-field"><label>Site</label><input type="text" id="door-site" placeholder="e.g., Security Office" /></div><div class="modal-field"><label>Reader</label><input type="text" id="door-reader" placeholder="e.g., HID Prox" /></div><div class="modal-field"><label>Lock Type</label><input type="text" id="door-lock" placeholder="e.g., Magnetic" /></div><div class="modal-field"><label>Powered</label><select id="door-powered"><option value="Yes">Yes</option><option value="No">No</option><option value="Not In Use">Not In Use</option></select></div><div class="modal-field"><label>Status</label><select id="door-status"><option value="Online">Online</option><option value="Offline">Offline</option><option value="Under Maintenance">Under Maintenance</option></select></div><div class="modal-field"><label>Technician</label><select id="door-tech"><option value="Shanice Vernon">Shanice Vernon</option><option value="Shavine">Shavine</option><option value="Marvin Grant">Marvin Grant</option><option value="Ackeem">Ackeem</option><option value="Unassigned">Unassigned</option></select></div></div></div><div class="modal-section"><div class="modal-section-title">Additional Info</div><div class="modal-grid"><div class="modal-field"><label>IP Address</label><input type="text" id="door-ip" placeholder="e.g., 10.19.1.100" /></div><div class="modal-field"><label>Controller</label><input type="text" id="door-controller" placeholder="e.g., Controller A" /></div><div class="modal-field"><label>Purchase Date</label><input type="date" id="door-purchase-date" /></div><div class="modal-field"><label>Warranty Expiry</label><input type="date" id="door-warranty-expiry" /></div></div></div><div class="modal-footer"><button class="btn" onclick="closeAddModal('add-door-modal')">Cancel</button><button class="btn btn-accent" onclick="saveNewDoor()"><i class="ti ti-device-floppy"></i> Add Door</button></div></div></div>
 
-<div class="modal-overlay" id="camera-detail-modal"><div class="modal wide"><button class="modal-close" onclick="closeCameraDetailModal()"><i class="ti ti-x"></i></button><div class="modal-title" id="camera-detail-title"></div><div class="modal-sub" id="camera-detail-sub"></div><div class="modal-section" id="cam-preview-section"><div class="cam-preview-large" id="cam-preview-large"></div></div><div class="modal-section"><div class="modal-section-title">Details</div><div class="modal-grid" id="camera-detail-grid"></div></div><div class="modal-section" id="cam-detail-comments-section"></div><div class="modal-section"><div class="modal-section-title">Quick Actions</div><div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn btn-sm" id="cam-ping-btn"><i class="ti ti-network"></i> Ping</button><button class="btn btn-sm" id="cam-open-btn"><i class="ti ti-external-link"></i> Open in Browser</button></div><div id="cam-ping-result" style="margin-top:8px;"></div></div><div class="modal-footer"><button class="btn" onclick="closeCameraDetailModal()">Close</button></div></div></div>
+<!-- ADD SERVER MODAL -->
+<div class="modal-overlay" id="add-server-modal"><div class="modal"><button class="modal-close" onclick="closeAddModal('add-server-modal')"><i class="ti ti-x"></i></button><div class="modal-title">🖥 Add Server</div><div class="modal-sub">Add a new server to the system</div><div class="modal-section"><div class="modal-grid"><div class="modal-field"><label>Serial Number *</label><input type="text" id="server-serial" placeholder="e.g., J1013DDR" /></div><div class="modal-field"><label>Location *</label><input type="text" id="server-location" placeholder="e.g., Kingport" /></div><div class="modal-field"><label>Client *</label><select id="server-client"><option value="">Select Client</option></select></div><div class="modal-field"><label>Capacity</label><input type="text" id="server-capacity" placeholder="e.g., 6.11TB" /></div><div class="modal-field"><label>In Use</label><input type="text" id="server-used" placeholder="e.g., 1.4TB" /></div><div class="modal-field"><label>Health</label><input type="text" id="server-health" placeholder="e.g., Good (23%)" /></div><div class="modal-field"><label>Applications</label><input type="text" id="server-apps" placeholder="e.g., Ocularis DM5" /></div><div class="modal-field"><label>Status</label><select id="server-status"><option value="ONLINE">Online</option><option value="OFFLINE">Offline</option></select></div></div></div><div class="modal-section"><div class="modal-section-title">Additional Info</div><div class="modal-grid"><div class="modal-field"><label>Purchase Date</label><input type="date" id="server-purchase-date" /></div><div class="modal-field"><label>Warranty Expiry</label><input type="date" id="server-warranty-expiry" /></div></div></div><div class="modal-footer"><button class="btn" onclick="closeAddModal('add-server-modal')">Cancel</button><button class="btn btn-accent" onclick="saveNewServer()"><i class="ti ti-device-floppy"></i> Add Server</button></div></div></div>
+
+<!-- ADD SWITCH MODAL -->
+<div class="modal-overlay" id="add-switch-modal"><div class="modal"><button class="modal-close" onclick="closeAddModal('add-switch-modal')"><i class="ti ti-x"></i></button><div class="modal-title">🔌 Add Switch</div><div class="modal-sub">Add a new network switch</div><div class="modal-section"><div class="modal-grid"><div class="modal-field"><label>Switch Name *</label><input type="text" id="switch-name" placeholder="e.g., Main Entrance" /></div><div class="modal-field"><label>Client *</label><select id="switch-client"><option value="">Select Client</option></select></div><div class="modal-field"><label>Location</label><input type="text" id="switch-location" placeholder="e.g., Security Office" /></div><div class="modal-field"><label>Model</label><select id="switch-model"><option value="AXIS T8508">AXIS T8508</option><option value="AXIS T8516">AXIS T8516</option><option value="AXIS T8504-R">AXIS T8504-R</option><option value="TL-SG2210P">TL-SG2210P</option><option value="NS3552-16P-2T-2S">NS3552-16P-2T-2S</option><option value="XS728T">XS728T</option><option value="XS716T">XS716T</option><option value="US-16-XG">US-16-XG</option><option value="M4300-24X">M4300-24X</option></select></div><div class="modal-field"><label>IP Address</label><input type="text" id="switch-ip" placeholder="e.g., 10.19.1.21" /></div><div class="modal-field"><label>Firmware</label><input type="text" id="switch-firmware" placeholder="e.g., 6.54.2739" /></div><div class="modal-field"><label>MAC Address</label><input type="text" id="switch-mac" placeholder="e.g., AC:CC:8E:FA:4B:1B" /></div><div class="modal-field"><label>Purchase Date</label><input type="date" id="switch-purchase-date" /></div><div class="modal-field"><label>Warranty Expiry</label><input type="date" id="switch-warranty-expiry" /></div></div></div><div class="modal-footer"><button class="btn" onclick="closeAddModal('add-switch-modal')">Cancel</button><button class="btn btn-accent" onclick="saveNewSwitch()"><i class="ti ti-device-floppy"></i> Add Switch</button></div></div></div>
+
+<!-- ADD CLIENT MODAL -->
+<div class="modal-overlay" id="add-client-modal"><div class="modal"><button class="modal-close" onclick="closeAddModal('add-client-modal')"><i class="ti ti-x"></i></button><div class="modal-title">👤 Add Client</div><div class="modal-sub">Add a new client to the system</div><div class="modal-section"><div class="modal-grid"><div class="modal-field"><label>Client Name *</label><input type="text" id="client-name" placeholder="e.g., KFTL" /></div><div class="modal-field"><label>Contact Email</label><input type="email" id="client-email" placeholder="client@example.com" /></div><div class="modal-field"><label>Phone</label><input type="text" id="client-phone" placeholder="+1 (555) 555-5555" /></div><div class="modal-field"><label>Address</label><input type="text" id="client-address" placeholder="Client address" /></div></div></div><div class="modal-footer"><button class="btn" onclick="closeAddModal('add-client-modal')">Cancel</button><button class="btn btn-accent" onclick="saveNewClient()"><i class="ti ti-device-floppy"></i> Add Client</button></div></div></div>
+
+<!-- Theme Dropdown -->
+<div class="theme-dropdown" id="theme-dropdown" style="display:none;position:absolute;right:0;top:100%;margin-top:8px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:6px 0;min-width:140px;z-index:100;box-shadow:0 12px 48px rgba(0,0,0,0.4);">
+  <button class="dd-item" onclick="setTheme('dark')" style="display:flex;align-items:center;gap:10px;padding:8px 16px;color:var(--text-primary);cursor:pointer;font-size:13px;border:none;background:none;width:100%;font-family:var(--font);">🌙 Dark</button>
+  <button class="dd-item" onclick="setTheme('light')" style="display:flex;align-items:center;gap:10px;padding:8px 16px;color:var(--text-primary);cursor:pointer;font-size:13px;border:none;background:none;width:100%;font-family:var(--font);">☀️ Light</button>
+  <button class="dd-item" onclick="setTheme('jet-black')" style="display:flex;align-items:center;gap:10px;padding:8px 16px;color:var(--text-primary);cursor:pointer;font-size:13px;border:none;background:none;width:100%;font-family:var(--font);">⚫ Jet Black</button>
+</div>
 
 <div class="confirm-overlay" id="confirm-overlay"><div class="confirm-dialog"><div class="confirm-title" id="confirm-title">Are you sure?</div><div class="confirm-desc" id="confirm-desc">This action cannot be undone.</div><div class="confirm-actions"><button class="btn" onclick="closeConfirm()">Cancel</button><button class="btn btn-accent" id="confirm-btn" onclick="executeConfirm()">Confirm</button></div></div></div>
 
@@ -801,6 +883,7 @@ var SWITCHES = [];
 var SERVICE_REQUESTS = [];
 var AUDIT_LOG = [];
 var EMAILS = [];
+var CLIENTS = JSON.parse(localStorage.getItem('ccsm_clients') || '["KFTL","KWL","Lasco","Nestle","NIDS","Nutrien"]');
 var PINNED_FILES = JSON.parse(localStorage.getItem('ccsm_pinned') || '[]');
 var SENT_EMAILS = [];
 var DRAFT_EMAILS = [];
@@ -812,6 +895,409 @@ var currentClientFilter = null;
 var currentZoneFilter = null;
 var userClient = null;
 var isAdmin = true;
+
+// ============================================================
+// ── THEME FUNCTIONS ──────────────────────────────────────────
+// ============================================================
+
+function toggleThemeDropdown() {
+  var dropdown = document.getElementById('theme-dropdown');
+  if (dropdown) {
+    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+  }
+}
+
+function setTheme(theme) {
+  var root = document.documentElement;
+  var btn = document.getElementById('theme-toggle-btn');
+  var logo = document.getElementById('logo-img');
+  var dropdown = document.getElementById('theme-dropdown');
+  
+  // Remove all theme classes
+  root.classList.remove('light-theme', 'jet-black-theme');
+  
+  if (theme === 'light') {
+    root.classList.add('light-theme');
+    btn.innerHTML = '<i class="ti ti-moon"></i>';
+    if (logo) logo.src = 'logo-light.png';
+  } else if (theme === 'jet-black') {
+    root.classList.add('jet-black-theme');
+    btn.innerHTML = '<i class="ti ti-moon"></i>';
+    if (logo) logo.src = 'logo-black.png';
+    // Fallback to logo.png if black logo doesn't exist
+    logo.onerror = function() { this.src = 'logo.png'; };
+  } else {
+    // Dark (default)
+    btn.innerHTML = '<i class="ti ti-sun"></i>';
+    if (logo) logo.src = 'logo.png';
+  }
+  
+  localStorage.setItem('ccsm_theme', theme);
+  if (dropdown) dropdown.style.display = 'none';
+  toast('Theme: ' + theme.charAt(0).toUpperCase() + theme.slice(1), 'success');
+}
+
+// ============================================================
+// ── ADD DROPDOWN FUNCTIONS ──────────────────────────────────
+// ============================================================
+
+function toggleAddDropdown() {
+  var dropdown = document.getElementById('add-dropdown');
+  if (dropdown) {
+    dropdown.classList.toggle('open');
+  }
+}
+
+function closeAddDropdown() {
+  var dropdown = document.getElementById('add-dropdown');
+  if (dropdown) {
+    dropdown.classList.remove('open');
+  }
+}
+
+function openAddModal(modalId) {
+  document.getElementById(modalId).classList.add('open');
+  populateClientDropdowns();
+}
+
+function closeAddModal(modalId) {
+  document.getElementById(modalId).classList.remove('open');
+}
+
+function populateClientDropdowns() {
+  var selects = document.querySelectorAll('#sr-client, #cam-client, #door-client, #server-client, #switch-client');
+  selects.forEach(function(select) {
+    var currentVal = select.value;
+    select.innerHTML = '<option value="">Select Client</option>';
+    CLIENTS.forEach(function(client) {
+      var option = document.createElement('option');
+      option.value = client;
+      option.textContent = client;
+      select.appendChild(option);
+    });
+    if (currentVal && CLIENTS.indexOf(currentVal) !== -1) {
+      select.value = currentVal;
+    }
+  });
+}
+
+// ============================================================
+// ── ADD FUNCTIONS ────────────────────────────────────────────
+// ============================================================
+
+function generateId() {
+  return 'SR-' + String(Math.floor(Math.random() * 9000) + 1000);
+}
+
+function saveNewClient() {
+  var name = document.getElementById('client-name').value.trim();
+  if (!name) {
+    toast('Please enter a client name', 'warning');
+    return;
+  }
+  if (CLIENTS.indexOf(name) !== -1) {
+    toast('Client already exists', 'warning');
+    return;
+  }
+  CLIENTS.push(name);
+  localStorage.setItem('ccsm_clients', JSON.stringify(CLIENTS));
+  closeAddModal('add-client-modal');
+  document.getElementById('client-name').value = '';
+  document.getElementById('client-email').value = '';
+  document.getElementById('client-phone').value = '';
+  document.getElementById('client-address').value = '';
+  toast('Client ' + name + ' added successfully!', 'success');
+  updateClientNavVisibility();
+}
+
+function saveNewCamera() {
+  var name = document.getElementById('cam-name').value.trim();
+  var client = document.getElementById('cam-client').value;
+  if (!name) { toast('Please enter a camera name', 'warning'); return; }
+  if (!client) { toast('Please select a client', 'warning'); return; }
+  
+  var newCamera = {
+    name: name,
+    zone: document.getElementById('cam-zone').value.trim() || 'Unassigned',
+    ip_address: document.getElementById('cam-ip').value.trim() || '',
+    model: document.getElementById('cam-model').value.trim() || '',
+    resolution: document.getElementById('cam-resolution').value.trim() || '',
+    archiver: document.getElementById('cam-archiver').value.trim() || '',
+    status: document.getElementById('cam-status').value,
+    purchase_date: document.getElementById('cam-purchase-date').value || '',
+    warranty_expiry: document.getElementById('cam-warranty-expiry').value || '',
+    comments: document.getElementById('cam-comments').value.trim() || ''
+  };
+  
+  CAMERAS.push(newCamera);
+  localStorage.setItem('ccsm_cameras', JSON.stringify(CAMERAS));
+  closeAddModal('add-camera-modal');
+  // Clear form
+  document.getElementById('cam-name').value = '';
+  document.getElementById('cam-zone').value = '';
+  document.getElementById('cam-ip').value = '';
+  document.getElementById('cam-model').value = '';
+  document.getElementById('cam-resolution').value = '';
+  document.getElementById('cam-archiver').value = '';
+  document.getElementById('cam-comments').value = '';
+  document.getElementById('cam-purchase-date').value = '';
+  document.getElementById('cam-warranty-expiry').value = '';
+  toast('Camera ' + name + ' added successfully!', 'success');
+  renderCamerasOptimized();
+  renderDashboard();
+}
+
+function saveNewDoor() {
+  var name = document.getElementById('door-name').value.trim();
+  var client = document.getElementById('door-client').value;
+  if (!name) { toast('Please enter a door name', 'warning'); return; }
+  if (!client) { toast('Please select a client', 'warning'); return; }
+  
+  var newDoor = {
+    name: name,
+    site: document.getElementById('door-site').value.trim() || 'Unassigned',
+    client: client,
+    reader: document.getElementById('door-reader').value.trim() || '',
+    lock: document.getElementById('door-lock').value.trim() || '',
+    powered: document.getElementById('door-powered').value,
+    status: document.getElementById('door-status').value,
+    tech: document.getElementById('door-tech').value,
+    ip: document.getElementById('door-ip').value.trim() || '',
+    controller: document.getElementById('door-controller').value.trim() || '',
+    purchase_date: document.getElementById('door-purchase-date').value || '',
+    warranty_expiry: document.getElementById('door-warranty-expiry').value || '',
+    comments: '',
+    history: []
+  };
+  
+  DOORS.push(newDoor);
+  localStorage.setItem('ccsm_doors', JSON.stringify(DOORS));
+  closeAddModal('add-door-modal');
+  toast('Door ' + name + ' added successfully!', 'success');
+  renderDoorsEnhanced();
+  renderDashboard();
+}
+
+function saveNewServer() {
+  var serial = document.getElementById('server-serial').value.trim();
+  var location = document.getElementById('server-location').value.trim();
+  var client = document.getElementById('server-client').value;
+  if (!serial) { toast('Please enter a serial number', 'warning'); return; }
+  if (!location) { toast('Please enter a location', 'warning'); return; }
+  if (!client) { toast('Please select a client', 'warning'); return; }
+  
+  var newServer = {
+    location: location,
+    serial: serial,
+    capacity: document.getElementById('server-capacity').value.trim() || '',
+    used: document.getElementById('server-used').value.trim() || '',
+    health: document.getElementById('server-health').value.trim() || 'Good',
+    apps: document.getElementById('server-apps').value.trim() || '',
+    status: document.getElementById('server-status').value,
+    purchase_date: document.getElementById('server-purchase-date').value || '',
+    warranty_expiry: document.getElementById('server-warranty-expiry').value || '',
+    comments: ''
+  };
+  
+  SERVERS.push(newServer);
+  localStorage.setItem('ccsm_servers', JSON.stringify(SERVERS));
+  closeAddModal('add-server-modal');
+  toast('Server ' + serial + ' added successfully!', 'success');
+  renderServersEnhanced();
+  renderDashboard();
+}
+
+function saveNewSwitch() {
+  var name = document.getElementById('switch-name').value.trim();
+  var client = document.getElementById('switch-client').value;
+  if (!name) { toast('Please enter a switch name', 'warning'); return; }
+  if (!client) { toast('Please select a client', 'warning'); return; }
+  
+  var newSwitch = {
+    name: name,
+    location: document.getElementById('switch-location').value.trim() || 'Unassigned',
+    model: document.getElementById('switch-model').value,
+    ip_address: document.getElementById('switch-ip').value.trim() || '',
+    firmware: document.getElementById('switch-firmware').value.trim() || '',
+    mac: document.getElementById('switch-mac').value.trim() || '',
+    purchase_date: document.getElementById('switch-purchase-date').value || '',
+    warranty_expiry: document.getElementById('switch-warranty-expiry').value || '',
+    comments: ''
+  };
+  
+  SWITCHES.push(newSwitch);
+  localStorage.setItem('ccsm_switches', JSON.stringify(SWITCHES));
+  closeAddModal('add-switch-modal');
+  toast('Switch ' + name + ' added successfully!', 'success');
+  renderSwitchesEnhanced();
+  renderDashboard();
+}
+
+function saveNewSR() {
+  var subject = document.getElementById('sr-subject').value.trim();
+  var client = document.getElementById('sr-client').value;
+  if (!subject) { toast('Please enter a subject', 'warning'); return; }
+  if (!client) { toast('Please select a client', 'warning'); return; }
+  
+  var id = generateId();
+  var newSR = {
+    id: id,
+    client: client,
+    site: document.getElementById('sr-site').value.trim() || 'Unknown',
+    subject: subject,
+    from: currentUser ? currentUser.username : 'System',
+    category: document.getElementById('sr-category').value,
+    priority: document.getElementById('sr-priority').value,
+    status: 'Open',
+    assigned: document.getElementById('sr-assigned').value,
+    received: new Date().toLocaleDateString('en-JM'),
+    body: document.getElementById('sr-description').value.trim() || '',
+    notes: '',
+    hardware: [],
+    history: [{ time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }), msg: 'Created' }],
+    attachments: []
+  };
+  
+  SERVICE_REQUESTS.unshift(newSR);
+  localStorage.setItem('ccsm_sr', JSON.stringify(SERVICE_REQUESTS));
+  closeAddModal('add-sr-modal');
+  // Clear form
+  document.getElementById('sr-subject').value = '';
+  document.getElementById('sr-site').value = '';
+  document.getElementById('sr-description').value = '';
+  toast('Service Request ' + id + ' created!', 'success');
+  renderSR();
+  renderDashboard();
+  document.getElementById('sr-badge').textContent = SERVICE_REQUESTS.filter(function(r) { return r.status !== 'Resolved'; }).length;
+}
+
+// ============================================================
+// ── EXPORT FUNCTIONS ─────────────────────────────────────────
+// ============================================================
+
+function exportToCSV(data, headers, filename) {
+  if (!data || data.length === 0) {
+    toast('No data to export', 'warning');
+    return;
+  }
+  
+  var headerRow = headers.join(',');
+  var rows = data.map(function(item) {
+    return headers.map(function(header) {
+      var value = item[header] || '';
+      // Handle nested objects or arrays
+      if (typeof value === 'object') value = JSON.stringify(value);
+      // Escape quotes and commas
+      return '"' + String(value).replace(/"/g, '""') + '"';
+    }).join(',');
+  });
+  
+  var csv = [headerRow].concat(rows).join('\n');
+  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  var link = document.createElement('a');
+  var url = URL.createObjectURL(blob);
+  link.setAttribute('href', url);
+  link.setAttribute('download', filename + '_' + new Date().toISOString().slice(0,10) + '.csv');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  toast('Exported ' + data.length + ' items', 'success');
+}
+
+function exportCamerasCSV() {
+  var headers = ['name', 'zone', 'ip_address', 'status', 'comments', 'model', 'resolution', 'archiver', 'purchase_date', 'warranty_expiry'];
+  var data = CAMERAS.map(function(c) {
+    var ip = getCameraIP(c) || c.ip_address || '';
+    return {
+      name: c.name,
+      zone: c.zone,
+      ip_address: ip,
+      status: c.status,
+      comments: c.comments || '',
+      model: c.model || '',
+      resolution: c.resolution || '',
+      archiver: c.archiver || '',
+      purchase_date: c.purchase_date || '',
+      warranty_expiry: c.warranty_expiry || ''
+    };
+  });
+  exportToCSV(data, headers, 'cameras');
+}
+
+function exportDoorsCSV() {
+  var headers = ['name', 'site', 'client', 'reader', 'lock', 'powered', 'status', 'tech', 'ip', 'controller', 'purchase_date', 'warranty_expiry'];
+  var data = DOORS.map(function(d) {
+    return {
+      name: d.name,
+      site: d.site,
+      client: d.client,
+      reader: d.reader || '',
+      lock: d.lock || '',
+      powered: d.powered || '',
+      status: d.status,
+      tech: d.tech,
+      ip: d.ip || '',
+      controller: d.controller || '',
+      purchase_date: d.purchase_date || '',
+      warranty_expiry: d.warranty_expiry || ''
+    };
+  });
+  exportToCSV(data, headers, 'doors');
+}
+
+function exportServersCSV() {
+  var headers = ['location', 'serial', 'capacity', 'used', 'health', 'apps', 'status', 'purchase_date', 'warranty_expiry'];
+  var data = SERVERS.map(function(s) {
+    return {
+      location: s.location,
+      serial: s.serial,
+      capacity: s.capacity || '',
+      used: s.used || '',
+      health: s.health || '',
+      apps: s.apps || '',
+      status: s.status,
+      purchase_date: s.purchase_date || '',
+      warranty_expiry: s.warranty_expiry || ''
+    };
+  });
+  exportToCSV(data, headers, 'servers');
+}
+
+function exportSwitchesCSV() {
+  var headers = ['name', 'location', 'model', 'ip_address', 'firmware', 'mac', 'purchase_date', 'warranty_expiry'];
+  var data = SWITCHES.map(function(s) {
+    return {
+      name: s.name,
+      location: s.location,
+      model: s.model,
+      ip_address: s.ip_address || '',
+      firmware: s.firmware || '',
+      mac: s.mac || '',
+      purchase_date: s.purchase_date || '',
+      warranty_expiry: s.warranty_expiry || ''
+    };
+  });
+  exportToCSV(data, headers, 'switches');
+}
+
+function exportSRsCSV() {
+  var headers = ['id', 'client', 'site', 'subject', 'category', 'priority', 'status', 'assigned', 'received'];
+  var data = SERVICE_REQUESTS.map(function(r) {
+    return {
+      id: r.id,
+      client: r.client || '',
+      site: r.site || '',
+      subject: r.subject || '',
+      category: r.category || '',
+      priority: r.priority || '',
+      status: r.status || '',
+      assigned: r.assigned || '',
+      received: r.received || ''
+    };
+  });
+  exportToCSV(data, headers, 'service_requests');
+}
 
 // ============================================================
 // ── HELPER FUNCTIONS ─────────────────────────────────────────
@@ -893,10 +1379,8 @@ function renderAllClients() {
   var container = document.getElementById('client-dropdowns-container');
   if (!container) return;
   
-  var clients = ['KFTL', 'KWL', 'Lasco', 'Nestle', 'NIDS', 'Nutrien'];
   var html = '';
-  
-  clients.forEach(function(client) {
+  CLIENTS.forEach(function(client) {
     html += '<div class="nav-client-group">';
     html += '<div class="nav-item nav-client-parent" data-client="' + client + '" onclick="toggleClientDropdown(\'' + client + '\')">';
     html += '<img class="nav-client-logo" src="logo-' + client.toLowerCase() + '.png" onerror="this.style.display=\'none\'">';
@@ -1016,7 +1500,7 @@ function fullDateTime(){return new Date().toLocaleDateString('en-JM',{weekday:'s
 function toast(m,type){type=type||'info';var c=document.getElementById('toast-container'),t=document.createElement('div');t.className='toast '+type;var icons={info:'ti ti-info-circle',success:'ti ti-check',warning:'ti ti-alert-triangle',error:'ti ti-x'};t.innerHTML='<i class="'+(icons[type]||icons.info)+'"></i> '+m;c.appendChild(t);setTimeout(function(){t.style.opacity='0';t.style.transition='opacity 0.3s';setTimeout(function(){t.remove();},300);},3000);}
 function copyText(t){navigator.clipboard.writeText(t).then(function(){toast('Copied','success');}).catch(function(){toast('Copy failed','error');});}
 async function revealAndCopySwitchPassword(switchId){try{var result=await get('/switches/'+switchId+'/reveal-password');if(result&&result.password){copyText(result.password);}else{toast('No password on file','warning');}}catch(e){}}
-function toggleTheme(){var root=document.documentElement;var btn=document.getElementById('theme-toggle-btn');var logo=document.getElementById('logo-img');if(root.classList.contains('light-theme')){root.classList.remove('light-theme');btn.innerHTML='<i class="ti ti-sun"></i>';if(logo)logo.src='logo.png';localStorage.setItem('ccsm_theme','dark');}else{root.classList.add('light-theme');btn.innerHTML='<i class="ti ti-moon"></i>';if(logo)logo.src='logo-light.png';localStorage.setItem('ccsm_theme','light');}}
+function toggleThemeOld(){var root=document.documentElement;var btn=document.getElementById('theme-toggle-btn');var logo=document.getElementById('logo-img');if(root.classList.contains('light-theme')){root.classList.remove('light-theme');btn.innerHTML='<i class="ti ti-sun"></i>';if(logo)logo.src='logo.png';localStorage.setItem('ccsm_theme','dark');}else{root.classList.add('light-theme');btn.innerHTML='<i class="ti ti-moon"></i>';if(logo)logo.src='logo-light.png';localStorage.setItem('ccsm_theme','light');}}
 function acknowledgeAlarm(){document.getElementById('emergency-banner').classList.remove('active');toast('Alarm acknowledged','success');}
 
 function camBadge(s){if(s==='Online')return'<span class="badge b-done">Online</span>';if(s==='Defective')return'<span class="badge b-high">Defective</span>';if(s==='No Power')return'<span class="badge b-high">No Power</span>';if(s==='No Camera')return'<span class="badge b-open">No Camera</span>';return'<span class="badge b-info">Needs Check</span>';}
@@ -1467,10 +1951,29 @@ function renderAnalytics() { document.getElementById('analytics-tech-times').inn
 
 document.getElementById('topbar-date').textContent = fullDateTime();
 setInterval(function() { document.getElementById('topbar-date').textContent = fullDateTime(); }, 30000);
-if (localStorage.getItem('ccsm_theme') === 'light') { document.documentElement.classList.add('light-theme'); var themeBtn = document.getElementById('theme-toggle-btn'); if (themeBtn) themeBtn.innerHTML = '<i class="ti ti-moon"></i>'; var logo = document.getElementById('logo-img'); if (logo) logo.src = 'logo-light.png'; }
+
+// Load saved theme
+var savedTheme = localStorage.getItem('ccsm_theme') || 'dark';
+setTheme(savedTheme);
+
 checkLogin();
 if (localStorage.getItem('ccsm_sidebar') === '1') toggleSidebar();
 PINNED_FILES = JSON.parse(localStorage.getItem('ccsm_pinned') || '[]');
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(e) {
+  var addDropdown = document.getElementById('add-dropdown');
+  var themeDropdown = document.getElementById('theme-dropdown');
+  var addBtn = document.getElementById('add-btn');
+  var themeBtn = document.getElementById('theme-toggle-btn');
+  
+  if (addDropdown && addBtn && !addBtn.contains(e.target) && !addDropdown.contains(e.target)) {
+    addDropdown.classList.remove('open');
+  }
+  if (themeDropdown && themeBtn && !themeBtn.contains(e.target) && !themeDropdown.contains(e.target)) {
+    themeDropdown.style.display = 'none';
+  }
+});
 </script>
 </body>
 </html>
