@@ -88,7 +88,6 @@ function requireRole(...allowedRoles) {
   };
 }
 
-// ── DATABASE INIT ─────────────────────────────────────────
 async function initDatabase() {
   try {
     await pool.query(`
@@ -99,24 +98,28 @@ async function initDatabase() {
       CREATE TABLE IF NOT EXISTS cameras (
         id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL, zone VARCHAR(50), status VARCHAR(20) DEFAULT 'Unknown',
         ip_address VARCHAR(15), username VARCHAR(50), model VARCHAR(100), resolution VARCHAR(50),
-        archiver VARCHAR(50), comments TEXT, last_seen TIMESTAMP, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        archiver VARCHAR(50), purchase_date VARCHAR(50), warranty_expiry VARCHAR(50), comments TEXT,
+        last_seen TIMESTAMP, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(name, ip_address)
       );
       CREATE TABLE IF NOT EXISTS doors (
         id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL UNIQUE, site VARCHAR(100), client VARCHAR(20),
         reader VARCHAR(100), lock_type VARCHAR(50), powered VARCHAR(20), status VARCHAR(20) DEFAULT 'Offline',
         tech VARCHAR(50), ip_address VARCHAR(15), controller VARCHAR(100), last_service VARCHAR(50),
-        access_direction VARCHAR(10) DEFAULT 'In', history JSONB DEFAULT '[]', comments TEXT DEFAULT '',
+        access_direction VARCHAR(10) DEFAULT 'In', purchase_date VARCHAR(50), warranty_expiry VARCHAR(50),
+        history JSONB DEFAULT '[]', comments TEXT DEFAULT '',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
       CREATE TABLE IF NOT EXISTS servers (
         id SERIAL PRIMARY KEY, location VARCHAR(100), serial VARCHAR(50) NOT NULL UNIQUE, capacity VARCHAR(20),
-        used VARCHAR(20), health VARCHAR(100), apps TEXT, status VARCHAR(20) DEFAULT 'ONLINE', comments TEXT DEFAULT '',
+        used VARCHAR(20), health VARCHAR(100), apps TEXT, status VARCHAR(20) DEFAULT 'ONLINE',
+        purchase_date VARCHAR(50), warranty_expiry VARCHAR(50), comments TEXT DEFAULT '',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
       CREATE TABLE IF NOT EXISTS switches (
         id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL UNIQUE, location VARCHAR(100), model VARCHAR(100),
-        ip_address VARCHAR(15), firmware VARCHAR(20), username VARCHAR(50), password VARCHAR(100), mac VARCHAR(20), comments TEXT DEFAULT '',
+        ip_address VARCHAR(15), firmware VARCHAR(20), username VARCHAR(50), password VARCHAR(100), mac VARCHAR(20),
+        purchase_date VARCHAR(50), warranty_expiry VARCHAR(50), comments TEXT DEFAULT '',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
       CREATE TABLE IF NOT EXISTS tickets (
@@ -163,160 +166,158 @@ async function seedData() {
       console.log('🌱 Seeding cameras...');
       const cameras = [
         // ── ADMIN/HR ──
-        ['ATM Walkway','ADMIN/HR','Online','172.17.102.79','root','Axis P3227-LVE','','','Archiver 3'],
-        ['Board N Ceo Secretary','ADMIN/HR','Online','172.17.102.130','root','Axis P3245-LV','','','Archiver 4'],
-        ['Executive 2nd Fl Exit Stair Lower Case','ADMIN/HR','Online','172.17.102.132','root','Axis P3245-LV','','','Archiver 1'],
-        ['Executive 2nd Fl Exit Stair Top Case','ADMIN/HR','Online','172.17.102.134','root','Axis P3245-LV','','','Archiver 1'],
-        ['HR Meeting Rm Passage','ADMIN/HR','Online','172.17.102.131','root','Axis P3245-LV','','Camera refocused','Archiver 3'],
-        ['HR Waiting Area','ADMIN/HR','Online','172.17.102.133','root','Axis P3245-LV','','','Archiver 3'],
-        ['Lobby HR','ADMIN/HR','Online','172.17.102.80','root','Axis P3227-LVE','','','Archiver 3'],
-        ['Meeting RM Passage','ADMIN/HR','Online','172.17.102.128','root','Axis P3245-LV','','','Archiver 3'],
-        ['Payroll Walkway','ADMIN/HR','Online','172.17.102.93','root','Axis P3227-LVE','','','Archiver 3'],
-        ['Planning Main Entry','ADMIN/HR','Online','172.17.102.129','root','Axis P3245-LV','','','Archiver 3'],
-        ['Procurement Passage','ADMIN/HR','Online','172.17.102.92','root','Axis P3227-LVE','','','Archiver 2'],
+        ['ATM Walkway','ADMIN/HR','Online','172.17.102.79','root','Axis P3227-LVE','','','Archiver 3','',''],
+        ['Board N Ceo Secretary','ADMIN/HR','Online','172.17.102.130','root','Axis P3245-LV','','','Archiver 4','',''],
+        ['Executive 2nd Fl Exit Stair Lower Case','ADMIN/HR','Online','172.17.102.132','root','Axis P3245-LV','','','Archiver 1','',''],
+        ['Executive 2nd Fl Exit Stair Top Case','ADMIN/HR','Online','172.17.102.134','root','Axis P3245-LV','','','Archiver 1','',''],
+        ['HR Meeting Rm Passage','ADMIN/HR','Online','172.17.102.131','root','Axis P3245-LV','','Camera refocused','Archiver 3','',''],
+        ['HR Waiting Area','ADMIN/HR','Online','172.17.102.133','root','Axis P3245-LV','','','Archiver 3','',''],
+        ['Lobby HR','ADMIN/HR','Online','172.17.102.80','root','Axis P3227-LVE','','','Archiver 3','',''],
+        ['Meeting RM Passage','ADMIN/HR','Online','172.17.102.128','root','Axis P3245-LV','','','Archiver 3','',''],
+        ['Payroll Walkway','ADMIN/HR','Online','172.17.102.93','root','Axis P3227-LVE','','','Archiver 3','',''],
+        ['Planning Main Entry','ADMIN/HR','Online','172.17.102.129','root','Axis P3245-LV','','','Archiver 3','',''],
+        ['Procurement Passage','ADMIN/HR','Online','172.17.102.92','root','Axis P3227-LVE','','','Archiver 2','',''],
         // ── ENGINEERING ──
-        ['Bathroom Passage 1','ENGINEERING','Online','172.17.102.156','root','Axis P3227-LVE','','','Archiver 4'],
-        ['Bathroom Passage 2','ENGINEERING','Online','172.17.102.157','root','Axis P3227-LVE','','','Archiver 4'],
-        ['Battery Shop','ENGINEERING','Online','172.17.102.154','root','Axis P1447-LE','','Lift Required','Archiver 4'],
-        ['Data Center A','ENGINEERING','Online','172.17.103.153','root','Axis P3227-LVE','','','Archiver 2'],
-        ['F Changing Room Exit Passage','ENGINEERING','Online','172.17.102.149','root','Axis P3245-LV','','','Archiver 5'],
-        ['Eng Workshop 3','ENGINEERING','Online','172.17.102.152','root','Axis P3245-LV','','Lift Required','Archiver 5'],
-        ['Eng Rear Passage','ENGINEERING','Online','172.17.102.148','root','Axis P3227-LVE','','','Archiver 2'],
-        ['Engineering East Stair','ENGINEERING','Online','172.17.102.146','root','Axis P3245-LV','','','Archiver 5'],
-        ['Engineering West Stair','ENGINEERING','Online','172.17.102.147','root','Axis P3245-LV','','','Archiver 4'],
-        ['IT Entry','ENGINEERING','Online','172.17.103.152','root','Axis P3227-LVE','','','Archiver 2'],
-        ['IT Exit','ENGINEERING','Online','172.17.103.151','root','Axis P3227-LVE','','','Archiver 2'],
-        ['IT Stairwell','ENGINEERING','Online','172.17.102.145','root','Axis P3245-LV','','','Archiver 4'],
-        ['Engineering Lunch Room','ENGINEERING','Online','172.17.102.97','root','Axis P3227-LVE','','','Archiver 2'],
-        ['Engineering Entry','ENGINEERING','Online','172.17.102.151','root','Axis P3245-LV','','','Archiver 5'],
-        ['Engineering Gym','ENGINEERING','Online','172.17.102.150','root','Axis P3245-LV','','','Archiver 4'],
-        ['Training Room East','ENGINEERING','Online','172.17.102.84','root','Axis P3227-LVE','','','Archiver 5'],
-        ['Training Room West','ENGINEERING','Online','172.17.102.95','root','Axis P3227-LVE','','','Archiver 2'],
-        ['Eng Lunch RM Kitchen','ENGINEERING','Online','172.17.103.193','root','Axis M3085-V','','','Archiver 5'],
-        ['Engineering Entry Passage','ENGINEERING','Online','172.17.102.75','root','Axis P3227-LVE','','','Archiver 5'],
-        ['Tyre Shop','ENGINEERING','Online','172.17.102.153','root','Axis P1447-LE','','Lift Required','Archiver 2'],
+        ['Bathroom Passage 1','ENGINEERING','Online','172.17.102.156','root','Axis P3227-LVE','','','Archiver 4','',''],
+        ['Bathroom Passage 2','ENGINEERING','Online','172.17.102.157','root','Axis P3227-LVE','','','Archiver 4','',''],
+        ['Battery Shop','ENGINEERING','Online','172.17.102.154','root','Axis P1447-LE','','Lift Required','Archiver 4','',''],
+        ['Data Center A','ENGINEERING','Online','172.17.103.153','root','Axis P3227-LVE','','','Archiver 2','',''],
+        ['F Changing Room Exit Passage','ENGINEERING','Online','172.17.102.149','root','Axis P3245-LV','','','Archiver 5','',''],
+        ['Eng Workshop 3','ENGINEERING','Online','172.17.102.152','root','Axis P3245-LV','','Lift Required','Archiver 5','',''],
+        ['Eng Rear Passage','ENGINEERING','Online','172.17.102.148','root','Axis P3227-LVE','','','Archiver 2','',''],
+        ['Engineering East Stair','ENGINEERING','Online','172.17.102.146','root','Axis P3245-LV','','','Archiver 5','',''],
+        ['Engineering West Stair','ENGINEERING','Online','172.17.102.147','root','Axis P3245-LV','','','Archiver 4','',''],
+        ['IT Entry','ENGINEERING','Online','172.17.103.152','root','Axis P3227-LVE','','','Archiver 2','',''],
+        ['IT Exit','ENGINEERING','Online','172.17.103.151','root','Axis P3227-LVE','','','Archiver 2','',''],
+        ['IT Stairwell','ENGINEERING','Online','172.17.102.145','root','Axis P3245-LV','','','Archiver 4','',''],
+        ['Engineering Lunch Room','ENGINEERING','Online','172.17.102.97','root','Axis P3227-LVE','','','Archiver 2','',''],
+        ['Engineering Entry','ENGINEERING','Online','172.17.102.151','root','Axis P3245-LV','','','Archiver 5','',''],
+        ['Engineering Gym','ENGINEERING','Online','172.17.102.150','root','Axis P3245-LV','','','Archiver 4','',''],
+        ['Training Room East','ENGINEERING','Online','172.17.102.84','root','Axis P3227-LVE','','','Archiver 5','',''],
+        ['Training Room West','ENGINEERING','Online','172.17.102.95','root','Axis P3227-LVE','','','Archiver 2','',''],
+        ['Eng Lunch RM Kitchen','ENGINEERING','Online','172.17.103.193','root','Axis M3085-V','','','Archiver 5','',''],
+        ['Engineering Entry Passage','ENGINEERING','Online','172.17.102.75','root','Axis P3227-LVE','','','Archiver 5','',''],
+        ['Tyre Shop','ENGINEERING','Online','172.17.102.153','root','Axis P1447-LE','','Lift Required','Archiver 2','',''],
         // ── HIGH MAST ──
-        ['HM5(11)','HIGH MAST','Online','172.17.102.192','root','Axis P3227-LVE','','Camera had default IP reconfigured','Archiver 5'],
-        ['HM5(134)','HIGH MAST','Online','172.17.102.222','administrator','Avigilon 5.0C-H5A-DP2','','Camera lens damaged','Archiver 2'],
-        ['HM8','HIGH MAST','Online','172.17.102.220','administrator','Avigilon 5.0C-H5A-DP2','','','Archiver 5'],
-        ['HM14','HIGH MAST','Online','172.17.102.212','administrator','Avigilon 5.0C-H5A-DP2','','','Archiver 5'],
-        ['HM23','HIGH MAST','Online','172.17.102.201','root','Axis P3227-LVE','','','Archiver 5'],
-        ['HM24A','HIGH MAST','Defective','172.17.102.214','root','Axis P1447-LE','','No Fibre link','Archiver 5'],
-        ['Manager Car Park Dome','HIGH MAST','Online','172.17.102.187','root','Axis P3227-LVE','','Camera lens Damaged','Archiver 4'],
-        ['N30','HIGH MAST','Online','172.17.102.209','root','Axis P3227-LVE','','Pole','Archiver 3'],
-        ['N31','HIGH MAST','Online','172.17.102.208','root','Axis P3227-LVE','','Camera needs reset, POE replaced','Archiver 5'],
-        ['N33','HIGH MAST','Online','172.17.102.206','root','Axis P3227-LVE','','','Archiver 3'],
-        ['N34','HIGH MAST','Online','172.17.102.205','root','Axis P3227-LVE','','','Archiver 5'],
-        ['HM14 PTZ 2','HIGH MAST','Online','172.17.103.200','root','Axis P5655-E','','To be added to genetec','Archiver 3'],
+        ['HM5(11)','HIGH MAST','Online','172.17.102.192','root','Axis P3227-LVE','','Camera had default IP reconfigured','Archiver 5','',''],
+        ['HM5(134)','HIGH MAST','Online','172.17.102.222','administrator','Avigilon 5.0C-H5A-DP2','','Camera lens damaged','Archiver 2','',''],
+        ['HM8','HIGH MAST','Online','172.17.102.220','administrator','Avigilon 5.0C-H5A-DP2','','','Archiver 5','',''],
+        ['HM14','HIGH MAST','Online','172.17.102.212','administrator','Avigilon 5.0C-H5A-DP2','','','Archiver 5','',''],
+        ['HM23','HIGH MAST','Online','172.17.102.201','root','Axis P3227-LVE','','','Archiver 5','',''],
+        ['HM24A','HIGH MAST','Defective','172.17.102.214','root','Axis P1447-LE','','No Fibre link','Archiver 5','',''],
+        ['Manager Car Park Dome','HIGH MAST','Online','172.17.102.187','root','Axis P3227-LVE','','Camera lens Damaged','Archiver 4','',''],
+        ['N30','HIGH MAST','Online','172.17.102.209','root','Axis P3227-LVE','','Pole','Archiver 3','',''],
+        ['N31','HIGH MAST','Online','172.17.102.208','root','Axis P3227-LVE','','Camera needs reset, POE replaced','Archiver 5','',''],
+        ['N33','HIGH MAST','Online','172.17.102.206','root','Axis P3227-LVE','','','Archiver 3','',''],
+        ['N34','HIGH MAST','Online','172.17.102.205','root','Axis P3227-LVE','','','Archiver 5','',''],
+        ['HM14 PTZ 2','HIGH MAST','Online','172.17.103.200','root','Axis P5655-E','','To be added to genetec','Archiver 3','',''],
         // ── NORTH TERMINAL PERIMETER ──
-        ['N Fence','NORTH TERMINAL PERIMETER','Online','172.17.103.109','root','Axis P3227-LVE','','Analytics Applied','Archiver 4'],
-        ['East West Corner Perimeter Rest Bay','NORTH TERMINAL PERIMETER','Online','172.17.102.108','root','Axis P1447-LE','','Analytics Applied','Archiver 1'],
-        ['N Terminal NW Corner','NORTH TERMINAL PERIMETER','Online','172.17.102.227','root','Axis P1447-LE','','Analytics Applied','Archiver 2'],
-        ['North South Corner Rest Bay','NORTH TERMINAL PERIMETER','Online','172.17.102.107','root','Axis P1447-LE','','Analytics Applied','Archiver 4'],
-        ['PPE Store Perim N','NORTH TERMINAL PERIMETER','Online','172.17.102.162','root','Axis P1447-LE','','Analytics Applied','Archiver 3'],
-        ['PPE Store Perim S','NORTH TERMINAL PERIMETER','Online','172.17.102.159','root','Axis P1447-LE','','Analytics Applied','Archiver 4'],
-        ['Wharfage Perim','NORTH TERMINAL PERIMETER','Defective','172.17.102.180','root','Axis P1447-LE','','replacement needed','Archiver 1'],
+        ['N Fence','NORTH TERMINAL PERIMETER','Online','172.17.103.109','root','Axis P3227-LVE','','Analytics Applied','Archiver 4','',''],
+        ['East West Corner Perimeter Rest Bay','NORTH TERMINAL PERIMETER','Online','172.17.102.108','root','Axis P1447-LE','','Analytics Applied','Archiver 1','',''],
+        ['N Terminal NW Corner','NORTH TERMINAL PERIMETER','Online','172.17.102.227','root','Axis P1447-LE','','Analytics Applied','Archiver 2','',''],
+        ['North South Corner Rest Bay','NORTH TERMINAL PERIMETER','Online','172.17.102.107','root','Axis P1447-LE','','Analytics Applied','Archiver 4','',''],
+        ['PPE Store Perim N','NORTH TERMINAL PERIMETER','Online','172.17.102.162','root','Axis P1447-LE','','Analytics Applied','Archiver 3','',''],
+        ['PPE Store Perim S','NORTH TERMINAL PERIMETER','Online','172.17.102.159','root','Axis P1447-LE','','Analytics Applied','Archiver 4','',''],
+        ['Wharfage Perim','NORTH TERMINAL PERIMETER','Defective','172.17.102.180','root','Axis P1447-LE','','replacement needed','Archiver 1','',''],
         // ── PTZ CAMERAS ──
-        ['Berth 9 PTZ','PTZ','Online','172.17.103.146','root','Axis P5655-E','','','Archiver 5'],
-        ['HM3 PTZ','PTZ','Defective','172.17.102.218','admin','Pelco P2820-ESR','','POE added, signs of being defective','Archiver 2'],
-        ['HM4 PTZ','PTZ','Online','172.17.102.219','admin','Pelco P2820-ESR','','','Archiver 1'],
-        ['HM5 PTZ','PTZ','Online','172.17.102.223','admin','Pelco P2820-ESR','','','Archiver 5'],
-        ['HM8 PTZ','PTZ','Online','172.17.102.221','administrator','Pelco P2820-ESR','','','Archiver 1'],
-        ['HM10 PTZ','PTZ','Online','172.17.102.224','admin','Pelco P2820-ESR','','Camera reconfigured, had default IP','Archiver 1'],
-        ['HM11 PTZ','PTZ','Online','172.17.102.225','admin','Pelco P2820-ESR','','','Archiver 3'],
-        ['HM14 PTZ','PTZ','Online','172.17.103.145','root','Axis P5655-E','','','Archiver 3'],
-        ['HM23 PTZ','PTZ','Defective','172.17.102.200','admin','Pelco P2820-ESR','','Cables corroded, recrimped. Camera overheating, deemed defective','Archiver 3'],
-        ['HM24A PTZ','PTZ','Defective','172.17.102.215','root','Axis P5655-E','','No Fibre link','Archiver 3'],
-        ['HM28 PTZ','PTZ','Online','172.17.102.202','admin','Pelco P2820-ESR','','','Archiver 3'],
-        ['Manager Car Park PTZ','PTZ','Defective','172.17.102.186','administrator','Pelco P2820-ESR','','Defective','Archiver 4'],
-        ['N Terminal NW Corner PTZ','PTZ','Online','172.17.102.226','root','Axis P5655-E','','','Archiver 2'],
-        ['N25 PTZ','PTZ','Defective','172.17.102.216','administrator','Pelco P2820-ESR','','Defective','Archiver 1'],
-        ['N30 PTZ','PTZ','Online','172.17.102.210','admin','Pelco P2820-ESR','','Reset needs to be done','Archiver 4'],
-        ['N31 PTZ- Context','PTZ','Defective','172.17.102.207','admin','FLIR DX-624','','POE injector changed, Camera needs reset','Archiver 4'],
-        ['N34 PTZ - Context','PTZ','Defective','172.17.102.204','admin','FLIR DX-624','','Defective','Archiver 1'],
-        ['Visitor Car Park PTZ 1','PTZ','Online','172.17.102.184','administrator','Pelco P2820-ESR','','','Archiver 2'],
-        ['Visitor Car Park PTZ 2','PTZ','Defective','172.17.102.185','administrator','Pelco P2820-ESR','','REPLACEMENT/AXIS Q6318-LE 60HZ to be installed','Archiver 2'],
-        ['B8 PTZ','PTZ','Online','172.17.103.66','administrator','Pelco P2820-ESR','','','Archiver 3'],
-        ['D12 PTZ','PTZ','Online','172.17.103.105','admin','Pelco P2820-ESR','','','Archiver 3'],
-        ['B9 PTZ','PTZ','Offline','172.17.103.67','administrator','Pelco P2820-ESR','','','Archiver 3'],
-        ['A2 PTZ','PTZ','Online','172.17.103.144','admin','Pelco P2820-ESR','','','Archiver 5'],
-        ['A5 PTZ','PTZ','Online','172.17.103.34','admin','Pelco P2820-ESR','','','Archiver 4'],
-        ['A7 PTZ','PTZ','Offline','172.17.103.36','admin','Pelco P2820-ESR','','','Archiver 4'],
-        ['A1 PTZ','PTZ','Online','172.17.103.30','admin','Pelco P2820-ESR','','','Archiver 1'],
-        ['South Perim PTZ','PTZ','Offline','172.17.103.86','admin','Pelco P2820-ESR','','','Archiver 1'],
-        ['C2 PTZ','PTZ','Online','172.17.103.82','administrator','Pelco P2820-ESR','','','Archiver 5'],
-        ['C9 PTZ','PTZ','Online','172.17.103.143','admin','Pelco P2820-ESR','','','Archiver 3'],
-        ['B5 PTZ','PTZ','Offline','172.17.103.63','admin','Pelco P2820-ESR','','','Archiver 3'],
-        ['W6 PTZ','PTZ','Online','172.17.102.248','admin','Pelco P2820-ESR','','','Archiver 2'],
-        ['C1 PTZ','PTZ','Offline','172.17.103.81','admin','Pelco P2820-ESR','','','Archiver 4'],
-        ['A10 PTZ','PTZ','Online','172.17.103.39','admin','Pelco P2820-ESR','','','Archiver 1'],
-        ['B12 PTZ','PTZ','Offline','172.17.103.70','admin','Pelco P2820-ESR','','','Archiver 3'],
-        ['B1 PTZ','PTZ','Online','172.17.103.60','admin','Pelco P2820-ESR','','','Archiver 3'],
-        ['B2 PTZ','PTZ','Online','172.17.103.61','admin','Pelco P2820-ESR','','','Archiver 3'],
-        ['B6 PTZ','PTZ','Online','172.17.103.64','admin','Pelco P2820-ESR','','','Archiver 3'],
-        ['A8 PTZ','PTZ','Offline','172.17.103.37','admin','Pelco P2820-ESR','','','Archiver 4'],
-        ['A6 PTZ','PTZ','Offline','172.17.103.35','administrator','Pelco P2820-ESR','','','Archiver 4'],
-        ['A12 PTZ','PTZ','Online','172.17.103.41','admin','Pelco P2820-ESR','','','Archiver 3'],
-        ['A4 PTZ','PTZ','Online','172.17.103.33','admin','Pelco P2820-ESR','','','Archiver 1'],
-        ['B10 PTZ','PTZ','Offline','172.17.103.68','admin','Pelco P2820-ESR','','','Archiver 3'],
-        ['SW Corner Perim PTZ','PTZ','Online','172.17.102.155','admin','Pelco P2820-ESR','','','Archiver 4'],
-        ['D4 PTZ','PTZ','Online','172.17.103.99','admin','Pelco P2820-ESR','','','Archiver 2'],
-        ['A11 PTZ','PTZ','Online','172.17.103.40','admin','Pelco P2820-ESR','','','Archiver 1'],
-        ['D10 PTZ','PTZ','Online','172.17.103.104','administrator','Pelco P2820-ESR','','','Archiver 5'],
-        ['C11 PTZ','PTZ','Offline','172.17.103.85','administrator','Pelco P2820-ESR','','','Archiver 1'],
-        ['D5 PTZ','PTZ','Online','172.17.103.100','administrator','Pelco P2820-ESR','','','Archiver 2'],
-        ['B11 PTZ','PTZ','Offline','172.17.103.69','administrator','Pelco P2820-ESR','','','Archiver 3'],
-        ['W2 PTZ','PTZ','Offline','172.17.102.244','administrator','Pelco P2820-ESR','','','Archiver 4'],
-        ['C4 PTZ','PTZ','Online','172.17.103.83','administrator','Pelco P2820-ESR','','','Archiver 1'],
-        ['SE Tower PTZ','PTZ','Online','172.17.103.165','admin','Opgal OP94-1200-0000','','','Archiver 4'],
+        ['Berth 9 PTZ','PTZ','Online','172.17.103.146','root','Axis P5655-E','','','Archiver 5','',''],
+        ['HM3 PTZ','PTZ','Defective','172.17.102.218','admin','Pelco P2820-ESR','','POE added, signs of being defective','Archiver 2','',''],
+        ['HM4 PTZ','PTZ','Online','172.17.102.219','admin','Pelco P2820-ESR','','','Archiver 1','',''],
+        ['HM5 PTZ','PTZ','Online','172.17.102.223','admin','Pelco P2820-ESR','','','Archiver 5','',''],
+        ['HM8 PTZ','PTZ','Online','172.17.102.221','administrator','Pelco P2820-ESR','','','Archiver 1','',''],
+        ['HM10 PTZ','PTZ','Online','172.17.102.224','admin','Pelco P2820-ESR','','Camera reconfigured, had default IP','Archiver 1','',''],
+        ['HM11 PTZ','PTZ','Online','172.17.102.225','admin','Pelco P2820-ESR','','','Archiver 3','',''],
+        ['HM14 PTZ','PTZ','Online','172.17.103.145','root','Axis P5655-E','','','Archiver 3','',''],
+        ['HM23 PTZ','PTZ','Defective','172.17.102.200','admin','Pelco P2820-ESR','','Cables corroded, recrimped. Camera overheating, deemed defective','Archiver 3','',''],
+        ['HM24A PTZ','PTZ','Defective','172.17.102.215','root','Axis P5655-E','','No Fibre link','Archiver 3','',''],
+        ['HM28 PTZ','PTZ','Online','172.17.102.202','admin','Pelco P2820-ESR','','','Archiver 3','',''],
+        ['Manager Car Park PTZ','PTZ','Defective','172.17.102.186','administrator','Pelco P2820-ESR','','Defective','Archiver 4','',''],
+        ['N Terminal NW Corner PTZ','PTZ','Online','172.17.102.226','root','Axis P5655-E','','','Archiver 2','',''],
+        ['N25 PTZ','PTZ','Defective','172.17.102.216','administrator','Pelco P2820-ESR','','Defective','Archiver 1','',''],
+        ['N30 PTZ','PTZ','Online','172.17.102.210','admin','Pelco P2820-ESR','','Reset needs to be done','Archiver 4','',''],
+        ['N31 PTZ- Context','PTZ','Defective','172.17.102.207','admin','FLIR DX-624','','POE injector changed, Camera needs reset','Archiver 4','',''],
+        ['N34 PTZ - Context','PTZ','Defective','172.17.102.204','admin','FLIR DX-624','','Defective','Archiver 1','',''],
+        ['Visitor Car Park PTZ 1','PTZ','Online','172.17.102.184','administrator','Pelco P2820-ESR','','','Archiver 2','',''],
+        ['Visitor Car Park PTZ 2','PTZ','Defective','172.17.102.185','administrator','Pelco P2820-ESR','','REPLACEMENT/AXIS Q6318-LE 60HZ to be installed','Archiver 2','',''],
+        ['B8 PTZ','PTZ','Online','172.17.103.66','administrator','Pelco P2820-ESR','','','Archiver 3','',''],
+        ['D12 PTZ','PTZ','Online','172.17.103.105','admin','Pelco P2820-ESR','','','Archiver 3','',''],
+        ['B9 PTZ','PTZ','Offline','172.17.103.67','administrator','Pelco P2820-ESR','','','Archiver 3','',''],
+        ['A2 PTZ','PTZ','Online','172.17.103.144','admin','Pelco P2820-ESR','','','Archiver 5','',''],
+        ['A5 PTZ','PTZ','Online','172.17.103.34','admin','Pelco P2820-ESR','','','Archiver 4','',''],
+        ['A7 PTZ','PTZ','Offline','172.17.103.36','admin','Pelco P2820-ESR','','','Archiver 4','',''],
+        ['A1 PTZ','PTZ','Online','172.17.103.30','admin','Pelco P2820-ESR','','','Archiver 1','',''],
+        ['South Perim PTZ','PTZ','Offline','172.17.103.86','admin','Pelco P2820-ESR','','','Archiver 1','',''],
+        ['C2 PTZ','PTZ','Online','172.17.103.82','administrator','Pelco P2820-ESR','','','Archiver 5','',''],
+        ['C9 PTZ','PTZ','Online','172.17.103.143','admin','Pelco P2820-ESR','','','Archiver 3','',''],
+        ['B5 PTZ','PTZ','Offline','172.17.103.63','admin','Pelco P2820-ESR','','','Archiver 3','',''],
+        ['W6 PTZ','PTZ','Online','172.17.102.248','admin','Pelco P2820-ESR','','','Archiver 2','',''],
+        ['C1 PTZ','PTZ','Offline','172.17.103.81','admin','Pelco P2820-ESR','','','Archiver 4','',''],
+        ['A10 PTZ','PTZ','Online','172.17.103.39','admin','Pelco P2820-ESR','','','Archiver 1','',''],
+        ['B12 PTZ','PTZ','Offline','172.17.103.70','admin','Pelco P2820-ESR','','','Archiver 3','',''],
+        ['B1 PTZ','PTZ','Online','172.17.103.60','admin','Pelco P2820-ESR','','','Archiver 3','',''],
+        ['B2 PTZ','PTZ','Online','172.17.103.61','admin','Pelco P2820-ESR','','','Archiver 3','',''],
+        ['B6 PTZ','PTZ','Online','172.17.103.64','admin','Pelco P2820-ESR','','','Archiver 3','',''],
+        ['A8 PTZ','PTZ','Offline','172.17.103.37','admin','Pelco P2820-ESR','','','Archiver 4','',''],
+        ['A6 PTZ','PTZ','Offline','172.17.103.35','administrator','Pelco P2820-ESR','','','Archiver 4','',''],
+        ['A12 PTZ','PTZ','Online','172.17.103.41','admin','Pelco P2820-ESR','','','Archiver 3','',''],
+        ['A4 PTZ','PTZ','Online','172.17.103.33','admin','Pelco P2820-ESR','','','Archiver 1','',''],
+        ['B10 PTZ','PTZ','Offline','172.17.103.68','admin','Pelco P2820-ESR','','','Archiver 3','',''],
+        ['SW Corner Perim PTZ','PTZ','Online','172.17.102.155','admin','Pelco P2820-ESR','','','Archiver 4','',''],
+        ['D4 PTZ','PTZ','Online','172.17.103.99','admin','Pelco P2820-ESR','','','Archiver 2','',''],
+        ['A11 PTZ','PTZ','Online','172.17.103.40','admin','Pelco P2820-ESR','','','Archiver 1','',''],
+        ['D10 PTZ','PTZ','Online','172.17.103.104','administrator','Pelco P2820-ESR','','','Archiver 5','',''],
+        ['C11 PTZ','PTZ','Offline','172.17.103.85','administrator','Pelco P2820-ESR','','','Archiver 1','',''],
+        ['D5 PTZ','PTZ','Online','172.17.103.100','administrator','Pelco P2820-ESR','','','Archiver 2','',''],
+        ['B11 PTZ','PTZ','Offline','172.17.103.69','administrator','Pelco P2820-ESR','','','Archiver 3','',''],
+        ['W2 PTZ','PTZ','Offline','172.17.102.244','administrator','Pelco P2820-ESR','','','Archiver 4','',''],
+        ['C4 PTZ','PTZ','Online','172.17.103.83','administrator','Pelco P2820-ESR','','','Archiver 1','',''],
+        ['SE Tower PTZ','PTZ','Online','172.17.103.165','admin','Opgal OP94-1200-0000','','','Archiver 4','',''],
       ];
       for (const cam of cameras) {
-        await pool.query(`INSERT INTO cameras (name, zone, status, ip_address, username, model, resolution, comments, archiver) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) ON CONFLICT (name, ip_address) DO NOTHING`, cam);
+        await pool.query(`INSERT INTO cameras (name, zone, status, ip_address, username, model, resolution, comments, archiver, purchase_date, warranty_expiry) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) ON CONFLICT (name, ip_address) DO NOTHING`, cam);
       }
       console.log('✅ Cameras seeded (' + cameras.length + ' cameras)');
     }
-    
-    // ── SEED DOORS ──────────────────────────────────
+
     const doorsCheck = await pool.query("SELECT COUNT(*) FROM doors");
     if (parseInt(doorsCheck.rows[0].count) === 0) {
       console.log('🌱 Seeding doors...');
       const doors = [
-        ['Second Entrance Staff Entrance 2','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.100','eyeLock Panel 2','6/3/2026','In','[{"date":"Jun 18, 2026","event":"Reader replacement","tech":"Marvin Grant"}]',''],
-        ['Second Entrance Staff Exit 1','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.101','eyeLock Panel 1','6/3/2026','Out','[{"date":"Jun 18, 2026","event":"Reader replacement","tech":"Marvin Grant"}]',''],
-        ['Second Entrance Staff Entrance 1','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.102','eyeLock Panel 3','6/3/2026','In','[{"date":"Jun 18, 2026","event":"Reader replacement","tech":"Marvin Grant"}]',''],
-        ['Second Entrance Staff Exit 2','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.103','eyeLock Panel 4','6/3/2026','Out','[{"date":"Jun 18, 2026","event":"Reader replacement","tech":"Marvin Grant"}]',''],
-        ['Batching room','LML B Liquid Plant','Lasco','—','—','Not In Use','Offline','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]','No longer use, equipment removed'],
-        ['Blow mold entrance 1','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]','Door needs repair, door drop'],
-        ['Blow mold entrance 2','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]','Door needs repair, door drop'],
-        ['Chemistry lab','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Electrical room to utilites','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 1200','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Utilites to electrical room','LML B Liquid Plant','Lasco','eyeLock (Biometric)','—','Yes','Online','Unassigned','','','','Out','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Entrance to upstairs offices - IN','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Entrance to upstairs offices - OUT','LML B Liquid Plant','Lasco','eyeLock (Biometric)','—','Yes','Online','Unassigned','','','','Out','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Filling room 1','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Filling room 2','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Filling room 3','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Filling room 4','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Guest access - IN','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Guest access - OUT','LML B Liquid Plant','Lasco','eyeLock (Biometric)','—','Yes','Online','Unassigned','','','','Out','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Lobby','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Microbiology lab','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Prep Room','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Processing room 1','LML B Liquid Plant','Lasco','—','—','Not In Use','Offline','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]','No longer use, equipment removed'],
-        ['Processing room 2','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Product dev lab','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Production floor - IN','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Production floor - OUT','LML B Liquid Plant','Lasco','eyeLock (Biometric)','—','Yes','Online','Unassigned','','','','Out','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['QA office','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Shop and spare parts','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]','']
+        ['Second Entrance Staff Entrance 2','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.100','eyeLock Panel 2','6/3/2026','In','','','[{"date":"Jun 18, 2026","event":"Reader replacement","tech":"Marvin Grant"}]',''],
+        ['Second Entrance Staff Exit 1','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.101','eyeLock Panel 1','6/3/2026','Out','','','[{"date":"Jun 18, 2026","event":"Reader replacement","tech":"Marvin Grant"}]',''],
+        ['Second Entrance Staff Entrance 1','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.102','eyeLock Panel 3','6/3/2026','In','','','[{"date":"Jun 18, 2026","event":"Reader replacement","tech":"Marvin Grant"}]',''],
+        ['Second Entrance Staff Exit 2','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.103','eyeLock Panel 4','6/3/2026','Out','','','[{"date":"Jun 18, 2026","event":"Reader replacement","tech":"Marvin Grant"}]',''],
+        ['Batching room','LML B Liquid Plant','Lasco','—','—','Not In Use','Offline','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]','No longer use, equipment removed'],
+        ['Blow mold entrance 1','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]','Door needs repair, door drop'],
+        ['Blow mold entrance 2','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]','Door needs repair, door drop'],
+        ['Chemistry lab','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Electrical room to utilites','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 1200','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Utilites to electrical room','LML B Liquid Plant','Lasco','eyeLock (Biometric)','—','Yes','Online','Unassigned','','','','Out','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Entrance to upstairs offices - IN','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Entrance to upstairs offices - OUT','LML B Liquid Plant','Lasco','eyeLock (Biometric)','—','Yes','Online','Unassigned','','','','Out','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Filling room 1','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Filling room 2','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Filling room 3','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Filling room 4','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Guest access - IN','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Guest access - OUT','LML B Liquid Plant','Lasco','eyeLock (Biometric)','—','Yes','Online','Unassigned','','','','Out','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Lobby','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Microbiology lab','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Prep Room','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Processing room 1','LML B Liquid Plant','Lasco','—','—','Not In Use','Offline','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]','No longer use, equipment removed'],
+        ['Processing room 2','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Product dev lab','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Production floor - IN','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Production floor - OUT','LML B Liquid Plant','Lasco','eyeLock (Biometric)','—','Yes','Online','Unassigned','','','','Out','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['QA office','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
+        ['Shop and spare parts','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]','']
       ];
       for (const door of doors) {
-        await pool.query(`INSERT INTO doors (name, site, client, reader, lock_type, powered, status, tech, ip_address, controller, last_service, access_direction, history, comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13::jsonb,$14) ON CONFLICT (name) DO NOTHING`, door);
+        await pool.query(`INSERT INTO doors (name, site, client, reader, lock_type, powered, status, tech, ip_address, controller, last_service, access_direction, purchase_date, warranty_expiry, history, comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15::jsonb,$16) ON CONFLICT (name) DO NOTHING`, door);
       }
       console.log('✅ Doors seeded (' + doors.length + ' doors)');
     }
 
-    // ── SEED SERVERS ──────────────────────────────────
     const serversCheck = await pool.query("SELECT COUNT(*) FROM servers");
     if (parseInt(serversCheck.rows[0].count) === 0) {
       console.log('🌱 Seeding servers...');
@@ -337,7 +338,6 @@ async function seedData() {
       console.log('✅ Servers seeded');
     }
 
-    // ── SEED SWITCHES ──────────────────────────────────
     const switchesCheck = await pool.query("SELECT COUNT(*) FROM switches");
     if (parseInt(switchesCheck.rows[0].count) === 0) {
       console.log('🌱 Seeding switches...');
@@ -364,7 +364,6 @@ async function seedData() {
       console.log('✅ Switches seeded');
     }
 
-    // ── SEED TICKETS ──────────────────────────────────
     const ticketsCheck = await pool.query("SELECT COUNT(*) FROM tickets");
     if (parseInt(ticketsCheck.rows[0].count) === 0) {
       console.log('🌱 Seeding tickets...');
@@ -380,7 +379,7 @@ async function seedData() {
         ['SR-1855','KFTL','KWC','Cam 248 KWC Stripping Ramp 5 — Out of Focus','vincent@lascoja.com','Camera','High','Open','Unassigned','Mar 17, 2026','Camera lens defective. Lens not responding to focus.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
         ['SR-1856','KWL','GALC','Cam 263 TP Pole 47 Cam 1 — Out of Focus','vincent@lascoja.com','Camera','High','Open','Unassigned','Sep 16, 2025','Camera covering crystalized. Dome needs replacement.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
         ['SR-1857','KWL','GALC','Cam 235 TP Pole 42 Cam 2 — Out of Focus','vincent@lascoja.com','Camera','High','Open','Unassigned','Sep 16, 2025','Camera covering crystalized. Dome needs replacement.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1858','KFTL','PORT','Cam 361 KWL Port Berth 1 Corner — Navigational Difficulty','vincent@lascoja.com','Camera','High','Open','Unassigned','Apr 28, 2026','Camera rebooted, settings changed. Won\'t accept config after reboot.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
+        ['SR-1858','KFTL','PORT','Cam 361 KWL Port Berth 1 Corner — Navigational Difficulty','vincent@lascoja.com','Camera','High','Open','Unassigned','Apr 28, 2026','Camera rebooted, settings changed. Will not accept config after reboot.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
         ['SR-1859','KWL','GALC','Cam 246 TP Pole 11 PTZ — Intermittent Disconnections','vincent@lascoja.com','Camera','High','Open','Unassigned','Mar 14, 2026','Camera defective.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
         ['SR-1860','KFTL','Port','Cam 402 Port Berth 1 OP South — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','Mar 22, 2026','CAMERA DEFECTIVE.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
         ['SR-1861','KWL','GALC','Cam 282 TP Pole 21 Cam 1 — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','May 29, 2026','Camera defective needs replacement.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
@@ -405,7 +404,6 @@ async function seedData() {
       console.log('✅ Tickets seeded (' + tickets.length + ' tickets)');
     }
 
-    // ── SEED AUDIT LOGS ──────────────────────────────────
     const auditCheck = await pool.query("SELECT COUNT(*) FROM audit_logs");
     if (parseInt(auditCheck.rows[0].count) === 0) {
       console.log('🌱 Seeding audit logs...');
@@ -423,7 +421,6 @@ async function seedData() {
       console.log('✅ Audit logs seeded');
     }
 
-    // ── SEED EMAILS ──────────────────────────────────
     const emailsCheck = await pool.query("SELECT COUNT(*) FROM emails");
     if (parseInt(emailsCheck.rows[0].count) === 0) {
       console.log('🌱 Seeding emails...');
@@ -443,14 +440,11 @@ async function seedData() {
       console.log('✅ Emails seeded');
     }
 
-      console.log('✅ Seed data complete');
+    console.log('✅ Seed data complete');
   } catch (error) {
     console.error('❌ Seed error:', error.message);
-    console.error('❌ Full error:', JSON.stringify(error, null, 2));
-    console.error('❌ Stack:', error.stack);
   }
 }
-
 // ═══════════════════════════════════════════════════════════
 // ── ROUTES ────────────────────────────────────────────────
 // ═══════════════════════════════════════════════════════════
@@ -467,9 +461,7 @@ app.post('/api/auth/login', async (req, res) => {
     if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
     const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
     res.json({ token, user: { id: user.id, username: user.username, role: user.role, email: user.email } });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
 // ── MICROSOFT OAUTH TOKEN EXCHANGE ──────────────────────
@@ -480,15 +472,9 @@ app.post('/api/auth/microsoft', async (req, res) => {
     const clientId = process.env.MS_CLIENT_ID || 'e87a6592-aaa5-4a13-9c85-8dbc8e9cd7b2';
     const redirectUri = process.env.MS_REDIRECT_URI || 'https://e-tech-ccsm-production-19f0.up.railway.app';
     const tenantId = process.env.MS_TENANT_ID || '799ae988-9d3d-40d3-bf5c-93197f5d8d44';
-    const params = new URLSearchParams({
-      client_id: clientId,
-      scope: 'https://graph.microsoft.com/Sites.Read.All Files.Read.All User.Read',
-      code: code, redirect_uri: redirectUri, grant_type: 'authorization_code'
-    });
+    const params = new URLSearchParams({ client_id: clientId, scope: 'https://graph.microsoft.com/Sites.Read.All Files.Read.All User.Read', code: code, redirect_uri: redirectUri, grant_type: 'authorization_code' });
     if (code_verifier) { params.append('code_verifier', code_verifier); }
-    const tokenResponse = await fetch(`https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`, {
-      method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString()
-    });
+    const tokenResponse = await fetch(`https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString() });
     const data = await tokenResponse.json();
     if (data.error) { console.error('Token exchange error:', data); return res.status(400).json({ error: data.error_description || data.error }); }
     res.json(data);
@@ -507,7 +493,6 @@ function formatFileSize(bytes) {
   if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
   return (bytes / 1048576).toFixed(1) + ' MB';
 }
-
 async function fetchSharePointFiles(accessToken) {
   try {
     const siteResponse = await fetch('https://graph.microsoft.com/v1.0/sites/etechsystemsltd.sharepoint.com:/sites/Share', { headers: { Authorization: 'Bearer ' + accessToken } });
@@ -525,9 +510,7 @@ async function fetchSharePointFiles(accessToken) {
         const subData = await subResponse.json();
         for (let j = 0; j < subData.value.length; j++) {
           const file = subData.value[j];
-          if (!file.folder) {
-            allFiles.push({ name: file.name, type: getFileType(file.name), size: formatFileSize(file.size), modified: new Date(file.lastModifiedDateTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), downloadUrl: file['@microsoft.graph.downloadUrl'], client: item.name, status: 'synced' });
-          }
+          if (!file.folder) { allFiles.push({ name: file.name, type: getFileType(file.name), size: formatFileSize(file.size), modified: new Date(file.lastModifiedDateTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), downloadUrl: file['@microsoft.graph.downloadUrl'], client: item.name, status: 'synced' }); }
         }
       } else {
         allFiles.push({ name: item.name, type: getFileType(item.name), size: formatFileSize(item.size), modified: new Date(item.lastModifiedDateTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), downloadUrl: item['@microsoft.graph.downloadUrl'], client: 'Root', status: 'synced' });
@@ -536,7 +519,6 @@ async function fetchSharePointFiles(accessToken) {
     return allFiles;
   } catch (error) { console.error('SharePoint fetch error:', error); return null; }
 }
-
 app.get('/api/sharepoint/sync', authenticate, async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
@@ -547,7 +529,6 @@ app.get('/api/sharepoint/sync', authenticate, async (req, res) => {
     res.json({ data: files, count: files.length });
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
-
 app.get('/api/sharepoint/file', authenticate, async (req, res) => {
   try {
     const { url } = req.query;
@@ -568,13 +549,15 @@ app.get('/api/cameras', authenticate, async (req, res) => {
 });
 app.put('/api/cameras/:name', authenticate, async (req, res) => {
   try {
-    const { name } = req.params; const { comments, status, model, resolution, archiver } = req.body;
+    const { name } = req.params; const { comments, status, model, resolution, archiver, purchase_date, warranty_expiry } = req.body;
     const fields = []; const values = []; let counter = 1;
     if (comments !== undefined) { fields.push('comments = $' + counter); values.push(comments); counter++; }
     if (status !== undefined) { fields.push('status = $' + counter); values.push(status); counter++; }
     if (model !== undefined) { fields.push('model = $' + counter); values.push(model); counter++; }
     if (resolution !== undefined) { fields.push('resolution = $' + counter); values.push(resolution); counter++; }
     if (archiver !== undefined) { fields.push('archiver = $' + counter); values.push(archiver); counter++; }
+    if (purchase_date !== undefined) { fields.push('purchase_date = $' + counter); values.push(purchase_date); counter++; }
+    if (warranty_expiry !== undefined) { fields.push('warranty_expiry = $' + counter); values.push(warranty_expiry); counter++; }
     fields.push('updated_at = CURRENT_TIMESTAMP'); values.push(name);
     await pool.query('UPDATE cameras SET ' + fields.join(', ') + ' WHERE name = $' + counter, values);
     res.json({ success: true });
@@ -588,10 +571,12 @@ app.get('/api/doors', authenticate, async (req, res) => {
 });
 app.put('/api/doors/:name', authenticate, async (req, res) => {
   try {
-    const { name } = req.params; const { status, tech, comments } = req.body;
+    const { name } = req.params; const { status, tech, comments, purchase_date, warranty_expiry } = req.body;
     if (status !== undefined) await pool.query('UPDATE doors SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [status, name]);
     if (tech !== undefined) await pool.query('UPDATE doors SET tech = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [tech, name]);
     if (comments !== undefined) await pool.query('UPDATE doors SET comments = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [comments, name]);
+    if (purchase_date !== undefined) await pool.query('UPDATE doors SET purchase_date = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [purchase_date, name]);
+    if (warranty_expiry !== undefined) await pool.query('UPDATE doors SET warranty_expiry = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [warranty_expiry, name]);
     res.json({ success: true });
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
@@ -603,8 +588,10 @@ app.get('/api/servers', authenticate, async (req, res) => {
 });
 app.put('/api/servers/:serial', authenticate, async (req, res) => {
   try {
-    const { serial } = req.params; const { comments } = req.body;
+    const { serial } = req.params; const { comments, purchase_date, warranty_expiry } = req.body;
     if (comments !== undefined) await pool.query('UPDATE servers SET comments = $1, updated_at = CURRENT_TIMESTAMP WHERE serial = $2', [comments, serial]);
+    if (purchase_date !== undefined) await pool.query('UPDATE servers SET purchase_date = $1, updated_at = CURRENT_TIMESTAMP WHERE serial = $2', [purchase_date, serial]);
+    if (warranty_expiry !== undefined) await pool.query('UPDATE servers SET warranty_expiry = $1, updated_at = CURRENT_TIMESTAMP WHERE serial = $2', [warranty_expiry, serial]);
     res.json({ success: true });
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
@@ -629,8 +616,10 @@ app.get('/api/switches/:id/reveal-password', authenticate, async (req, res) => {
 });
 app.put('/api/switches/:name', authenticate, async (req, res) => {
   try {
-    const { name } = req.params; const { comments } = req.body;
+    const { name } = req.params; const { comments, purchase_date, warranty_expiry } = req.body;
     if (comments !== undefined) await pool.query('UPDATE switches SET comments = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [comments, name]);
+    if (purchase_date !== undefined) await pool.query('UPDATE switches SET purchase_date = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [purchase_date, name]);
+    if (warranty_expiry !== undefined) await pool.query('UPDATE switches SET warranty_expiry = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [warranty_expiry, name]);
     res.json({ success: true });
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
