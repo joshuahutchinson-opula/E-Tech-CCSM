@@ -28,147 +28,156 @@
     --skeleton-bg: rgba(255,255,255,0.04);
     --skeleton-shine: rgba(255,255,255,0.08);
     --tooltip-bg: rgba(20, 22, 40, 0.95);
+    --card-text: #f0f4ff;
+    --stat-val-color: #ffffff;
   }
   :root.light-theme {
-    --sidebar-bg: rgba(245, 247, 250, 0.95); --sidebar-border: rgba(0,0,0,0.08); --main-bg: #f0f2f5;
-    --card-bg: rgba(255, 255, 255, 0.85); --card-border: rgba(0, 0, 0, 0.08); --text-primary: #1a1a2e;
-    --text-secondary: rgba(0, 0, 0, 0.6); --text-muted: rgba(0, 0, 0, 0.35); --accent-start: #4f8cf7;
-    --accent-end: #00d4ff; --accent: #4f8cf7; --accent-glow: rgba(79, 140, 247, 0.2); --danger: #dc2626;
-    --warning: #d97706; --success: #059669; --info: #2563eb; --skeleton-bg: rgba(0,0,0,0.06);
-    --skeleton-shine: rgba(0,0,0,0.1); --tooltip-bg: rgba(255, 255, 255, 0.95);
+    --sidebar-bg: rgba(245, 247, 250, 0.95);
+    --sidebar-border: rgba(0,0,0,0.08);
+    --main-bg: #f0f2f5;
+    --card-bg: rgba(255, 255, 255, 0.85);
+    --card-border: rgba(0, 0, 0, 0.08);
+    --text-primary: #1a1a2e;
+    --text-secondary: rgba(0, 0, 0, 0.6);
+    --text-muted: rgba(0, 0, 0, 0.35);
+    --accent-start: #4f8cf7;
+    --accent-end: #00d4ff;
+    --accent: #4f8cf7;
+    --accent-glow: rgba(79, 140, 247, 0.2);
+    --danger: #dc2626;
+    --warning: #d97706;
+    --success: #059669;
+    --info: #2563eb;
+    --skeleton-bg: rgba(0,0,0,0.06);
+    --skeleton-shine: rgba(0,0,0,0.1);
+    --tooltip-bg: rgba(255, 255, 255, 0.95);
+    --card-text: #1a1a2e;
+    --stat-val-color: #1a1a2e;
   }
-  :root.jet-black-theme {
-    --sidebar-bg: rgba(8, 8, 12, 0.99);
-    --sidebar-border: rgba(255,255,255,0.04);
-    --main-bg: #08080c;
-    --card-bg: rgba(12, 12, 18, 0.98);
-    --card-border: rgba(255, 255, 255, 0.04);
-    --text-primary: #ffffff;
-    --text-secondary: rgba(255, 255, 255, 0.65);
-    --text-muted: rgba(255, 255, 255, 0.25);
-    --accent-start: #00d4ff;
-    --accent-end: #7b2ffc;
-    --accent: #00d4ff;
-    --accent-glow: rgba(0, 212, 255, 0.15);
-    --danger: #ff0055;
-    --warning: #ffaa00;
-    --success: #00ff88;
-    --info: #00d4ff;
-    --skeleton-bg: rgba(255,255,255,0.02);
-    --skeleton-shine: rgba(255,255,255,0.04);
-    --tooltip-bg: rgba(8, 8, 12, 0.98);
-  }
-  :root.jet-black-theme body { background: #08080c; }
-  :root.jet-black-theme .panel, :root.jet-black-theme .stat-card, :root.jet-black-theme .analytics-card, :root.jet-black-theme .modal { background: rgba(12, 12, 18, 0.98) !important; border: 1px solid rgba(255, 255, 255, 0.04) !important; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8) !important; }
-  :root.jet-black-theme .panel:hover, :root.jet-black-theme .stat-card:hover { border-color: rgba(0, 212, 255, 0.12) !important; box-shadow: 0 12px 48px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 212, 255, 0.03) !important; }
-  :root.jet-black-theme .sidebar { background: rgba(8, 8, 12, 0.99) !important; border-right: 1px solid rgba(255, 255, 255, 0.04); }
-  :root.jet-black-theme .nav-item.active { background: linear-gradient(90deg, rgba(0, 212, 255, 0.08) 0%, rgba(123, 47, 252, 0.04) 100%) !important; border-left: 2px solid #00d4ff !important; color: #fff !important; }
-  :root.jet-black-theme .nav-item:hover { background: rgba(255, 255, 255, 0.02) !important; }
-  :root.jet-black-theme .tbl th { color: rgba(255, 255, 255, 0.35) !important; border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important; }
-  :root.jet-black-theme .tbl td { border-bottom: 1px solid rgba(255,255,255,0.02) !important; }
-  :root.jet-black-theme .tbl tr:hover td { background: rgba(0, 212, 255, 0.02) !important; }
-  :root.jet-black-theme .tbl tr.clickable:hover td { background: rgba(0, 212, 255, 0.03) !important; }
-  :root.jet-black-theme .modal { background: rgba(12, 12, 18, 0.98) !important; border: 1px solid rgba(255,255,255,0.04) !important; box-shadow: 0 24px 80px rgba(0, 0, 0, 0.95) !important; }
-  :root.jet-black-theme .search-bar input, :root.jet-black-theme .search-bar select { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); color: #fff; }
-  :root.jet-black-theme .search-bar input:focus, :root.jet-black-theme .search-bar select:focus { border-color: #00d4ff; }
-  :root.jet-black-theme .search-bar select { background: #0a0a0f; }
-  :root.jet-black-theme .search-bar select option { background: #0a0a0f; color: #fff; }
-  :root.jet-black-theme .filter-pill { border: 1px solid rgba(255,255,255,0.04); color: rgba(255,255,255,0.5); }
-  :root.jet-black-theme .filter-pill:hover { border-color: rgba(255,255,255,0.1); }
-  :root.jet-black-theme .filter-pill.active { background: rgba(0, 212, 255, 0.08); border-color: #00d4ff; color: #fff; }
-  :root.jet-black-theme .modal-field label { color: rgba(255,255,255,0.35); letter-spacing: 0.05em; }
-  :root.jet-black-theme .modal-field input, :root.jet-black-theme .modal-field select, :root.jet-black-theme .modal-field textarea { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); color: #fff; }
-  :root.jet-black-theme .modal-field input:focus, :root.jet-black-theme .modal-field select:focus, :root.jet-black-theme .modal-field textarea:focus { border-color: #00d4ff; }
-  :root.jet-black-theme .modal-body-text { background: rgba(255,255,255,0.01); color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.02); }
-  :root.jet-black-theme .notes-area { background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.04); color: #fff; }
-  :root.jet-black-theme .notes-area:focus { border-color: #00d4ff; }
-  :root.jet-black-theme .btn { border: 1px solid rgba(255,255,255,0.06); color: #fff; background: rgba(255,255,255,0.01); }
-  :root.jet-black-theme .btn:hover { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); }
-  :root.jet-black-theme .btn-accent { background: linear-gradient(135deg, #00d4ff, #7b2ffc) !important; border: none !important; color: #fff !important; box-shadow: 0 4px 20px rgba(0, 212, 255, 0.15); }
-  :root.jet-black-theme .btn-accent:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(0, 212, 255, 0.25); }
-  :root.jet-black-theme .status-select, :root.jet-black-theme .priority-select { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); color: #fff; }
-  :root.jet-black-theme .status-select option, :root.jet-black-theme .priority-select option { background: #0a0a0f; color: #fff; }
-  :root.jet-black-theme .status-select:focus, :root.jet-black-theme .priority-select:focus { border-color: #00d4ff; }
-  :root.jet-black-theme .audit-log .audit-item { border-bottom: 1px solid rgba(255,255,255,0.02); color: rgba(255,255,255,0.5); }
-  :root.jet-black-theme .audit-log .audit-item .audit-user { color: rgba(255,255,255,0.8); }
-  :root.jet-black-theme .outlook-container { background: rgba(12,12,18,0.95); border: 1px solid rgba(255,255,255,0.04); }
-  :root.jet-black-theme .outlook-email { border-bottom: 1px solid rgba(255,255,255,0.02); }
-  :root.jet-black-theme .outlook-email:hover { background: rgba(255,255,255,0.01); }
-  :root.jet-black-theme .outlook-email.active { background: rgba(0, 212, 255, 0.04); border-left: 2px solid #00d4ff; }
-  :root.jet-black-theme .outlook-email.unread .oe-sender { color: #fff; }
-  :root.jet-black-theme .outlook-email.unread .oe-subject { color: rgba(255,255,255,0.9); }
-  :root.jet-black-theme .outlook-folder-pane { border-right: 1px solid rgba(255,255,255,0.04); }
-  :root.jet-black-theme .outlook-folder-item:hover { background: rgba(255,255,255,0.01); }
-  :root.jet-black-theme .outlook-folder-item.active { background: rgba(0, 212, 255, 0.04); color: #fff; }
-  :root.jet-black-theme .ore-header { border-bottom: 1px solid rgba(255,255,255,0.04); }
-  :root.jet-black-theme .ore-subject { color: #fff; }
-  :root.jet-black-theme .notes-inline { color: rgba(255,255,255,0.4); }
-  :root.jet-black-theme .notes-inline:focus { background: rgba(255,255,255,0.01); color: #fff; border-color: #00d4ff; }
-  :root.jet-black-theme .file-explorer { background: rgba(255,255,255,0.005); border: 1px solid rgba(255,255,255,0.04); }
-  :root.jet-black-theme .file-explorer .file-item { border-bottom: 1px solid rgba(255,255,255,0.02); }
-  :root.jet-black-theme .file-explorer .file-item:hover { background: rgba(255,255,255,0.01); }
-  :root.jet-black-theme .file-explorer .file-item.folder .file-icon { color: #00d4ff; }
-  :root.jet-black-theme .breadcrumb { background: rgba(255,255,255,0.005); }
-  :root.jet-black-theme .breadcrumb .crumb:hover { background: rgba(255,255,255,0.02); }
-  :root.jet-black-theme .breadcrumb .crumb.current { color: #fff; }
-  :root.jet-black-theme .topbar { border-bottom: 1px solid rgba(255,255,255,0.04); }
-  :root.jet-black-theme .cam-zone-header, :root.jet-black-theme .door-zone-header, :root.jet-black-theme .server-zone-header, :root.jet-black-theme .switch-zone-header { background: rgba(255,255,255,0.005); border: 1px solid rgba(255,255,255,0.04); }
-  :root.jet-black-theme .cam-zone-header:hover, :root.jet-black-theme .door-zone-header:hover, :root.jet-black-theme .server-zone-header:hover, :root.jet-black-theme .switch-zone-header:hover { background: rgba(255,255,255,0.01); border-color: rgba(255,255,255,0.06); }
-  :root.jet-black-theme .cam-zone-header .zone-name, :root.jet-black-theme .door-zone-header .zone-name, :root.jet-black-theme .server-zone-header .zone-name, :root.jet-black-theme .switch-zone-header .zone-name { color: #fff; }
-  :root.jet-black-theme .stat-card .stat-val { background: linear-gradient(135deg, #00d4ff 0%, #7b2ffc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-  :root.jet-black-theme .stat-card .stat-label { color: rgba(255,255,255,0.4); }
-  :root.jet-black-theme .stat-card .stat-note { color: rgba(255,255,255,0.3); }
-  :root.jet-black-theme .emergency-banner { background: rgba(255, 0, 85, 0.04) !important; border: 1px solid rgba(255, 0, 85, 0.15) !important; }
-  :root.jet-black-theme .emergency-banner .em-title { color: #ff0055; }
-  :root.jet-black-theme .emergency-banner .em-detail { color: rgba(255, 0, 85, 0.7); }
-  :root.jet-black-theme .page-title { color: #ffffff; }
-  :root.jet-black-theme .file-search-bar input { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); color: #fff; }
-  :root.jet-black-theme .file-search-bar input:focus { border-color: #00d4ff; }
-  :root.jet-black-theme .file-search-bar select { background: #0a0a0f; border: 1px solid rgba(255,255,255,0.04); color: #fff; }
-  :root.jet-black-theme .file-search-bar select option { background: #0a0a0f; color: #fff; }
-  :root.jet-black-theme .audit-filters select { background: #0a0a0f; border: 1px solid rgba(255,255,255,0.04); color: #fff; }
-  :root.jet-black-theme .audit-filters select option { background: #0a0a0f; color: #fff; }
-  :root.jet-black-theme .app { background: var(--main-bg); }
-  :root.jet-black-theme .content { background: transparent; }
-  :root.jet-black-theme .main { background: transparent; }
-  :root.jet-black-theme .badge.b-done { background: rgba(0, 255, 136, 0.08) !important; color: #00ff88 !important; }
-  :root.jet-black-theme .badge.b-high { background: rgba(255, 0, 85, 0.08) !important; color: #ff0055 !important; }
-  :root.jet-black-theme .badge.b-open { background: rgba(255, 170, 0, 0.08) !important; color: #ffaa00 !important; }
-  :root.jet-black-theme .badge.b-info { background: rgba(0, 212, 255, 0.08) !important; color: #00d4ff !important; }
-  :root.jet-black-theme .badge.b-under-maintenance { background: rgba(255, 170, 0, 0.08) !important; color: #ffaa00 !important; }
-  :root.jet-black-theme .badge.b-in-progress { background: rgba(0, 212, 255, 0.08) !important; color: #00d4ff !important; }
-  :root.jet-black-theme .badge.b-pending { background: rgba(255, 170, 0, 0.08) !important; color: #ffaa00 !important; }
-  :root.jet-black-theme .filter-pill.active { background: linear-gradient(135deg, rgba(0, 212, 255, 0.12), rgba(123, 47, 252, 0.08)) !important; border-color: #00d4ff !important; color: #fff !important; }
-  :root.jet-black-theme .add-btn { background: linear-gradient(135deg, #00d4ff, #7b2ffc) !important; box-shadow: 0 2px 12px rgba(0, 212, 255, 0.2); }
-  :root.jet-black-theme .add-btn:hover { box-shadow: 0 4px 20px rgba(0, 212, 255, 0.35); }
-  :root.jet-black-theme .add-dropdown { background: rgba(12, 12, 18, 0.98); border: 1px solid rgba(255,255,255,0.04); }
-  :root.jet-black-theme .add-dropdown .dd-item:hover { background: rgba(0, 212, 255, 0.04); }
-  :root.jet-black-theme .add-dropdown .dd-item .dd-icon { color: rgba(255,255,255,0.4); }
-  :root.jet-black-theme .add-dropdown .dd-sep { background: rgba(255,255,255,0.04); }
-  :root.jet-black-theme .theme-dropdown { background: rgba(12, 12, 18, 0.98); border: 1px solid rgba(255,255,255,0.04); }
-  :root.jet-black-theme .theme-option:hover { background: rgba(0, 212, 255, 0.04); }
-  :root.jet-black-theme .outlook-email .oe-flag.flagged { color: #ffaa00; }
-  :root.jet-black-theme .outlook-email .oe-sender { color: rgba(255,255,255,0.6); }
-  :root.jet-black-theme .outlook-email .oe-subject { color: rgba(255,255,255,0.5); }
-  :root.jet-black-theme .outlook-email .oe-preview { color: rgba(255,255,255,0.25); }
-  :root.jet-black-theme .outlook-folder-item .folder-count { background: rgba(255,255,255,0.04); }
-  :root.jet-black-theme .outlook-folder-item .folder-count.unread { background: rgba(0, 212, 255, 0.12); color: #00d4ff; }
-  :root.jet-black-theme .scroll-top { background: rgba(12,12,18,0.9); border: 1px solid rgba(255,255,255,0.04); }
-  :root.jet-black-theme .scroll-top:hover { background: linear-gradient(135deg, #00d4ff, #7b2ffc); border-color: transparent; }
-  :root.jet-black-theme .att-upload-zone { border: 1.5px dashed rgba(255,255,255,0.04); }
-  :root.jet-black-theme .att-upload-zone:hover { border-color: #00d4ff; background: rgba(0, 212, 255, 0.02); }
-  :root.jet-black-theme .similar-ticket { border: 1px solid rgba(255,255,255,0.02); }
-  :root.jet-black-theme .similar-ticket:hover { border-color: rgba(255,255,255,0.06); background: rgba(255,255,255,0.01); }
-  :root.jet-black-theme .tl-item::before { background: linear-gradient(135deg, #00d4ff, #7b2ffc) !important; box-shadow: 0 0 12px rgba(0, 212, 255, 0.15); }
-  :root.jet-black-theme .tl-time { color: rgba(255,255,255,0.25); }
-  :root.jet-black-theme .tl-msg { color: rgba(255,255,255,0.5); }
-  :root.jet-black-theme .recurring-warning { background: rgba(255, 0, 85, 0.04); border: 1px solid rgba(255, 0, 85, 0.08); color: #ff0055; }
-  :root.jet-black-theme .hw-suggestion { border: 1px solid rgba(255,255,255,0.02); }
-  :root.jet-black-theme .hw-suggestion:hover { border-color: rgba(255,255,255,0.06); background: rgba(255,255,255,0.01); }
-  :root.jet-black-theme .integration-note { background: rgba(0, 212, 255, 0.02); border: 1px solid rgba(0, 212, 255, 0.06); }
-  :root.jet-black-theme .door-stat-card { background: rgba(255,255,255,0.005); border: 1px solid rgba(255,255,255,0.04); }
-  :root.jet-black-theme .server-stat-card { background: rgba(255,255,255,0.005); border: 1px solid rgba(255,255,255,0.04); }
-  :root.jet-black-theme .switch-stat-card { background: rgba(255,255,255,0.005); border: 1px solid rgba(255,255,255,0.04); }
+  :root.light-theme body { background: #e8ecf1; }
+  :root.light-theme .panel, :root.light-theme .stat-card, :root.light-theme .analytics-card, :root.light-theme .modal { background: rgba(255, 255, 255, 0.85) !important; border: 1px solid rgba(0, 0, 0, 0.08) !important; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important; }
+  :root.light-theme .panel:hover, :root.light-theme .stat-card:hover { border-color: rgba(79, 140, 247, 0.3) !important; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 0 20px rgba(79, 140, 247, 0.08) !important; }
+  :root.light-theme .sidebar { background: rgba(245, 247, 250, 0.95) !important; border-right: 1px solid rgba(0,0,0,0.06); }
+  :root.light-theme .nav-item:hover { background: rgba(0, 0, 0, 0.04) !important; }
+  :root.light-theme .nav-item.active { background: rgba(79, 140, 247, 0.1) !important; border-left: 2px solid #4a9eff !important; color: #1a1a2e !important; }
+  :root.light-theme .nav-sub-item.active { background: rgba(79, 140, 247, 0.1) !important; color: #1a1a2e !important; }
+  :root.light-theme .nav-item { color: rgba(0,0,0,0.6) !important; }
+  :root.light-theme .nav-item.active { color: #1a1a2e !important; }
+  :root.light-theme .nav-zone-item.active { background: rgba(79, 140, 247, 0.1) !important; color: #1a1a2e !important; }
+  :root.light-theme .nav-client-parent { color: rgba(0,0,0,0.6) !important; }
+  :root.light-theme .nav-client-parent.open { color: #1a1a2e !important; }
+  :root.light-theme .tbl th { color: rgba(0, 0, 0, 0.5) !important; }
+  :root.light-theme .tbl td { border-bottom: 1px solid rgba(0,0,0,0.04) !important; color: #1a1a2e !important; }
+  :root.light-theme .tbl tr:hover td { background: rgba(79, 140, 247, 0.03) !important; }
+  :root.light-theme .modal { background: rgba(255, 255, 255, 0.95) !important; border: 1px solid rgba(0,0,0,0.1) !important; }
+  :root.light-theme .search-bar input, :root.light-theme .search-bar select { background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.1); color: #1a1a2e; }
+  :root.light-theme .search-bar select { background: #fff; }
+  :root.light-theme .search-bar select option { background: #fff; color: #000; }
+  :root.light-theme .filter-pill { border: 1px solid rgba(0,0,0,0.1); color: rgba(0,0,0,0.6); }
+  :root.light-theme .filter-pill.active { background: rgba(79,140,247,0.15); border-color: #4a9eff; color: #1a1a2e; }
+  :root.light-theme .modal-field label { color: rgba(0,0,0,0.45); }
+  :root.light-theme .modal-body-text { background: rgba(0,0,0,0.02); color: rgba(0,0,0,0.65); }
+  :root.light-theme .notes-area { background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.1); color: #1a1a2e; }
+  :root.light-theme .btn { border: 1px solid rgba(0,0,0,0.12); color: #1a1a2e; }
+  :root.light-theme .btn:hover { background: rgba(0,0,0,0.04); }
+  :root.light-theme .status-select, :root.light-theme .priority-select { background: #fff; border: 1px solid rgba(0,0,0,0.12); color: #1a1a2e; }
+  :root.light-theme .status-select option, :root.light-theme .priority-select option { background: #fff; color: #000; }
+  :root.light-theme .audit-log .audit-item { border-bottom: 1px solid rgba(0,0,0,0.04); color: rgba(0,0,0,0.6); }
+  :root.light-theme .outlook-container { background: rgba(255,255,255,0.7); border: 1px solid rgba(0,0,0,0.08); }
+  :root.light-theme .outlook-email { border-bottom: 1px solid rgba(0,0,0,0.04); }
+  :root.light-theme .outlook-email:hover { background: rgba(0,0,0,0.02); }
+  :root.light-theme .outlook-email.active { background: rgba(79,140,247,0.08); }
+  :root.light-theme .outlook-folder-pane { border-right: 1px solid rgba(0,0,0,0.08); }
+  :root.light-theme .outlook-folder-item:hover { background: rgba(0,0,0,0.03); }
+  :root.light-theme .outlook-folder-item.active { background: rgba(79,140,247,0.1); }
+  :root.light-theme .ore-header { border-bottom: 1px solid rgba(0,0,0,0.06); }
+  :root.light-theme .notes-inline { color: rgba(0,0,0,0.55); }
+  :root.light-theme .notes-inline:focus { background: rgba(0,0,0,0.03); color: #1a1a2e; }
+  :root.light-theme .file-explorer { background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.08); }
+  :root.light-theme .file-explorer .file-item { border-bottom: 1px solid rgba(0,0,0,0.04); color: #1a1a2e; }
+  :root.light-theme .file-explorer .file-item:hover { background: rgba(0,0,0,0.03); }
+  :root.light-theme .breadcrumb { background: rgba(0,0,0,0.02); }
+  :root.light-theme .breadcrumb .crumb:hover { background: rgba(0,0,0,0.05); }
+  :root.light-theme .breadcrumb .back-btn { background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.06); }
+  :root.light-theme .topbar { border-bottom: 1px solid rgba(0,0,0,0.06); }
+  :root.light-theme .cam-zone-header, :root.light-theme .door-zone-header, :root.light-theme .server-zone-header, :root.light-theme .switch-zone-header { background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.06); }
+  :root.light-theme .cam-zone-header:hover, :root.light-theme .door-zone-header:hover, :root.light-theme .server-zone-header:hover, :root.light-theme .switch-zone-header:hover { background: rgba(0,0,0,0.04); }
+  :root.light-theme .stat-card .stat-val { -webkit-text-fill-color: #1a1a2e !important; background: none !important; color: #1a1a2e !important; }
+  :root.light-theme .stat-card .stat-label { color: rgba(0,0,0,0.5) !important; }
+  :root.light-theme .stat-card .stat-note { color: rgba(0,0,0,0.4) !important; }
+  :root.light-theme .emergency-banner { background: rgba(220, 38, 38, 0.12) !important; border: 1px solid rgba(220, 38, 38, 0.5) !important; }
+  :root.light-theme .emergency-banner .em-title { color: #991b1b; }
+  :root.light-theme .emergency-banner .em-detail { color: #dc2626; }
+  :root.light-theme .page-title { color: #1a1a2e; }
+  :root.light-theme .file-search-bar select { background: #fff; border: 1px solid rgba(0,0,0,0.1); color: #1a1a2e; }
+  :root.light-theme .file-search-bar select option { background: #fff; color: #000; }
+  :root.light-theme .audit-filters select { background: #fff; border: 1px solid rgba(0,0,0,0.1); color: #1a1a2e; }
+  :root.light-theme .audit-filters select option { background: #fff; color: #000; }
+  :root.light-theme .app { background: var(--main-bg); }
+  :root.light-theme .content { background: transparent; }
+  :root.light-theme .main { background: transparent; }
+  :root.light-theme .add-dropdown { background: rgba(255,255,255,0.95); border: 1px solid rgba(0,0,0,0.08); }
+  :root.light-theme .add-dropdown .dd-item { color: #1a1a2e; }
+  :root.light-theme .add-dropdown .dd-item:hover { background: rgba(0,0,0,0.04); }
+  :root.light-theme .theme-dropdown { background: rgba(255,255,255,0.95); border: 1px solid rgba(0,0,0,0.08); }
+  :root.light-theme .theme-dropdown .theme-option { color: #1a1a2e; }
+  :root.light-theme .theme-dropdown .theme-option:hover { background: rgba(0,0,0,0.04); }
+  :root.light-theme .modal-field input, :root.light-theme .modal-field select, :root.light-theme .modal-field textarea { background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.1); color: #1a1a2e; }
+  :root.light-theme .modal-field select option { background: #fff; color: #000; }
+  :root.light-theme .modal-close { color: rgba(0,0,0,0.4); }
+  :root.light-theme .modal-close:hover { color: #000; }
+  :root.light-theme .modal-title { color: #1a1a2e; }
+  :root.light-theme .modal-sub { color: rgba(0,0,0,0.4); }
+  :root.light-theme .modal-section-title { color: rgba(0,0,0,0.4); border-bottom: 1px solid rgba(0,0,0,0.06); }
+  :root.light-theme .badge { color: #1a1a2e; }
+  :root.light-theme .b-done { background: rgba(5, 150, 105, 0.12) !important; color: #059669 !important; }
+  :root.light-theme .b-high { background: rgba(220, 38, 38, 0.12) !important; color: #dc2626 !important; }
+  :root.light-theme .b-open { background: rgba(217, 119, 6, 0.12) !important; color: #d97706 !important; }
+  :root.light-theme .b-info { background: rgba(37, 99, 235, 0.12) !important; color: #2563eb !important; }
+  :root.light-theme .b-under-maintenance { background: rgba(217, 119, 6, 0.12) !important; color: #d97706 !important; }
+  :root.light-theme .b-in-progress { background: rgba(37, 99, 235, 0.12) !important; color: #2563eb !important; }
+  :root.light-theme .b-pending { background: rgba(217, 119, 6, 0.12) !important; color: #d97706 !important; }
+  :root.light-theme .stat-card .stat-val { color: #1a1a2e !important; -webkit-text-fill-color: #1a1a2e !important; }
+  :root.light-theme .cam-zone-header .zone-name { color: #1a1a2e; }
+  :root.light-theme .door-zone-header .zone-name { color: #1a1a2e; }
+  :root.light-theme .server-zone-header .zone-name { color: #1a1a2e; }
+  :root.light-theme .switch-zone-header .zone-name { color: #1a1a2e; }
+  :root.light-theme .cam-zone-header .zone-count { color: rgba(0,0,0,0.4); }
+  :root.light-theme .door-zone-header .zone-count { color: rgba(0,0,0,0.4); }
+  :root.light-theme .server-zone-header .zone-count { color: rgba(0,0,0,0.4); }
+  :root.light-theme .switch-zone-header .zone-count { color: rgba(0,0,0,0.4); }
+  :root.light-theme .cam-zone-header .zone-client { color: rgba(0,0,0,0.3); }
+  :root.light-theme .door-zone-header .zone-client { color: rgba(0,0,0,0.3); }
+  :root.light-theme .switch-zone-header .zone-client { color: rgba(0,0,0,0.3); }
+  :root.light-theme .door-stat-card .ds-label { color: rgba(0,0,0,0.4); }
+  :root.light-theme .door-stat-card .ds-value { color: #1a1a2e; }
+  :root.light-theme .server-stat-card .ss-label { color: rgba(0,0,0,0.4); }
+  :root.light-theme .server-stat-card .ss-value { color: #1a1a2e; }
+  :root.light-theme .switch-stat-card .ss-label { color: rgba(0,0,0,0.4); }
+  :root.light-theme .switch-stat-card .ss-value { color: #1a1a2e; }
+  :root.light-theme .integration-note { background: rgba(37, 99, 235, 0.06); border: 1px solid rgba(37, 99, 235, 0.1); color: rgba(0,0,0,0.6); }
+  :root.light-theme .panel-title { color: rgba(0,0,0,0.4); }
+  :root.light-theme .folder-info { color: rgba(0,0,0,0.3); }
+  :root.light-theme .breadcrumb .crumb { color: rgba(0,0,0,0.5); }
+  :root.light-theme .breadcrumb .crumb.current { color: #1a1a2e; }
+  :root.light-theme .cam-pagination .page-btn { color: #1a1a2e; border-color: rgba(0,0,0,0.1); }
+  :root.light-theme .cam-pagination .page-btn.active { background: #4a9eff; color: #fff; border-color: #4a9eff; }
+  :root.light-theme .cam-pagination .page-info { color: rgba(0,0,0,0.4); }
+  :root.light-theme .topo-filter-btn { border: 1px solid rgba(0,0,0,0.1); color: rgba(0,0,0,0.5); }
+  :root.light-theme .topo-filter-btn.active { background: rgba(79,140,247,0.12); border-color: #4a9eff; color: #1a1a2e; }
+  :root.light-theme .topo-filter-btn:hover { background: rgba(0,0,0,0.04); color: #1a1a2e; }
+  :root.light-theme .topo-health-bar { background: rgba(0,0,0,0.06); }
+  :root.light-theme .topo-dev-badge.online { background: rgba(5, 150, 105, 0.08); color: #059669; }
+  :root.light-theme .topo-dev-badge.offline { background: rgba(220, 38, 38, 0.08); color: #dc2626; }
+  :root.light-theme .topo-device-chip { color: #1a1a2e; }
+  :root.light-theme .topo-device-chip.online { background: rgba(5, 150, 105, 0.06); border: 1px solid rgba(5, 150, 105, 0.1); }
+  :root.light-theme .topo-device-chip.offline { background: rgba(220, 38, 38, 0.06); border: 1px solid rgba(220, 38, 38, 0.1); }
+  :root.light-theme .topo-device-chip:hover { border-color: rgba(0,0,0,0.2); }
+  :root.light-theme .topo-switch-label { color: #1a1a2e; background: rgba(0,0,0,0.02); }
+  :root.light-theme .topo-expand-row td { background: rgba(0,0,0,0.01); border-bottom: 1px solid rgba(0,0,0,0.04); }
+  :root.light-theme .topo-mini-arrow { color: rgba(0,0,0,0.2); }
+  :root.light-theme .topo-table th { color: rgba(0,0,0,0.4); }
+  :root.light-theme .topo-table th:hover { color: #1a1a2e; }
 
   .skeleton { background: var(--skeleton-bg); border-radius: 4px; height: 20px; position: relative; overflow: hidden; animation: shimmer 1.8s infinite; }
   .skeleton::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent); transform: translateX(-100%); animation: shimmer-slide 1.8s infinite; }
@@ -209,11 +218,13 @@
   .sidebar { background: rgba(10, 12, 26, 0.95) !important; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-right: 1px solid rgba(255, 255, 255, 0.05); }
   .nav-item.active { background: linear-gradient(90deg, rgba(79, 140, 247, 0.25) 0%, rgba(0, 212, 255, 0.1) 100%) !important; border-left: 3px solid var(--accent-start) !important; color: #fff !important; }
   .nav-item:hover { background: rgba(255, 255, 255, 0.04) !important; }
-  .nav-client-parent { font-weight: 500; display: flex; align-items: center; gap: 6px; }
+  .nav-client-parent { font-weight: 500; display: flex; align-items: center; gap: 6px; cursor: pointer; }
   .nav-client-parent .ti-chevron-right { transition: transform 0.2s; font-size: 12px; }
   .nav-client-parent.open .ti-chevron-right { transform: rotate(90deg); }
   .nav-sub-item { padding-left: 40px !important; font-size: 12px !important; }
   .nav-sub-item.active { background: rgba(0,64,128,0.25); border-left: 2px solid #4a9eff; color: #fff; }
+  .nav-zone-item { padding-left: 40px !important; font-size: 12px !important; }
+  .nav-zone-item.active { background: rgba(0,64,128,0.25); border-left: 2px solid #4a9eff; color: #fff; }
   .nav-fixed-top { flex-shrink: 0; }
   .nav-scroll-bottom { flex: 1; overflow-y: auto; }
   .nav-scroll-bottom::-webkit-scrollbar { width: 3px; }
@@ -222,7 +233,7 @@
   .page-client-logo { width: 20px; height: 20px; border-radius: 3px; object-fit: contain; vertical-align: middle; margin-right: 4px; }
   .stat-card { position: relative; overflow: hidden; padding: 18px 20px !important; }
   .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: linear-gradient(180deg, var(--accent-start), var(--accent-end)); border-radius: 0 2px 2px 0; opacity: 0.8; }
-  .stat-card .stat-val { font-size: 32px !important; font-weight: 700 !important; letter-spacing: -0.02em; background: linear-gradient(135deg, #fff 60%, rgba(255,255,255,0.6)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .stat-card .stat-val { font-size: 32px !important; font-weight: 700 !important; letter-spacing: -0.02em; color: var(--stat-val-color); }
   .stat-card .stat-label { font-size: 11px !important; font-weight: 600 !important; letter-spacing: 0.08em; color: var(--text-secondary); text-transform: uppercase; }
   .trend-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; background: rgba(52, 211, 153, 0.15); color: #34d399; margin-left: 8px; }
   .trend-badge.down { background: rgba(255, 94, 122, 0.15); color: #ff5e7a; }
@@ -300,7 +311,7 @@
   .btn-danger { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: #f87171; }
   .btn-sm { font-size: 11px; padding: 5px 10px; } .btn-xs { font-size: 10px; padding: 3px 8px; }
   .btn-success { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.3); color: #4ade80; }
-  .add-btn { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-start), var(--accent-end)); color: #fff; border: none; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 2px 8px rgba(79, 140, 247, 0.3); }
+  .add-btn { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-start), var(--accent-end)); color: #fff; border: none; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 2px 8px rgba(79, 140, 247, 0.3); }
   .add-btn:hover { transform: scale(1.05); box-shadow: 0 4px 16px rgba(79, 140, 247, 0.5); }
   .add-dropdown { display: none; position: absolute; right: 0; top: 100%; margin-top: 8px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; min-width: 200px; box-shadow: 0 12px 48px rgba(0,0,0,0.4); backdrop-filter: blur(20px); padding: 6px 0; z-index: 100; }
   .add-dropdown.open { display: block; }
@@ -309,6 +320,8 @@
   .add-dropdown .dd-item i { font-size: 16px; color: var(--text-secondary); }
   .add-dropdown .dd-sep { height: 1px; background: var(--card-border); margin: 4px 12px; }
   .add-dropdown .dd-item .dd-icon { width: 24px; text-align: center; }
+  .theme-toggle-btn { padding: 6px 10px !important; border-radius: 6px !important; background: var(--card-bg) !important; border: 1px solid var(--card-border) !important; font-size: 14px !important; cursor: pointer !important; transition: all 0.2s !important; display: flex !important; align-items: center !important; gap: 4px !important; }
+  .theme-toggle-btn:hover { background: rgba(255,255,255,0.06) !important; border-color: rgba(255,255,255,0.15) !important; }
   .theme-dropdown { display: none; position: absolute; right: 0; top: 100%; margin-top: 8px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 6px 0; min-width: 140px; z-index: 100; box-shadow: 0 12px 48px rgba(0,0,0,0.4); }
   .theme-dropdown .theme-option { display: flex; align-items: center; gap: 10px; padding: 8px 16px; color: var(--text-primary); cursor: pointer; font-size: 13px; border: none; background: none; width: 100%; font-family: var(--font); }
   .theme-dropdown .theme-option:hover { background: rgba(255,255,255,0.04); }
@@ -411,8 +424,10 @@
   .modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus { outline: none; border-color: #4a9eff; }
   .modal-field textarea { min-height: 80px; resize: vertical; }
   .modal-field select option { background: #0d1117; color: var(--text-primary); }
+  .modal-field input[type="file"] { padding: 6px 10px; border-radius: 4px; font-size: 12px; width: 100%; font-family: var(--font); }
   .modal-field input[type="date"] { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: var(--text-primary); padding: 4px 8px; border-radius: 4px; font-size: 11px; width: 100%; font-family: var(--font); }
   .modal-field input[type="date"]:focus { outline: none; border-color: #4a9eff; }
+  .logo-upload-preview { width: 60px; height: 60px; border-radius: 8px; object-fit: contain; border: 1px solid var(--card-border); background: rgba(255,255,255,0.03); display: block; margin-top: 4px; }
   .cam-preview-large { width: 100%; height: 260px; border-radius: 8px; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; border: 1px solid var(--card-border); margin-bottom: 12px; overflow: hidden; }
   .cam-preview-large img { width: 100%; height: 100%; object-fit: contain; }
   .cam-preview-large .offline-msg { color: var(--text-muted); font-size: 13px; display: flex; align-items: center; gap: 8px; }
@@ -785,8 +800,8 @@
     <div class="topbar">
       <span class="page-title" id="page-title">Dashboard</span>
       <div class="topbar-right">
-        <button class="btn btn-xs theme-toggle-btn" onclick="toggleThemeDropdown()" title="Toggle theme" id="theme-toggle-btn">
-          <i class="ti ti-palette"></i>
+        <button class="btn theme-toggle-btn" onclick="toggleThemeDropdown()" title="Toggle theme" id="theme-toggle-btn">
+          <i class="ti ti-palette"></i> Theme
         </button>
         <div class="theme-dropdown" id="theme-dropdown">
           <button class="theme-option" onclick="setTheme('dark');closeThemeDropdown();">🌙 Dark</button>
@@ -861,12 +876,11 @@
       <!-- Service Requests Tab -->
       <div class="tab" id="tab-service">
         <div class="sr-toolbar"><input type="text" id="sr-search" placeholder="Search…" oninput="debounceRenderSR()" /><select id="sr-site-filter" onchange="renderSR()"><option>All sites</option><option>Kingport</option><option>Port</option><option>TLF</option><option>KWC</option><option>Tinson Pen</option></select><span class="filter-pill active" data-status="All" onclick="setPillFilter(this)">All</span><span class="filter-pill" data-status="Open" onclick="setPillFilter(this)">Open</span><span class="filter-pill" data-status="In Progress" onclick="setPillFilter(this)">In Progress</span><span class="filter-pill" data-status="On-Site Review" onclick="setPillFilter(this)">On-Site</span><span class="filter-pill" data-status="Pending" onclick="setPillFilter(this)">Pending</span><span class="filter-pill" data-status="Resolved" onclick="setPillFilter(this)">Resolved</span></div>
-        <div class="sr-tab-bar"><button class="sr-tab-btn active" onclick="switchAnalyticsTab('tickets',this)"><i class="ti ti-clipboard-list"></i> Tickets</button><button class="sr-tab-btn" onclick="switchAnalyticsTab('analytics',this)"><i class="ti ti-chart-bar"></i> Performance Analytics</button></div>
+        <div class="sr-tab-bar"><button class="sr-tab-btn active" onclick="switchAnalyticsTab('tickets',this)"><i class="ti ti-clipboard-list"></i> Tickets</button></div>
         <div id="sr-tickets-view">
           <div class="bulk-bar" id="bulk-bar"><span id="bulk-count">0 selected</span><select class="status-select" id="bulk-status" style="font-size:11px;padding:4px 8px"><option value="">Bulk Status…</option><option>Open</option><option>In Progress</option><option>On-Site Review</option><option>Pending</option><option>Resolved</option></select><select class="status-select" id="bulk-assign" style="font-size:11px;padding:4px 8px"><option value="">Bulk Assign…</option><option>Shanice Vernon</option><option>Shavine</option><option>Marvin Grant</option><option>Ackeem</option><option>Unassigned</option></select><select class="status-select" id="bulk-priority" style="font-size:11px;padding:4px 8px"><option value="">Bulk Priority…</option><option>High</option><option>Medium</option><option>Low</option></select><button class="btn btn-xs btn-accent" onclick="bulkApply()">Apply</button><button class="btn btn-xs" onclick="clearSelection()">Clear</button><button class="btn btn-xs" onclick="mergeSelected()" id="merge-btn" style="display:none"><i class="ti ti-fold"></i> Merge</button></div>
           <div class="panel"><div class="panel-header"><span class="panel-title" id="sr-count-label">Service Requests</span><div style="display:flex;align-items:center;gap:8px;"><button class="btn btn-sm" onclick="exportSRsCSV()"><i class="ti ti-download"></i> Export CSV</button></div></div><div class="loading-overlay" id="sr-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading tickets...</span></div></div><table class="tbl" id="sr-table"><thead><tr><th style="width:24px"><input type="checkbox" id="sr-select-all" onchange="toggleSelectAll()" /></th><th>ID</th><th>Client</th><th>Site</th><th>Subject</th><th>Category</th><th>SLA</th><th>Priority</th><th>Assigned</th><th>Notes</th><th>Status</th></tr></thead><tbody id="sr-tbody"></tbody></table></div>
         </div>
-        <div id="sr-analytics-view" style="display:none"><div class="analytics-grid"><div class="analytics-card"><div class="analytics-card-title">Resolution Time by Tech (Avg)</div><div id="analytics-tech-times"></div></div><div class="analytics-card"><div class="analytics-card-title">Issues by Client</div><div id="analytics-client-issues"></div></div><div class="analytics-card"><div class="analytics-card-title">Tickets Per Month</div><div id="analytics-monthly"></div></div><div class="analytics-card"><div class="analytics-card-title">Busiest Hours</div><div id="analytics-hours"></div></div></div></div>
       </div>
       <!-- Cameras Tab -->
       <div class="tab" id="tab-cameras"><div class="panel"><div class="panel-header"><span class="panel-title">All Cameras</span><div style="display:flex;align-items:center;gap:8px;"><button class="btn btn-sm" onclick="exportCamerasCSV()"><i class="ti ti-download"></i> Export CSV</button><span class="last-updated" id="cam-last-updated" style="color:var(--text-secondary);">Last updated: Today 14:32</span><button class="btn btn-sm" onclick="refreshCameras()" title="Refresh"><i class="ti ti-refresh"></i></button></div></div><div class="cam-status-filters" id="cam-status-filters"></div><div class="search-bar"><input type="text" id="cam-search" placeholder="Search by camera name, IP, or comments…" oninput="debounceRenderCameras()" /><select id="cam-per-page" onchange="renderCamerasOptimized()" style="flex:0 0 120px;"><option value="10">10 per page</option><option value="25">25 per page</option><option value="50">50 per page</option><option value="999">All</option></select></div><div class="loading-overlay" id="cam-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading cameras...</span></div></div><div id="cam-groups-container"></div><div class="cam-pagination" id="cam-pagination"></div></div></div>
@@ -902,8 +916,11 @@
 <!-- ADD SWITCH MODAL -->
 <div class="modal-overlay" id="add-switch-modal"><div class="modal"><button class="modal-close" onclick="closeAddModal('add-switch-modal')"><i class="ti ti-x"></i></button><div class="modal-title">🔌 Add Switch</div><div class="modal-sub">Add a new network switch</div><div class="modal-section"><div class="modal-grid"><div class="modal-field"><label>Switch Name *</label><input type="text" id="switch-name" placeholder="e.g., Main Entrance" /></div><div class="modal-field"><label>Client *</label><select id="switch-client"><option value="">Select Client</option></select></div><div class="modal-field"><label>Location</label><input type="text" id="switch-location" placeholder="e.g., Security Office" /></div><div class="modal-field"><label>Model</label><select id="switch-model"><option value="AXIS T8508">AXIS T8508</option><option value="AXIS T8516">AXIS T8516</option><option value="AXIS T8504-R">AXIS T8504-R</option><option value="TL-SG2210P">TL-SG2210P</option><option value="NS3552-16P-2T-2S">NS3552-16P-2T-2S</option><option value="XS728T">XS728T</option><option value="XS716T">XS716T</option><option value="US-16-XG">US-16-XG</option><option value="M4300-24X">M4300-24X</option></select></div><div class="modal-field"><label>IP Address</label><input type="text" id="switch-ip" placeholder="e.g., 10.19.1.21" /></div><div class="modal-field"><label>Firmware</label><input type="text" id="switch-firmware" placeholder="e.g., 6.54.2739" /></div><div class="modal-field"><label>MAC Address</label><input type="text" id="switch-mac" placeholder="e.g., AC:CC:8E:FA:4B:1B" /></div><div class="modal-field"><label>Purchase Date</label><input type="date" id="switch-purchase-date" /></div><div class="modal-field"><label>Warranty Expiry</label><input type="date" id="switch-warranty-expiry" /></div></div></div><div class="modal-footer"><button class="btn" onclick="closeAddModal('add-switch-modal')">Cancel</button><button class="btn btn-accent" onclick="saveNewSwitch()"><i class="ti ti-device-floppy"></i> Add Switch</button></div></div></div>
 
-<!-- ADD CLIENT MODAL -->
-<div class="modal-overlay" id="add-client-modal"><div class="modal"><button class="modal-close" onclick="closeAddModal('add-client-modal')"><i class="ti ti-x"></i></button><div class="modal-title">👤 Add Client</div><div class="modal-sub">Add a new client to the system</div><div class="modal-section"><div class="modal-grid"><div class="modal-field"><label>Client Name *</label><input type="text" id="client-name" placeholder="e.g., KFTL" /></div><div class="modal-field"><label>Contact Email</label><input type="email" id="client-email" placeholder="client@example.com" /></div><div class="modal-field"><label>Phone</label><input type="text" id="client-phone" placeholder="+1 (555) 555-5555" /></div><div class="modal-field"><label>Address</label><input type="text" id="client-address" placeholder="Client address" /></div></div></div><div class="modal-footer"><button class="btn" onclick="closeAddModal('add-client-modal')">Cancel</button><button class="btn btn-accent" onclick="saveNewClient()"><i class="ti ti-device-floppy"></i> Add Client</button></div></div></div>
+<!-- ADD CLIENT MODAL WITH LOGO UPLOAD -->
+<div class="modal-overlay" id="add-client-modal"><div class="modal"><button class="modal-close" onclick="closeAddModal('add-client-modal')"><i class="ti ti-x"></i></button><div class="modal-title">👤 Add Client</div><div class="modal-sub">Add a new client to the system</div><div class="modal-section"><div class="modal-grid"><div class="modal-field"><label>Client Name *</label><input type="text" id="client-name" placeholder="e.g., KFTL" /></div><div class="modal-field"><label>Contact Email</label><input type="email" id="client-email" placeholder="client@example.com" /></div><div class="modal-field"><label>Phone</label><input type="text" id="client-phone" placeholder="+1 (555) 555-5555" /></div><div class="modal-field"><label>Address</label><input type="text" id="client-address" placeholder="Client address" /></div></div></div><div class="modal-section"><div class="modal-section-title">Branding</div><div class="modal-field"><label>Client Logo</label><input type="file" id="client-logo-upload" accept="image/*" onchange="previewClientLogo(this)" /><img id="client-logo-preview" class="logo-upload-preview" style="display:none;" /></div></div><div class="modal-footer"><button class="btn" onclick="closeAddModal('add-client-modal')">Cancel</button><button class="btn btn-accent" onclick="saveNewClient()"><i class="ti ti-device-floppy"></i> Add Client</button></div></div></div>
+
+<!-- EDIT CLIENT MODAL -->
+<div class="modal-overlay" id="edit-client-modal"><div class="modal"><button class="modal-close" onclick="closeAddModal('edit-client-modal')"><i class="ti ti-x"></i></button><div class="modal-title">✏️ Edit Client</div><div class="modal-sub">Update client information</div><div class="modal-section"><div class="modal-grid"><div class="modal-field"><label>Client Name *</label><input type="text" id="edit-client-name" placeholder="Client name" /></div><div class="modal-field"><label>Contact Email</label><input type="email" id="edit-client-email" placeholder="client@example.com" /></div><div class="modal-field"><label>Phone</label><input type="text" id="edit-client-phone" placeholder="+1 (555) 555-5555" /></div><div class="modal-field"><label>Address</label><input type="text" id="edit-client-address" placeholder="Client address" /></div></div></div><div class="modal-section"><div class="modal-section-title">Branding</div><div class="modal-field"><label>Client Logo</label><input type="file" id="edit-client-logo-upload" accept="image/*" onchange="previewEditClientLogo(this)" /><img id="edit-client-logo-preview" class="logo-upload-preview" style="display:none;" /></div></div><div class="modal-footer"><button class="btn" onclick="closeAddModal('edit-client-modal')">Cancel</button><button class="btn btn-accent" onclick="saveEditClient()"><i class="ti ti-device-floppy"></i> Save Changes</button></div></div></div>
 
 <div class="confirm-overlay" id="confirm-overlay"><div class="confirm-dialog"><div class="confirm-title" id="confirm-title">Are you sure?</div><div class="confirm-desc" id="confirm-desc">This action cannot be undone.</div><div class="confirm-actions"><button class="btn" onclick="closeConfirm()">Cancel</button><button class="btn btn-accent" id="confirm-btn" onclick="executeConfirm()">Confirm</button></div></div></div>
 
@@ -935,6 +952,7 @@ var SERVICE_REQUESTS = [];
 var AUDIT_LOG = [];
 var EMAILS = [];
 var CLIENTS = JSON.parse(localStorage.getItem('ccsm_clients') || '["KFTL","KWL","Lasco","Nestle","NIDS","Nutrien"]');
+var CLIENT_LOGO_DATA = JSON.parse(localStorage.getItem('ccsm_client_logos') || '{}');
 var PINNED_FILES = JSON.parse(localStorage.getItem('ccsm_pinned') || '[]');
 var SENT_EMAILS = [];
 var DRAFT_EMAILS = [];
@@ -946,6 +964,7 @@ var currentClientFilter = null;
 var currentZoneFilter = null;
 var userClient = null;
 var isAdmin = true;
+var editingClient = null;
 
 // ============================================================
 // ── THEME FUNCTIONS ──────────────────────────────────────────
@@ -971,27 +990,57 @@ function setTheme(theme) {
   var logo = document.getElementById('logo-img');
   var dropdown = document.getElementById('theme-dropdown');
   
-  // Remove all theme classes
   root.classList.remove('light-theme', 'jet-black-theme');
   
   if (theme === 'light') {
     root.classList.add('light-theme');
-    if (btn) btn.innerHTML = '<i class="ti ti-moon"></i>';
+    if (btn) btn.innerHTML = '<i class="ti ti-moon"></i> Theme';
     if (logo) logo.src = 'logo-light.png';
   } else if (theme === 'jet-black') {
     root.classList.add('jet-black-theme');
-    if (btn) btn.innerHTML = '<i class="ti ti-moon"></i>';
+    if (btn) btn.innerHTML = '<i class="ti ti-moon"></i> Theme';
     if (logo) logo.src = 'logo-black.png';
     if (logo) logo.onerror = function() { this.src = 'logo.png'; };
   } else {
-    // Dark (default)
-    if (btn) btn.innerHTML = '<i class="ti ti-sun"></i>';
+    if (btn) btn.innerHTML = '<i class="ti ti-sun"></i> Theme';
     if (logo) logo.src = 'logo.png';
   }
   
   localStorage.setItem('ccsm_theme', theme);
   if (dropdown) dropdown.style.display = 'none';
   toast('Theme: ' + theme.charAt(0).toUpperCase() + theme.slice(1), 'success');
+}
+
+// ============================================================
+// ── CLIENT LOGO FUNCTIONS ───────────────────────────────────
+// ============================================================
+
+function previewClientLogo(input) {
+  var preview = document.getElementById('client-logo-preview');
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      preview.style.display = 'block';
+      preview.src = e.target.result;
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function previewEditClientLogo(input) {
+  var preview = document.getElementById('edit-client-logo-preview');
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      preview.style.display = 'block';
+      preview.src = e.target.result;
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function getClientLogoData(clientName) {
+  return CLIENT_LOGO_DATA[clientName] || null;
 }
 
 // ============================================================
@@ -1051,6 +1100,91 @@ function populateClientDropdowns() {
 }
 
 // ============================================================
+// ── EDIT/DELETE CLIENT ──────────────────────────────────────
+// ============================================================
+
+function showClientContextMenu(e, client) {
+  e.preventDefault();
+  e.stopPropagation();
+  var menu = document.getElementById('ctx-menu');
+  menu.innerHTML = '';
+  menu.innerHTML += '<div class="ctx-item" onclick="editClient(\'' + client + '\');hideContextMenu();"><i class="ti ti-edit"></i> Edit Client</div>';
+  menu.innerHTML += '<div class="ctx-sep"></div>';
+  menu.innerHTML += '<div class="ctx-item" style="color:#f87171;" onclick="deleteClient(\'' + client + '\');hideContextMenu();"><i class="ti ti-trash"></i> Delete Client</div>';
+  menu.classList.add('open');
+  menu.style.left = e.clientX + 'px';
+  menu.style.top = e.clientY + 'px';
+}
+
+function editClient(clientName) {
+  editingClient = clientName;
+  document.getElementById('edit-client-name').value = clientName;
+  document.getElementById('edit-client-email').value = '';
+  document.getElementById('edit-client-phone').value = '';
+  document.getElementById('edit-client-address').value = '';
+  var preview = document.getElementById('edit-client-logo-preview');
+  var logoData = CLIENT_LOGO_DATA[clientName];
+  if (logoData) {
+    preview.style.display = 'block';
+    preview.src = logoData;
+  } else {
+    preview.style.display = 'none';
+  }
+  document.getElementById('edit-client-modal').classList.add('open');
+}
+
+function saveEditClient() {
+  var newName = document.getElementById('edit-client-name').value.trim();
+  var oldName = editingClient;
+  if (!newName) { toast('Please enter a client name', 'warning'); return; }
+  
+  // Update the client name in the list
+  var index = CLIENTS.indexOf(oldName);
+  if (index !== -1) {
+    CLIENTS[index] = newName;
+  }
+  
+  // Update logo data
+  var preview = document.getElementById('edit-client-logo-preview');
+  if (preview.style.display !== 'none' && preview.src) {
+    CLIENT_LOGO_DATA[newName] = preview.src;
+    if (oldName !== newName) {
+      delete CLIENT_LOGO_DATA[oldName];
+    }
+  }
+  
+  localStorage.setItem('ccsm_clients', JSON.stringify(CLIENTS));
+  localStorage.setItem('ccsm_client_logos', JSON.stringify(CLIENT_LOGO_DATA));
+  
+  closeAddModal('edit-client-modal');
+  toast('Client updated successfully!', 'success');
+  updateClientNavVisibility();
+  if (currentTab === 'dashboard') renderDashboard();
+}
+
+function deleteClient(clientName) {
+  openConfirm('Delete Client?', 'Are you sure you want to delete "' + clientName + '"? This cannot be undone.', function() {
+    CLIENTS = CLIENTS.filter(function(c) { return c !== clientName; });
+    delete CLIENT_LOGO_DATA[clientName];
+    localStorage.setItem('ccsm_clients', JSON.stringify(CLIENTS));
+    localStorage.setItem('ccsm_client_logos', JSON.stringify(CLIENT_LOGO_DATA));
+    toast('Client ' + clientName + ' deleted', 'info');
+    updateClientNavVisibility();
+    if (currentTab === 'dashboard') renderDashboard();
+  }, true);
+}
+
+function hideContextMenu() {
+  document.getElementById('ctx-menu').classList.remove('open');
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.ctx-menu')) {
+    hideContextMenu();
+  }
+});
+
+// ============================================================
 // ── ADD FUNCTIONS ────────────────────────────────────────────
 // ============================================================
 
@@ -1069,12 +1203,22 @@ function saveNewClient() {
     return;
   }
   CLIENTS.push(name);
+  
+  // Save logo if uploaded
+  var preview = document.getElementById('client-logo-preview');
+  if (preview.style.display !== 'none' && preview.src) {
+    CLIENT_LOGO_DATA[name] = preview.src;
+  }
+  
   localStorage.setItem('ccsm_clients', JSON.stringify(CLIENTS));
+  localStorage.setItem('ccsm_client_logos', JSON.stringify(CLIENT_LOGO_DATA));
   closeAddModal('add-client-modal');
   document.getElementById('client-name').value = '';
   document.getElementById('client-email').value = '';
   document.getElementById('client-phone').value = '';
   document.getElementById('client-address').value = '';
+  document.getElementById('client-logo-upload').value = '';
+  document.getElementById('client-logo-preview').style.display = 'none';
   toast('Client ' + name + ' added successfully!', 'success');
   updateClientNavVisibility();
 }
@@ -1371,6 +1515,10 @@ function exportSRsCSV() {
 function getClientLogo(client) {
   if (!client) return '';
   var logoFile = 'logo-' + client.toLowerCase() + '.png';
+  var logoData = CLIENT_LOGO_DATA[client];
+  if (logoData) {
+    return '<img class="page-client-logo" src="' + logoData + '" />';
+  }
   return '<img class="page-client-logo" src="' + logoFile + '" onerror="this.style.display=\'none\'" />';
 }
 
@@ -1445,9 +1593,11 @@ function renderAllClients() {
   
   var html = '';
   CLIENTS.forEach(function(client) {
+    var logoData = CLIENT_LOGO_DATA[client];
+    var logoHtml = logoData ? '<img class="nav-client-logo" src="' + logoData + '" />' : '<img class="nav-client-logo" src="logo-' + client.toLowerCase() + '.png" onerror="this.style.display=\'none\'" />';
     html += '<div class="nav-client-group">';
-    html += '<div class="nav-item nav-client-parent" data-client="' + client + '" onclick="toggleClientDropdown(\'' + client + '\')">';
-    html += '<img class="nav-client-logo" src="logo-' + client.toLowerCase() + '.png" onerror="this.style.display=\'none\'">';
+    html += '<div class="nav-item nav-client-parent" data-client="' + client + '" onclick="toggleClientDropdown(\'' + client + '\')" oncontextmenu="showClientContextMenu(event, \'' + client + '\')">';
+    html += logoHtml;
     html += '<i class="ti ti-chevron-right" id="client-arrow-' + client + '"></i>';
     html += ' <span>' + client + '</span>';
     html += '</div>';
@@ -1498,7 +1648,10 @@ function updateClientNavVisibility() {
   var logoImg = document.getElementById('logo-img');
   
   if (userClient && !isAdmin) {
-    if (logoImg) {
+    var logoData = CLIENT_LOGO_DATA[userClient];
+    if (logoData) {
+      logoImg.src = logoData;
+    } else {
       logoImg.src = 'logo-' + userClient.toLowerCase() + '.png';
       logoImg.onerror = function() { this.src = 'logo.png'; };
     }
@@ -1511,9 +1664,7 @@ function updateClientNavVisibility() {
     renderClientZones(userClient);
     
   } else {
-    if (logoImg) {
-      logoImg.src = 'logo.png';
-    }
+    logoImg.src = 'logo.png';
     
     if (toolsSection) toolsSection.style.display = '';
     if (filesNavItem) filesNavItem.style.display = '';
@@ -1991,14 +2142,8 @@ function closeFilePreview() { document.getElementById('file-preview-overlay').cl
 document.getElementById('file-preview-overlay').addEventListener('click', function(e) { if (e.target === this) closeFilePreview(); });
 
 // ============================================================
-// ── ANALYTICS ────────────────────────────────────────────────
+// ── INIT ──────────────────────────────────────────────────────
 // ============================================================
-
-function switchAnalyticsTab(tab, el) { analyticsTab = tab; document.querySelectorAll('.sr-tab-btn').forEach(function(b) { b.classList.remove('active'); }); el.classList.add('active'); document.getElementById('sr-tickets-view').style.display = tab === 'tickets' ? '' : 'none'; document.getElementById('sr-analytics-view').style.display = tab === 'analytics' ? '' : 'none'; if (tab === 'analytics') renderAnalytics(); }
-function renderAnalytics() { document.getElementById('analytics-tech-times').innerHTML = '<div class="metric-row"><span class="metric-name">Shanice Vernon</span><div class="metric-bar-wrap"><div class="metric-bar-fill" style="width:100%;background:#4a9eff"></div></div><span class="metric-val">~18h avg · 12 resolved</span></div>'; document.getElementById('analytics-client-issues').innerHTML = '<div class="metric-row"><span class="metric-name">KFTL</span><span class="metric-val">📷 8 · 🚪 4 · 🖥 2</span></div><div class="metric-row"><span class="metric-name">KWL</span><span class="metric-val">📷 5 · 🖥 1</span></div>'; document.getElementById('analytics-monthly').innerHTML = '<div class="metric-row"><span class="metric-name">June</span><div class="metric-bar-wrap"><div class="metric-bar-fill" style="width:100%;background:#4ade80"></div></div><span class="metric-val">8 tickets</span></div>'; document.getElementById('analytics-hours').innerHTML = '<div class="metric-row"><span class="metric-name">10:00 - 11:00</span><div class="metric-bar-wrap"><div class="metric-bar-fill" style="width:100%;background:#f59e0b"></div></div><span class="metric-val">5</span></div>'; }
-
-// ============================================================
-// ── INIT ──────────────────────────────────────────────────────// ============================================================
 
 document.getElementById('topbar-date').textContent = fullDateTime();
 setInterval(function() { document.getElementById('topbar-date').textContent = fullDateTime(); }, 30000);
