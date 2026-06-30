@@ -30,21 +30,7 @@
     --tooltip-bg: rgba(20, 22, 40, 0.95);
   }
   /* Force select to behave normally */
-select#login-client {
-  display: inline-block !important;
-  appearance: menulist !important;
-  -webkit-appearance: menulist !important;
-  -moz-appearance: menulist !important;
-  background: #1a1a2e !important;
-  color: #ffffff !important;
-  border: 1px solid rgba(255,255,255,0.1) !important;
-  border-radius: 8px !important;
-  padding: 10px 14px !important;
-  width: 100% !important;
-  font-size: 14px !important;
-  font-family: var(--font) !important;
-  cursor: pointer !important;
-}
+
 
 select#login-client option {
   background: #1a1a2e !important;
@@ -60,9 +46,15 @@ select, select option {
   color: #ffffff !important;
   background-color: #1a1a2e !important;
 }
-
-#login-page select {
-  background-color: rgba(30, 30, 60, 0.95) !important;
+/* Clean dropdown fix - only affects login page */
+#login-client {
+  background: #1a1a2e !important;
+  color: #ffffff !important;
+  appearance: auto !important;
+  -webkit-appearance: auto !important;
+}
+#login-client option {
+  background: #1a1a2e !important;
   color: #ffffff !important;
 }
 
@@ -70,10 +62,7 @@ select, select option {
   background-color: #1a1a2e !important;
   color: #ffffff !important;
 }
-/* Fix dropdown text colors */
-#login-client, #login-client option {
-  color: #ffffff !important;
-}
+
 #login-client option {
   background: #1a1a2e !important;
 }
@@ -732,32 +721,17 @@ select, select option {
     <h2>CCSM</h2><p>Sign in with your work email</p>
     <button class="microsoft-btn" onclick="loginWithMicrosoft()"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 23 23"><path fill="#f25022" d="M1 1h10v10H1z"/><path fill="#7fba00" d="M12 1h10v10H12z"/><path fill="#00a4ef" d="M1 12h10v10H1z"/><path fill="#ffb900" d="M12 12h10v10H12z"/></svg> Sign in with Microsoft</button>
     <div class="login-divider">or</div>
-<div style="margin-top:4px;">
-  <input id="login-username" type="text" placeholder="Username" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:var(--text-primary);margin-bottom:10px;font-size:14px;font-family:var(--font);">
-  <input id="login-password" type="password" placeholder="Password" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:var(--text-primary);margin-bottom:10px;font-size:14px;font-family:var(--font);">
-<select id="login-client">
-  <option value="">Admin (Full Access)</option>
-  <option value="KFTL">KFTL</option>
-  <option value="KWL">KWL</option>
-  <option value="Lasco">Lasco</option>
-  <option value="Nestle">Nestle</option>
-  <option value="NIDS">NIDS</option>
-  <option value="Nutrien">Nutrien</option>
-</select>
-  <option value="" style="background:#1a1a2e;color:#ffffff;">Admin (Full Access)</option>
-  <option value="KFTL" style="background:#1a1a2e;color:#ffffff;">KFTL</option>
-  <option value="KWL" style="background:#1a1a2e;color:#ffffff;">KWL</option>
-  <option value="Lasco" style="background:#1a1a2e;color:#ffffff;">Lasco</option>
-  <option value="Nestle" style="background:#1a1a2e;color:#ffffff;">Nestle</option>
-  <option value="NIDS" style="background:#1a1a2e;color:#ffffff;">NIDS</option>
-  <option value="Nutrien" style="background:#1a1a2e;color:#ffffff;">Nutrien</option>
-  </select>
+    <div style="margin-top:4px;">
+      <input id="login-username" type="text" placeholder="Username" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#f0f4ff;margin-bottom:10px;font-size:14px;font-family:var(--font);">
+      <input id="login-password" type="password" placeholder="Password" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#f0f4ff;margin-bottom:12px;font-size:14px;font-family:var(--font);">
+      <button onclick="loginLocal()" style="width:100%;padding:10px;border-radius:8px;border:none;background:linear-gradient(135deg,#4f8cf7,#00d4ff);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font);">Sign in</button>
+    </div>
   <button onclick="loginLocal()" style="width:100%;padding:10px;border-radius:8px;border:none;background:linear-gradient(135deg,#4f8cf7,#00d4ff);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font);">Sign in</button>
 </div>
     </div>
     <div id="login-error" style="color:#f87171;font-size:12px;margin-top:12px;display:none;"></div>
     <div class="login-loading" id="login-loading"><i class="ti ti-loader"></i> Signing in...</div>
-    <p style="color:var(--text-muted);font-size:11px;margin-top:16px;">Default local: admin / admin123</p>
+<p style="color:var(--text-muted);font-size:11px;margin-top:16px;">Admin: admin / admin123 &bull; Client: kftl / kftl123</p>
   </div>
 </div>
 
@@ -1178,38 +1152,37 @@ function hideLogin(){document.getElementById('login-page').style.display='none';
 async function loginLocal(){
   var username = document.getElementById('login-username').value;
   var password = document.getElementById('login-password').value;
-  var clientSelect = document.getElementById('login-client');
-  var selectedClient = clientSelect ? clientSelect.value : '';
   var errorDiv = document.getElementById('login-error');
   var loadingDiv = document.getElementById('login-loading');
   
   errorDiv.style.display = 'none';
   loadingDiv.classList.add('active');
   
-  try {
-    // Check for client-specific login first (kftl/kftl123 pattern)
-    var lowerUser = username.toLowerCase();
-    var lowerPass = password.toLowerCase();
-    
-    var clientPasswords = {
-      'kftl': 'kftl123',
-      'kwl': 'kwl123',
-      'lasco': 'lasco123',
-      'nestle': 'nestle123',
-      'nids': 'nids123',
-      'nutrien': 'nutrien123'
-    };
-    
-    var foundClient = null;
-    for (var client in clientPasswords) {
-      if (lowerUser === client && lowerPass === clientPasswords[client]) {
-        foundClient = client.toUpperCase();
-        break;
-      }
+  // Client credentials mapping
+  var clientCredentials = {
+    'kftl': { password: 'kftl123', client: 'KFTL' },
+    'kwl': { password: 'kwl123', client: 'KWL' },
+    'lasco': { password: 'lasco123', client: 'Lasco' },
+    'nestle': { password: 'nestle123', client: 'Nestle' },
+    'nids': { password: 'nids123', client: 'NIDS' },
+    'nutrien': { password: 'nutrien123', client: 'Nutrien' }
+  };
+  
+  var lowerUser = username.toLowerCase();
+  var lowerPass = password.toLowerCase();
+  
+  // Check if this is a client login
+  var foundClient = null;
+  for (var client in clientCredentials) {
+    if (lowerUser === client && lowerPass === clientCredentials[client].password) {
+      foundClient = clientCredentials[client].client;
+      break;
     }
-    
-    // If client credentials matched, use client mode
+  }
+  
+  try {
     if (foundClient) {
+      // Client login - use mock data
       currentUser = {
         username: username,
         client: foundClient,
@@ -1219,6 +1192,7 @@ async function loginLocal(){
       userClient = foundClient;
       isAdmin = false;
       currentClientFilter = foundClient;
+      currentZoneFilter = null;
       
       localStorage.setItem('user', JSON.stringify(currentUser));
       token = 'client-token-' + Date.now();
@@ -1231,97 +1205,73 @@ async function loginLocal(){
       
       updateClientNavVisibility();
       toast('Welcome, ' + currentUser.username + ' (Client View)!', 'success');
-      
-      // Load mock data directly (skip API calls)
-      loadMockData();
-      return;
-    }
-    
-    // If client was selected from dropdown, use that
-    if (selectedClient) {
-      currentUser = {
-        username: username || 'clientuser',
-        client: selectedClient,
-        isAdmin: false,
-        role: 'Client User'
-      };
-      userClient = selectedClient;
-      isAdmin = false;
-      currentClientFilter = selectedClient;
-      
-      localStorage.setItem('user', JSON.stringify(currentUser));
-      token = 'client-token-' + Date.now();
-      localStorage.setItem('token', token);
-      
-      hideLogin();
-      document.getElementById('user-name-display').textContent = currentUser.username;
-      document.getElementById('user-role-display').textContent = 'Client User';
-      document.getElementById('user-avatar').textContent = currentUser.username.slice(0, 2).toUpperCase();
-      
-      updateClientNavVisibility();
-      toast('Welcome, ' + currentUser.username + ' (Client View)!', 'success');
-      
       loadMockData();
       return;
     }
     
     // Try admin login with backend
-    var result = await apiCall('POST', '/auth/login', {
-      username: username,
-      password: password
-    });
-    
-    token = result.token;
-    currentUser = result.user;
-    userClient = currentUser.client || null;
-    isAdmin = currentUser.isAdmin !== false;
-    
-    if (userClient && !isAdmin) {
-      currentClientFilter = userClient;
-    } else {
-      currentClientFilter = null;
-    }
-    
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(currentUser));
-    
-    hideLogin();
-    document.getElementById('user-name-display').textContent = currentUser.username;
-    document.getElementById('user-role-display').textContent = currentUser.role || (isAdmin ? 'Administrator' : 'Client User');
-    document.getElementById('user-avatar').textContent = currentUser.username.slice(0, 2).toUpperCase();
-    
-    updateClientNavVisibility();
-    toast('Welcome, ' + currentUser.username + '!', 'success');
-    await loadData();
-    
-  } catch(error) {
-    // If API fails, try fallback to mock admin login
-    if (username === 'admin' && password === 'admin123') {
-      currentUser = {
-        username: 'admin',
-        isAdmin: true,
-        role: 'Administrator'
-      };
-      userClient = null;
-      isAdmin = true;
-      currentClientFilter = null;
+    try {
+      var result = await apiCall('POST', '/auth/login', {
+        username: username,
+        password: password
+      });
       
-      localStorage.setItem('user', JSON.stringify(currentUser));
-      token = 'admin-token-' + Date.now();
+      token = result.token;
+      currentUser = result.user;
+      userClient = currentUser.client || null;
+      isAdmin = currentUser.isAdmin !== false;
+      
+      if (userClient && !isAdmin) {
+        currentClientFilter = userClient;
+      } else {
+        currentClientFilter = null;
+      }
+      
       localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(currentUser));
       
       hideLogin();
-      document.getElementById('user-name-display').textContent = 'admin';
-      document.getElementById('user-role-display').textContent = 'Administrator';
-      document.getElementById('user-avatar').textContent = 'AD';
+      document.getElementById('user-name-display').textContent = currentUser.username;
+      document.getElementById('user-role-display').textContent = currentUser.role || (isAdmin ? 'Administrator' : 'Client User');
+      document.getElementById('user-avatar').textContent = currentUser.username.slice(0, 2).toUpperCase();
       
       updateClientNavVisibility();
-      toast('Welcome, Admin! (Offline Mode)', 'success');
-      loadMockData();
-    } else {
-      errorDiv.textContent = error.message || 'Login failed. Try: admin/admin123 or kftl/kftl123';
-      errorDiv.style.display = 'block';
+      toast('Welcome, ' + currentUser.username + '!', 'success');
+      await loadData();
+      return;
+    } catch (backendError) {
+      // If backend fails and this is admin credentials, use mock admin
+      if (username === 'admin' && password === 'admin123') {
+        currentUser = {
+          username: 'admin',
+          isAdmin: true,
+          role: 'Administrator'
+        };
+        userClient = null;
+        isAdmin = true;
+        currentClientFilter = null;
+        currentZoneFilter = null;
+        
+        localStorage.setItem('user', JSON.stringify(currentUser));
+        token = 'admin-token-' + Date.now();
+        localStorage.setItem('token', token);
+        
+        hideLogin();
+        document.getElementById('user-name-display').textContent = 'admin';
+        document.getElementById('user-role-display').textContent = 'Administrator';
+        document.getElementById('user-avatar').textContent = 'AD';
+        
+        updateClientNavVisibility();
+        toast('Welcome, Admin! (Offline Mode)', 'success');
+        loadMockData();
+        return;
+      }
+      throw backendError;
     }
+    
+  } catch(error) {
+    errorDiv.textContent = error.message || 'Login failed. Try: admin/admin123 or kftl/kftl123';
+    errorDiv.style.display = 'block';
   } finally {
     loadingDiv.classList.remove('active');
   }
