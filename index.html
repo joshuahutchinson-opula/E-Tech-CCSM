@@ -880,12 +880,12 @@ function hideLoading(elId){var el=document.getElementById(elId);if(el)el.classLi
 
 var debounceTimers={};
 function debounce(fn,key,delay){delay=delay||300;if(debounceTimers[key])clearTimeout(debounceTimers[key]);debounceTimers[key]=setTimeout(function(){fn();delete debounceTimers[key];},delay);}
-function debounceRenderSR(){debounce(renderSR,'sr',250);}
-function debounceRenderCameras(){debounce(renderCamerasOptimized,'cam',250);}
-function debounceRenderDoors(){debounce(renderDoorsEnhanced,'door',250);}
-function debounceRenderServers(){debounce(renderServersEnhanced,'srv',250);}
-function debounceRenderSwitches(){debounce(renderSwitchesEnhanced,'sw',250);}
-function debounceRenderFiles(){debounce(renderFileExplorer,'file',250);}
+function debounceRenderSR(){debounce(renderSR,'sr',3);}
+function debounceRenderCameras(){debounce(renderCamerasOptimized,'cam',3);}
+function debounceRenderDoors(){debounce(renderDoorsEnhanced,'door',3);}
+function debounceRenderServers(){debounce(renderServersEnhanced,'srv',3);}
+function debounceRenderSwitches(){debounce(renderSwitchesEnhanced,'sw',3);}
+function debounceRenderFiles(){debounce(renderFileExplorer,'file',3);}
 
 function setUnsaved(show){var el=document.getElementById('unsaved-indicator');if(el){if(show)el.classList.add('visible');else el.classList.remove('visible');}}
 function toggleSidebar(){sidebarCollapsed=!sidebarCollapsed;document.getElementById('sidebar').classList.toggle('collapsed',sidebarCollapsed);document.getElementById('collapse-icon').className='ti ti-chevron-'+(sidebarCollapsed?'right':'left');localStorage.setItem('ccsm_sidebar',sidebarCollapsed?'1':'0');}
