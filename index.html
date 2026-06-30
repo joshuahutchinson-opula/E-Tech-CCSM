@@ -44,6 +44,13 @@ select, select option {
   background-color: #1a1a2e !important;
   color: #ffffff !important;
 }
+/* Fix dropdown text colors */
+#login-client, #login-client option {
+  color: #ffffff !important;
+}
+#login-client option {
+  background: #1a1a2e !important;
+}
   :root.light-theme {
     --sidebar-bg: rgba(245, 247, 250, 0.95); --sidebar-border: rgba(0,0,0,0.08); --main-bg: #f0f2f5;
     --card-bg: rgba(255, 255, 255, 0.85); --card-border: rgba(0, 0, 0, 0.08); --text-primary: #1a1a2e;
@@ -679,13 +686,13 @@ select, select option {
   <option value="NIDS" style="background:#1a1a2e;color:#ffffff;">NIDS</option>
   <option value="Nutrien" style="background:#1a1a2e;color:#ffffff;">Nutrien</option>
 </select>
-    <option value="">Admin (Full Access)</option>
-    <option value="KFTL">KFTL</option>
-    <option value="KWL">KWL</option>
-    <option value="Lasco">Lasco</option>
-    <option value="Nestle">Nestle</option>
-    <option value="NIDS">NIDS</option>
-    <option value="Nutrien">Nutrien</option>
+  <option value="" style="background:#1a1a2e;color:#ffffff;">Admin (Full Access)</option>
+  <option value="KFTL" style="background:#1a1a2e;color:#ffffff;">KFTL</option>
+  <option value="KWL" style="background:#1a1a2e;color:#ffffff;">KWL</option>
+  <option value="Lasco" style="background:#1a1a2e;color:#ffffff;">Lasco</option>
+  <option value="Nestle" style="background:#1a1a2e;color:#ffffff;">Nestle</option>
+  <option value="NIDS" style="background:#1a1a2e;color:#ffffff;">NIDS</option>
+  <option value="Nutrien" style="background:#1a1a2e;color:#ffffff;">Nutrien</option>
   </select>
   <button onclick="loginLocal()" style="width:100%;padding:10px;border-radius:8px;border:none;background:linear-gradient(135deg,#4f8cf7,#00d4ff);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font);">Sign in</button>
 </div>
