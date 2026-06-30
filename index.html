@@ -98,7 +98,9 @@
   :root.light-theme #login-page .login-box p { color: rgba(255,255,255,0.25) !important; }
   :root.light-theme .login-divider { color: rgba(255,255,255,0.25); }
   :root.light-theme .login-divider::before, :root.light-theme .login-divider::after { background: rgba(255,255,255,0.06); }
-  :root.light-theme #login-page input { background: rgba(255,255,255,0.04) !important; border: 1px solid rgba(255,255,255,0.1) !important; color: #f0f4ff !important; }
+:root.light-theme #login-page input, :root.light-theme #login-page select { background: rgba(255,255,255,0.04) !important; border: 1px solid rgba(255,255,255,0.1) !important; color: #f0f4ff !important; }
+:root.light-theme #login-page select option { background: #1a1a2e !important; color: #f0f4ff !important; }
+#login-page select option { background: #1a1a2e !important; color: #f0f4ff !important; }
   :root.light-theme .microsoft-btn { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); color: #f0f4ff; }
   :root.light-theme .microsoft-btn:hover { background: rgba(255,255,255,0.08); }
   .skeleton { background: var(--skeleton-bg); border-radius: 4px; height: 20px; position: relative; overflow: hidden; animation: shimmer 1.8s infinite; }
@@ -654,7 +656,15 @@
 <div style="margin-top:4px;">
   <input id="login-username" type="text" placeholder="Username" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:var(--text-primary);margin-bottom:10px;font-size:14px;font-family:var(--font);">
   <input id="login-password" type="password" placeholder="Password" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:var(--text-primary);margin-bottom:10px;font-size:14px;font-family:var(--font);">
-  <select id="login-client" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:var(--text-primary);margin-bottom:12px;font-size:14px;font-family:var(--font);">
+ <select id="login-client" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#f0f4ff;margin-bottom:12px;font-size:14px;font-family:var(--font);">
+  <option value="" style="background:#1a1a2e;color:#f0f4ff;">Admin (Full Access)</option>
+  <option value="KFTL" style="background:#1a1a2e;color:#f0f4ff;">KFTL</option>
+  <option value="KWL" style="background:#1a1a2e;color:#f0f4ff;">KWL</option>
+  <option value="Lasco" style="background:#1a1a2e;color:#f0f4ff;">Lasco</option>
+  <option value="Nestle" style="background:#1a1a2e;color:#f0f4ff;">Nestle</option>
+  <option value="NIDS" style="background:#1a1a2e;color:#f0f4ff;">NIDS</option>
+  <option value="Nutrien" style="background:#1a1a2e;color:#f0f4ff;">Nutrien</option>
+</select>
     <option value="">Admin (Full Access)</option>
     <option value="KFTL">KFTL</option>
     <option value="KWL">KWL</option>
@@ -825,8 +835,15 @@ function updateClientNavVisibility() {
   var inboxNavItem = document.querySelector('.nav-item[data-tab="inbox"]');
   var clientsLabel = document.getElementById('clients-section-label');
   var container = document.getElementById('client-dropdowns-container');
+  var logoImg = document.getElementById('logo-img');
   
   if (userClient && !isAdmin) {
+    // Change logo to client logo
+    if (logoImg) {
+      logoImg.src = 'logo-' + userClient.toLowerCase() + '.png';
+      logoImg.onerror = function() { this.src = 'logo.png'; };
+    }
+    
     // Hide Tools, Files & Logs, and Inbox for client users
     if (toolsSection) toolsSection.style.display = 'none';
     if (filesNavItem) filesNavItem.style.display = 'none';
@@ -837,6 +854,11 @@ function updateClientNavVisibility() {
     renderClientZones(userClient);
     
   } else {
+    // Restore E-Tech logo for admin
+    if (logoImg) {
+      logoImg.src = 'logo.png';
+    }
+    
     // Show all for admin
     if (toolsSection) toolsSection.style.display = '';
     if (filesNavItem) filesNavItem.style.display = '';
