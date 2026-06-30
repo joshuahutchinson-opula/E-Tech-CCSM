@@ -38,87 +38,137 @@
     --skeleton-shine: rgba(0,0,0,0.1); --tooltip-bg: rgba(255, 255, 255, 0.95);
   }
   :root.jet-black-theme {
-    --sidebar-bg: rgba(0, 0, 0, 0.98);
-    --sidebar-border: rgba(255,255,255,0.05);
-    --main-bg: #000000;
-    --card-bg: rgba(10, 10, 15, 0.98);
-    --card-border: rgba(255, 255, 255, 0.05);
+    --sidebar-bg: rgba(8, 8, 12, 0.99);
+    --sidebar-border: rgba(255,255,255,0.04);
+    --main-bg: #08080c;
+    --card-bg: rgba(12, 12, 18, 0.98);
+    --card-border: rgba(255, 255, 255, 0.04);
     --text-primary: #ffffff;
-    --text-secondary: rgba(255, 255, 255, 0.6);
+    --text-secondary: rgba(255, 255, 255, 0.65);
     --text-muted: rgba(255, 255, 255, 0.25);
     --accent-start: #00d4ff;
     --accent-end: #7b2ffc;
     --accent: #00d4ff;
-    --accent-glow: rgba(0, 212, 255, 0.2);
+    --accent-glow: rgba(0, 212, 255, 0.15);
     --danger: #ff0055;
     --warning: #ffaa00;
     --success: #00ff88;
     --info: #00d4ff;
+    --skeleton-bg: rgba(255,255,255,0.02);
+    --skeleton-shine: rgba(255,255,255,0.04);
+    --tooltip-bg: rgba(8, 8, 12, 0.98);
   }
-  :root.jet-black-theme body { background: #000000; }
-  :root.jet-black-theme .panel, :root.jet-black-theme .stat-card, :root.jet-black-theme .analytics-card, :root.jet-black-theme .modal { background: rgba(10, 10, 15, 0.98) !important; border: 1px solid rgba(255, 255, 255, 0.05) !important; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8) !important; }
-  :root.jet-black-theme .panel:hover, :root.jet-black-theme .stat-card:hover { border-color: rgba(0, 212, 255, 0.2) !important; box-shadow: 0 12px 48px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 212, 255, 0.05) !important; }
-  :root.jet-black-theme .sidebar { background: rgba(0, 0, 0, 0.98) !important; border-right: 1px solid rgba(255, 255, 255, 0.05); }
-  :root.jet-black-theme .nav-item.active { background: linear-gradient(90deg, rgba(0, 212, 255, 0.15) 0%, rgba(123, 47, 252, 0.05) 100%) !important; border-left: 3px solid #00d4ff !important; color: #fff !important; }
-  :root.jet-black-theme .nav-item:hover { background: rgba(255, 255, 255, 0.03) !important; }
-  :root.jet-black-theme .tbl th { color: rgba(255, 255, 255, 0.4) !important; }
-  :root.jet-black-theme .tbl td { border-bottom: 1px solid rgba(255,255,255,0.03) !important; }
-  :root.jet-black-theme .tbl tr:hover td { background: rgba(0, 212, 255, 0.03) !important; }
-  :root.jet-black-theme .modal { background: rgba(10, 10, 15, 0.98) !important; border: 1px solid rgba(255,255,255,0.05) !important; box-shadow: 0 24px 80px rgba(0, 0, 0, 0.9) !important; }
-  :root.jet-black-theme .search-bar input, :root.jet-black-theme .search-bar select { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); color: #fff; }
+  :root.jet-black-theme body { background: #08080c; }
+  :root.jet-black-theme .panel, :root.jet-black-theme .stat-card, :root.jet-black-theme .analytics-card, :root.jet-black-theme .modal { background: rgba(12, 12, 18, 0.98) !important; border: 1px solid rgba(255, 255, 255, 0.04) !important; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8) !important; }
+  :root.jet-black-theme .panel:hover, :root.jet-black-theme .stat-card:hover { border-color: rgba(0, 212, 255, 0.12) !important; box-shadow: 0 12px 48px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 212, 255, 0.03) !important; }
+  :root.jet-black-theme .sidebar { background: rgba(8, 8, 12, 0.99) !important; border-right: 1px solid rgba(255, 255, 255, 0.04); }
+  :root.jet-black-theme .nav-item.active { background: linear-gradient(90deg, rgba(0, 212, 255, 0.08) 0%, rgba(123, 47, 252, 0.04) 100%) !important; border-left: 2px solid #00d4ff !important; color: #fff !important; }
+  :root.jet-black-theme .nav-item:hover { background: rgba(255, 255, 255, 0.02) !important; }
+  :root.jet-black-theme .tbl th { color: rgba(255, 255, 255, 0.35) !important; border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important; }
+  :root.jet-black-theme .tbl td { border-bottom: 1px solid rgba(255,255,255,0.02) !important; }
+  :root.jet-black-theme .tbl tr:hover td { background: rgba(0, 212, 255, 0.02) !important; }
+  :root.jet-black-theme .tbl tr.clickable:hover td { background: rgba(0, 212, 255, 0.03) !important; }
+  :root.jet-black-theme .modal { background: rgba(12, 12, 18, 0.98) !important; border: 1px solid rgba(255,255,255,0.04) !important; box-shadow: 0 24px 80px rgba(0, 0, 0, 0.95) !important; }
+  :root.jet-black-theme .search-bar input, :root.jet-black-theme .search-bar select { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); color: #fff; }
+  :root.jet-black-theme .search-bar input:focus, :root.jet-black-theme .search-bar select:focus { border-color: #00d4ff; }
   :root.jet-black-theme .search-bar select { background: #0a0a0f; }
   :root.jet-black-theme .search-bar select option { background: #0a0a0f; color: #fff; }
-  :root.jet-black-theme .filter-pill { border: 1px solid rgba(255,255,255,0.05); color: rgba(255,255,255,0.6); }
-  :root.jet-black-theme .filter-pill.active { background: rgba(0, 212, 255, 0.15); border-color: #00d4ff; color: #fff; }
-  :root.jet-black-theme .modal-field label { color: rgba(255,255,255,0.4); }
-  :root.jet-black-theme .modal-body-text { background: rgba(255,255,255,0.02); color: rgba(255,255,255,0.6); }
-  :root.jet-black-theme .notes-area { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); color: #fff; }
-  :root.jet-black-theme .btn { border: 1px solid rgba(255,255,255,0.08); color: #fff; }
-  :root.jet-black-theme .btn:hover { background: rgba(255,255,255,0.04); }
-  :root.jet-black-theme .status-select, :root.jet-black-theme .priority-select { background: #0a0a0f; border: 1px solid rgba(255,255,255,0.05); color: #fff; }
+  :root.jet-black-theme .filter-pill { border: 1px solid rgba(255,255,255,0.04); color: rgba(255,255,255,0.5); }
+  :root.jet-black-theme .filter-pill:hover { border-color: rgba(255,255,255,0.1); }
+  :root.jet-black-theme .filter-pill.active { background: rgba(0, 212, 255, 0.08); border-color: #00d4ff; color: #fff; }
+  :root.jet-black-theme .modal-field label { color: rgba(255,255,255,0.35); letter-spacing: 0.05em; }
+  :root.jet-black-theme .modal-field input, :root.jet-black-theme .modal-field select, :root.jet-black-theme .modal-field textarea { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); color: #fff; }
+  :root.jet-black-theme .modal-field input:focus, :root.jet-black-theme .modal-field select:focus, :root.jet-black-theme .modal-field textarea:focus { border-color: #00d4ff; }
+  :root.jet-black-theme .modal-body-text { background: rgba(255,255,255,0.01); color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.02); }
+  :root.jet-black-theme .notes-area { background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.04); color: #fff; }
+  :root.jet-black-theme .notes-area:focus { border-color: #00d4ff; }
+  :root.jet-black-theme .btn { border: 1px solid rgba(255,255,255,0.06); color: #fff; background: rgba(255,255,255,0.01); }
+  :root.jet-black-theme .btn:hover { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1); }
+  :root.jet-black-theme .btn-accent { background: linear-gradient(135deg, #00d4ff, #7b2ffc) !important; border: none !important; color: #fff !important; box-shadow: 0 4px 20px rgba(0, 212, 255, 0.15); }
+  :root.jet-black-theme .btn-accent:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(0, 212, 255, 0.25); }
+  :root.jet-black-theme .status-select, :root.jet-black-theme .priority-select { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); color: #fff; }
   :root.jet-black-theme .status-select option, :root.jet-black-theme .priority-select option { background: #0a0a0f; color: #fff; }
-  :root.jet-black-theme .audit-log .audit-item { border-bottom: 1px solid rgba(255,255,255,0.03); color: rgba(255,255,255,0.6); }
-  :root.jet-black-theme .outlook-container { background: rgba(10,10,15,0.95); border: 1px solid rgba(255,255,255,0.05); }
-  :root.jet-black-theme .outlook-email { border-bottom: 1px solid rgba(255,255,255,0.03); }
-  :root.jet-black-theme .outlook-email:hover { background: rgba(255,255,255,0.02); }
-  :root.jet-black-theme .outlook-email.active { background: rgba(0, 212, 255, 0.05); }
-  :root.jet-black-theme .outlook-folder-pane { border-right: 1px solid rgba(255,255,255,0.05); }
-  :root.jet-black-theme .outlook-folder-item:hover { background: rgba(255,255,255,0.02); }
-  :root.jet-black-theme .outlook-folder-item.active { background: rgba(0, 212, 255, 0.08); }
-  :root.jet-black-theme .ore-header { border-bottom: 1px solid rgba(255,255,255,0.05); }
-  :root.jet-black-theme .notes-inline { color: rgba(255,255,255,0.5); }
-  :root.jet-black-theme .notes-inline:focus { background: rgba(255,255,255,0.02); color: #fff; }
-  :root.jet-black-theme .file-explorer { background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); }
-  :root.jet-black-theme .file-explorer .file-item { border-bottom: 1px solid rgba(255,255,255,0.03); }
-  :root.jet-black-theme .file-explorer .file-item:hover { background: rgba(255,255,255,0.02); }
-  :root.jet-black-theme .breadcrumb { background: rgba(255,255,255,0.01); }
-  :root.jet-black-theme .breadcrumb .crumb:hover { background: rgba(255,255,255,0.04); }
-  :root.jet-black-theme .topbar { border-bottom: 1px solid rgba(255,255,255,0.05); }
-  :root.jet-black-theme .cam-zone-header, :root.jet-black-theme .door-zone-header, :root.jet-black-theme .server-zone-header, :root.jet-black-theme .switch-zone-header { background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); }
-  :root.jet-black-theme .cam-zone-header:hover, :root.jet-black-theme .door-zone-header:hover, :root.jet-black-theme .server-zone-header:hover, :root.jet-black-theme .switch-zone-header:hover { background: rgba(255,255,255,0.03); }
-  :root.jet-black-theme .stat-card .stat-val { -webkit-text-fill-color: #ffffff !important; background: none !important; }
-  :root.jet-black-theme .emergency-banner { background: rgba(255, 0, 85, 0.08) !important; border: 1px solid rgba(255, 0, 85, 0.3) !important; }
+  :root.jet-black-theme .status-select:focus, :root.jet-black-theme .priority-select:focus { border-color: #00d4ff; }
+  :root.jet-black-theme .audit-log .audit-item { border-bottom: 1px solid rgba(255,255,255,0.02); color: rgba(255,255,255,0.5); }
+  :root.jet-black-theme .audit-log .audit-item .audit-user { color: rgba(255,255,255,0.8); }
+  :root.jet-black-theme .outlook-container { background: rgba(12,12,18,0.95); border: 1px solid rgba(255,255,255,0.04); }
+  :root.jet-black-theme .outlook-email { border-bottom: 1px solid rgba(255,255,255,0.02); }
+  :root.jet-black-theme .outlook-email:hover { background: rgba(255,255,255,0.01); }
+  :root.jet-black-theme .outlook-email.active { background: rgba(0, 212, 255, 0.04); border-left: 2px solid #00d4ff; }
+  :root.jet-black-theme .outlook-email.unread .oe-sender { color: #fff; }
+  :root.jet-black-theme .outlook-email.unread .oe-subject { color: rgba(255,255,255,0.9); }
+  :root.jet-black-theme .outlook-folder-pane { border-right: 1px solid rgba(255,255,255,0.04); }
+  :root.jet-black-theme .outlook-folder-item:hover { background: rgba(255,255,255,0.01); }
+  :root.jet-black-theme .outlook-folder-item.active { background: rgba(0, 212, 255, 0.04); color: #fff; }
+  :root.jet-black-theme .ore-header { border-bottom: 1px solid rgba(255,255,255,0.04); }
+  :root.jet-black-theme .ore-subject { color: #fff; }
+  :root.jet-black-theme .notes-inline { color: rgba(255,255,255,0.4); }
+  :root.jet-black-theme .notes-inline:focus { background: rgba(255,255,255,0.01); color: #fff; border-color: #00d4ff; }
+  :root.jet-black-theme .file-explorer { background: rgba(255,255,255,0.005); border: 1px solid rgba(255,255,255,0.04); }
+  :root.jet-black-theme .file-explorer .file-item { border-bottom: 1px solid rgba(255,255,255,0.02); }
+  :root.jet-black-theme .file-explorer .file-item:hover { background: rgba(255,255,255,0.01); }
+  :root.jet-black-theme .file-explorer .file-item.folder .file-icon { color: #00d4ff; }
+  :root.jet-black-theme .breadcrumb { background: rgba(255,255,255,0.005); }
+  :root.jet-black-theme .breadcrumb .crumb:hover { background: rgba(255,255,255,0.02); }
+  :root.jet-black-theme .breadcrumb .crumb.current { color: #fff; }
+  :root.jet-black-theme .topbar { border-bottom: 1px solid rgba(255,255,255,0.04); }
+  :root.jet-black-theme .cam-zone-header, :root.jet-black-theme .door-zone-header, :root.jet-black-theme .server-zone-header, :root.jet-black-theme .switch-zone-header { background: rgba(255,255,255,0.005); border: 1px solid rgba(255,255,255,0.04); }
+  :root.jet-black-theme .cam-zone-header:hover, :root.jet-black-theme .door-zone-header:hover, :root.jet-black-theme .server-zone-header:hover, :root.jet-black-theme .switch-zone-header:hover { background: rgba(255,255,255,0.01); border-color: rgba(255,255,255,0.06); }
+  :root.jet-black-theme .cam-zone-header .zone-name, :root.jet-black-theme .door-zone-header .zone-name, :root.jet-black-theme .server-zone-header .zone-name, :root.jet-black-theme .switch-zone-header .zone-name { color: #fff; }
+  :root.jet-black-theme .stat-card .stat-val { background: linear-gradient(135deg, #00d4ff 0%, #7b2ffc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  :root.jet-black-theme .stat-card .stat-label { color: rgba(255,255,255,0.4); }
+  :root.jet-black-theme .stat-card .stat-note { color: rgba(255,255,255,0.3); }
+  :root.jet-black-theme .emergency-banner { background: rgba(255, 0, 85, 0.04) !important; border: 1px solid rgba(255, 0, 85, 0.15) !important; }
   :root.jet-black-theme .emergency-banner .em-title { color: #ff0055; }
-  :root.jet-black-theme .emergency-banner .em-detail { color: #ff0055; }
+  :root.jet-black-theme .emergency-banner .em-detail { color: rgba(255, 0, 85, 0.7); }
   :root.jet-black-theme .page-title { color: #ffffff; }
-  :root.jet-black-theme .file-search-bar select { background: #0a0a0f; border: 1px solid rgba(255,255,255,0.05); color: #fff; }
+  :root.jet-black-theme .file-search-bar input { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); color: #fff; }
+  :root.jet-black-theme .file-search-bar input:focus { border-color: #00d4ff; }
+  :root.jet-black-theme .file-search-bar select { background: #0a0a0f; border: 1px solid rgba(255,255,255,0.04); color: #fff; }
   :root.jet-black-theme .file-search-bar select option { background: #0a0a0f; color: #fff; }
-  :root.jet-black-theme .audit-filters select { background: #0a0a0f; border: 1px solid rgba(255,255,255,0.05); color: #fff; }
+  :root.jet-black-theme .audit-filters select { background: #0a0a0f; border: 1px solid rgba(255,255,255,0.04); color: #fff; }
   :root.jet-black-theme .audit-filters select option { background: #0a0a0f; color: #fff; }
   :root.jet-black-theme .app { background: var(--main-bg); }
   :root.jet-black-theme .content { background: transparent; }
   :root.jet-black-theme .main { background: transparent; }
-  :root.jet-black-theme .stat-card .stat-val { background: linear-gradient(135deg, #00d4ff 0%, #7b2ffc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-  :root.jet-black-theme .btn-accent { background: linear-gradient(135deg, #00d4ff, #7b2ffc) !important; border: none !important; color: #fff !important; box-shadow: 0 4px 16px rgba(0, 212, 255, 0.3); }
-  :root.jet-black-theme .btn-accent:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0, 212, 255, 0.5); }
-  :root.jet-black-theme .badge.b-done { background: rgba(0, 255, 136, 0.15) !important; color: #00ff88 !important; }
-  :root.jet-black-theme .badge.b-high { background: rgba(255, 0, 85, 0.15) !important; color: #ff0055 !important; }
-  :root.jet-black-theme .badge.b-open { background: rgba(255, 170, 0, 0.15) !important; color: #ffaa00 !important; }
-  :root.jet-black-theme .badge.b-info { background: rgba(0, 212, 255, 0.15) !important; color: #00d4ff !important; }
-  :root.jet-black-theme .badge.b-under-maintenance { background: rgba(255, 170, 0, 0.15) !important; color: #ffaa00 !important; }
-  :root.jet-black-theme .badge.b-in-progress { background: rgba(0, 212, 255, 0.15) !important; color: #00d4ff !important; }
-  :root.jet-black-theme .badge.b-pending { background: rgba(255, 170, 0, 0.15) !important; color: #ffaa00 !important; }
-  :root.jet-black-theme .filter-pill.active { background: linear-gradient(135deg, #00d4ff, #7b2ffc) !important; border-color: transparent !important; color: #fff !important; }
+  :root.jet-black-theme .badge.b-done { background: rgba(0, 255, 136, 0.08) !important; color: #00ff88 !important; }
+  :root.jet-black-theme .badge.b-high { background: rgba(255, 0, 85, 0.08) !important; color: #ff0055 !important; }
+  :root.jet-black-theme .badge.b-open { background: rgba(255, 170, 0, 0.08) !important; color: #ffaa00 !important; }
+  :root.jet-black-theme .badge.b-info { background: rgba(0, 212, 255, 0.08) !important; color: #00d4ff !important; }
+  :root.jet-black-theme .badge.b-under-maintenance { background: rgba(255, 170, 0, 0.08) !important; color: #ffaa00 !important; }
+  :root.jet-black-theme .badge.b-in-progress { background: rgba(0, 212, 255, 0.08) !important; color: #00d4ff !important; }
+  :root.jet-black-theme .badge.b-pending { background: rgba(255, 170, 0, 0.08) !important; color: #ffaa00 !important; }
+  :root.jet-black-theme .filter-pill.active { background: linear-gradient(135deg, rgba(0, 212, 255, 0.12), rgba(123, 47, 252, 0.08)) !important; border-color: #00d4ff !important; color: #fff !important; }
+  :root.jet-black-theme .add-btn { background: linear-gradient(135deg, #00d4ff, #7b2ffc) !important; box-shadow: 0 2px 12px rgba(0, 212, 255, 0.2); }
+  :root.jet-black-theme .add-btn:hover { box-shadow: 0 4px 20px rgba(0, 212, 255, 0.35); }
+  :root.jet-black-theme .add-dropdown { background: rgba(12, 12, 18, 0.98); border: 1px solid rgba(255,255,255,0.04); }
+  :root.jet-black-theme .add-dropdown .dd-item:hover { background: rgba(0, 212, 255, 0.04); }
+  :root.jet-black-theme .add-dropdown .dd-item .dd-icon { color: rgba(255,255,255,0.4); }
+  :root.jet-black-theme .add-dropdown .dd-sep { background: rgba(255,255,255,0.04); }
+  :root.jet-black-theme .theme-dropdown { background: rgba(12, 12, 18, 0.98); border: 1px solid rgba(255,255,255,0.04); }
+  :root.jet-black-theme .theme-option:hover { background: rgba(0, 212, 255, 0.04); }
+  :root.jet-black-theme .outlook-email .oe-flag.flagged { color: #ffaa00; }
+  :root.jet-black-theme .outlook-email .oe-sender { color: rgba(255,255,255,0.6); }
+  :root.jet-black-theme .outlook-email .oe-subject { color: rgba(255,255,255,0.5); }
+  :root.jet-black-theme .outlook-email .oe-preview { color: rgba(255,255,255,0.25); }
+  :root.jet-black-theme .outlook-folder-item .folder-count { background: rgba(255,255,255,0.04); }
+  :root.jet-black-theme .outlook-folder-item .folder-count.unread { background: rgba(0, 212, 255, 0.12); color: #00d4ff; }
+  :root.jet-black-theme .scroll-top { background: rgba(12,12,18,0.9); border: 1px solid rgba(255,255,255,0.04); }
+  :root.jet-black-theme .scroll-top:hover { background: linear-gradient(135deg, #00d4ff, #7b2ffc); border-color: transparent; }
+  :root.jet-black-theme .att-upload-zone { border: 1.5px dashed rgba(255,255,255,0.04); }
+  :root.jet-black-theme .att-upload-zone:hover { border-color: #00d4ff; background: rgba(0, 212, 255, 0.02); }
+  :root.jet-black-theme .similar-ticket { border: 1px solid rgba(255,255,255,0.02); }
+  :root.jet-black-theme .similar-ticket:hover { border-color: rgba(255,255,255,0.06); background: rgba(255,255,255,0.01); }
+  :root.jet-black-theme .tl-item::before { background: linear-gradient(135deg, #00d4ff, #7b2ffc) !important; box-shadow: 0 0 12px rgba(0, 212, 255, 0.15); }
+  :root.jet-black-theme .tl-time { color: rgba(255,255,255,0.25); }
+  :root.jet-black-theme .tl-msg { color: rgba(255,255,255,0.5); }
+  :root.jet-black-theme .recurring-warning { background: rgba(255, 0, 85, 0.04); border: 1px solid rgba(255, 0, 85, 0.08); color: #ff0055; }
+  :root.jet-black-theme .hw-suggestion { border: 1px solid rgba(255,255,255,0.02); }
+  :root.jet-black-theme .hw-suggestion:hover { border-color: rgba(255,255,255,0.06); background: rgba(255,255,255,0.01); }
+  :root.jet-black-theme .integration-note { background: rgba(0, 212, 255, 0.02); border: 1px solid rgba(0, 212, 255, 0.06); }
+  :root.jet-black-theme .door-stat-card { background: rgba(255,255,255,0.005); border: 1px solid rgba(255,255,255,0.04); }
+  :root.jet-black-theme .server-stat-card { background: rgba(255,255,255,0.005); border: 1px solid rgba(255,255,255,0.04); }
+  :root.jet-black-theme .switch-stat-card { background: rgba(255,255,255,0.005); border: 1px solid rgba(255,255,255,0.04); }
 
   .skeleton { background: var(--skeleton-bg); border-radius: 4px; height: 20px; position: relative; overflow: hidden; animation: shimmer 1.8s infinite; }
   .skeleton::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent); transform: translateX(-100%); animation: shimmer-slide 1.8s infinite; }
@@ -259,6 +309,9 @@
   .add-dropdown .dd-item i { font-size: 16px; color: var(--text-secondary); }
   .add-dropdown .dd-sep { height: 1px; background: var(--card-border); margin: 4px 12px; }
   .add-dropdown .dd-item .dd-icon { width: 24px; text-align: center; }
+  .theme-dropdown { display: none; position: absolute; right: 0; top: 100%; margin-top: 8px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 6px 0; min-width: 140px; z-index: 100; box-shadow: 0 12px 48px rgba(0,0,0,0.4); }
+  .theme-dropdown .theme-option { display: flex; align-items: center; gap: 10px; padding: 8px 16px; color: var(--text-primary); cursor: pointer; font-size: 13px; border: none; background: none; width: 100%; font-family: var(--font); }
+  .theme-dropdown .theme-option:hover { background: rgba(255,255,255,0.04); }
   .content { flex: 1; overflow-y: auto; padding: 20px 24px; scroll-behavior: smooth; position: relative; }
   .content::-webkit-scrollbar { width: 6px; } .content::-webkit-scrollbar-track { background: transparent; } .content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
   .tab { display: none; } .tab.active { display: block; }
@@ -735,6 +788,11 @@
         <button class="btn btn-xs theme-toggle-btn" onclick="toggleThemeDropdown()" title="Toggle theme" id="theme-toggle-btn">
           <i class="ti ti-palette"></i>
         </button>
+        <div class="theme-dropdown" id="theme-dropdown">
+          <button class="theme-option" onclick="setTheme('dark');closeThemeDropdown();">🌙 Dark</button>
+          <button class="theme-option" onclick="setTheme('light');closeThemeDropdown();">☀️ Light</button>
+          <button class="theme-option" onclick="setTheme('jet-black');closeThemeDropdown();">⚫ Jet Black</button>
+        </div>
         <button class="add-btn" onclick="toggleAddDropdown()" title="Add New" id="add-btn">
           <i class="ti ti-plus"></i>
         </button>
@@ -847,13 +905,6 @@
 <!-- ADD CLIENT MODAL -->
 <div class="modal-overlay" id="add-client-modal"><div class="modal"><button class="modal-close" onclick="closeAddModal('add-client-modal')"><i class="ti ti-x"></i></button><div class="modal-title">👤 Add Client</div><div class="modal-sub">Add a new client to the system</div><div class="modal-section"><div class="modal-grid"><div class="modal-field"><label>Client Name *</label><input type="text" id="client-name" placeholder="e.g., KFTL" /></div><div class="modal-field"><label>Contact Email</label><input type="email" id="client-email" placeholder="client@example.com" /></div><div class="modal-field"><label>Phone</label><input type="text" id="client-phone" placeholder="+1 (555) 555-5555" /></div><div class="modal-field"><label>Address</label><input type="text" id="client-address" placeholder="Client address" /></div></div></div><div class="modal-footer"><button class="btn" onclick="closeAddModal('add-client-modal')">Cancel</button><button class="btn btn-accent" onclick="saveNewClient()"><i class="ti ti-device-floppy"></i> Add Client</button></div></div></div>
 
-<!-- Theme Dropdown -->
-<div class="theme-dropdown" id="theme-dropdown" style="display:none;position:absolute;right:0;top:100%;margin-top:8px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:6px 0;min-width:140px;z-index:100;box-shadow:0 12px 48px rgba(0,0,0,0.4);">
-  <button class="dd-item" onclick="setTheme('dark')" style="display:flex;align-items:center;gap:10px;padding:8px 16px;color:var(--text-primary);cursor:pointer;font-size:13px;border:none;background:none;width:100%;font-family:var(--font);">🌙 Dark</button>
-  <button class="dd-item" onclick="setTheme('light')" style="display:flex;align-items:center;gap:10px;padding:8px 16px;color:var(--text-primary);cursor:pointer;font-size:13px;border:none;background:none;width:100%;font-family:var(--font);">☀️ Light</button>
-  <button class="dd-item" onclick="setTheme('jet-black')" style="display:flex;align-items:center;gap:10px;padding:8px 16px;color:var(--text-primary);cursor:pointer;font-size:13px;border:none;background:none;width:100%;font-family:var(--font);">⚫ Jet Black</button>
-</div>
-
 <div class="confirm-overlay" id="confirm-overlay"><div class="confirm-dialog"><div class="confirm-title" id="confirm-title">Are you sure?</div><div class="confirm-desc" id="confirm-desc">This action cannot be undone.</div><div class="confirm-actions"><button class="btn" onclick="closeConfirm()">Cancel</button><button class="btn btn-accent" id="confirm-btn" onclick="executeConfirm()">Confirm</button></div></div></div>
 
 <div class="file-preview-overlay" id="file-preview-overlay"><div class="preview-modal"><div class="preview-header"><span class="preview-title" id="preview-title">File</span><div class="preview-actions"><button class="btn btn-sm btn-success" id="preview-save-btn" style="display:none;" onclick="saveFilePreview()"><i class="ti ti-device-floppy"></i> Save</button><button class="btn btn-sm" onclick="downloadFilePreview()"><i class="ti ti-download"></i> Download</button><button class="btn btn-sm" onclick="closeFilePreview()"><i class="ti ti-x"></i> Close</button></div></div><div class="preview-body" id="preview-body"><div class="preview-placeholder"><i class="ti ti-file"></i><span>Loading preview...</span></div></div></div></div>
@@ -907,6 +958,13 @@ function toggleThemeDropdown() {
   }
 }
 
+function closeThemeDropdown() {
+  var dropdown = document.getElementById('theme-dropdown');
+  if (dropdown) {
+    dropdown.style.display = 'none';
+  }
+}
+
 function setTheme(theme) {
   var root = document.documentElement;
   var btn = document.getElementById('theme-toggle-btn');
@@ -918,17 +976,16 @@ function setTheme(theme) {
   
   if (theme === 'light') {
     root.classList.add('light-theme');
-    btn.innerHTML = '<i class="ti ti-moon"></i>';
+    if (btn) btn.innerHTML = '<i class="ti ti-moon"></i>';
     if (logo) logo.src = 'logo-light.png';
   } else if (theme === 'jet-black') {
     root.classList.add('jet-black-theme');
-    btn.innerHTML = '<i class="ti ti-moon"></i>';
+    if (btn) btn.innerHTML = '<i class="ti ti-moon"></i>';
     if (logo) logo.src = 'logo-black.png';
-    // Fallback to logo.png if black logo doesn't exist
-    logo.onerror = function() { this.src = 'logo.png'; };
+    if (logo) logo.onerror = function() { this.src = 'logo.png'; };
   } else {
     // Dark (default)
-    btn.innerHTML = '<i class="ti ti-sun"></i>';
+    if (btn) btn.innerHTML = '<i class="ti ti-sun"></i>';
     if (logo) logo.src = 'logo.png';
   }
   
@@ -956,9 +1013,21 @@ function closeAddDropdown() {
 }
 
 function openAddModal(modalId) {
-  document.getElementById(modalId).classList.add('open');
-  populateClientDropdowns();
+  var modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.add('open');
+    populateClientDropdowns();
+  } else {
+    toast('Modal not found: ' + modalId, 'error');
+  }
 }
+
+function openAddSRModal() { openAddModal('add-sr-modal'); }
+function openAddCameraModal() { openAddModal('add-camera-modal'); }
+function openAddDoorModal() { openAddModal('add-door-modal'); }
+function openAddServerModal() { openAddModal('add-server-modal'); }
+function openAddSwitchModal() { openAddModal('add-switch-modal'); }
+function openAddClientModal() { openAddModal('add-client-modal'); }
 
 function closeAddModal(modalId) {
   document.getElementById(modalId).classList.remove('open');
@@ -1032,7 +1101,6 @@ function saveNewCamera() {
   CAMERAS.push(newCamera);
   localStorage.setItem('ccsm_cameras', JSON.stringify(CAMERAS));
   closeAddModal('add-camera-modal');
-  // Clear form
   document.getElementById('cam-name').value = '';
   document.getElementById('cam-zone').value = '';
   document.getElementById('cam-ip').value = '';
@@ -1161,7 +1229,6 @@ function saveNewSR() {
   SERVICE_REQUESTS.unshift(newSR);
   localStorage.setItem('ccsm_sr', JSON.stringify(SERVICE_REQUESTS));
   closeAddModal('add-sr-modal');
-  // Clear form
   document.getElementById('sr-subject').value = '';
   document.getElementById('sr-site').value = '';
   document.getElementById('sr-description').value = '';
@@ -1185,9 +1252,7 @@ function exportToCSV(data, headers, filename) {
   var rows = data.map(function(item) {
     return headers.map(function(header) {
       var value = item[header] || '';
-      // Handle nested objects or arrays
       if (typeof value === 'object') value = JSON.stringify(value);
-      // Escape quotes and commas
       return '"' + String(value).replace(/"/g, '""') + '"';
     }).join(',');
   });
@@ -1329,7 +1394,6 @@ function renderClientZones(client) {
   var zones = [];
   var siteMap = {};
   
-  // Collect zones from all assets
   CAMERAS.forEach(function(c) {
     var clientName = getClient(c.zone);
     if (clientName === client && c.zone && siteMap[c.zone] === undefined) {
@@ -1434,34 +1498,28 @@ function updateClientNavVisibility() {
   var logoImg = document.getElementById('logo-img');
   
   if (userClient && !isAdmin) {
-    // Change logo to client logo
     if (logoImg) {
       logoImg.src = 'logo-' + userClient.toLowerCase() + '.png';
       logoImg.onerror = function() { this.src = 'logo.png'; };
     }
     
-    // Hide Tools, Files & Logs, and Inbox for client users
     if (toolsSection) toolsSection.style.display = 'none';
     if (filesNavItem) filesNavItem.style.display = 'none';
     if (inboxNavItem) inboxNavItem.style.display = 'none';
     if (clientsLabel) clientsLabel.textContent = 'Zones';
     
-    // Render zones for this client
     renderClientZones(userClient);
     
   } else {
-    // Restore E-Tech logo for admin
     if (logoImg) {
       logoImg.src = 'logo.png';
     }
     
-    // Show all for admin
     if (toolsSection) toolsSection.style.display = '';
     if (filesNavItem) filesNavItem.style.display = '';
     if (inboxNavItem) inboxNavItem.style.display = '';
     if (clientsLabel) clientsLabel.textContent = 'Clients';
     
-    // Render all clients with dropdowns for admin
     renderAllClients();
   }
 }
@@ -1500,7 +1558,6 @@ function fullDateTime(){return new Date().toLocaleDateString('en-JM',{weekday:'s
 function toast(m,type){type=type||'info';var c=document.getElementById('toast-container'),t=document.createElement('div');t.className='toast '+type;var icons={info:'ti ti-info-circle',success:'ti ti-check',warning:'ti ti-alert-triangle',error:'ti ti-x'};t.innerHTML='<i class="'+(icons[type]||icons.info)+'"></i> '+m;c.appendChild(t);setTimeout(function(){t.style.opacity='0';t.style.transition='opacity 0.3s';setTimeout(function(){t.remove();},300);},3000);}
 function copyText(t){navigator.clipboard.writeText(t).then(function(){toast('Copied','success');}).catch(function(){toast('Copy failed','error');});}
 async function revealAndCopySwitchPassword(switchId){try{var result=await get('/switches/'+switchId+'/reveal-password');if(result&&result.password){copyText(result.password);}else{toast('No password on file','warning');}}catch(e){}}
-function toggleThemeOld(){var root=document.documentElement;var btn=document.getElementById('theme-toggle-btn');var logo=document.getElementById('logo-img');if(root.classList.contains('light-theme')){root.classList.remove('light-theme');btn.innerHTML='<i class="ti ti-sun"></i>';if(logo)logo.src='logo.png';localStorage.setItem('ccsm_theme','dark');}else{root.classList.add('light-theme');btn.innerHTML='<i class="ti ti-moon"></i>';if(logo)logo.src='logo-light.png';localStorage.setItem('ccsm_theme','light');}}
 function acknowledgeAlarm(){document.getElementById('emergency-banner').classList.remove('active');toast('Alarm acknowledged','success');}
 
 function camBadge(s){if(s==='Online')return'<span class="badge b-done">Online</span>';if(s==='Defective')return'<span class="badge b-high">Defective</span>';if(s==='No Power')return'<span class="badge b-high">No Power</span>';if(s==='No Camera')return'<span class="badge b-open">No Camera</span>';return'<span class="badge b-info">Needs Check</span>';}
@@ -1587,7 +1644,6 @@ async function loginLocal(){
   errorDiv.style.display = 'none';
   loadingDiv.classList.add('active');
   
-  // Client credentials mapping
   var clientCredentials = {
     'kftl': { password: 'kftl123', client: 'KFTL' },
     'kwl': { password: 'kwl123', client: 'KWL' },
@@ -1600,7 +1656,6 @@ async function loginLocal(){
   var lowerUser = username.toLowerCase();
   var lowerPass = password.toLowerCase();
   
-  // Check if this is a client login
   var foundClient = null;
   for (var client in clientCredentials) {
     if (lowerUser === client && lowerPass === clientCredentials[client].password) {
@@ -1611,7 +1666,6 @@ async function loginLocal(){
   
   try {
     if (foundClient) {
-      // Client login - use mock data
       currentUser = {
         username: username,
         client: foundClient,
@@ -1638,7 +1692,6 @@ async function loginLocal(){
       return;
     }
     
-    // Try admin login with backend
     try {
       var result = await apiCall('POST', '/auth/login', {
         username: username,
@@ -1669,7 +1722,6 @@ async function loginLocal(){
       await loadData();
       return;
     } catch (backendError) {
-      // If backend fails and this is admin credentials, use mock admin
       if (username === 'admin' && password === 'admin123') {
         currentUser = {
           username: 'admin',
@@ -1946,13 +1998,11 @@ function switchAnalyticsTab(tab, el) { analyticsTab = tab; document.querySelecto
 function renderAnalytics() { document.getElementById('analytics-tech-times').innerHTML = '<div class="metric-row"><span class="metric-name">Shanice Vernon</span><div class="metric-bar-wrap"><div class="metric-bar-fill" style="width:100%;background:#4a9eff"></div></div><span class="metric-val">~18h avg · 12 resolved</span></div>'; document.getElementById('analytics-client-issues').innerHTML = '<div class="metric-row"><span class="metric-name">KFTL</span><span class="metric-val">📷 8 · 🚪 4 · 🖥 2</span></div><div class="metric-row"><span class="metric-name">KWL</span><span class="metric-val">📷 5 · 🖥 1</span></div>'; document.getElementById('analytics-monthly').innerHTML = '<div class="metric-row"><span class="metric-name">June</span><div class="metric-bar-wrap"><div class="metric-bar-fill" style="width:100%;background:#4ade80"></div></div><span class="metric-val">8 tickets</span></div>'; document.getElementById('analytics-hours').innerHTML = '<div class="metric-row"><span class="metric-name">10:00 - 11:00</span><div class="metric-bar-wrap"><div class="metric-bar-fill" style="width:100%;background:#f59e0b"></div></div><span class="metric-val">5</span></div>'; }
 
 // ============================================================
-// ── INIT ──────────────────────────────────────────────────────
-// ============================================================
+// ── INIT ──────────────────────────────────────────────────────// ============================================================
 
 document.getElementById('topbar-date').textContent = fullDateTime();
 setInterval(function() { document.getElementById('topbar-date').textContent = fullDateTime(); }, 30000);
 
-// Load saved theme
 var savedTheme = localStorage.getItem('ccsm_theme') || 'dark';
 setTheme(savedTheme);
 
@@ -1960,7 +2010,6 @@ checkLogin();
 if (localStorage.getItem('ccsm_sidebar') === '1') toggleSidebar();
 PINNED_FILES = JSON.parse(localStorage.getItem('ccsm_pinned') || '[]');
 
-// Close dropdowns when clicking outside
 document.addEventListener('click', function(e) {
   var addDropdown = document.getElementById('add-dropdown');
   var themeDropdown = document.getElementById('theme-dropdown');
