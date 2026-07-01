@@ -2960,7 +2960,7 @@ document.getElementById('app').classList.remove('client-mode');
     buildClientView(data, user);
   }
 
-  function buildClientView(data, user) {
+function buildClientView(data, user) {
     var container = document.getElementById('client-view-container');
     if (!container) return;
     
@@ -2971,11 +2971,11 @@ document.getElementById('app').classList.remove('client-mode');
     // Get health
     var allAssets = [];
     if (data.assets) {
-      Object.values(data.assets).forEach(function(arr) {
-        if (Array.isArray(arr)) {
-          arr.forEach(function(a) { allAssets.push(a); });
-        }
-      });
+        Object.values(data.assets).forEach(function(arr) {
+            if (Array.isArray(arr)) {
+                arr.forEach(function(a) { allAssets.push(a); });
+            }
+        });
     }
     var total = allAssets.length;
     var online = allAssets.filter(function(a) { return a.status === 'Online' || a.status === 'ONLINE'; }).length;
@@ -2988,154 +2988,736 @@ document.getElementById('app').classList.remove('client-mode');
     
     var clientLogo = data.logo || 'logo.png';
     var clientName = data.name || 'Client';
+    var primaryColor = data.color || '#e31b23';
+    var secondaryColor = data.secondary || '#8b0000';
     
-    // Build the client view HTML
+    // Build the client view HTML with sidebar
     container.innerHTML = `
-      <div style="display:flex;flex-direction:column;height:100vh;background:#f5f5f5;font-family:'Inter',sans-serif;">
-        <!-- Top Bar -->
-        <header style="background:#ffffff;border-bottom:1px solid rgba(0,0,0,0.08);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
-          <div style="display:flex;align-items:center;gap:14px;">
-            <img src="${clientLogo}" alt="${clientName}" style="height:34px;width:auto;border-radius:4px;" onerror="this.src='logo.png'">
-            <span style="font-size:17px;font-weight:700;color:#1a1a2e;letter-spacing:-0.02em;">${clientName} <span style="font-weight:400;font-size:10px;color:#999;text-transform:uppercase;letter-spacing:0.06em;margin-left:6px;">· Client Portal</span></span>
+      <div style="display:flex;height:100vh;background:#f5f5f5;font-family:'Inter',sans-serif;">
+        <!-- Sidebar -->
+        <div style="width:200px;background:#ffffff;border-right:1px solid rgba(0,0,0,0.08);display:flex;flex-direction:column;flex-shrink:0;height:100vh;overflow:hidden;">
+          <div style="padding:16px 20px 14px;border-bottom:1px solid rgba(0,0,0,0.08);">
+            <img src="${clientLogo}" alt="${clientName}" style="height:32px;width:auto;border-radius:4px;" onerror="this.src='logo.png'">
           </div>
-          <div style="display:flex;align-items:center;gap:12px;">
-            <img src="logo-light.png" alt="ETech" style="height:34px;width:auto;opacity:1;" onerror="this.src='logo.png'">
-            <div style="display:flex;align-items:center;gap:10px;padding:4px 14px 4px 4px;border-radius:8px;border:1px solid rgba(0,0,0,0.08);background:#f8f9fa;">
-              <div style="width:30px;height:30px;border-radius:6px;background:linear-gradient(135deg, ${data.color}, ${data.secondary});display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;">${user.client.toUpperCase().slice(0,2)}</div>
+          <nav style="flex:1;padding:12px 0 0;overflow-y:auto;">
+            <div style="padding:6px 20px 4px;font-size:10px;color:#999;text-transform:uppercase;letter-spacing:0.1em;">Main</div>
+            <div class="client-nav-item active" data-tab="dashboard" onclick="clientSwitchTab('dashboard')" style="display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:13px;color:#666;cursor:pointer;border-left:2px solid ${primaryColor};background:rgba(227,27,35,0.06);">
+              <i class="ti ti-layout-dashboard" style="font-size:17px;width:20px;text-align:center;"></i> <span>Dashboard</span>
             </div>
-            <button onclick="logout()" style="padding:6px 14px;border-radius:6px;border:1px solid rgba(0,0,0,0.08);background:transparent;color:#999;cursor:pointer;font-size:11px;font-family:Inter,sans-serif;transition:all 0.2s;" onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444';" onmouseout="this.style.borderColor='rgba(0,0,0,0.08)';this.style.color='#999';">Logout</button>
+            <div class="client-nav-item" data-tab="cameras" onclick="clientSwitchTab('cameras')" style="display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:13px;color:#666;cursor:pointer;border-left:2px solid transparent;">
+              <i class="ti ti-video" style="font-size:17px;width:20px;text-align:center;"></i> <span>Cameras</span>
+              <span style="margin-left:auto;background:#e0e0e0;color:#555;font-size:10px;border-radius:10px;padding:1px 7px;font-weight:500;">${(data.assets && data.assets.cameras) ? data.assets.cameras.length : 0}</span>
+            </div>
+            <div class="client-nav-item" data-tab="doors" onclick="clientSwitchTab('doors')" style="display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:13px;color:#666;cursor:pointer;border-left:2px solid transparent;">
+              <i class="ti ti-door" style="font-size:17px;width:20px;text-align:center;"></i> <span>Access Control</span>
+              <span style="margin-left:auto;background:#e0e0e0;color:#555;font-size:10px;border-radius:10px;padding:1px 7px;font-weight:500;">${(data.assets && data.assets.doors) ? data.assets.doors.length : 0}</span>
+            </div>
+            <div class="client-nav-item" data-tab="servers" onclick="clientSwitchTab('servers')" style="display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:13px;color:#666;cursor:pointer;border-left:2px solid transparent;">
+              <i class="ti ti-server" style="font-size:17px;width:20px;text-align:center;"></i> <span>Servers</span>
+              <span style="margin-left:auto;background:#e0e0e0;color:#555;font-size:10px;border-radius:10px;padding:1px 7px;font-weight:500;">${(data.assets && data.assets.servers) ? data.assets.servers.length : 0}</span>
+            </div>
+            <div class="client-nav-item" data-tab="switches" onclick="clientSwitchTab('switches')" style="display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:13px;color:#666;cursor:pointer;border-left:2px solid transparent;">
+              <i class="ti ti-router" style="font-size:17px;width:20px;text-align:center;"></i> <span>Switches</span>
+              <span style="margin-left:auto;background:#e0e0e0;color:#555;font-size:10px;border-radius:10px;padding:1px 7px;font-weight:500;">${(data.assets && data.assets.switches) ? data.assets.switches.length : 0}</span>
+            </div>
+            <div class="client-nav-item" data-tab="software" onclick="clientSwitchTab('software')" style="display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:13px;color:#666;cursor:pointer;border-left:2px solid transparent;">
+              <i class="ti ti-code" style="font-size:17px;width:20px;text-align:center;"></i> <span>Software</span>
+            </div>
+            <div class="client-nav-item" data-tab="assets" onclick="clientSwitchTab('assets')" style="display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:13px;color:#666;cursor:pointer;border-left:2px solid transparent;">
+              <i class="ti ti-database" style="font-size:17px;width:20px;text-align:center;"></i> <span>Client Assets</span>
+            </div>
+            <div style="padding:6px 20px 4px;font-size:10px;color:#999;text-transform:uppercase;letter-spacing:0.1em;margin-top:8px;">Support</div>
+            <div class="client-nav-item" data-tab="service-requests" onclick="clientSwitchTab('service-requests')" style="display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:13px;color:#666;cursor:pointer;border-left:2px solid transparent;">
+              <i class="ti ti-clipboard-list" style="font-size:17px;width:20px;text-align:center;"></i> <span>Service Requests</span>
+              <span style="margin-left:auto;background:${primaryColor};color:#fff;font-size:10px;border-radius:10px;padding:1px 7px;font-weight:500;">${(data.srs || []).filter(function(s) { return s.status !== 'Resolved'; }).length}</span>
+            </div>
+            <div class="client-nav-item" data-tab="contact" onclick="clientSwitchTab('contact')" style="display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:13px;color:#666;cursor:pointer;border-left:2px solid transparent;">
+              <i class="ti ti-headset" style="font-size:17px;width:20px;text-align:center;"></i> <span>Contact</span>
+            </div>
+          </nav>
+          <div style="padding:14px 20px;border-top:1px solid rgba(0,0,0,0.08);display:flex;align-items:center;gap:10px;">
+            <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg, ${primaryColor}, ${secondaryColor});display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0;">${user.client.toUpperCase().slice(0,2)}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;color:#1a1a2e;font-weight:500;">${user.client.toUpperCase()}</div>
+              <div style="font-size:10px;color:#999;">Client User</div>
+            </div>
+            <button onclick="logout()" style="background:none;border:none;color:#999;cursor:pointer;font-size:14px;padding:4px;"><i class="ti ti-logout"></i></button>
           </div>
-        </header>
+        </div>
         
-        <!-- Content -->
-        <div style="flex:1;overflow-y:auto;padding:28px 32px;background:#f5f5f5;">
-          <!-- Welcome Banner -->
-          <div style="background:linear-gradient(135deg, ${data.color}, ${data.secondary});border-radius:12px;padding:32px 36px;margin-bottom:24px;position:relative;overflow:hidden;box-shadow:0 8px 32px ${data.color}44;">
-            <div style="position:relative;z-index:1;">
-              <div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:500;margin-bottom:2px;letter-spacing:0.04em;">${greeting}</div>
-              <h1 style="font-size:28px;font-weight:800;color:#fff;letter-spacing:-0.02em;margin-bottom:4px;">24/7 Support, ${clientName}</h1>
-              <div style="font-size:14px;color:rgba(255,255,255,0.8);font-weight:500;">${healthMessage}</div>
-              <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:10px;">
-                <div style="display:inline-flex;align-items:center;gap:12px;background:rgba(255,255,255,0.12);padding:6px 18px 6px 14px;border-radius:20px;backdrop-filter:blur(4px);">
-                  <span style="font-size:20px;font-weight:700;color:#fff;">${health}%</span>
-                  <span style="font-size:12px;color:rgba(255,255,255,0.7);font-weight:500;">System Health</span>
+        <!-- Main Content -->
+        <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;">
+          <!-- Top Bar -->
+          <header style="background:#ffffff;border-bottom:1px solid rgba(0,0,0,0.08);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+            <span style="font-size:15px;font-weight:600;color:#1a1a2e;" id="client-page-title">Dashboard</span>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <span style="font-size:12px;color:#999;">${fullDateTime()}</span>
+              <button onclick="logout()" style="padding:4px 12px;border-radius:4px;border:1px solid rgba(0,0,0,0.08);background:transparent;color:#999;cursor:pointer;font-size:11px;font-family:'Inter',sans-serif;">Logout</button>
+            </div>
+          </header>
+          
+          <!-- Content -->
+          <div style="flex:1;overflow-y:auto;padding:20px 24px;background:#f5f5f5;" id="client-main-content">
+            <!-- Dashboard Tab -->
+            <div class="client-tab active" id="client-tab-dashboard">
+              <!-- Welcome Banner -->
+              <div style="background:linear-gradient(135deg, ${primaryColor}, ${secondaryColor});border-radius:12px;padding:28px 32px;margin-bottom:24px;position:relative;overflow:hidden;box-shadow:0 8px 32px ${primaryColor}44;">
+                <div style="position:relative;z-index:1;">
+                  <div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:500;margin-bottom:2px;letter-spacing:0.04em;">${greeting}</div>
+                  <h1 style="font-size:26px;font-weight:700;color:#fff;letter-spacing:-0.02em;margin-bottom:4px;">24/7 Support, ${clientName}</h1>
+                  <div style="font-size:14px;color:rgba(255,255,255,0.8);font-weight:500;">${healthMessage}</div>
+                  <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:10px;">
+                    <div style="display:inline-flex;align-items:center;gap:12px;background:rgba(255,255,255,0.12);padding:6px 18px 6px 14px;border-radius:20px;backdrop-filter:blur(4px);">
+                      <span style="font-size:20px;font-weight:700;color:#fff;">${health}%</span>
+                      <span style="font-size:12px;color:rgba(255,255,255,0.7);font-weight:500;">System Health</span>
+                    </div>
+                    <div style="display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,0.12);padding:4px 16px 4px 12px;border-radius:20px;backdrop-filter:blur(4px);">
+                      <img src="${clientLogo}" alt="${clientName}" style="height:24px;width:auto;border-radius:4px;" onerror="this.style.display='none'">
+                      <span style="color:rgba(255,255,255,0.9);font-weight:500;font-size:13px;">${clientName}</span>
+                    </div>
+                  </div>
                 </div>
-                <div style="display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,0.12);padding:4px 16px 4px 12px;border-radius:20px;backdrop-filter:blur(4px);">
-                  <img src="${clientLogo}" alt="${clientName}" style="height:24px;width:auto;border-radius:4px;" onerror="this.style.display='none'">
-                  <span style="color:rgba(255,255,255,0.9);font-weight:500;font-size:13px;">${clientName}</span>
+              </div>
+              
+              <!-- Stats -->
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+                <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:18px 22px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+                  <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">Total Assets</div>
+                  <div style="font-size:30px;font-weight:700;color:#1a1a2e;line-height:1.2;margin-top:2px;">${total}</div>
+                  <div style="font-size:11px;color:#888;margin-top:2px;">All systems</div>
+                </div>
+                <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:18px 22px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+                  <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">Online</div>
+                  <div style="font-size:30px;font-weight:700;color:#22c55e;line-height:1.2;margin-top:2px;">${online}</div>
+                  <div style="font-size:11px;color:#888;margin-top:2px;"><span style="color:#22c55e;">●</span> Operational</div>
+                </div>
+                <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:18px 22px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+                  <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">Offline / Issues</div>
+                  <div style="font-size:30px;font-weight:700;color:#ef4444;line-height:1.2;margin-top:2px;">${total - online}</div>
+                  <div style="font-size:11px;color:#888;margin-top:2px;"><span style="color:#ef4444;">●</span> Needs attention</div>
+                </div>
+                <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:18px 22px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+                  <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">Open Service Requests</div>
+                  <div style="font-size:30px;font-weight:700;color:#f59e0b;line-height:1.2;margin-top:2px;">${(data.srs || []).filter(function(s) { return s.status !== 'Resolved'; }).length}</div>
+                  <div style="font-size:11px;color:#888;margin-top:2px;"><span style="color:#f59e0b;">●</span> Pending resolution</div>
                 </div>
               </div>
-            </div>
-          </div>
-          
-          <!-- Stats -->
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
-            <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:18px 22px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
-              <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">Total Assets</div>
-              <div style="font-size:30px;font-weight:700;color:#1a1a2e;line-height:1.2;margin-top:2px;">${total}</div>
-              <div style="font-size:11px;color:#888;margin-top:2px;">All systems</div>
-            </div>
-            <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:18px 22px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
-              <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">Online</div>
-              <div style="font-size:30px;font-weight:700;color:#22c55e;line-height:1.2;margin-top:2px;">${online}</div>
-              <div style="font-size:11px;color:#888;margin-top:2px;"><span style="color:#22c55e;">●</span> Operational</div>
-            </div>
-            <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:18px 22px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
-              <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">Offline / Issues</div>
-              <div style="font-size:30px;font-weight:700;color:#ef4444;line-height:1.2;margin-top:2px;">${total - online}</div>
-              <div style="font-size:11px;color:#888;margin-top:2px;"><span style="color:#ef4444;">●</span> Needs attention</div>
-            </div>
-            <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:18px 22px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
-              <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">Open Service Requests</div>
-              <div style="font-size:30px;font-weight:700;color:#f59e0b;line-height:1.2;margin-top:2px;">${(data.srs || []).filter(function(s) { return s.status !== 'Resolved'; }).length}</div>
-              <div style="font-size:11px;color:#888;margin-top:2px;"><span style="color:#f59e0b;">●</span> Pending resolution</div>
-            </div>
-          </div>
-          
-          <!-- Asset Overview -->
-          <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-              <span style="font-size:12px;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.08em;">Asset Overview</span>
-            </div>
-            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
-              ${Object.keys(data.assets || {}).map(function(key) {
-                var items = data.assets[key] || [];
-                var onlineCount = items.filter(function(a) { return a.status === 'Online' || a.status === 'ONLINE'; }).length;
-                var totalCount = items.length;
-                var icons = { cameras: '📷', doors: '🚪', servers: '🖥', switches: '🔌' };
-                var labels = { cameras: 'Cameras', doors: 'Access Control', servers: 'Servers', switches: 'Switches' };
-                var dots = '';
-                if (totalCount > 0) {
-                  dots = '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;margin-right:4px;"></span>';
-                  if (totalCount - onlineCount > 0) {
-                    dots += '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;margin-right:4px;"></span>';
-                  }
-                }
-                return '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:6px;background:#f8f9fa;border:1px solid rgba(0,0,0,0.04);">' +
-                  '<span style="font-size:18px;opacity:0.6;">' + (icons[key] || '📎') + '</span>' +
-                  '<div><div style="font-size:18px;font-weight:700;color:#1a1a2e;line-height:1.2;">' + totalCount + '</div>' +
-                  '<div style="font-size:10px;color:#999;text-transform:uppercase;letter-spacing:0.06em;">' + (labels[key] || key) + '</div></div>' +
-                  '<div style="margin-left:auto;display:flex;gap:4px;">' + dots + '</div></div>';
-              }).join('')}
-            </div>
-          </div>
-          
-          <!-- Activity -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-            <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-                <span style="font-size:12px;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.08em;">Today's Activity</span>
-              </div>
-              <div>
-                ${(data.activity || []).map(function(item) {
-                  var badgeClass = item.type === 'urgent' ? 'urgent' : item.type === 'success' ? 'success' : 'info';
-                  var badgeColors = {
-                    urgent: 'color:#ef4444;background:#fee2e2;',
-                    success: 'color:#22c55e;background:#dcfce7;',
-                    info: 'color:#3b82f6;background:#dbeafe;'
-                  };
-                  return '<div style="display:flex;gap:14px;padding:8px 0;border-bottom:1px solid #f0f0f0;">' +
-                    '<span style="font-size:11px;color:#999;font-weight:500;min-width:50px;flex-shrink:0;">' + item.time + '</span>' +
-                    '<div style="flex:1;"><div style="font-size:13px;color:#1a1a2e;font-weight:500;">' + item.msg + '</div></div>' +
-                    '<span style="font-size:10px;font-weight:500;padding:2px 10px;border-radius:12px;align-self:center;flex-shrink:0;' + (badgeColors[badgeClass] || '') + '">' + (item.type || 'info') + '</span>' +
-                    '</div>';
-                }).join('') || '<div style="padding:8px 0;text-align:center;color:#999;font-size:13px;">No activity today</div>'}
-              </div>
-            </div>
-            <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-                <span style="font-size:12px;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.08em;">Open Service Requests</span>
-              </div>
-              <div style="overflow-x:auto;">
-                <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                  <thead>
-                    <tr><th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">ID</th>
-                    <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Subject</th>
-                    <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Priority</th>
-                    <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Status</th></tr>
-                  </thead>
-                  <tbody>
-                    ${(data.srs || []).filter(function(s) { return s.status !== 'Resolved'; }).map(function(sr) {
-                      var priClass = sr.priority === 'High' ? 'color:#ef4444;font-weight:600;' : sr.priority === 'Medium' ? 'color:#f59e0b;font-weight:600;' : 'color:#22c55e;font-weight:600;';
-                      var statusClass = sr.status === 'Open' ? 'open' : sr.status === 'In Progress' ? 'in-progress' : 'resolved';
-                      var statusColors = {
-                        open: 'color:#f59e0b;background:#fef3c7;',
-                        'in-progress': 'color:#3b82f6;background:#dbeafe;',
-                        resolved: 'color:#22c55e;background:#dcfce7;'
+              
+              <!-- Activity -->
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                    <span style="font-size:12px;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.08em;">Today's Activity</span>
+                  </div>
+                  <div>
+                    ${(data.activity || []).map(function(item) {
+                      var badgeClass = item.type === 'urgent' ? 'urgent' : item.type === 'success' ? 'success' : 'info';
+                      var badgeColors = {
+                        urgent: 'color:#ef4444;background:#fee2e2;',
+                        success: 'color:#22c55e;background:#dcfce7;',
+                        info: 'color:#3b82f6;background:#dbeafe;'
                       };
-                      return '<tr><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><strong>' + sr.id + '</strong></td>' +
-                        '<td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + sr.subject + '</td>' +
-                        '<td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><span style="' + priClass + '">' + sr.priority + '</span></td>' +
-                        '<td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><span style="display:inline-block;padding:2px 12px;border-radius:12px;font-size:10px;font-weight:600;' + (statusColors[statusClass] || '') + '">' + sr.status + '</span></td></tr>';
-                    }).join('') || '<tr><td colspan="4" style="text-align:center;color:#999;padding:16px;">No open service requests</td></tr>'}
-                  </tbody>
-                </table>
+                      return '<div style="display:flex;gap:14px;padding:8px 0;border-bottom:1px solid #f0f0f0;">' +
+                        '<span style="font-size:11px;color:#999;font-weight:500;min-width:50px;flex-shrink:0;">' + item.time + '</span>' +
+                        '<div style="flex:1;"><div style="font-size:13px;color:#1a1a2e;font-weight:500;">' + item.msg + '</div></div>' +
+                        '<span style="font-size:10px;font-weight:500;padding:2px 10px;border-radius:12px;align-self:center;flex-shrink:0;' + (badgeColors[badgeClass] || '') + '">' + (item.type || 'info') + '</span>' +
+                        '</div>';
+                    }).join('') || '<div style="padding:8px 0;text-align:center;color:#999;font-size:13px;">No activity today</div>'}
+                  </div>
+                </div>
+                <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                    <span style="font-size:12px;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.08em;">Open Service Requests</span>
+                    <button class="btn-link" onclick="clientSwitchTab('service-requests')" style="background:none;border:none;color:${primaryColor};cursor:pointer;font-size:11px;font-family:'Inter',sans-serif;">View all →</button>
+                  </div>
+                  <div style="overflow-x:auto;">
+                    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                      <thead>
+                        <tr><th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">ID</th>
+                        <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Subject</th>
+                        <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Priority</th>
+                        <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Status</th></tr>
+                      </thead>
+                      <tbody>
+                        ${(data.srs || []).filter(function(s) { return s.status !== 'Resolved'; }).map(function(sr) {
+                          var priClass = sr.priority === 'High' ? 'color:#ef4444;font-weight:600;' : sr.priority === 'Medium' ? 'color:#f59e0b;font-weight:600;' : 'color:#22c55e;font-weight:600;';
+                          var statusClass = sr.status === 'Open' ? 'open' : sr.status === 'In Progress' ? 'in-progress' : 'resolved';
+                          var statusColors = {
+                            open: 'color:#f59e0b;background:#fef3c7;',
+                            'in-progress': 'color:#3b82f6;background:#dbeafe;',
+                            resolved: 'color:#22c55e;background:#dcfce7;'
+                          };
+                          return '<tr><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><strong>' + sr.id + '</strong></td>' +
+                            '<td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + sr.subject + '</td>' +
+                            '<td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><span style="' + priClass + '">' + sr.priority + '</span></td>' +
+                            '<td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><span style="display:inline-block;padding:2px 12px;border-radius:12px;font-size:10px;font-weight:600;' + (statusColors[statusClass] || '') + '">' + sr.status + '</span></td></tr>';
+                        }).join('') || '<tr><td colspan="4" style="text-align:center;color:#999;padding:16px;">No open service requests</td></tr>'}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cameras Tab -->
+            <div class="client-tab" id="client-tab-cameras" style="display:none;">
+              <h2 style="font-size:18px;font-weight:600;color:#1a1a2e;margin-bottom:16px;">Cameras</h2>
+              <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+                <div style="overflow-x:auto;">
+                  <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                    <thead>
+                      <tr><th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Name</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Zone</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">IP</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Status</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Model</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Resolution</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Archiver</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Install Date</th></tr>
+                    </thead>
+                    <tbody>
+                      ${(data.assets && data.assets.cameras) ? data.assets.cameras.map(function(c) {
+                        var statusColor = c.status === 'Online' || c.status === 'ONLINE' ? 'color:#22c55e;background:#dcfce7;' : 'color:#ef4444;background:#fee2e2;';
+                        return '<tr style="cursor:pointer;" onclick="openClientCameraDetail(\'' + c.name + '\')"><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><strong>' + c.name + '</strong></td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (c.zone || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;font-family:monospace;font-size:11px;">' + (c.ip || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><span style="display:inline-block;padding:2px 12px;border-radius:12px;font-size:10px;font-weight:600;' + statusColor + '">' + c.status + '</span></td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (c.model || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (c.resolution || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (c.archiver || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (c.install_date || '—') + '</td></tr>';
+                      }).join('') : '<tr><td colspan="8" style="text-align:center;color:#999;padding:16px;">No cameras found</td></tr>'}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Doors Tab -->
+            <div class="client-tab" id="client-tab-doors" style="display:none;">
+              <h2 style="font-size:18px;font-weight:600;color:#1a1a2e;margin-bottom:16px;">Access Control — Doors</h2>
+              <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+                <div style="overflow-x:auto;">
+                  <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                    <thead>
+                      <tr><th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Name</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Site</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Reader</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Lock</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Powered</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Status</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Tech</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Install Date</th></tr>
+                    </thead>
+                    <tbody>
+                      ${(data.assets && data.assets.doors) ? data.assets.doors.map(function(d) {
+                        var statusColor = d.status === 'Online' ? 'color:#22c55e;background:#dcfce7;' : d.status === 'Offline' ? 'color:#ef4444;background:#fee2e2;' : 'color:#f59e0b;background:#fef3c7;';
+                        return '<tr style="cursor:pointer;" onclick="openClientDoorDetail(\'' + d.name + '\')"><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><strong>' + d.name + '</strong></td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (d.zone || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (d.reader || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (d.lock || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (d.powered || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><span style="display:inline-block;padding:2px 12px;border-radius:12px;font-size:10px;font-weight:600;' + statusColor + '">' + d.status + '</span></td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (d.tech || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (d.install_date || '—') + '</td></tr>';
+                      }).join('') : '<tr><td colspan="8" style="text-align:center;color:#999;padding:16px;">No doors found</td></tr>'}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Servers Tab -->
+            <div class="client-tab" id="client-tab-servers" style="display:none;">
+              <h2 style="font-size:18px;font-weight:600;color:#1a1a2e;margin-bottom:16px;">Servers</h2>
+              <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+                <div style="overflow-x:auto;">
+                  <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                    <thead>
+                      <tr><th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Location</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Serial</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Make</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Model</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Storage</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Health</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Apps</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Status</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Install Date</th></tr>
+                    </thead>
+                    <tbody>
+                      ${(data.assets && data.assets.servers) ? data.assets.servers.map(function(s) {
+                        var capacityNum = parseFloat(s.capacity);
+                        var usedNum = parseFloat(s.used);
+                        var pct = (!isNaN(capacityNum) && !isNaN(usedNum) && capacityNum > 0) ? Math.round((usedNum / capacityNum) * 100) : 0;
+                        var barColor = pct > 85 ? 'red' : pct > 70 ? 'yellow' : 'green';
+                        var storageDisplay = s.used && s.capacity ? s.used + ' / ' + s.capacity : s.capacity || s.used || '—';
+                        var statusColor = s.status === 'ONLINE' ? 'color:#22c55e;background:#dcfce7;' : 'color:#ef4444;background:#fee2e2;';
+                        var healthColor = s.health && s.health.indexOf('Failed') !== -1 ? '#ef4444' : '#22c55e';
+                        return '<tr style="cursor:pointer;" onclick="openClientServerDetail(\'' + s.name + '\')"><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.zone || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;font-family:monospace;font-size:11px;">' + (s.serial || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.make || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.model || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><div style="display:flex;flex-direction:column;gap:2px;"><span>' + storageDisplay + '</span><div style="width:100%;height:4px;background:#f0f0f0;border-radius:2px;overflow:hidden;"><div style="height:100%;border-radius:2px;width:' + pct + '%;background:' + (pct > 85 ? '#ef4444' : pct > 70 ? '#f59e0b' : '#22c55e') + ';"></div></div></div></td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:' + healthColor + ';">' + (s.health || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.apps || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><span style="display:inline-block;padding:2px 12px;border-radius:12px;font-size:10px;font-weight:600;' + statusColor + '">' + s.status + '</span></td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.install_date || '—') + '</td></tr>';
+                      }).join('') : '<tr><td colspan="9" style="text-align:center;color:#999;padding:16px;">No servers found</td></tr>'}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Switches Tab -->
+            <div class="client-tab" id="client-tab-switches" style="display:none;">
+              <h2 style="font-size:18px;font-weight:600;color:#1a1a2e;margin-bottom:16px;">Network Switches</h2>
+              <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+                <div style="overflow-x:auto;">
+                  <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                    <thead>
+                      <tr><th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Name</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Location</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Model</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">IP</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Firmware</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Status</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Install Date</th></tr>
+                    </thead>
+                    <tbody>
+                      ${(data.assets && data.assets.switches) ? data.assets.switches.map(function(s) {
+                        var statusColor = s.status === 'Online' ? 'color:#22c55e;background:#dcfce7;' : 'color:#ef4444;background:#fee2e2;';
+                        return '<tr style="cursor:pointer;" onclick="openClientSwitchDetail(\'' + s.name + '\')"><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><strong>' + s.name + '</strong></td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.zone || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.model || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;font-family:monospace;font-size:11px;">' + (s.ip_address || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.firmware || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><span style="display:inline-block;padding:2px 12px;border-radius:12px;font-size:10px;font-weight:600;' + statusColor + '">' + s.status + '</span></td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.install_date || '—') + '</td></tr>';
+                      }).join('') : '<tr><td colspan="7" style="text-align:center;color:#999;padding:16px;">No switches found</td></tr>'}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Software Tab -->
+            <div class="client-tab" id="client-tab-software" style="display:none;">
+              <h2 style="font-size:18px;font-weight:600;color:#1a1a2e;margin-bottom:16px;">Software & Licenses</h2>
+              <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+                <div style="overflow-x:auto;">
+                  <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                    <thead>
+                      <tr><th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Vendor</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Version</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">SMA Expiry</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Status</th></tr>
+                    </thead>
+                    <tbody>
+                      ${(data.software || []).map(function(s) {
+                        var statusColor = s.status === 'Good' ? 'color:#22c55e;background:#dcfce7;' : s.status === 'Warning' ? 'color:#f59e0b;background:#fef3c7;' : 'color:#ef4444;background:#fee2e2;';
+                        return '<tr><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + s.vendor + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.version || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.sma_expiry || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><span style="display:inline-block;padding:2px 12px;border-radius:12px;font-size:10px;font-weight:600;' + statusColor + '">' + s.status + '</span></td></tr>';
+                      }).join('') || '<tr><td colspan="4" style="text-align:center;color:#999;padding:16px;">No software found</td></tr>'}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Client Assets Tab -->
+            <div class="client-tab" id="client-tab-assets" style="display:none;">
+              <h2 style="font-size:18px;font-weight:600;color:#1a1a2e;margin-bottom:16px;">Client Assets</h2>
+              <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+                <div style="display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid #f0f0f0;">
+                  <button class="asset-sub-tab active" data-subtab="storage" onclick="clientAssetSubTab('storage')" style="padding:8px 20px;font-size:13px;font-weight:500;color:#999;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;background:none;border-top:none;border-left:none;border-right:none;font-family:'Inter',sans-serif;">Storage</button>
+                  <button class="asset-sub-tab" data-subtab="stations" onclick="clientAssetSubTab('stations')" style="padding:8px 20px;font-size:13px;font-weight:500;color:#999;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;background:none;border-top:none;border-left:none;border-right:none;font-family:'Inter',sans-serif;">Stations</button>
+                  <button class="asset-sub-tab" data-subtab="monitors" onclick="clientAssetSubTab('monitors')" style="padding:8px 20px;font-size:13px;font-weight:500;color:#999;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;background:none;border-top:none;border-left:none;border-right:none;font-family:'Inter',sans-serif;">Monitors</button>
+                </div>
+                <div class="asset-sub-content active" id="client-subtab-storage">
+                  <div style="overflow-x:auto;">
+                    <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                      <thead>
+                        <tr><th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Name</th>
+                        <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Total</th>
+                        <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Usable</th>
+                        <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Health</th>
+                        <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Make</th>
+                        <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Model</th>
+                        <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Warranty</th></tr>
+                      </thead>
+                      <tbody>
+                        ${(data.assets && data.assets.storage) ? (data.assets.storage.map(function(s) {
+                          var healthColor = s.health >= 90 ? 'color:#22c55e;background:#dcfce7;' : s.health >= 70 ? 'color:#f59e0b;background:#fef3c7;' : 'color:#ef4444;background:#fee2e2;';
+                          return '<tr><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><strong>' + s.name + '</strong></td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + s.total + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + s.usable + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><span style="display:inline-block;padding:2px 12px;border-radius:12px;font-size:10px;font-weight:600;' + healthColor + '">' + s.health + '%</span></td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.make || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.model || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.warranty_expiry || '—') + '</td></tr>';
+                        }).join('') || '<tr><td colspan="7" style="text-align:center;color:#999;padding:16px;">No storage found</td></tr>') : '<tr><td colspan="7" style="text-align:center;color:#999;padding:16px;">No storage found</td></tr>'}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="asset-sub-content" id="client-subtab-stations" style="display:none;">
+                  <div style="overflow-x:auto;">
+                    <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                      <thead>
+                        <tr><th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Name</th>
+                        <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">APPs</th>
+                        <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Storage</th>
+                        <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Health</th>
+                        <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Make</th>
+                        <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Model</th>
+                        <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Warranty</th></tr>
+                      </thead>
+                      <tbody>
+                        ${(data.assets && data.assets.stations) ? (data.assets.stations.map(function(s) {
+                          var healthColor = s.health >= 90 ? 'color:#22c55e;background:#dcfce7;' : s.health >= 70 ? 'color:#f59e0b;background:#fef3c7;' : 'color:#ef4444;background:#fee2e2;';
+                          return '<tr><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><strong>' + s.name + '</strong></td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.apps || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.storage || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><span style="display:inline-block;padding:2px 12px;border-radius:12px;font-size:10px;font-weight:600;' + healthColor + '">' + s.health + '%</span></td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.make || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.model || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.warranty_expiry || '—') + '</td></tr>';
+                        }).join('') || '<tr><td colspan="7" style="text-align:center;color:#999;padding:16px;">No stations found</td></tr>') : '<tr><td colspan="7" style="text-align:center;color:#999;padding:16px;">No stations found</td></tr>'}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="asset-sub-content" id="client-subtab-monitors" style="display:none;">
+                  <div style="overflow-x:auto;">
+                    <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                      <thead>
+                        <tr><th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Name</th>
+                        <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Size</th>
+                        <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Health</th>
+                        <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Make</th>
+                        <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Model</th>
+                        <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Warranty</th></tr>
+                      </thead>
+                      <tbody>
+                        ${(data.assets && data.assets.monitors) ? (data.assets.monitors.map(function(s) {
+                          var healthColor = s.health >= 90 ? 'color:#22c55e;background:#dcfce7;' : s.health >= 70 ? 'color:#f59e0b;background:#fef3c7;' : 'color:#ef4444;background:#fee2e2;';
+                          return '<tr><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><strong>' + s.name + '</strong></td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.size || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><span style="display:inline-block;padding:2px 12px;border-radius:12px;font-size:10px;font-weight:600;' + healthColor + '">' + s.health + '%</span></td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.make || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.model || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + (s.warranty_expiry || '—') + '</td></tr>';
+                        }).join('') || '<tr><td colspan="6" style="text-align:center;color:#999;padding:16px;">No monitors found</td></tr>') : '<tr><td colspan="6" style="text-align:center;color:#999;padding:16px;">No monitors found</td></tr>'}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Service Requests Tab -->
+            <div class="client-tab" id="client-tab-service-requests" style="display:none;">
+              <h2 style="font-size:18px;font-weight:600;color:#1a1a2e;margin-bottom:16px;">Service Requests</h2>
+              <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+                <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
+                  <input type="text" id="client-sr-search" placeholder="Search requests..." style="flex:1;min-width:150px;border:1px solid rgba(0,0,0,0.08);padding:6px 10px;border-radius:4px;font-size:12px;font-family:'Inter',sans-serif;" oninput="renderClientSRs()">
+                  <select id="client-sr-filter" style="border:1px solid rgba(0,0,0,0.08);padding:6px 10px;border-radius:4px;font-size:12px;font-family:'Inter',sans-serif;" onchange="renderClientSRs()">
+                    <option value="all">All Status</option>
+                    <option value="Open">Open</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved</option>
+                  </select>
+                  <button class="btn btn-accent btn-sm" onclick="clientSwitchTab('create-sr')" style="padding:6px 14px;border-radius:4px;border:none;background:${primaryColor};color:#fff;cursor:pointer;font-size:12px;font-family:'Inter',sans-serif;"><i class="ti ti-plus"></i> New</button>
+                </div>
+                <div style="overflow-x:auto;">
+                  <table style="width:100%;border-collapse:collapse;font-size:12px;" id="client-sr-table">
+                    <thead>
+                      <tr><th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">ID</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Subject</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Priority</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Status</th>
+                      <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Date</th></tr>
+                    </thead>
+                    <tbody id="client-sr-body">
+                      ${(data.srs || []).map(function(sr) {
+                        var priClass = sr.priority === 'High' ? 'color:#ef4444;font-weight:600;' : sr.priority === 'Medium' ? 'color:#f59e0b;font-weight:600;' : 'color:#22c55e;font-weight:600;';
+                        var statusClass = sr.status === 'Open' ? 'open' : sr.status === 'In Progress' ? 'in-progress' : 'resolved';
+                        var statusColors = {
+                          open: 'color:#f59e0b;background:#fef3c7;',
+                          'in-progress': 'color:#3b82f6;background:#dbeafe;',
+                          resolved: 'color:#22c55e;background:#dcfce7;'
+                        };
+                        return '<tr><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><strong>' + sr.id + '</strong></td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + sr.subject + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><span style="' + priClass + '">' + sr.priority + '</span></td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><span style="display:inline-block;padding:2px 12px;border-radius:12px;font-size:10px;font-weight:600;' + (statusColors[statusClass] || '') + '">' + sr.status + '</span></td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#999;font-size:11px;">' + sr.date + '</td></tr>';
+                      }).join('') || '<tr><td colspan="5" style="text-align:center;color:#999;padding:16px;">No service requests found</td></tr>'}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Create SR Tab -->
+            <div class="client-tab" id="client-tab-create-sr" style="display:none;">
+              <h2 style="font-size:18px;font-weight:600;color:#1a1a2e;margin-bottom:16px;">Create Service Request</h2>
+              <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+                <form onsubmit="clientSubmitSR(event)">
+                  <div style="margin-bottom:14px;">
+                    <label style="display:block;font-size:11px;font-weight:600;color:#666;margin-bottom:3px;">Subject *</label>
+                    <input type="text" id="client-sr-subject" placeholder="Brief description of the issue" required style="width:100%;padding:8px 12px;border-radius:4px;border:1px solid rgba(0,0,0,0.08);font-size:12px;font-family:'Inter',sans-serif;">
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                    <div style="margin-bottom:14px;">
+                      <label style="display:block;font-size:11px;font-weight:600;color:#666;margin-bottom:3px;">Asset Type</label>
+                      <select id="client-sr-asset-type" style="width:100%;padding:8px 12px;border-radius:4px;border:1px solid rgba(0,0,0,0.08);font-size:12px;font-family:'Inter',sans-serif;">
+                        <option value="Camera">Camera</option>
+                        <option value="Access Control">Access Control</option>
+                        <option value="Server">Server</option>
+                        <option value="Switch">Switch</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                    <div style="margin-bottom:14px;">
+                      <label style="display:block;font-size:11px;font-weight:600;color:#666;margin-bottom:3px;">Priority</label>
+                      <select id="client-sr-priority" style="width:100%;padding:8px 12px;border-radius:4px;border:1px solid rgba(0,0,0,0.08);font-size:12px;font-family:'Inter',sans-serif;">
+                        <option value="High">🔴 High</option>
+                        <option value="Medium" selected>🟡 Medium</option>
+                        <option value="Low">🟢 Low</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div style="margin-bottom:14px;">
+                    <label style="display:block;font-size:11px;font-weight:600;color:#666;margin-bottom:3px;">Description *</label>
+                    <textarea id="client-sr-description" placeholder="Detailed description of the issue..." required style="width:100%;padding:8px 12px;border-radius:4px;border:1px solid rgba(0,0,0,0.08);font-size:12px;font-family:'Inter',sans-serif;min-height:100px;resize:vertical;"></textarea>
+                  </div>
+                  <div style="display:flex;gap:10px;margin-top:6px;">
+                    <button type="submit" style="padding:8px 20px;border-radius:4px;border:none;background:${primaryColor};color:#fff;cursor:pointer;font-size:12px;font-family:'Inter',sans-serif;"><i class="ti ti-send"></i> Submit Request</button>
+                    <button type="button" onclick="clientSwitchTab('service-requests')" style="padding:8px 20px;border-radius:4px;border:1px solid rgba(0,0,0,0.08);background:transparent;color:#555;cursor:pointer;font-size:12px;font-family:'Inter',sans-serif;">Cancel</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Contact Tab -->
+            <div class="client-tab" id="client-tab-contact" style="display:none;">
+              <h2 style="font-size:18px;font-weight:600;color:#1a1a2e;margin-bottom:16px;">Contact Support</h2>
+              <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:500px;">
+                  <div>
+                    <div style="font-size:10px;color:#999;text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Email</div>
+                    <div style="font-size:14px;color:#1a1a2e;font-weight:500;">support@etechsystems.com</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;color:#999;text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Phone</div>
+                    <div style="font-size:14px;color:#1a1a2e;font-weight:500;">+1 (876) 555-0199</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;color:#999;text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Hours</div>
+                    <div style="font-size:14px;color:#1a1a2e;font-weight:500;">Mon-Fri 8:00am - 6:00pm</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;color:#999;text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Emergency</div>
+                    <div style="font-size:14px;color:#ef4444;font-weight:600;">+1 (876) 555-0911</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     `;
+    
+    // Set up client tab switching
+    window.clientSwitchTab = function(tab) {
+      // Update nav items
+      document.querySelectorAll('.client-nav-item').forEach(function(el) {
+        el.style.borderLeftColor = 'transparent';
+        el.style.background = 'transparent';
+        if (el.dataset.tab === tab) {
+          el.style.borderLeftColor = primaryColor;
+          el.style.background = 'rgba(227,27,35,0.06)';
+        }
+      });
+      
+      // Update content tabs
+      document.querySelectorAll('.client-tab').forEach(function(el) {
+        el.style.display = 'none';
+      });
+      var target = document.getElementById('client-tab-' + tab);
+      if (target) target.style.display = 'block';
+      
+      // Update title
+      var titles = {
+        dashboard: 'Dashboard',
+        cameras: 'Cameras',
+        doors: 'Access Control',
+        servers: 'Servers',
+        switches: 'Switches',
+        software: 'Software & Licenses',
+        assets: 'Client Assets',
+        'service-requests': 'Service Requests',
+        'create-sr': 'Create Service Request',
+        contact: 'Contact Support'
+      };
+      var titleEl = document.getElementById('client-page-title');
+      if (titleEl) titleEl.textContent = titles[tab] || tab;
+      
+      // Refresh SR list if needed
+      if (tab === 'service-requests') renderClientSRs();
+    };
+    
+    // Asset sub-tab switching
+    window.clientAssetSubTab = function(tab) {
+      document.querySelectorAll('.asset-sub-tab').forEach(function(el) {
+        el.style.color = '#999';
+        el.style.borderBottomColor = 'transparent';
+        if (el.dataset.subtab === tab) {
+          el.style.color = primaryColor;
+          el.style.borderBottomColor = primaryColor;
+        }
+      });
+      document.querySelectorAll('.asset-sub-content').forEach(function(el) {
+        el.style.display = 'none';
+      });
+      var target = document.getElementById('client-subtab-' + tab);
+      if (target) target.style.display = 'block';
+    };
+    
+    // Set initial active states
+    document.querySelector('.client-nav-item[data-tab="dashboard"]').style.borderLeftColor = primaryColor;
+    document.querySelector('.client-nav-item[data-tab="dashboard"]').style.background = 'rgba(227,27,35,0.06)';
+    document.querySelector('.asset-sub-tab[data-subtab="storage"]').style.color = primaryColor;
+    document.querySelector('.asset-sub-tab[data-subtab="storage"]').style.borderBottomColor = primaryColor;
+    
+    // SR functions
+    window.renderClientSRs = function() {
+      var search = document.getElementById('client-sr-search') ? document.getElementById('client-sr-search').value.toLowerCase() : '';
+      var filter = document.getElementById('client-sr-filter') ? document.getElementById('client-sr-filter').value : 'all';
+      
+      var filtered = (data.srs || []).filter(function(sr) {
+        var matchSearch = sr.subject.toLowerCase().indexOf(search) !== -1 || sr.id.toLowerCase().indexOf(search) !== -1;
+        var matchStatus = filter === 'all' || sr.status === filter;
+        return matchSearch && matchStatus;
+      });
+      
+      var body = document.getElementById('client-sr-body');
+      if (filtered.length === 0) {
+        body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;padding:16px;">No service requests found</td></tr>';
+      } else {
+        body.innerHTML = filtered.map(function(sr) {
+          var priClass = sr.priority === 'High' ? 'color:#ef4444;font-weight:600;' : sr.priority === 'Medium' ? 'color:#f59e0b;font-weight:600;' : 'color:#22c55e;font-weight:600;';
+          var statusClass = sr.status === 'Open' ? 'open' : sr.status === 'In Progress' ? 'in-progress' : 'resolved';
+          var statusColors = {
+            open: 'color:#f59e0b;background:#fef3c7;',
+            'in-progress': 'color:#3b82f6;background:#dbeafe;',
+            resolved: 'color:#22c55e;background:#dcfce7;'
+          };
+          return '<tr><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><strong>' + sr.id + '</strong></td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + sr.subject + '</td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><span style="' + priClass + '">' + sr.priority + '</span></td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><span style="display:inline-block;padding:2px 12px;border-radius:12px;font-size:10px;font-weight:600;' + (statusColors[statusClass] || '') + '">' + sr.status + '</span></td><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#999;font-size:11px;">' + sr.date + '</td></tr>';
+        }).join('');
+      }
+    };
+    
+    window.clientSubmitSR = function(e) {
+      e.preventDefault();
+      
+      var subject = document.getElementById('client-sr-subject').value.trim();
+      var description = document.getElementById('client-sr-description').value.trim();
+      var assetType = document.getElementById('client-sr-asset-type').value;
+      var priority = document.getElementById('client-sr-priority').value;
+      
+      if (!subject) { toast('Please enter a subject', 'warning'); return; }
+      if (!description) { toast('Please enter a description', 'warning'); return; }
+      
+      var id = 'SR-' + String(Math.floor(Math.random() * 9000) + 1000);
+      var newSR = {
+        id: id,
+        subject: subject,
+        priority: priority,
+        status: 'Open',
+        date: new Date().toLocaleDateString('en-JM'),
+        description: description,
+        assetType: assetType
+      };
+      
+      data.srs.unshift(newSR);
+      
+      var now = new Date();
+      var timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+      data.activity.unshift({
+        time: timeStr,
+        msg: 'SR-' + id + ' created: ' + subject,
+        type: 'info'
+      });
+      
+      document.getElementById('client-sr-subject').value = '';
+      document.getElementById('client-sr-description').value = '';
+      
+      toast('Service Request ' + id + ' created!', 'success');
+      
+      // Rebuild the entire client view
+      buildClientView(data, user);
+      clientSwitchTab('service-requests');
+    };
+    
+    // Keep the openClient* functions for detail modals
+    window.openClientCameraDetail = function(name) {
+      var camera = (data.assets && data.assets.cameras) ? data.assets.cameras.find(function(c) { return c.name === name; }) : null;
+      if (!camera) return;
+      
+      document.getElementById('camera-detail-title').textContent = camera.name;
+      document.getElementById('camera-detail-sub').textContent = 'Zone: ' + (camera.zone || '—') + ' · Status: ' + camera.status;
+      
+      var preview = document.getElementById('cam-preview-large');
+      if (camera.status === 'Online' && camera.ip) {
+        preview.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;min-height:280px;">' +
+          '<img src="http://' + camera.ip + '/snapshot.jpg" onerror="this.parentElement.innerHTML=\'<div class=&quot;offline-msg&quot; style=&quot;color:var(--text-muted);padding:20px;text-align:center;&quot;><i class=&quot;ti ti-video-off&quot; style=&quot;font-size:32px;display:block;margin-bottom:8px;&quot;></i>Preview unavailable<br><span style=&quot;font-size:11px;&quot;>Camera may be offline</span></div>\'" style="max-width:100%;max-height:100%;min-height:280px;object-fit:contain;border-radius:4px;" />' +
+          '<div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.6);color:#4ade80;padding:4px 10px;border-radius:4px;font-size:10px;display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#4ade80;animation:pulse 1.5s infinite;"></span> LIVE</div>' +
+          '</div>';
+      } else {
+        preview.innerHTML = '<div class="offline-msg" style="color:var(--text-muted);padding:40px;text-align:center;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;"><i class="ti ti-video-off" style="font-size:48px;display:block;margin-bottom:12px;"></i>Camera ' + camera.status.toLowerCase() + '<br><span style="font-size:11px;opacity:0.6;">Preview unavailable</span></div>';
+      }
+      
+      document.getElementById('camera-detail-grid').innerHTML =
+        '<div class="modal-field"><label>Name</label><span>' + camera.name + '</span></div>' +
+        '<div class="modal-field"><label>Zone</label><span>' + (camera.zone || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Status</label>' + getStatusBadgeHTML(camera.status) + '</div>' +
+        '<div class="modal-field"><label>IP Address</label><span class="mono">' + (camera.ip || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Model</label><span>' + (camera.model || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Resolution</label><span>' + (camera.resolution || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Archiver</label><span>' + (camera.archiver || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Install Date</label><span>' + (camera.install_date || '—') + '</span></div>';
+      
+      document.getElementById('cam-modal-comments').value = camera.comments || '';
+      document.getElementById('camera-detail-modal').classList.add('open');
+    };
+    
+    window.openClientDoorDetail = function(name) {
+      var door = (data.assets && data.assets.doors) ? data.assets.doors.find(function(d) { return d.name === name; }) : null;
+      if (!door) return;
+      
+      document.getElementById('door-detail-title').textContent = door.name;
+      document.getElementById('door-detail-sub').textContent = 'Site: ' + (door.zone || '—') + ' · Status: ' + door.status;
+      
+      document.getElementById('door-detail-grid').innerHTML =
+        '<div class="modal-field"><label>Name</label><span>' + door.name + '</span></div>' +
+        '<div class="modal-field"><label>Site</label><span>' + (door.zone || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Status</label>' + getStatusBadgeHTML(door.status) + '</div>' +
+        '<div class="modal-field"><label>Reader</label><span>' + (door.reader || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Lock Type</label><span>' + (door.lock || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Powered</label><span>' + (door.powered || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Technician</label><span>' + (door.tech || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Door Swing</label><span>' + (door.doorSwing || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Access Type</label><span>' + (door.accessType || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Anti-Passback</label><span>' + (door.antiPassback || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Controller Type</label><span>' + (door.controllerType || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Install Date</label><span>' + (door.install_date || '—') + '</span></div>';
+      
+      document.getElementById('door-modal-comments').value = door.comments || '';
+      document.getElementById('door-detail-modal').classList.add('open');
+    };
+    
+    window.openClientServerDetail = function(name) {
+      var server = (data.assets && data.assets.servers) ? data.assets.servers.find(function(s) { return s.name === name; }) : null;
+      if (!server) return;
+      
+      document.getElementById('server-detail-title').textContent = server.name;
+      document.getElementById('server-detail-sub').textContent = 'Location: ' + (server.zone || '—') + ' · Status: ' + server.status;
+      
+      document.getElementById('server-detail-grid').innerHTML =
+        '<div class="modal-field"><label>Name</label><span>' + server.name + '</span></div>' +
+        '<div class="modal-field"><label>Location</label><span>' + (server.zone || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Status</label>' + getStatusBadgeHTML(server.status) + '</div>' +
+        '<div class="modal-field"><label>Serial</label><span>' + (server.serial || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Make</label><span>' + (server.make || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Model</label><span>' + (server.model || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Capacity</label><span>' + (server.capacity || '—') + '</span></div>' +
+        '<div class="modal-field"><label>In Use</label><span>' + (server.used || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Health</label><span>' + (server.health || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Applications</label><span>' + (server.apps || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Install Date</label><span>' + (server.install_date || '—') + '</span></div>';
+      
+      document.getElementById('server-modal-comments').value = server.comments || '';
+      document.getElementById('server-detail-modal').classList.add('open');
+    };
+    
+    window.openClientSwitchDetail = function(name) {
+      var sw = (data.assets && data.assets.switches) ? data.assets.switches.find(function(s) { return s.name === name; }) : null;
+      if (!sw) return;
+      
+      document.getElementById('switch-detail-title').textContent = sw.name;
+      document.getElementById('switch-detail-sub').textContent = 'Location: ' + (sw.zone || '—') + ' · Status: ' + sw.status;
+      
+      document.getElementById('switch-detail-grid').innerHTML =
+        '<div class="modal-field"><label>Name</label><span>' + sw.name + '</span></div>' +
+        '<div class="modal-field"><label>Location</label><span>' + (sw.zone || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Status</label>' + getStatusBadgeHTML(sw.status) + '</div>' +
+        '<div class="modal-field"><label>Model</label><span>' + (sw.model || '—') + '</span></div>' +
+        '<div class="modal-field"><label>IP Address</label><span>' + (sw.ip_address || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Firmware</label><span>' + (sw.firmware || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Install Date</label><span>' + (sw.install_date || '—') + '</span></div>';
+      
+      document.getElementById('switch-modal-comments').value = sw.comments || '';
+      document.getElementById('switch-detail-modal').classList.add('open');
+    };
+    
+    // Update topbar date
+    setInterval(function() {
+      var el = document.querySelector('#client-view-container .topbar-date');
+      if (el) el.textContent = fullDateTime();
+    }, 30000);
   }
 
   // ============================================================
