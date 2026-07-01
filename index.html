@@ -20,8 +20,6 @@
     --text-primary: #f0f4ff;
     --text-secondary: rgba(255, 255, 255, 0.55);
     --text-muted: rgba(255, 255, 255, 0.25);
-    --accent-start: #4f8cf7;
-    --accent-end: #00d4ff;
     --accent: #4f8cf7;
     --accent-glow: rgba(79, 140, 247, 0.3);
     --danger: #ff5e7a;
@@ -29,10 +27,6 @@
     --success: #34d399;
     --info: #60a5fa;
     --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --skeleton-bg: rgba(255,255,255,0.04);
-    --skeleton-shine: rgba(255,255,255,0.08);
-    --tooltip-bg: rgba(20, 22, 40, 0.95);
-    --card-text: #f0f4ff;
     --stat-val-color: #ffffff;
     --client-primary: #4f8cf7;
     --client-secondary: #00d4ff;
@@ -50,12 +44,6 @@
     --text-primary: #1a1a2e;
     --text-secondary: rgba(0, 0, 0, 0.6);
     --text-muted: rgba(0, 0, 0, 0.35);
-    --accent: #4f8cf7;
-    --accent-glow: rgba(79, 140, 247, 0.2);
-    --danger: #dc2626;
-    --warning: #d97706;
-    --success: #059669;
-    --info: #2563eb;
     --stat-val-color: #1a1a2e;
     --client-header-bg: rgba(245, 247, 250, 0.95);
   }
@@ -71,10 +59,6 @@
     --text-muted: rgba(255, 255, 255, 0.2);
     --accent: #00d4ff;
     --accent-glow: rgba(0, 212, 255, 0.12);
-    --danger: #ff0055;
-    --warning: #ffaa00;
-    --success: #00ff88;
-    --info: #00d4ff;
     --stat-val-color: #ffffff;
     --client-header-bg: rgba(0, 0, 0, 0.99);
   }
@@ -104,11 +88,6 @@
   .ctx-menu .ctx-item i { font-size: 14px; width: 18px; text-align: center; }
   .ctx-menu .ctx-sep { height: 1px; background: var(--card-border); margin: 4px 12px; }
 
-  /* Scroll Top */
-  .scroll-top { position: fixed; bottom: 30px; right: 30px; width: 36px; height: 36px; border-radius: 50%; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-secondary); cursor: pointer; font-size: 16px; display: none; align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(10px); box-shadow: 0 4px 16px rgba(0,0,0,0.3); transition: all 0.2s; }
-  .scroll-top:hover { background: var(--client-button-gradient); color: #fff; border-color: transparent; }
-  .scroll-top.visible { display: flex; }
-
   /* Buttons */
   .btn { font-size: 12px; padding: 7px 14px; border: 1px solid var(--card-border); border-radius: 6px; background: transparent; color: var(--text-primary); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font); transition: all 0.15s; white-space: nowrap; }
   .btn:hover { background: rgba(255,255,255,0.06); border-color: var(--accent); }
@@ -130,6 +109,9 @@
   .b-under-maintenance { background: rgba(255,179,71,0.15); color: #ffb347; }
   .b-in-progress { background: rgba(96,165,250,0.15); color: #93c5fd; }
   .b-pending { background: rgba(255,179,71,0.15); color: #ffb347; }
+  .b-warning { background: rgba(255,179,71,0.15); color: #ffb347; }
+  .b-expired { background: rgba(255,94,122,0.15); color: #ff5e7a; }
+  .b-good { background: rgba(52,211,153,0.15); color: #34d399; }
 
   .status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 500; }
   .status-badge.good { background: rgba(52,211,153,0.15); color: #34d399; }
@@ -231,11 +213,11 @@
   .tl-msg { color: var(--text-secondary); }
 
   /* Zone Groups */
-  .cam-zone-group, .door-zone-group, .server-zone-group, .switch-zone-group { margin-bottom: 12px; }
-  .cam-zone-header, .door-zone-header, .server-zone-header, .switch-zone-header { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px; padding: 10px 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
-  .cam-zone-header:hover, .door-zone-header:hover, .server-zone-header:hover, .switch-zone-header:hover { border-color: var(--accent); background: rgba(255,255,255,0.02); }
-  .cam-zone-body, .door-zone-body, .server-zone-body, .switch-zone-body { padding: 8px 0; }
-  .cam-zone-body.hidden, .door-zone-body.hidden, .server-zone-body.hidden, .switch-zone-body.hidden { display: none; }
+  .cam-zone-group, .door-zone-group, .server-zone-group, .switch-zone-group, .software-zone-group, .assets-zone-group { margin-bottom: 12px; }
+  .cam-zone-header, .door-zone-header, .server-zone-header, .switch-zone-header, .software-zone-header, .assets-zone-header { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px; padding: 10px 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
+  .cam-zone-header:hover, .door-zone-header:hover, .server-zone-header:hover, .switch-zone-header:hover, .software-zone-header:hover, .assets-zone-header:hover { border-color: var(--accent); background: rgba(255,255,255,0.02); }
+  .cam-zone-body, .door-zone-body, .server-zone-body, .switch-zone-body, .software-zone-body, .assets-zone-body { padding: 8px 0; }
+  .cam-zone-body.hidden, .door-zone-body.hidden, .server-zone-body.hidden, .switch-zone-body.hidden, .software-zone-body.hidden, .assets-zone-body.hidden { display: none; }
   .zone-name { font-weight: 500; color: var(--text-primary); }
   .zone-client { font-size: 11px; color: var(--text-muted); margin-left: 8px; }
   .zone-count { font-size: 11px; color: var(--text-muted); }
@@ -347,10 +329,10 @@
   .bulk-bar select { background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); color: var(--text-primary); padding: 4px 8px; border-radius: 4px; font-size: 11px; font-family: var(--font); }
 
   /* Stats Cards */
-  .door-stats, .server-stats-grid, .switch-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
-  .door-stat-card, .server-stat-card, .switch-stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px; padding: 10px 14px; }
-  .ds-label, .ss-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
-  .ds-value, .ss-value { font-size: 20px; font-weight: 600; color: var(--text-primary); margin: 4px 0; }
+  .door-stats, .server-stats-grid, .switch-stats-grid, .assets-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
+  .door-stat-card, .server-stat-card, .switch-stat-card, .assets-stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px; padding: 10px 14px; }
+  .ds-label, .ss-label, .as-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .ds-value, .ss-value, .as-value { font-size: 20px; font-weight: 600; color: var(--text-primary); margin: 4px 0; }
   .ds-value.online { color: var(--success); }
   .ds-value.offline { color: var(--danger); }
   .ds-value.under-maintenance { color: var(--warning); }
@@ -401,6 +383,14 @@
   .audit-time { color: var(--text-muted); min-width: 50px; }
   .audit-user { font-weight: 500; color: var(--text-primary); min-width: 80px; }
   .audit-action .highlight { color: var(--text-primary); }
+
+  /* Client Assets Sub-tabs */
+  .asset-sub-tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 2px solid var(--card-border); }
+  .asset-sub-tab { padding: 8px 20px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; background: none; border-top: none; border-left: none; border-right: none; font-family: var(--font); }
+  .asset-sub-tab:hover { color: var(--text-primary); }
+  .asset-sub-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .asset-sub-content { display: none; }
+  .asset-sub-content.active { display: block; }
 
   /* App Layout */
   .app { display: flex; height: 100vh; width: 100%; max-width: 100%; background: var(--main-bg); overflow: hidden; display: none; }
@@ -552,7 +542,7 @@
     .btn { font-size: 10px; padding: 5px 10px; }
     .outlook-folder-pane { width: 120px; }
     .outlook-list-pane { width: 35%; }
-    .door-stats, .server-stats-grid, .switch-stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .door-stats, .server-stats-grid, .switch-stats-grid, .assets-stats-grid { grid-template-columns: repeat(2, 1fr); }
     .file-item { grid-template-columns: 30px 1fr 60px 60px; }
     .file-item .file-modified { display: none; }
   }
@@ -569,7 +559,7 @@
     .outlook-folder-pane { width: 100%; border-right: none; border-bottom: 1px solid var(--card-border); max-height: 120px; }
     .outlook-content { flex-direction: column; }
     .outlook-list-pane { width: 100%; border-right: none; border-bottom: 1px solid var(--card-border); max-height: 200px; }
-    .door-stats, .server-stats-grid, .switch-stats-grid { grid-template-columns: 1fr 1fr; }
+    .door-stats, .server-stats-grid, .switch-stats-grid, .assets-stats-grid { grid-template-columns: 1fr 1fr; }
     .file-item { grid-template-columns: 30px 1fr; gap: 4px; }
     .file-item .file-type, .file-item .file-size, .file-item .file-modified { display: none; }
     .ore-actions { flex-wrap: wrap; }
@@ -671,6 +661,10 @@
             <button class="dd-item" onclick="openAddDoorModal();closeAddDropdown();"><span class="dd-icon">🚪</span> Add Door</button>
             <button class="dd-item" onclick="openAddServerModal();closeAddDropdown();"><span class="dd-icon">🖥</span> Add Server</button>
             <button class="dd-item" onclick="openAddSwitchModal();closeAddDropdown();"><span class="dd-icon">🔌</span> Add Switch</button>
+            <button class="dd-item" onclick="openAddSoftwareModal();closeAddDropdown();"><span class="dd-icon">💻</span> Add Software</button>
+            <button class="dd-item" onclick="openAddStorageModal();closeAddDropdown();"><span class="dd-icon">💾</span> Add Storage</button>
+            <button class="dd-item" onclick="openAddStationModal();closeAddDropdown();"><span class="dd-icon">🖥️</span> Add Station</button>
+            <button class="dd-item" onclick="openAddMonitorModal();closeAddDropdown();"><span class="dd-icon">🖥️</span> Add Monitor</button>
             <div class="dd-sep"></div>
             <button class="dd-item" onclick="openAddClientModal();closeAddDropdown();"><span class="dd-icon">👤</span> Add Client</button>
           </div>
@@ -971,6 +965,97 @@
             </div>
             <div class="loading-overlay" id="sw-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading switches...</span></div></div>
             <div id="sw-groups-container"></div>
+          </div>
+        </div>
+
+        <!-- Software Tab -->
+        <div class="tab" id="tab-software">
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Software & Licenses</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <button class="btn btn-sm" onclick="exportSoftwareCSV()"><i class="ti ti-download"></i> Export CSV</button>
+                <button class="btn btn-sm" onclick="refreshSoftware()" title="Refresh"><i class="ti ti-refresh"></i></button>
+              </div>
+            </div>
+            <div class="software-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;">
+              <div class="door-stat-card"><div class="ds-label">Total Software</div><div class="ds-value" id="sw-total-count">0</div></div>
+              <div class="door-stat-card"><div class="ds-label">Good</div><div class="ds-value online" id="sw-good-count">0</div></div>
+              <div class="door-stat-card"><div class="ds-label">Warning</div><div class="ds-value under-maintenance" id="sw-warning-count">0</div></div>
+              <div class="door-stat-card"><div class="ds-label">Expired</div><div class="ds-value offline" id="sw-expired-count">0</div></div>
+            </div>
+            <div class="search-bar">
+              <input type="text" id="sw-search" placeholder="Search software by vendor or version…" oninput="debounceRenderSoftware()" />
+              <select id="sw-status-filter" onchange="renderSoftware()" style="flex:0 0 150px;">
+                <option value="All">All statuses</option>
+                <option value="Good">Good</option>
+                <option value="Warning">Warning</option>
+                <option value="Expired">Expired</option>
+              </select>
+            </div>
+            <div class="loading-overlay" id="sw-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading software...</span></div></div>
+            <div id="sw-groups-container"></div>
+          </div>
+        </div>
+
+        <!-- Client Assets Tab -->
+        <div class="tab" id="tab-assets">
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Client Assets</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <button class="btn btn-sm" onclick="exportAssetsCSV()"><i class="ti ti-download"></i> Export CSV</button>
+                <button class="btn btn-sm" onclick="refreshAssets()" title="Refresh"><i class="ti ti-refresh"></i></button>
+              </div>
+            </div>
+            <!-- Sub-tabs -->
+            <div class="asset-sub-tabs">
+              <button class="asset-sub-tab active" data-subtab="storage" onclick="switchAssetSubTab('storage')">Storage</button>
+              <button class="asset-sub-tab" data-subtab="stations" onclick="switchAssetSubTab('stations')">Stations</button>
+              <button class="asset-sub-tab" data-subtab="monitors" onclick="switchAssetSubTab('monitors')">Monitors</button>
+            </div>
+            
+            <!-- Storage Sub-tab -->
+            <div class="asset-sub-content active" id="subtab-storage">
+              <div class="assets-stats-grid">
+                <div class="assets-stat-card"><div class="as-label">Total Storage</div><div class="as-value" id="storage-total">0</div><div class="ss-sub">Items</div></div>
+                <div class="assets-stat-card"><div class="as-label">Total Capacity</div><div class="as-value" id="storage-capacity">0 TB</div><div class="ss-sub">All storage</div></div>
+                <div class="assets-stat-card"><div class="as-label">Avg Health</div><div class="as-value green" id="storage-health">0%</div><div class="ss-sub">Average</div></div>
+              </div>
+              <div class="search-bar">
+                <input type="text" id="storage-search" placeholder="Search storage by name or make…" oninput="debounceRenderStorage()" />
+              </div>
+              <div class="loading-overlay" id="storage-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading storage...</span></div></div>
+              <div id="storage-groups-container"></div>
+            </div>
+
+            <!-- Stations Sub-tab -->
+            <div class="asset-sub-content" id="subtab-stations">
+              <div class="assets-stats-grid">
+                <div class="assets-stat-card"><div class="as-label">Total Stations</div><div class="as-value" id="stations-total">0</div><div class="ss-sub">Items</div></div>
+                <div class="assets-stat-card"><div class="as-label">Avg Health</div><div class="as-value green" id="stations-health">0%</div><div class="ss-sub">Average</div></div>
+                <div class="assets-stat-card"><div class="as-label">Total Storage</div><div class="as-value" id="stations-storage">0 TB</div><div class="ss-sub">All stations</div></div>
+              </div>
+              <div class="search-bar">
+                <input type="text" id="stations-search" placeholder="Search stations by name or apps…" oninput="debounceRenderStations()" />
+              </div>
+              <div class="loading-overlay" id="stations-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading stations...</span></div></div>
+              <div id="stations-groups-container"></div>
+            </div>
+
+            <!-- Monitors Sub-tab -->
+            <div class="asset-sub-content" id="subtab-monitors">
+              <div class="assets-stats-grid">
+                <div class="assets-stat-card"><div class="as-label">Total Monitors</div><div class="as-value" id="monitors-total">0</div><div class="ss-sub">Items</div></div>
+                <div class="assets-stat-card"><div class="as-label">Avg Health</div><div class="as-value green" id="monitors-health">0%</div><div class="ss-sub">Average</div></div>
+                <div class="assets-stat-card"><div class="as-label">Avg Size</div><div class="as-value" id="monitors-size">0"</div><div class="ss-sub">Average</div></div>
+              </div>
+              <div class="search-bar">
+                <input type="text" id="monitors-search" placeholder="Search monitors by make or model…" oninput="debounceRenderMonitors()" />
+              </div>
+              <div class="loading-overlay" id="monitors-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading monitors...</span></div></div>
+              <div id="monitors-groups-container"></div>
+            </div>
           </div>
         </div>
 
@@ -1313,17 +1398,12 @@
           <div class="modal-field"><label>Reader</label><input type="text" id="door-reader" placeholder="e.g., HID Prox" /></div>
           <div class="modal-field"><label>Lock Type</label><input type="text" id="door-lock" placeholder="e.g., Magnetic" /></div>
           <div class="modal-field"><label>Powered</label><select id="door-powered"><option value="Yes">Yes</option><option value="No">No</option><option value="Not In Use">Not In Use</option></select></div>
-          <div class="modal-field"><label>Status</label><select id="door-status"><option value="Online">Online</option><option value="Offline">Offline</option><option value="Under Maintenance">Under Maintenance</option></select></div>
-          <div class="modal-field"><label>Technician</label><select id="door-tech"><option value="Shanice Vernon">Shanice Vernon</option><option value="Shavine">Shavine</option><option value="Marvin Grant">Marvin Grant</option><option value="Ackeem">Ackeem</option><option value="Unassigned">Unassigned</option></select></div>
-        </div>
-      </div>
-      <div class="modal-section">
-        <div class="modal-section-title">Access Control Details</div>
-        <div class="modal-grid">
           <div class="modal-field"><label>Door Swing</label><select id="door-swing"><option value="In">In</option><option value="Out">Out</option></select></div>
           <div class="modal-field"><label>Access Type</label><select id="door-access-type"><option value="Read In + Read Out">Read In + Read Out</option><option value="Read In + Push Out">Read In + Push Out</option><option value="Read In Only">Read In Only</option><option value="Push Out Only">Push Out Only</option><option value="RTE Only">RTE Only</option><option value="Read In + RTE">Read In + RTE</option></select></div>
           <div class="modal-field"><label>Anti-Passback</label><select id="door-anti-passback"><option value="Yes">Yes</option><option value="No">No</option></select></div>
           <div class="modal-field"><label>Controller Type</label><select id="door-controller-type"><option value="Standalone">Standalone Controllers</option><option value="Integrated">Integrated Controllers</option><option value="Networked/IP">Networked/IP Controllers</option><option value="Centralized/Panel-Based">Centralized/Panel-Based Controllers</option></select></div>
+          <div class="modal-field"><label>Status</label><select id="door-status"><option value="Online">Online</option><option value="Offline">Offline</option><option value="Under Maintenance">Under Maintenance</option></select></div>
+          <div class="modal-field"><label>Technician</label><select id="door-tech"><option value="Shanice Vernon">Shanice Vernon</option><option value="Shavine">Shavine</option><option value="Marvin Grant">Marvin Grant</option><option value="Ackeem">Ackeem</option><option value="Unassigned">Unassigned</option></select></div>
         </div>
       </div>
       <div class="modal-section">
@@ -1360,11 +1440,6 @@
           <div class="modal-field"><label>Health</label><input type="text" id="server-health" placeholder="e.g., Good (23%)" /></div>
           <div class="modal-field"><label>Applications</label><input type="text" id="server-apps" placeholder="e.g., Ocularis DM5" /></div>
           <div class="modal-field"><label>Status</label><select id="server-status"><option value="ONLINE">Online</option><option value="OFFLINE">Offline</option></select></div>
-        </div>
-      </div>
-      <div class="modal-section">
-        <div class="modal-section-title">Additional Info</div>
-        <div class="modal-grid">
           <div class="modal-field"><label>Purchase Date</label><input type="date" id="server-purchase-date" /></div>
           <div class="modal-field"><label>Warranty Expiry</label><input type="date" id="server-warranty-expiry" /></div>
         </div>
@@ -1398,6 +1473,121 @@
       <div class="modal-footer">
         <button class="btn" onclick="closeAddModal('add-switch-modal')">Cancel</button>
         <button class="btn btn-accent" onclick="saveNewSwitch()"><i class="ti ti-device-floppy"></i> Add Switch</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Software Modal -->
+  <div class="modal-overlay" id="add-software-modal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeAddModal('add-software-modal')"><i class="ti ti-x"></i></button>
+      <div class="modal-title">💻 Add Software</div>
+      <div class="modal-sub">Add new software to the system</div>
+      <div class="modal-section">
+        <div class="modal-grid">
+          <div class="modal-field"><label>Vendor *</label><select id="software-vendor">
+            <option value="">Select Vendor</option>
+            <option value="Octave">Octave</option>
+            <option value="AMAG">AMAG</option>
+            <option value="Axis">Axis</option>
+            <option value="Inex Tech">Inex Tech</option>
+            <option value="Salto">Salto</option>
+            <option value="Eyelock">Eyelock</option>
+            <option value="Commend">Commend</option>
+            <option value="Southwest Microwave">Southwest Microwave</option>
+            <option value="Trackable">Trackable</option>
+            <option value="Corsight">Corsight</option>
+            <option value="Telaeris">Telaeris</option>
+            <option value="Ipsotek">Ipsotek</option>
+            <option value="IQGEO">IQGEO</option>
+            <option value="NTEST">NTEST</option>
+            <option value="Galaxy">Galaxy</option>
+            <option value="Lenel">Lenel</option>
+            <option value="Maxxess">Maxxess</option>
+          </select></div>
+          <div class="modal-field"><label>Client *</label><select id="software-client"><option value="">Select Client</option></select></div>
+          <div class="modal-field"><label>Version</label><input type="text" id="software-version" placeholder="e.g., 8.5.2" /></div>
+          <div class="modal-field"><label>SMA Expiration</label><input type="date" id="software-sma" /></div>
+          <div class="modal-field"><label>Status</label><select id="software-status"><option value="Good">Good</option><option value="Warning">Warning</option><option value="Expired">Expired</option></select></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeAddModal('add-software-modal')">Cancel</button>
+        <button class="btn btn-accent" onclick="saveNewSoftware()"><i class="ti ti-device-floppy"></i> Add Software</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Storage Modal -->
+  <div class="modal-overlay" id="add-storage-modal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeAddModal('add-storage-modal')"><i class="ti ti-x"></i></button>
+      <div class="modal-title">💾 Add Storage</div>
+      <div class="modal-sub">Add new storage to the system</div>
+      <div class="modal-section">
+        <div class="modal-grid">
+          <div class="modal-field"><label>Name *</label><input type="text" id="storage-name" placeholder="e.g., NAS-01" /></div>
+          <div class="modal-field"><label>Client *</label><select id="storage-client"><option value="">Select Client</option></select></div>
+          <div class="modal-field"><label>Total Storage</label><input type="text" id="storage-total" placeholder="e.g., 10TB" /></div>
+          <div class="modal-field"><label>Usable Storage</label><input type="text" id="storage-usable" placeholder="e.g., 8.2TB" /></div>
+          <div class="modal-field"><label>Health %</label><input type="number" id="storage-health" placeholder="e.g., 85" /></div>
+          <div class="modal-field"><label>Make</label><input type="text" id="storage-make" placeholder="e.g., Dell" /></div>
+          <div class="modal-field"><label>Model</label><input type="text" id="storage-model" placeholder="e.g., PowerVault" /></div>
+          <div class="modal-field"><label>Warranty Expiry</label><input type="date" id="storage-warranty" /></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeAddModal('add-storage-modal')">Cancel</button>
+        <button class="btn btn-accent" onclick="saveNewStorage()"><i class="ti ti-device-floppy"></i> Add Storage</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Station Modal -->
+  <div class="modal-overlay" id="add-station-modal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeAddModal('add-station-modal')"><i class="ti ti-x"></i></button>
+      <div class="modal-title">🖥️ Add Station</div>
+      <div class="modal-sub">Add a new client station</div>
+      <div class="modal-section">
+        <div class="modal-grid">
+          <div class="modal-field"><label>Name *</label><input type="text" id="station-name" placeholder="e.g., Client-PC-01" /></div>
+          <div class="modal-field"><label>Client *</label><select id="station-client"><option value="">Select Client</option></select></div>
+          <div class="modal-field"><label>APPs</label><input type="text" id="station-apps" placeholder="e.g., Ocularis, Office" /></div>
+          <div class="modal-field"><label>Storage</label><input type="text" id="station-storage" placeholder="e.g., 512GB" /></div>
+          <div class="modal-field"><label>Health %</label><input type="number" id="station-health" placeholder="e.g., 90" /></div>
+          <div class="modal-field"><label>Make</label><input type="text" id="station-make" placeholder="e.g., Dell" /></div>
+          <div class="modal-field"><label>Model</label><input type="text" id="station-model" placeholder="e.g., OptiPlex" /></div>
+          <div class="modal-field"><label>Warranty Expiry</label><input type="date" id="station-warranty" /></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeAddModal('add-station-modal')">Cancel</button>
+        <button class="btn btn-accent" onclick="saveNewStation()"><i class="ti ti-device-floppy"></i> Add Station</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Monitor Modal -->
+  <div class="modal-overlay" id="add-monitor-modal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeAddModal('add-monitor-modal')"><i class="ti ti-x"></i></button>
+      <div class="modal-title">🖥️ Add Monitor</div>
+      <div class="modal-sub">Add a new monitor</div>
+      <div class="modal-section">
+        <div class="modal-grid">
+          <div class="modal-field"><label>Name *</label><input type="text" id="monitor-name" placeholder="e.g., Monitor-01" /></div>
+          <div class="modal-field"><label>Client *</label><select id="monitor-client"><option value="">Select Client</option></select></div>
+          <div class="modal-field"><label>Size</label><input type="text" id="monitor-size" placeholder="e.g., 27\"" /></div>
+          <div class="modal-field"><label>Health %</label><input type="number" id="monitor-health" placeholder="e.g., 95" /></div>
+          <div class="modal-field"><label>Make</label><input type="text" id="monitor-make" placeholder="e.g., Dell" /></div>
+          <div class="modal-field"><label>Model</label><input type="text" id="monitor-model" placeholder="e.g., UltraSharp" /></div>
+          <div class="modal-field"><label>Warranty Expiry</label><input type="date" id="monitor-warranty" /></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeAddModal('add-monitor-modal')">Cancel</button>
+        <button class="btn btn-accent" onclick="saveNewMonitor()"><i class="ti ti-device-floppy"></i> Add Monitor</button>
       </div>
     </div>
   </div>
@@ -1482,6 +1672,10 @@
   var DOORS = [];
   var SERVERS = [];
   var SWITCHES = [];
+  var SOFTWARE = [];
+  var STORAGE = [];
+  var STATIONS = [];
+  var MONITORS = [];
   var SERVICE_REQUESTS = [];
   var AUDIT_LOG = [];
   var EMAILS = [];
@@ -1732,6 +1926,20 @@
     return '<span style="color:#4ade80;">' + daysLeft + 'd</span>';
   }
 
+  function getSoftwareStatus(smaDate) {
+    if (!smaDate) return 'Warning';
+    var daysLeft = Math.ceil((new Date(smaDate) - new Date()) / (1000 * 60 * 60 * 24));
+    if (daysLeft < 0) return 'Expired';
+    if (daysLeft <= 30) return 'Warning';
+    return 'Good';
+  }
+
+  function softwareStatusBadge(status) {
+    if (status === 'Good') return '<span class="badge b-good">Good</span>';
+    if (status === 'Warning') return '<span class="badge b-warning">Warning</span>';
+    return '<span class="badge b-expired">Expired</span>';
+  }
+
   function getStatusBadge(health) {
     if (health >= 90) return '<span class="status-badge good">Good</span>';
     if (health >= 70) return '<span class="status-badge warning">Warning</span>';
@@ -1883,6 +2091,10 @@
   function openAddDoorModal() { openAddModal('add-door-modal'); }
   function openAddServerModal() { openAddModal('add-server-modal'); }
   function openAddSwitchModal() { openAddModal('add-switch-modal'); }
+  function openAddSoftwareModal() { openAddModal('add-software-modal'); }
+  function openAddStorageModal() { openAddModal('add-storage-modal'); }
+  function openAddStationModal() { openAddModal('add-station-modal'); }
+  function openAddMonitorModal() { openAddModal('add-monitor-modal'); }
   function openAddClientModal() { openAddModal('add-client-modal'); }
 
   function closeAddModal(modalId) {
@@ -1891,7 +2103,7 @@
   }
 
   function populateClientDropdowns() {
-    var selects = document.querySelectorAll('#sr-client, #cam-client, #door-client, #server-client, #switch-client');
+    var selects = document.querySelectorAll('#sr-client, #cam-client, #door-client, #server-client, #switch-client, #software-client, #storage-client, #station-client, #monitor-client');
     selects.forEach(function(select) {
       var currentVal = select.value;
       select.innerHTML = '<option value="">Select Client</option>';
@@ -2034,6 +2246,8 @@
     doors: 'Access Control',
     servers: 'Servers',
     switches: 'Switches',
+    software: 'Software & Licenses',
+    assets: 'Client Assets',
     files: 'Files & Logs'
   };
 
@@ -2060,6 +2274,8 @@
     if (id === 'doors') { renderDoorsEnhanced(); }
     if (id === 'servers') { renderServersEnhanced(); }
     if (id === 'switches') { renderSwitchesEnhanced(); }
+    if (id === 'software') { renderSoftware(); }
+    if (id === 'assets') { renderStorage(); renderStations(); renderMonitors(); }
   }
 
   document.getElementById('nav').addEventListener('click', function(e) {
@@ -2107,7 +2323,7 @@
       closeComposeModal();
       hideContextMenu();
     }
-    var tabs = ['dashboard', 'inbox', 'service', 'cameras', 'doors', 'servers', 'switches', 'files'];
+    var tabs = ['dashboard', 'inbox', 'service', 'cameras', 'doors', 'servers', 'switches', 'software', 'assets', 'files'];
     var num = parseInt(e.key);
     if (num >= 1 && num <= tabs.length) switchTab(tabs[num - 1]);
     if (e.key === 'n' || e.key === 'N') switchTab('service');
@@ -2270,7 +2486,6 @@
   }
 
   function applyClientBranding(client) {
-    // Placeholder - will be implemented later
     console.log('Client branding applied for:', client);
   }
 
@@ -2322,6 +2537,12 @@
   function loadMockData() {
     CAMERAS = JSON.parse(localStorage.getItem('ccsm_cameras') || '[]');
     DOORS = JSON.parse(localStorage.getItem('ccsm_doors') || '[]');
+    SERVERS = JSON.parse(localStorage.getItem('ccsm_servers') || '[]');
+    SWITCHES = JSON.parse(localStorage.getItem('ccsm_switches') || '[]');
+    SOFTWARE = JSON.parse(localStorage.getItem('ccsm_software') || '[]');
+    STORAGE = JSON.parse(localStorage.getItem('ccsm_storage') || '[]');
+    STATIONS = JSON.parse(localStorage.getItem('ccsm_stations') || '[]');
+    MONITORS = JSON.parse(localStorage.getItem('ccsm_monitors') || '[]');
     SERVICE_REQUESTS = JSON.parse(localStorage.getItem('ccsm_sr') || '[]');
     AUDIT_LOG = JSON.parse(localStorage.getItem('ccsm_audit_log') || '[]');
 
@@ -2344,6 +2565,56 @@
       localStorage.setItem('ccsm_doors', JSON.stringify(DOORS));
     }
 
+    if (SERVERS.length === 0) {
+      SERVERS = [
+        { location: "Kingport", serial: "J1013DDR", make: "Dell", model: "PowerEdge R740", capacity: "6.11TB", used: "1.4TB", health: "Good (23%)", apps: "Ocularis DM5, LPR", status: "ONLINE", comments: "", purchase_date: "2024-01-15", warranty_expiry: "2026-01-15" },
+        { location: "Kingport", serial: "J1013DDV", make: "HP", model: "ProLiant DL380", capacity: "6.11TB", used: "1.4TB", health: "Good, Failed drive", apps: "Ocularis DM6, Eyelock", status: "ONLINE", comments: "", purchase_date: "2023-06-01", warranty_expiry: "2025-06-01" },
+        { location: "Kingport", serial: "J1013DDX", make: "Lenovo", model: "ThinkSystem SR650", capacity: "45TB", used: "178GB", health: "Excellent", apps: "—", status: "ONLINE", comments: "", purchase_date: "2024-08-15", warranty_expiry: "2026-08-15" }
+      ];
+      localStorage.setItem('ccsm_servers', JSON.stringify(SERVERS));
+    }
+
+    if (SWITCHES.length === 0) {
+      SWITCHES = [
+        { name: "Main Entrance", location: "Security Office", model: "AXIS T8508", ip_address: "10.19.1.21", firmware: "6.54.2739", mac: "AC:CC:8E:FA:4B:1B", comments: "", purchase_date: "2024-02-01", warranty_expiry: "2026-02-01" },
+        { name: "2nd entrance", location: "SAL Duty Office", model: "AXIS T8516", ip_address: "10.19.1.23", firmware: "6.54.2739", mac: "AC:CC:8E:B6:DF:99", comments: "", purchase_date: "2024-03-15", warranty_expiry: "2026-03-15" }
+      ];
+      localStorage.setItem('ccsm_switches', JSON.stringify(SWITCHES));
+    }
+
+    if (SOFTWARE.length === 0) {
+      SOFTWARE = [
+        { vendor: "Axis", client: "KFTL", version: "8.5.2", sma_expiry: "2026-12-31", status: "Good" },
+        { vendor: "Lenel", client: "KWL", version: "7.3.1", sma_expiry: "2026-06-15", status: "Warning" },
+        { vendor: "AMAG", client: "KFTL", version: "9.0.0", sma_expiry: "2025-01-01", status: "Expired" }
+      ];
+      localStorage.setItem('ccsm_software', JSON.stringify(SOFTWARE));
+    }
+
+    if (STORAGE.length === 0) {
+      STORAGE = [
+        { name: "NAS-01", client: "KFTL", total: "10TB", usable: "8.2TB", health: 85, make: "Dell", model: "PowerVault", warranty_expiry: "2027-01-15" },
+        { name: "SAN-02", client: "KWL", total: "20TB", usable: "15.6TB", health: 92, make: "NetApp", model: "FAS2750", warranty_expiry: "2026-08-01" }
+      ];
+      localStorage.setItem('ccsm_storage', JSON.stringify(STORAGE));
+    }
+
+    if (STATIONS.length === 0) {
+      STATIONS = [
+        { name: "Client-PC-01", client: "KFTL", apps: "Ocularis, Office", storage: "512GB", health: 90, make: "Dell", model: "OptiPlex", warranty_expiry: "2027-03-15" },
+        { name: "Client-PC-02", client: "KWL", apps: "Eyelock, Office", storage: "256GB", health: 78, make: "HP", model: "EliteDesk", warranty_expiry: "2026-06-01" }
+      ];
+      localStorage.setItem('ccsm_stations', JSON.stringify(STATIONS));
+    }
+
+    if (MONITORS.length === 0) {
+      MONITORS = [
+        { name: "Monitor-01", client: "KFTL", size: "27\"", health: 95, make: "Dell", model: "UltraSharp", warranty_expiry: "2027-02-01" },
+        { name: "Monitor-02", client: "KWL", size: "32\"", health: 88, make: "LG", model: "UltraWide", warranty_expiry: "2026-09-15" }
+      ];
+      localStorage.setItem('ccsm_monitors', JSON.stringify(MONITORS));
+    }
+
     if (SERVICE_REQUESTS.length === 0) {
       SERVICE_REQUESTS = [
         { id: "SR-1847", client: "KFTL", site: "NORTH", subject: "8 Cameras Defective in NORTH Zone", from: "David Chen", category: "Camera", priority: "High", status: "Open", assigned: "Shanice Vernon", received: "Jun 15, 2026", body: "Multiple cameras showing as defective in NORTH zone. Need immediate attention.", notes: "Awaiting parts", history: [{ time: "14:22", msg: "Created" }, { time: "15:00", msg: "Assigned to Shanice" }], attachments: [] },
@@ -2360,6 +2631,10 @@
     renderDoorsEnhanced();
     renderServersEnhanced();
     renderSwitchesEnhanced();
+    renderSoftware();
+    renderStorage();
+    renderStations();
+    renderMonitors();
     renderInbox();
     renderFileExplorer();
   }
@@ -2424,6 +2699,20 @@
         zones.push(d.site);
       }
     });
+    SERVERS.forEach(function(s) {
+      var clientName = getClient(s.location);
+      if (clientName === client && s.location && siteMap[s.location] === undefined) {
+        siteMap[s.location] = true;
+        zones.push(s.location);
+      }
+    });
+    SWITCHES.forEach(function(s) {
+      var clientName = getClient(s.location);
+      if (clientName === client && s.location && siteMap[s.location] === undefined) {
+        siteMap[s.location] = true;
+        zones.push(s.location);
+      }
+    });
 
     zones.sort();
 
@@ -2462,6 +2751,8 @@
       html += '<div class="nav-item nav-sub-item" data-tab="doors" data-client="' + client + '"><i class="ti ti-door"></i> <span>Access Control</span></div>';
       html += '<div class="nav-item nav-sub-item" data-tab="servers" data-client="' + client + '"><i class="ti ti-server"></i> <span>Servers</span></div>';
       html += '<div class="nav-item nav-sub-item" data-tab="switches" data-client="' + client + '"><i class="ti ti-router"></i> <span>Switches</span></div>';
+      html += '<div class="nav-item nav-sub-item" data-tab="software" data-client="' + client + '"><i class="ti ti-code"></i> <span>Software</span></div>';
+      html += '<div class="nav-item nav-sub-item" data-tab="assets" data-client="' + client + '"><i class="ti ti-database"></i> <span>Client Assets</span></div>';
       html += '</div></div>';
     });
 
@@ -2495,6 +2786,8 @@
     else if (currentTab === 'doors') renderDoorsEnhanced();
     else if (currentTab === 'servers') renderServersEnhanced();
     else if (currentTab === 'switches') renderSwitchesEnhanced();
+    else if (currentTab === 'software') renderSoftware();
+    else if (currentTab === 'assets') { renderStorage(); renderStations(); renderMonitors(); }
     toast('Showing: ' + zone, 'info');
   }
 
@@ -3334,6 +3627,365 @@
     var sw = SWITCHES.find(function(s) { return s.name === title; });
     if (sw) window.open('http://' + sw.ip_address, '_blank');
     else toast('No IP', 'error');
+  }
+
+  // ============================================================
+  // ── SOFTWARE ──────────────────────────────────────────────────
+  // ============================================================
+
+  function renderSoftware() {
+    var search = document.getElementById('sw-search') ? document.getElementById('sw-search').value.toLowerCase() : '';
+    var statusFilter = document.getElementById('sw-status-filter') ? document.getElementById('sw-status-filter').value : 'All';
+    showLoading('sw-loading');
+    setTimeout(function() {
+      var filtered = SOFTWARE.filter(function(s) {
+        var match = s.vendor.toLowerCase().indexOf(search) !== -1 ||
+          (s.version || '').toLowerCase().indexOf(search) !== -1 ||
+          (s.client || '').toLowerCase().indexOf(search) !== -1;
+        var statusMatch = statusFilter === 'All' || s.status === statusFilter;
+        return match && statusMatch;
+      });
+      if (currentClientFilter) {
+        filtered = filtered.filter(function(s) { return s.client === currentClientFilter; });
+      }
+
+      var total = SOFTWARE.length;
+      document.getElementById('sw-total-count').textContent = total;
+      document.getElementById('sw-good-count').textContent = SOFTWARE.filter(function(s) { return s.status === 'Good'; }).length;
+      document.getElementById('sw-warning-count').textContent = SOFTWARE.filter(function(s) { return s.status === 'Warning'; }).length;
+      document.getElementById('sw-expired-count').textContent = SOFTWARE.filter(function(s) { return s.status === 'Expired'; }).length;
+
+      var container = document.getElementById('sw-groups-container');
+      if (!container) return;
+      
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="empty-state"><span class="empty-icon">💻</span><div class="empty-title">No software found</div></div>';
+      } else {
+        var html = '<table class="tbl"><thead><tr><th>Vendor</th><th>Client</th><th>Version</th><th>SMA Expiry</th><th>Status</th></tr></thead><tbody>';
+        filtered.forEach(function(s) {
+          html += '<tr><td>' + s.vendor + '</td><td>' + s.client + '</td><td>' + (s.version || '—') + '</td><td>' + (s.sma_expiry || '—') + '</td><td>' + softwareStatusBadge(s.status) + '</td></tr>';
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      }
+      document.querySelectorAll('.loading-overlay').forEach(function(el) { el.classList.remove('active'); });
+    }, 50);
+  }
+
+  function refreshSoftware() {
+    toast('Software data refreshed', 'success');
+    loadData();
+  }
+
+  function exportSoftwareCSV() {
+    var headers = ['vendor', 'client', 'version', 'sma_expiry', 'status'];
+    var data = SOFTWARE.map(function(s) {
+      return {
+        vendor: s.vendor || '',
+        client: s.client || '',
+        version: s.version || '',
+        sma_expiry: s.sma_expiry || '',
+        status: s.status || ''
+      };
+    });
+    exportToCSV(data, headers, 'software');
+  }
+
+  function saveNewSoftware() {
+    var vendor = document.getElementById('software-vendor').value;
+    var client = document.getElementById('software-client').value;
+    if (!vendor) { toast('Please select a vendor', 'warning'); return; }
+    if (!client) { toast('Please select a client', 'warning'); return; }
+
+    var newSoftware = {
+      vendor: vendor,
+      client: client,
+      version: document.getElementById('software-version').value.trim(),
+      sma_expiry: document.getElementById('software-sma').value,
+      status: document.getElementById('software-status').value
+    };
+
+    SOFTWARE.push(newSoftware);
+    localStorage.setItem('ccsm_software', JSON.stringify(SOFTWARE));
+    closeAddModal('add-software-modal');
+    toast('Software ' + vendor + ' added!', 'success');
+    renderSoftware();
+  }
+
+  // ============================================================
+  // ── CLIENT ASSETS ────────────────────────────────────────────
+  // ============================================================
+
+  var currentAssetSubTab = 'storage';
+
+  function switchAssetSubTab(tab) {
+    currentAssetSubTab = tab;
+    document.querySelectorAll('.asset-sub-tab').forEach(function(el) {
+      el.classList.remove('active');
+    });
+    document.querySelectorAll('.asset-sub-tab').forEach(function(el) {
+      if (el.dataset.subtab === tab) el.classList.add('active');
+    });
+    document.querySelectorAll('.asset-sub-content').forEach(function(el) {
+      el.classList.remove('active');
+    });
+    var content = document.getElementById('subtab-' + tab);
+    if (content) content.classList.add('active');
+    
+    if (tab === 'storage') renderStorage();
+    else if (tab === 'stations') renderStations();
+    else if (tab === 'monitors') renderMonitors();
+  }
+
+  function renderStorage() {
+    var search = document.getElementById('storage-search') ? document.getElementById('storage-search').value.toLowerCase() : '';
+    showLoading('storage-loading');
+    setTimeout(function() {
+      var filtered = STORAGE.filter(function(s) {
+        return s.name.toLowerCase().indexOf(search) !== -1 ||
+          (s.make || '').toLowerCase().indexOf(search) !== -1 ||
+          (s.model || '').toLowerCase().indexOf(search) !== -1;
+      });
+      if (currentClientFilter) {
+        filtered = filtered.filter(function(s) { return s.client === currentClientFilter; });
+      }
+
+      var total = STORAGE.length;
+      var totalCap = STORAGE.reduce(function(acc, s) {
+        var cap = parseFloat(s.total);
+        if (!isNaN(cap)) return acc + cap;
+        return acc;
+      }, 0);
+      var avgHealth = STORAGE.length > 0 ? Math.round(STORAGE.reduce(function(acc, s) { return acc + (s.health || 0); }, 0) / STORAGE.length) : 0;
+
+      document.getElementById('storage-total').textContent = total;
+      document.getElementById('storage-capacity').textContent = totalCap.toFixed(1) + ' TB';
+      document.getElementById('storage-health').textContent = avgHealth + '%';
+
+      var container = document.getElementById('storage-groups-container');
+      if (!container) return;
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="empty-state"><span class="empty-icon">💾</span><div class="empty-title">No storage found</div></div>';
+      } else {
+        var html = '<table class="tbl"><thead><tr><th>Name</th><th>Client</th><th>Total</th><th>Usable</th><th>Health</th><th>Make</th><th>Model</th><th>Warranty</th></tr></thead><tbody>';
+        filtered.forEach(function(s) {
+          html += '<tr><td>' + s.name + '</td><td>' + s.client + '</td><td>' + s.total + '</td><td>' + s.usable + '</td><td>' + getStatusBadge(s.health || 0) + ' ' + (s.health || 0) + '%</td><td>' + (s.make || '—') + '</td><td>' + (s.model || '—') + '</td><td>' + getWarrantyDisplay(s.warranty_expiry) + '</td></tr>';
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      }
+      document.querySelectorAll('.loading-overlay').forEach(function(el) { el.classList.remove('active'); });
+    }, 50);
+  }
+
+  function renderStations() {
+    var search = document.getElementById('stations-search') ? document.getElementById('stations-search').value.toLowerCase() : '';
+    showLoading('stations-loading');
+    setTimeout(function() {
+      var filtered = STATIONS.filter(function(s) {
+        return s.name.toLowerCase().indexOf(search) !== -1 ||
+          (s.apps || '').toLowerCase().indexOf(search) !== -1 ||
+          (s.make || '').toLowerCase().indexOf(search) !== -1 ||
+          (s.model || '').toLowerCase().indexOf(search) !== -1;
+      });
+      if (currentClientFilter) {
+        filtered = filtered.filter(function(s) { return s.client === currentClientFilter; });
+      }
+
+      var total = STATIONS.length;
+      var avgHealth = STATIONS.length > 0 ? Math.round(STATIONS.reduce(function(acc, s) { return acc + (s.health || 0); }, 0) / STATIONS.length) : 0;
+      var totalStorage = STATIONS.reduce(function(acc, s) {
+        var st = parseFloat(s.storage);
+        if (!isNaN(st)) return acc + st;
+        return acc;
+      }, 0);
+
+      document.getElementById('stations-total').textContent = total;
+      document.getElementById('stations-health').textContent = avgHealth + '%';
+      document.getElementById('stations-storage').textContent = totalStorage.toFixed(1) + ' TB';
+
+      var container = document.getElementById('stations-groups-container');
+      if (!container) return;
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="empty-state"><span class="empty-icon">🖥️</span><div class="empty-title">No stations found</div></div>';
+      } else {
+        var html = '<table class="tbl"><thead><tr><th>Name</th><th>Client</th><th>APPs</th><th>Storage</th><th>Health</th><th>Make</th><th>Model</th><th>Warranty</th></tr></thead><tbody>';
+        filtered.forEach(function(s) {
+          html += '<tr><td>' + s.name + '</td><td>' + s.client + '</td><td>' + (s.apps || '—') + '</td><td>' + (s.storage || '—') + '</td><td>' + getStatusBadge(s.health || 0) + ' ' + (s.health || 0) + '%</td><td>' + (s.make || '—') + '</td><td>' + (s.model || '—') + '</td><td>' + getWarrantyDisplay(s.warranty_expiry) + '</td></tr>';
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      }
+      document.querySelectorAll('.loading-overlay').forEach(function(el) { el.classList.remove('active'); });
+    }, 50);
+  }
+
+  function renderMonitors() {
+    var search = document.getElementById('monitors-search') ? document.getElementById('monitors-search').value.toLowerCase() : '';
+    showLoading('monitors-loading');
+    setTimeout(function() {
+      var filtered = MONITORS.filter(function(s) {
+        return s.name.toLowerCase().indexOf(search) !== -1 ||
+          (s.make || '').toLowerCase().indexOf(search) !== -1 ||
+          (s.model || '').toLowerCase().indexOf(search) !== -1;
+      });
+      if (currentClientFilter) {
+        filtered = filtered.filter(function(s) { return s.client === currentClientFilter; });
+      }
+
+      var total = MONITORS.length;
+      var avgHealth = MONITORS.length > 0 ? Math.round(MONITORS.reduce(function(acc, s) { return acc + (s.health || 0); }, 0) / MONITORS.length) : 0;
+      var avgSize = MONITORS.length > 0 ? Math.round(MONITORS.reduce(function(acc, s) {
+        var size = parseFloat(s.size);
+        if (!isNaN(size)) return acc + size;
+        return acc;
+      }, 0) / MONITORS.length) : 0;
+
+      document.getElementById('monitors-total').textContent = total;
+      document.getElementById('monitors-health').textContent = avgHealth + '%';
+      document.getElementById('monitors-size').textContent = avgSize + '"';
+
+      var container = document.getElementById('monitors-groups-container');
+      if (!container) return;
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="empty-state"><span class="empty-icon">🖥️</span><div class="empty-title">No monitors found</div></div>';
+      } else {
+        var html = '<table class="tbl"><thead><tr><th>Name</th><th>Client</th><th>Size</th><th>Health</th><th>Make</th><th>Model</th><th>Warranty</th></tr></thead><tbody>';
+        filtered.forEach(function(s) {
+          html += '<tr><td>' + s.name + '</td><td>' + s.client + '</td><td>' + (s.size || '—') + '</td><td>' + getStatusBadge(s.health || 0) + ' ' + (s.health || 0) + '%</td><td>' + (s.make || '—') + '</td><td>' + (s.model || '—') + '</td><td>' + getWarrantyDisplay(s.warranty_expiry) + '</td></tr>';
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      }
+      document.querySelectorAll('.loading-overlay').forEach(function(el) { el.classList.remove('active'); });
+    }, 50);
+  }
+
+  function refreshAssets() {
+    toast('Assets data refreshed', 'success');
+    loadData();
+  }
+
+  function exportAssetsCSV() {
+    if (currentAssetSubTab === 'storage') {
+      var headers = ['name', 'client', 'total', 'usable', 'health', 'make', 'model', 'warranty_expiry'];
+      var data = STORAGE.map(function(s) {
+        return {
+          name: s.name || '',
+          client: s.client || '',
+          total: s.total || '',
+          usable: s.usable || '',
+          health: s.health || 0,
+          make: s.make || '',
+          model: s.model || '',
+          warranty_expiry: s.warranty_expiry || ''
+        };
+      });
+      exportToCSV(data, headers, 'storage');
+    } else if (currentAssetSubTab === 'stations') {
+      var headers = ['name', 'client', 'apps', 'storage', 'health', 'make', 'model', 'warranty_expiry'];
+      var data = STATIONS.map(function(s) {
+        return {
+          name: s.name || '',
+          client: s.client || '',
+          apps: s.apps || '',
+          storage: s.storage || '',
+          health: s.health || 0,
+          make: s.make || '',
+          model: s.model || '',
+          warranty_expiry: s.warranty_expiry || ''
+        };
+      });
+      exportToCSV(data, headers, 'stations');
+    } else if (currentAssetSubTab === 'monitors') {
+      var headers = ['name', 'client', 'size', 'health', 'make', 'model', 'warranty_expiry'];
+      var data = MONITORS.map(function(s) {
+        return {
+          name: s.name || '',
+          client: s.client || '',
+          size: s.size || '',
+          health: s.health || 0,
+          make: s.make || '',
+          model: s.model || '',
+          warranty_expiry: s.warranty_expiry || ''
+        };
+      });
+      exportToCSV(data, headers, 'monitors');
+    }
+  }
+
+  function saveNewStorage() {
+    var name = document.getElementById('storage-name').value.trim();
+    var client = document.getElementById('storage-client').value;
+    if (!name) { toast('Please enter a storage name', 'warning'); return; }
+    if (!client) { toast('Please select a client', 'warning'); return; }
+
+    var newStorage = {
+      name: name,
+      client: client,
+      total: document.getElementById('storage-total').value.trim(),
+      usable: document.getElementById('storage-usable').value.trim(),
+      health: parseInt(document.getElementById('storage-health').value) || 0,
+      make: document.getElementById('storage-make').value.trim(),
+      model: document.getElementById('storage-model').value.trim(),
+      warranty_expiry: document.getElementById('storage-warranty').value
+    };
+
+    STORAGE.push(newStorage);
+    localStorage.setItem('ccsm_storage', JSON.stringify(STORAGE));
+    closeAddModal('add-storage-modal');
+    toast('Storage ' + name + ' added!', 'success');
+    renderStorage();
+  }
+
+  function saveNewStation() {
+    var name = document.getElementById('station-name').value.trim();
+    var client = document.getElementById('station-client').value;
+    if (!name) { toast('Please enter a station name', 'warning'); return; }
+    if (!client) { toast('Please select a client', 'warning'); return; }
+
+    var newStation = {
+      name: name,
+      client: client,
+      apps: document.getElementById('station-apps').value.trim(),
+      storage: document.getElementById('station-storage').value.trim(),
+      health: parseInt(document.getElementById('station-health').value) || 0,
+      make: document.getElementById('station-make').value.trim(),
+      model: document.getElementById('station-model').value.trim(),
+      warranty_expiry: document.getElementById('station-warranty').value
+    };
+
+    STATIONS.push(newStation);
+    localStorage.setItem('ccsm_stations', JSON.stringify(STATIONS));
+    closeAddModal('add-station-modal');
+    toast('Station ' + name + ' added!', 'success');
+    renderStations();
+  }
+
+  function saveNewMonitor() {
+    var name = document.getElementById('monitor-name').value.trim();
+    var client = document.getElementById('monitor-client').value;
+    if (!name) { toast('Please enter a monitor name', 'warning'); return; }
+    if (!client) { toast('Please select a client', 'warning'); return; }
+
+    var newMonitor = {
+      name: name,
+      client: client,
+      size: document.getElementById('monitor-size').value.trim(),
+      health: parseInt(document.getElementById('monitor-health').value) || 0,
+      make: document.getElementById('monitor-make').value.trim(),
+      model: document.getElementById('monitor-model').value.trim(),
+      warranty_expiry: document.getElementById('monitor-warranty').value
+    };
+
+    MONITORS.push(newMonitor);
+    localStorage.setItem('ccsm_monitors', JSON.stringify(MONITORS));
+    closeAddModal('add-monitor-modal');
+    toast('Monitor ' + name + ' added!', 'success');
+    renderMonitors();
   }
 
   // ============================================================
@@ -4352,6 +5004,10 @@
   function debounceRenderServers() { debounce(renderServersEnhanced, 'srv', 250); }
   function debounceRenderSwitches() { debounce(renderSwitchesEnhanced, 'sw', 250); }
   function debounceRenderFiles() { debounce(renderFileExplorer, 'file', 250); }
+  function debounceRenderSoftware() { debounce(renderSoftware, 'sw', 250); }
+  function debounceRenderStorage() { debounce(renderStorage, 'storage', 250); }
+  function debounceRenderStations() { debounce(renderStations, 'stations', 250); }
+  function debounceRenderMonitors() { debounce(renderMonitors, 'monitors', 250); }
 
   function saveNewCamera() {
     var name = document.getElementById('cam-name').value.trim();
@@ -4438,6 +5094,7 @@
     };
 
     SERVERS.push(newServer);
+    localStorage.setItem('ccsm_servers', JSON.stringify(SERVERS));
     closeAddModal('add-server-modal');
     toast('Server ' + serial + ' added!', 'success');
     renderServersEnhanced();
@@ -4529,6 +5186,10 @@
     doors: DOORS.length,
     servers: SERVERS.length,
     switches: SWITCHES.length,
+    software: SOFTWARE.length,
+    storage: STORAGE.length,
+    stations: STATIONS.length,
+    monitors: MONITORS.length,
     srs: SERVICE_REQUESTS.length
   });
 </script>
