@@ -269,9 +269,9 @@
     color: #1a1a2e;
   }
   .client-topbar .topbar-actions .etech-logo {
-    height: 28px;
+    height: 34px;
     width: auto;
-    opacity: 0.6;
+    opacity: 0.7;
     transition: opacity 0.2s;
   }
   .client-topbar .topbar-actions .etech-logo:hover {
@@ -498,7 +498,7 @@
   }
   .stat-card .stat-label {
     font-size: 10px;
-    color: #999;
+    color: #666;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     font-weight: 700;
@@ -537,7 +537,7 @@
   .panel-title {
     font-size: 12px;
     font-weight: 700;
-    color: #666;
+    color: #444;
     text-transform: uppercase;
     letter-spacing: 0.08em;
   }
@@ -552,6 +552,112 @@
   }
   .panel .link-btn:hover {
     text-decoration: underline;
+  }
+
+  /* ── Asset Sub-tabs ── */
+  .asset-sub-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+    border-bottom: 2px solid var(--client-border);
+    flex-wrap: wrap;
+  }
+  .asset-sub-tab {
+    padding: 8px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #999;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.15s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: var(--font);
+  }
+  .asset-sub-tab:hover {
+    color: #1a1a2e;
+  }
+  .asset-sub-tab.active {
+    color: var(--client-primary);
+    border-bottom-color: var(--client-primary);
+  }
+  .asset-sub-tab .tab-count {
+    font-size: 10px;
+    color: #bbb;
+    margin-left: 4px;
+  }
+  .asset-sub-tab.active .tab-count {
+    color: var(--client-primary);
+  }
+
+  /* ── Filter Pills ── */
+  .filter-pills {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .filter-pill {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 12px;
+    font-size: 11px;
+    color: #888;
+    background: #f8f9fa;
+    border: 1px solid var(--client-border);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+  .filter-pill:hover {
+    border-color: var(--client-primary);
+    color: #1a1a2e;
+  }
+  .filter-pill.active {
+    background: var(--client-primary);
+    color: #fff;
+    border-color: var(--client-primary);
+  }
+  .filter-pill .count {
+    background: rgba(0,0,0,0.06);
+    padding: 0 6px;
+    border-radius: 8px;
+    font-size: 10px;
+    margin-left: 4px;
+  }
+  .filter-pill.active .count {
+    background: rgba(255,255,255,0.2);
+  }
+
+  /* ── Search & Filter Bar ── */
+  .search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .search-bar input,
+  .search-bar select {
+    background: #f8f9fa;
+    border: 1px solid var(--client-border);
+    color: #1a1a2e;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: var(--font);
+  }
+  .search-bar input { flex: 1; min-width: 150px; }
+  .search-bar input:focus,
+  .search-bar select:focus {
+    outline: none;
+    border-color: var(--client-primary);
+  }
+  .search-bar select option {
+    background: #ffffff;
+    color: #1a1a2e;
   }
 
   /* ── Tables ── */
@@ -578,6 +684,9 @@
   .tbl tr:hover td {
     background: #f8f9fa;
   }
+  .tbl tr.clickable {
+    cursor: pointer;
+  }
   .tbl .status-badge {
     display: inline-block;
     padding: 2px 12px;
@@ -594,62 +703,6 @@
   .tbl .pri-high { color: #ef4444; font-weight: 600; }
   .tbl .pri-med { color: #f59e0b; font-weight: 600; }
   .tbl .pri-low { color: #22c55e; font-weight: 600; }
-
-  /* ── Search & Filter ── */
-  .search-filter-bar {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 14px;
-    flex-wrap: wrap;
-  }
-  .search-filter-bar input,
-  .search-filter-bar select {
-    background: #f8f9fa;
-    border: 1px solid var(--client-border);
-    color: #1a1a2e;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-family: var(--font);
-  }
-  .search-filter-bar input { flex: 1; min-width: 150px; }
-  .search-filter-bar input:focus,
-  .search-filter-bar select:focus {
-    outline: none;
-    border-color: var(--client-primary);
-  }
-  .search-filter-bar select option {
-    background: #ffffff;
-    color: #1a1a2e;
-  }
-
-  /* ── Tag Filters ── */
-  .tag-filters {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
-  }
-  .tag-filter {
-    padding: 4px 14px;
-    border-radius: 12px;
-    font-size: 10px;
-    font-weight: 500;
-    color: #888;
-    background: #f8f9fa;
-    border: 1px solid var(--client-border);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .tag-filter:hover {
-    border-color: var(--client-primary);
-    color: #1a1a2e;
-  }
-  .tag-filter.active {
-    background: var(--client-primary);
-    color: #fff;
-    border-color: var(--client-primary);
-  }
 
   /* ── Timeline ── */
   .timeline-item {
@@ -800,7 +853,7 @@
   .modal {
     background: #ffffff;
     border-radius: 12px;
-    width: 580px;
+    width: 680px;
     max-height: 86vh;
     overflow-y: auto;
     padding: 28px 32px;
@@ -809,8 +862,6 @@
     box-shadow: 0 24px 80px rgba(0,0,0,0.2);
     max-width: 95%;
   }
-  .modal.wide { width: 680px; }
-  .modal.xwide { width: 760px; }
   .modal-close {
     position: absolute;
     top: 16px;
@@ -866,21 +917,16 @@
     font-size: 13px;
     color: #1a1a2e;
   }
-  .modal-field input,
-  .modal-field select {
-    background: #f8f9fa;
-    border: 1px solid var(--client-border);
-    color: #1a1a2e;
-    padding: 6px 10px;
-    border-radius: 4px;
+  .modal-field .history-item {
+    padding: 4px 0;
     font-size: 12px;
-    width: 100%;
-    font-family: var(--font);
+    color: #666;
+    border-bottom: 1px solid #f0f0f0;
   }
-  .modal-field input:focus,
-  .modal-field select:focus {
-    outline: none;
-    border-color: var(--client-primary);
+  .modal-field .history-item .h-time {
+    color: #999;
+    font-size: 11px;
+    margin-right: 8px;
   }
   .modal-footer {
     display: flex;
@@ -889,6 +935,21 @@
     margin-top: 18px;
     padding-top: 14px;
     border-top: 1px solid var(--client-border);
+  }
+  .modal .btn {
+    padding: 8px 16px;
+    border: 1px solid var(--client-border);
+    border-radius: 6px;
+    background: transparent;
+    color: #666;
+    cursor: pointer;
+    font-family: var(--font);
+    font-size: 12px;
+    transition: all 0.2s;
+  }
+  .modal .btn:hover {
+    border-color: var(--client-primary);
+    color: var(--client-primary);
   }
 
   /* ── Responsive ── */
@@ -903,6 +964,7 @@
     .client-sidebar .nav-item i { margin: 0; }
     .client-sidebar .client-branding { padding: 0 8px 12px; }
     .client-content { padding: 20px; }
+    .modal { width: 95%; }
   }
   @media (max-width: 600px) {
     .stats-grid { grid-template-columns: 1fr; }
@@ -933,6 +995,8 @@
     .client-sidebar .nav-item { justify-content: flex-start; padding: 10px 14px; }
     .client-sidebar .nav-item i { margin: 0 6px 0 0; }
     .mobile-menu-btn { display: flex !important; }
+    .asset-sub-tabs { overflow-x: auto; flex-wrap: nowrap; }
+    .asset-sub-tab { padding: 6px 12px; font-size: 12px; white-space: nowrap; }
   }
 
   .mobile-menu-btn {
@@ -1023,8 +1087,21 @@
         <button class="nav-item active" data-page="dashboard" onclick="switchPage('dashboard')">
           <i class="ti ti-layout-dashboard"></i> <span>Dashboard</span>
         </button>
-        <button class="nav-item" data-page="assets" onclick="switchPage('assets')">
-          <i class="ti ti-devices"></i> <span>Assets</span>
+        <button class="nav-item" data-page="cameras" onclick="switchPage('cameras')">
+          <i class="ti ti-video"></i> <span>Cameras</span>
+          <span class="badge" id="cam-badge">0</span>
+        </button>
+        <button class="nav-item" data-page="doors" onclick="switchPage('doors')">
+          <i class="ti ti-door"></i> <span>Access Control</span>
+          <span class="badge" id="door-badge">0</span>
+        </button>
+        <button class="nav-item" data-page="servers" onclick="switchPage('servers')">
+          <i class="ti ti-server"></i> <span>Servers</span>
+          <span class="badge" id="server-badge">0</span>
+        </button>
+        <button class="nav-item" data-page="switches" onclick="switchPage('switches')">
+          <i class="ti ti-router"></i> <span>Switches</span>
+          <span class="badge" id="switch-badge">0</span>
         </button>
         <button class="nav-item" data-page="service-requests" onclick="switchPage('service-requests')">
           <i class="ti ti-clipboard-list"></i> <span>Service Requests</span>
@@ -1112,38 +1189,104 @@
           </div>
         </section>
 
-        <!-- Assets -->
-        <section class="page-section" id="page-assets">
-          <h2 style="font-size:20px;font-weight:700;color:#1a1a2e;margin-bottom:20px;">Your Assets</h2>
-          
-          <div class="stats-grid" style="margin-bottom:16px;">
-            <div class="stat-card"><div class="stat-value" id="asset-cameras">0</div><div class="stat-label">Cameras</div></div>
-            <div class="stat-card"><div class="stat-value" id="asset-doors">0</div><div class="stat-label">Access Control</div></div>
-            <div class="stat-card"><div class="stat-value" id="asset-servers">0</div><div class="stat-label">Servers</div></div>
-            <div class="stat-card"><div class="stat-value" id="asset-switches">0</div><div class="stat-label">Switches</div></div>
-          </div>
-
+        <!-- Cameras -->
+        <section class="page-section" id="page-cameras">
+          <h2 style="font-size:20px;font-weight:700;color:#1a1a2e;margin-bottom:20px;">Cameras</h2>
           <div class="panel">
-            <div class="search-filter-bar">
-              <input type="text" id="asset-search" placeholder="Search assets by name or location..." oninput="renderAssets()">
-              <select id="asset-type-filter" onchange="renderAssets()">
-                <option value="all">All Types</option>
-                <option value="Camera">Cameras</option>
-                <option value="Access Control">Access Control</option>
-                <option value="Server">Servers</option>
-                <option value="Switch">Switches</option>
+            <div class="panel-header">
+              <span class="panel-title">All Cameras</span>
+              <span class="last-updated" id="cam-last-updated" style="font-size:11px;color:#999;">Last updated: Today</span>
+            </div>
+            <div class="filter-pills" id="cam-filter-pills"></div>
+            <div class="search-bar">
+              <input type="text" id="cam-search" placeholder="Search by camera name, IP, or comments…" oninput="renderCameras()">
+              <select id="cam-per-page" onchange="renderCameras()" style="flex:0 0 120px;">
+                <option value="10">10 per page</option>
+                <option value="25">25 per page</option>
+                <option value="50">50 per page</option>
+                <option value="999">All</option>
               </select>
             </div>
-            <div class="tag-filters" id="asset-tag-filters">
-              <button class="tag-filter active" data-tag="all" onclick="filterAssetsByTag('all')">All</button>
-              <button class="tag-filter" data-tag="online" onclick="filterAssetsByTag('online')">Online</button>
-              <button class="tag-filter" data-tag="offline" onclick="filterAssetsByTag('offline')">Offline</button>
-              <button class="tag-filter" data-tag="maintenance" onclick="filterAssetsByTag('maintenance')">Maintenance</button>
+            <div class="tbl-wrap" style="overflow-x:auto;">
+              <table class="tbl" id="cam-table">
+                <thead><tr><th>Name</th><th>Zone</th><th>IP</th><th>Status</th><th>Model</th><th>Resolution</th><th>Archiver</th><th>Install Date</th></tr></thead>
+                <tbody id="cam-table-body"></tbody>
+              </table>
+            </div>
+            <div class="cam-pagination" id="cam-pagination"></div>
+          </div>
+        </section>
+
+        <!-- Doors -->
+        <section class="page-section" id="page-doors">
+          <h2 style="font-size:20px;font-weight:700;color:#1a1a2e;margin-bottom:20px;">Access Control — Doors</h2>
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">All Doors</span>
+              <span class="last-updated" id="door-last-updated" style="font-size:11px;color:#999;">Last updated: Today</span>
+            </div>
+            <div class="filter-pills" id="door-filter-pills"></div>
+            <div class="search-bar">
+              <input type="text" id="door-search" placeholder="Search doors, readers, or technicians…" oninput="renderDoors()">
             </div>
             <div class="tbl-wrap" style="overflow-x:auto;">
-              <table class="tbl" id="assets-table">
-                <thead><tr><th>Name</th><th>Type</th><th>Location</th><th>Status</th><th>Details</th></tr></thead>
-                <tbody id="assets-table-body"></tbody>
+              <table class="tbl" id="door-table">
+                <thead><tr><th>Name</th><th>Site</th><th>Reader</th><th>Lock</th><th>Powered</th><th>Status</th><th>Tech</th><th>Install Date</th></tr></thead>
+                <tbody id="door-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Servers -->
+        <section class="page-section" id="page-servers">
+          <h2 style="font-size:20px;font-weight:700;color:#1a1a2e;margin-bottom:20px;">Servers</h2>
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">All Servers</span>
+              <span class="last-updated" id="srv-last-updated" style="font-size:11px;color:#999;">Last updated: Today</span>
+            </div>
+            <div class="filter-pills" id="srv-filter-pills"></div>
+            <div class="search-bar">
+              <input type="text" id="srv-search" placeholder="Search servers by location, serial, or app…" oninput="renderServers()">
+            </div>
+            <div class="tbl-wrap" style="overflow-x:auto;">
+              <table class="tbl" id="srv-table">
+                <thead><tr><th>Location</th><th>Serial</th><th>Make</th><th>Model</th><th>Storage</th><th>Health</th><th>Apps</th><th>Status</th><th>Install Date</th></tr></thead>
+                <tbody id="srv-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Switches -->
+        <section class="page-section" id="page-switches">
+          <h2 style="font-size:20px;font-weight:700;color:#1a1a2e;margin-bottom:20px;">Network Switches</h2>
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">All Switches</span>
+              <span class="last-updated" id="sw-last-updated" style="font-size:11px;color:#999;">Last updated: Today</span>
+            </div>
+            <div class="filter-pills" id="sw-filter-pills"></div>
+            <div class="search-bar">
+              <input type="text" id="sw-search" placeholder="Search switches by name, location, IP, or model…" oninput="renderSwitches()">
+              <select id="sw-model-filter" onchange="renderSwitches()" style="flex:0 0 150px;">
+                <option value="All">All models</option>
+                <option value="AXIS T8508">AXIS T8508</option>
+                <option value="AXIS T8516">AXIS T8516</option>
+                <option value="AXIS T8504-R">AXIS T8504-R</option>
+                <option value="TL-SG2210P">TL-SG2210P</option>
+                <option value="NS3552-16P-2T-2S">NS3552-16P-2T-2S</option>
+                <option value="XS728T">XS728T</option>
+                <option value="XS716T">XS716T</option>
+                <option value="US-16-XG">US-16-XG</option>
+                <option value="M4300-24X">M4300-24X</option>
+              </select>
+            </div>
+            <div class="tbl-wrap" style="overflow-x:auto;">
+              <table class="tbl" id="sw-table">
+                <thead><tr><th>Name</th><th>Location</th><th>Model</th><th>IP</th><th>Firmware</th><th>Status</th><th>Install Date</th></tr></thead>
+                <tbody id="sw-table-body"></tbody>
               </table>
             </div>
           </div>
@@ -1154,7 +1297,7 @@
           <h2 style="font-size:20px;font-weight:700;color:#1a1a2e;margin-bottom:20px;">Service Requests</h2>
           
           <div class="panel">
-            <div class="search-filter-bar">
+            <div class="search-bar">
               <input type="text" id="sr-search" placeholder="Search requests..." oninput="renderServiceRequests()">
               <select id="sr-filter-status" onchange="renderServiceRequests()">
                 <option value="all">All Status</option>
@@ -1162,7 +1305,6 @@
                 <option value="In Progress">In Progress</option>
                 <option value="Resolved">Resolved</option>
               </select>
-              <button class="btn-primary" onclick="switchPage('create-sr')"><i class="ti ti-plus"></i> New</button>
             </div>
             <div class="tbl-wrap" style="overflow-x:auto;">
               <table class="tbl" id="sr-table">
@@ -1247,7 +1389,7 @@
 
   <!-- Camera Detail Modal -->
   <div class="modal-overlay" id="camera-detail-modal">
-    <div class="modal wide">
+    <div class="modal">
       <button class="modal-close" onclick="closeCameraDetailModal()"><i class="ti ti-x"></i></button>
       <div class="modal-title" id="cam-detail-title">Camera Name</div>
       <div class="modal-sub" id="cam-detail-sub">Zone: NORTH · Status: Online</div>
@@ -1256,18 +1398,22 @@
         <div class="modal-grid" id="camera-detail-grid"></div>
       </div>
       <div class="modal-section">
+        <div class="modal-section-title">Maintenance History</div>
+        <div id="cam-detail-history"></div>
+      </div>
+      <div class="modal-section">
         <div class="modal-section-title">Comments</div>
         <textarea class="notes-area" id="cam-detail-comments" style="width:100%;background:#f8f9fa;border:1px solid var(--client-border);border-radius:6px;color:#1a1a2e;padding:10px 12px;min-height:60px;font-family:var(--font);resize:vertical;font-size:12px;"></textarea>
       </div>
       <div class="modal-footer">
-        <button class="btn" onclick="closeCameraDetailModal()" style="padding:8px 16px;border:1px solid var(--client-border);border-radius:6px;background:transparent;color:#666;cursor:pointer;font-family:var(--font);">Close</button>
+        <button class="btn" onclick="closeCameraDetailModal()">Close</button>
       </div>
     </div>
   </div>
 
   <!-- Door Detail Modal -->
   <div class="modal-overlay" id="door-detail-modal">
-    <div class="modal wide">
+    <div class="modal">
       <button class="modal-close" onclick="closeDoorDetailModal()"><i class="ti ti-x"></i></button>
       <div class="modal-title" id="door-detail-title">Door Name</div>
       <div class="modal-sub" id="door-detail-sub">Site: Security Office · Status: Online</div>
@@ -1276,18 +1422,22 @@
         <div class="modal-grid" id="door-detail-grid"></div>
       </div>
       <div class="modal-section">
+        <div class="modal-section-title">Maintenance History</div>
+        <div id="door-detail-history"></div>
+      </div>
+      <div class="modal-section">
         <div class="modal-section-title">Comments</div>
         <textarea class="notes-area" id="door-detail-comments" style="width:100%;background:#f8f9fa;border:1px solid var(--client-border);border-radius:6px;color:#1a1a2e;padding:10px 12px;min-height:60px;font-family:var(--font);resize:vertical;font-size:12px;"></textarea>
       </div>
       <div class="modal-footer">
-        <button class="btn" onclick="closeDoorDetailModal()" style="padding:8px 16px;border:1px solid var(--client-border);border-radius:6px;background:transparent;color:#666;cursor:pointer;font-family:var(--font);">Close</button>
+        <button class="btn" onclick="closeDoorDetailModal()">Close</button>
       </div>
     </div>
   </div>
 
   <!-- Server Detail Modal -->
   <div class="modal-overlay" id="server-detail-modal">
-    <div class="modal wide">
+    <div class="modal">
       <button class="modal-close" onclick="closeServerDetailModal()"><i class="ti ti-x"></i></button>
       <div class="modal-title" id="server-detail-title">Server Name</div>
       <div class="modal-sub" id="server-detail-sub">Location: Kingport · Status: Online</div>
@@ -1296,18 +1446,22 @@
         <div class="modal-grid" id="server-detail-grid"></div>
       </div>
       <div class="modal-section">
+        <div class="modal-section-title">Maintenance History</div>
+        <div id="server-detail-history"></div>
+      </div>
+      <div class="modal-section">
         <div class="modal-section-title">Comments</div>
         <textarea class="notes-area" id="server-detail-comments" style="width:100%;background:#f8f9fa;border:1px solid var(--client-border);border-radius:6px;color:#1a1a2e;padding:10px 12px;min-height:60px;font-family:var(--font);resize:vertical;font-size:12px;"></textarea>
       </div>
       <div class="modal-footer">
-        <button class="btn" onclick="closeServerDetailModal()" style="padding:8px 16px;border:1px solid var(--client-border);border-radius:6px;background:transparent;color:#666;cursor:pointer;font-family:var(--font);">Close</button>
+        <button class="btn" onclick="closeServerDetailModal()">Close</button>
       </div>
     </div>
   </div>
 
   <!-- Switch Detail Modal -->
   <div class="modal-overlay" id="switch-detail-modal">
-    <div class="modal wide">
+    <div class="modal">
       <button class="modal-close" onclick="closeSwitchDetailModal()"><i class="ti ti-x"></i></button>
       <div class="modal-title" id="switch-detail-title">Switch Name</div>
       <div class="modal-sub" id="switch-detail-sub">Location: Security Office · Status: Online</div>
@@ -1316,11 +1470,15 @@
         <div class="modal-grid" id="switch-detail-grid"></div>
       </div>
       <div class="modal-section">
+        <div class="modal-section-title">Maintenance History</div>
+        <div id="switch-detail-history"></div>
+      </div>
+      <div class="modal-section">
         <div class="modal-section-title">Comments</div>
         <textarea class="notes-area" id="switch-detail-comments" style="width:100%;background:#f8f9fa;border:1px solid var(--client-border);border-radius:6px;color:#1a1a2e;padding:10px 12px;min-height:60px;font-family:var(--font);resize:vertical;font-size:12px;"></textarea>
       </div>
       <div class="modal-footer">
-        <button class="btn" onclick="closeSwitchDetailModal()" style="padding:8px 16px;border:1px solid var(--client-border);border-radius:6px;background:transparent;color:#666;cursor:pointer;font-family:var(--font);">Close</button>
+        <button class="btn" onclick="closeSwitchDetailModal()">Close</button>
       </div>
     </div>
   </div>
@@ -1341,24 +1499,24 @@
       secondary: '#8b0000',
       assets: {
         cameras: [
-          { name: 'HM3 PTZ', zone: 'NORTH', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5' },
-          { name: 'HM11 PTZ', zone: 'NORTH', status: 'Defective', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5' },
-          { name: 'N25 PTZ', zone: 'NORTH', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM6' },
-          { name: 'C1 PTZ', zone: 'SOUTH', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5' },
-          { name: 'W1', zone: 'WEST', status: 'No Power', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5' },
-          { name: 'A7 PTZ', zone: 'EAST', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5' }
+          { name: 'HM3 PTZ', zone: 'NORTH', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.19.1.150', install_date: '2024-01-15', history: [{ date: '2024-06-15', event: 'Firmware updated' }, { date: '2024-03-10', event: 'Lens cleaned' }] },
+          { name: 'HM11 PTZ', zone: 'NORTH', status: 'Defective', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.19.1.159', install_date: '2023-06-01', history: [{ date: '2024-05-20', event: 'Reported defective' }] },
+          { name: 'N25 PTZ', zone: 'NORTH', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM6', ip: '10.19.1.175', install_date: '2024-08-15', history: [{ date: '2024-09-01', event: 'Initial setup complete' }] },
+          { name: 'C1 PTZ', zone: 'SOUTH', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.19.1.140', install_date: '2023-11-01', history: [{ date: '2024-07-12', event: 'Replaced power supply' }] },
+          { name: 'W1', zone: 'WEST', status: 'No Power', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.19.1.180', install_date: '2024-03-15', history: [{ date: '2024-08-05', event: 'Power outage reported' }] },
+          { name: 'A7 PTZ', zone: 'EAST', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.19.1.130', install_date: '2024-05-20', history: [] }
         ],
         doors: [
-          { name: 'Main Entrance', zone: 'Security Office', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone' },
-          { name: '2nd Entrance', zone: 'SAL Duty Office', status: 'Offline', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', doorSwing: 'Out', accessType: 'Read In + Push Out', antiPassback: 'No', controllerType: 'Integrated' }
+          { name: 'Main Entrance', zone: 'Security Office', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Shanice Vernon', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-01-01', history: [{ date: '2024-06-10', event: 'Routine maintenance' }] },
+          { name: '2nd Entrance', zone: 'SAL Duty Office', status: 'Offline', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Marvin Grant', doorSwing: 'Out', accessType: 'Read In + Push Out', antiPassback: 'No', controllerType: 'Integrated', install_date: '2024-02-15', history: [{ date: '2024-05-30', event: 'Offline alert' }] }
         ],
         servers: [
-          { name: 'J1013DDR', zone: 'Kingport', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5, LPR' },
-          { name: 'J1013DDV', zone: 'Kingport', status: 'ONLINE', make: 'HP', model: 'ProLiant DL380', capacity: '6.11TB', used: '1.4TB', health: 'Good, Failed drive', apps: 'Ocularis DM6, Eyelock' }
+          { name: 'J1013DDR', zone: 'Kingport', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5, LPR', install_date: '2024-01-15', history: [{ date: '2024-07-01', event: 'Firmware update' }] },
+          { name: 'J1013DDV', zone: 'Kingport', status: 'ONLINE', make: 'HP', model: 'ProLiant DL380', capacity: '6.11TB', used: '1.4TB', health: 'Good, Failed drive', apps: 'Ocularis DM6, Eyelock', install_date: '2023-06-01', history: [{ date: '2024-06-20', event: 'Drive replacement advised' }] }
         ],
         switches: [
-          { name: 'Main Entrance', zone: 'Security Office', status: 'Online', model: 'AXIS T8508', ip_address: '10.19.1.21', firmware: '6.54.2739' },
-          { name: '2nd entrance', zone: 'SAL Duty Office', status: 'Online', model: 'AXIS T8516', ip_address: '10.19.1.23', firmware: '6.54.2739' }
+          { name: 'Main Entrance', zone: 'Security Office', status: 'Online', model: 'AXIS T8508', ip_address: '10.19.1.21', firmware: '6.54.2739', install_date: '2024-02-01', history: [{ date: '2024-07-15', event: 'Firmware updated' }] },
+          { name: '2nd entrance', zone: 'SAL Duty Office', status: 'Online', model: 'AXIS T8516', ip_address: '10.19.1.23', firmware: '6.54.2739', install_date: '2024-03-15', history: [] }
         ]
       },
       srs: [
@@ -1379,18 +1537,18 @@
       secondary: '#6d28d9',
       assets: {
         cameras: [
-          { name: 'TP-01', zone: 'Tinson Pen', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5' },
-          { name: 'TP-02', zone: 'Tinson Pen', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5' },
-          { name: 'WH-01', zone: 'Warehouse 1', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5' }
+          { name: 'TP-01', zone: 'Tinson Pen', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '172.16.19.91', install_date: '2024-04-01', history: [{ date: '2024-07-10', event: 'Camera recalibrated' }] },
+          { name: 'TP-02', zone: 'Tinson Pen', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '172.16.19.92', install_date: '2024-05-15', history: [] },
+          { name: 'WH-01', zone: 'Warehouse 1', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '172.16.20.10', install_date: '2024-03-01', history: [{ date: '2024-06-20', event: 'Lens cleaned' }] }
         ],
         doors: [
-          { name: 'Warehouse Main', zone: 'Warehouse 1', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone' }
+          { name: 'Warehouse Main', zone: 'Warehouse 1', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Ackeem', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-02-01', history: [{ date: '2024-05-15', event: 'Battery replaced' }] }
         ],
         servers: [
-          { name: 'KWL-SRV-01', zone: 'Tinson Pen', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5' }
+          { name: 'KWL-SRV-01', zone: 'Tinson Pen', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-01-01', history: [] }
         ],
         switches: [
-          { name: 'TP Switch 1', zone: 'Tinson Pen', status: 'Online', model: 'AXIS T8508', ip_address: '10.19.1.21', firmware: '6.54.2739' }
+          { name: 'TP Switch 1', zone: 'Tinson Pen', status: 'Online', model: 'AXIS T8508', ip_address: '10.19.1.21', firmware: '6.54.2739', install_date: '2024-02-15', history: [{ date: '2024-06-01', event: 'Port configuration updated' }] }
         ]
       },
       srs: [
@@ -1408,7 +1566,22 @@
   var currentUser = null;
   var clientData = null;
   var currentPage = 'dashboard';
-  var assetTagFilter = 'all';
+
+  // Pagination state
+  var camCurrentPage = 1;
+  var camPerPage = 10;
+  var camStatusFilter = 'All';
+  var camSearchQuery = '';
+
+  var doorStatusFilter = 'All';
+  var doorSearchQuery = '';
+
+  var srvStatusFilter = 'All';
+  var srvSearchQuery = '';
+
+  var swStatusFilter = 'All';
+  var swModelFilter = 'All';
+  var swSearchQuery = '';
 
   // ============================================================
   // ── TOAST ────────────────────────────────────────────────────
@@ -1526,11 +1699,9 @@
       el.onerror = function() { this.src = 'logo.png'; };
     });
     
-    // Set ETech logo - use light mode for white background, default for dark
+    // Set ETech logo - use light mode for white background clients
     var etechLogo = document.getElementById('etech-logo');
-    // Check if client uses light theme (white background)
     if (primaryColor === '#e31b23' || primaryColor === '#8b5cf6') {
-      // Light background clients - use light mode logo
       etechLogo.src = 'logo-light.png';
     } else {
       etechLogo.src = 'logo.png';
@@ -1546,9 +1717,15 @@
     document.getElementById('user-name').textContent = currentUser.username;
     document.getElementById('user-avatar').textContent = currentUser.username.slice(0, 2).toUpperCase();
     
+    // Update badges
+    updateBadges();
+    
     // Render everything
     renderDashboard();
-    renderAssets();
+    renderCameras();
+    renderDoors();
+    renderServers();
+    renderSwitches();
     renderServiceRequests();
     updateSRBadge();
   }
@@ -1601,6 +1778,37 @@
     return Math.round((online / allAssets.length) * 100);
   }
 
+  function getStatusCounts(items) {
+    var counts = { All: items.length };
+    items.forEach(function(item) {
+      var status = item.status === 'Online' || item.status === 'ONLINE' ? 'Online' :
+                    item.status === 'Offline' || item.status === 'Defective' || item.status === 'No Power' ? 'Offline' : 'Maintenance';
+      if (!counts[status]) counts[status] = 0;
+      counts[status]++;
+    });
+    return counts;
+  }
+
+  function renderFilterPills(containerId, items, currentFilter, onFilterChange) {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+    var counts = getStatusCounts(items);
+    var statuses = ['All', 'Online', 'Offline', 'Maintenance'];
+    container.innerHTML = statuses.map(function(s) {
+      var count = counts[s] || 0;
+      var active = s === currentFilter ? 'active' : '';
+      return '<span class="filter-pill ' + active + '" onclick="' + onFilterChange + '(\'' + s + '\')">' + s + ' <span class="count">' + count + '</span></span>';
+    }).join('');
+  }
+
+  function updateBadges() {
+    if (!clientData) return;
+    document.getElementById('cam-badge').textContent = clientData.assets.cameras.length;
+    document.getElementById('door-badge').textContent = clientData.assets.doors.length;
+    document.getElementById('server-badge').textContent = clientData.assets.servers.length;
+    document.getElementById('switch-badge').textContent = clientData.assets.switches.length;
+  }
+
   // ============================================================
   // ── NAVIGATION ──────────────────────────────────────────────
   // ============================================================
@@ -1617,8 +1825,12 @@
     var target = document.getElementById('page-' + page);
     if (target) target.classList.add('active');
     document.getElementById('client-sidebar').classList.remove('open');
+    
     if (page === 'dashboard') renderDashboard();
-    if (page === 'assets') renderAssets();
+    if (page === 'cameras') renderCameras();
+    if (page === 'doors') renderDoors();
+    if (page === 'servers') renderServers();
+    if (page === 'switches') renderSwitches();
     if (page === 'service-requests') renderServiceRequests();
   }
 
@@ -1699,145 +1911,339 @@
   }
 
   // ============================================================
-  // ── ASSETS ──────────────────────────────────────────────────
+  // ── CAMERAS ──────────────────────────────────────────────────
   // ============================================================
 
-  function renderAssets() {
+  function renderCameras() {
     if (!clientData) return;
+    var cameras = clientData.assets.cameras || [];
+    var search = document.getElementById('cam-search') ? document.getElementById('cam-search').value.toLowerCase() : '';
+    var perPageEl = document.getElementById('cam-per-page');
+    camPerPage = perPageEl ? parseInt(perPageEl.value) || 10 : 10;
     
-    var allAssets = getAllClientAssets();
-    
-    // Counts
-    document.getElementById('asset-cameras').textContent = clientData.assets.cameras.length;
-    document.getElementById('asset-doors').textContent = clientData.assets.doors.length;
-    document.getElementById('asset-servers').textContent = clientData.assets.servers.length;
-    document.getElementById('asset-switches').textContent = clientData.assets.switches.length;
-    
-    // Filter
-    var search = document.getElementById('asset-search') ? document.getElementById('asset-search').value.toLowerCase() : '';
-    var typeFilter = document.getElementById('asset-type-filter') ? document.getElementById('asset-type-filter').value : 'all';
-    
-    var filtered = allAssets.filter(function(a) {
-      var matchSearch = a.name.toLowerCase().indexOf(search) !== -1 || 
-                       (a.zone || '').toLowerCase().indexOf(search) !== -1;
-      var matchType = typeFilter === 'all' || a.type === typeFilter;
-      var matchTag = assetTagFilter === 'all' || getStatusClass(a.status) === assetTagFilter;
-      return matchSearch && matchType && matchTag;
+    var filtered = cameras.filter(function(c) {
+      var matchSearch = c.name.toLowerCase().indexOf(search) !== -1 || 
+                       (c.ip || '').toLowerCase().indexOf(search) !== -1 ||
+                       (c.comments || '').toLowerCase().indexOf(search) !== -1;
+      var matchStatus = camStatusFilter === 'All' || 
+                       (camStatusFilter === 'Online' && c.status === 'Online') ||
+                       (camStatusFilter === 'Offline' && (c.status === 'Offline' || c.status === 'Defective' || c.status === 'No Power')) ||
+                       (camStatusFilter === 'Maintenance' && c.status === 'Maintenance');
+      return matchSearch && matchStatus;
     });
     
-    // Render table
-    var body = document.getElementById('assets-table-body');
-    if (filtered.length === 0) {
-      body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;padding:16px;">No assets found</td></tr>';
+    // Pagination
+    var totalPages = Math.ceil(filtered.length / camPerPage);
+    if (camCurrentPage > totalPages) camCurrentPage = totalPages || 1;
+    var start = (camCurrentPage - 1) * camPerPage;
+    var end = Math.min(start + camPerPage, filtered.length);
+    var pageItems = filtered.slice(start, end);
+    
+    // Filter pills
+    renderFilterPills('cam-filter-pills', cameras, camStatusFilter, 'setCamStatusFilter');
+    
+    // Table
+    var body = document.getElementById('cam-table-body');
+    if (pageItems.length === 0) {
+      body.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#999;padding:16px;">No cameras found</td></tr>';
     } else {
-      body.innerHTML = filtered.map(function(a) {
-        var details = '';
-        if (a.type === 'Camera') details = a.model || '—';
-        else if (a.type === 'Access Control') details = a.reader || '—';
-        else if (a.type === 'Server') details = a.make + ' ' + a.model || '—';
-        else if (a.type === 'Switch') details = a.model || '—';
-        return '<tr onclick="openAssetDetail(\'' + a.type + '\', \'' + a.name + '\')" style="cursor:pointer;"><td><strong>' + a.name + '</strong></td><td>' + a.type + '</td><td>' + (a.zone || '—') + '</td><td>' + getStatusBadgeHTML(a.status) + '</td><td style="color:#999;font-size:12px;">' + details + '</td></tr>';
+      body.innerHTML = pageItems.map(function(c) {
+        return '<tr class="clickable" onclick="openCameraDetail(\'' + c.name + '\')"><td><strong>' + c.name + '</strong></td><td>' + (c.zone || '—') + '</td><td>' + (c.ip || '—') + '</td><td>' + getStatusBadgeHTML(c.status) + '</td><td>' + (c.model || '—') + '</td><td>' + (c.resolution || '—') + '</td><td>' + (c.archiver || '—') + '</td><td>' + (c.install_date || '—') + '</td></tr>';
       }).join('');
     }
+    
+    // Pagination
+    var pagination = document.getElementById('cam-pagination');
+    if (pagination) {
+      if (totalPages <= 1) {
+        pagination.innerHTML = '';
+      } else {
+        var paginationHtml = '<button onclick="changeCamPage(' + (camCurrentPage - 1) + ')" ' + (camCurrentPage <= 1 ? 'disabled' : '') + '>‹</button>';
+        for (var i = 1; i <= totalPages; i++) {
+          paginationHtml += '<button class="page-btn ' + (i === camCurrentPage ? 'active' : '') + '" onclick="changeCamPage(' + i + ')">' + i + '</button>';
+        }
+        paginationHtml += '<button onclick="changeCamPage(' + (camCurrentPage + 1) + ')" ' + (camCurrentPage >= totalPages ? 'disabled' : '') + '>›</button>';
+        paginationHtml += '<span class="page-info">' + (start + 1) + '-' + Math.min(end, filtered.length) + ' of ' + filtered.length + '</span>';
+        pagination.innerHTML = paginationHtml;
+      }
+    }
+    
+    updateLastUpdated('cam-last-updated');
   }
 
-  function filterAssetsByTag(tag) {
-    assetTagFilter = tag;
-    document.querySelectorAll('#asset-tag-filters .tag-filter').forEach(function(el) {
-      el.classList.remove('active');
-      if (el.dataset.tag === tag) el.classList.add('active');
-    });
-    renderAssets();
+  function setCamStatusFilter(status) {
+    camStatusFilter = status;
+    camCurrentPage = 1;
+    renderCameras();
   }
 
-  // ============================================================
-  // ── ASSET DETAIL MODALS ──────────────────────────────────────
-  // ============================================================
+  function changeCamPage(page) {
+    camCurrentPage = page;
+    renderCameras();
+  }
 
-  function openAssetDetail(type, name) {
-    if (!clientData) return;
+  function openCameraDetail(name) {
+    var camera = clientData.assets.cameras.find(function(c) { return c.name === name; });
+    if (!camera) return;
+    document.getElementById('cam-detail-title').textContent = camera.name;
+    document.getElementById('cam-detail-sub').textContent = 'Zone: ' + (camera.zone || '—') + ' · Status: ' + camera.status;
     
-    var asset = null;
-    var assetType = type.toLowerCase();
+    document.getElementById('camera-detail-grid').innerHTML =
+      '<div class="modal-field"><label>Name</label><span>' + camera.name + '</span></div>' +
+      '<div class="modal-field"><label>Zone</label><span>' + (camera.zone || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Status</label>' + getStatusBadgeHTML(camera.status) + '</div>' +
+      '<div class="modal-field"><label>IP Address</label><span>' + (camera.ip || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Model</label><span>' + (camera.model || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Resolution</label><span>' + (camera.resolution || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Archiver</label><span>' + (camera.archiver || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Install Date</label><span>' + (camera.install_date || '—') + '</span></div>';
     
-    if (assetType === 'camera') {
-      asset = clientData.assets.cameras.find(function(c) { return c.name === name; });
-      if (!asset) return;
-      document.getElementById('cam-detail-title').textContent = asset.name;
-      document.getElementById('cam-detail-sub').textContent = 'Zone: ' + (asset.zone || '—') + ' · Status: ' + asset.status;
-      document.getElementById('camera-detail-grid').innerHTML =
-        '<div class="modal-field"><label>Name</label><span>' + asset.name + '</span></div>' +
-        '<div class="modal-field"><label>Zone</label><span>' + (asset.zone || '—') + '</span></div>' +
-        '<div class="modal-field"><label>Status</label>' + getStatusBadgeHTML(asset.status) + '</div>' +
-        '<div class="modal-field"><label>Model</label><span>' + (asset.model || '—') + '</span></div>' +
-        '<div class="modal-field"><label>Resolution</label><span>' + (asset.resolution || '—') + '</span></div>' +
-        '<div class="modal-field"><label>Archiver</label><span>' + (asset.archiver || '—') + '</span></div>';
-      document.getElementById('cam-detail-comments').value = asset.comments || '';
-      document.getElementById('camera-detail-modal').classList.add('open');
-    } 
-    else if (assetType === 'access control' || assetType === 'door') {
-      asset = clientData.assets.doors.find(function(d) { return d.name === name; });
-      if (!asset) return;
-      document.getElementById('door-detail-title').textContent = asset.name;
-      document.getElementById('door-detail-sub').textContent = 'Site: ' + (asset.zone || '—') + ' · Status: ' + asset.status;
-      document.getElementById('door-detail-grid').innerHTML =
-        '<div class="modal-field"><label>Name</label><span>' + asset.name + '</span></div>' +
-        '<div class="modal-field"><label>Site</label><span>' + (asset.zone || '—') + '</span></div>' +
-        '<div class="modal-field"><label>Status</label>' + getStatusBadgeHTML(asset.status) + '</div>' +
-        '<div class="modal-field"><label>Reader</label><span>' + (asset.reader || '—') + '</span></div>' +
-        '<div class="modal-field"><label>Lock Type</label><span>' + (asset.lock || '—') + '</span></div>' +
-        '<div class="modal-field"><label>Powered</label><span>' + (asset.powered || '—') + '</span></div>' +
-        '<div class="modal-field"><label>Door Swing</label><span>' + (asset.doorSwing || '—') + '</span></div>' +
-        '<div class="modal-field"><label>Access Type</label><span>' + (asset.accessType || '—') + '</span></div>' +
-        '<div class="modal-field"><label>Anti-Passback</label><span>' + (asset.antiPassback || '—') + '</span></div>' +
-        '<div class="modal-field"><label>Controller Type</label><span>' + (asset.controllerType || '—') + '</span></div>';
-      document.getElementById('door-detail-comments').value = asset.comments || '';
-      document.getElementById('door-detail-modal').classList.add('open');
+    // Maintenance history
+    var historyContainer = document.getElementById('cam-detail-history');
+    if (camera.history && camera.history.length > 0) {
+      historyContainer.innerHTML = camera.history.map(function(h) {
+        return '<div class="history-item"><span class="h-time">' + h.date + '</span>' + h.event + '</div>';
+      }).join('');
+    } else {
+      historyContainer.innerHTML = '<div style="color:#999;font-size:12px;">No maintenance history</div>';
     }
-    else if (assetType === 'server') {
-      asset = clientData.assets.servers.find(function(s) { return s.name === name; });
-      if (!asset) return;
-      document.getElementById('server-detail-title').textContent = asset.name;
-      document.getElementById('server-detail-sub').textContent = 'Location: ' + (asset.zone || '—') + ' · Status: ' + asset.status;
-      document.getElementById('server-detail-grid').innerHTML =
-        '<div class="modal-field"><label>Name</label><span>' + asset.name + '</span></div>' +
-        '<div class="modal-field"><label>Location</label><span>' + (asset.zone || '—') + '</span></div>' +
-        '<div class="modal-field"><label>Status</label>' + getStatusBadgeHTML(asset.status) + '</div>' +
-        '<div class="modal-field"><label>Make</label><span>' + (asset.make || '—') + '</span></div>' +
-        '<div class="modal-field"><label>Model</label><span>' + (asset.model || '—') + '</span></div>' +
-        '<div class="modal-field"><label>Capacity</label><span>' + (asset.capacity || '—') + '</span></div>' +
-        '<div class="modal-field"><label>In Use</label><span>' + (asset.used || '—') + '</span></div>' +
-        '<div class="modal-field"><label>Health</label><span>' + (asset.health || '—') + '</span></div>' +
-        '<div class="modal-field"><label>Applications</label><span>' + (asset.apps || '—') + '</span></div>';
-      document.getElementById('server-detail-comments').value = asset.comments || '';
-      document.getElementById('server-detail-modal').classList.add('open');
-    }
-    else if (assetType === 'switch') {
-      asset = clientData.assets.switches.find(function(s) { return s.name === name; });
-      if (!asset) return;
-      document.getElementById('switch-detail-title').textContent = asset.name;
-      document.getElementById('switch-detail-sub').textContent = 'Location: ' + (asset.zone || '—') + ' · Status: ' + asset.status;
-      document.getElementById('switch-detail-grid').innerHTML =
-        '<div class="modal-field"><label>Name</label><span>' + asset.name + '</span></div>' +
-        '<div class="modal-field"><label>Location</label><span>' + (asset.zone || '—') + '</span></div>' +
-        '<div class="modal-field"><label>Status</label>' + getStatusBadgeHTML(asset.status) + '</div>' +
-        '<div class="modal-field"><label>Model</label><span>' + (asset.model || '—') + '</span></div>' +
-        '<div class="modal-field"><label>IP Address</label><span>' + (asset.ip_address || '—') + '</span></div>' +
-        '<div class="modal-field"><label>Firmware</label><span>' + (asset.firmware || '—') + '</span></div>';
-      document.getElementById('switch-detail-comments').value = asset.comments || '';
-      document.getElementById('switch-detail-modal').classList.add('open');
-    }
+    
+    document.getElementById('cam-detail-comments').value = camera.comments || '';
+    document.getElementById('camera-detail-modal').classList.add('open');
   }
 
   function closeCameraDetailModal() {
     document.getElementById('camera-detail-modal').classList.remove('open');
   }
+
+  // ============================================================
+  // ── DOORS ──────────────────────────────────────────────────
+  // ============================================================
+
+  function renderDoors() {
+    if (!clientData) return;
+    var doors = clientData.assets.doors || [];
+    var search = document.getElementById('door-search') ? document.getElementById('door-search').value.toLowerCase() : '';
+    
+    var filtered = doors.filter(function(d) {
+      var matchSearch = d.name.toLowerCase().indexOf(search) !== -1 || 
+                       (d.reader || '').toLowerCase().indexOf(search) !== -1 ||
+                       (d.tech || '').toLowerCase().indexOf(search) !== -1;
+      var matchStatus = doorStatusFilter === 'All' || 
+                       (doorStatusFilter === 'Online' && d.status === 'Online') ||
+                       (doorStatusFilter === 'Offline' && d.status === 'Offline') ||
+                       (doorStatusFilter === 'Maintenance' && d.status === 'Under Maintenance');
+      return matchSearch && matchStatus;
+    });
+    
+    renderFilterPills('door-filter-pills', doors, doorStatusFilter, 'setDoorStatusFilter');
+    
+    var body = document.getElementById('door-table-body');
+    if (filtered.length === 0) {
+      body.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#999;padding:16px;">No doors found</td></tr>';
+    } else {
+      body.innerHTML = filtered.map(function(d) {
+        return '<tr class="clickable" onclick="openDoorDetail(\'' + d.name + '\')"><td><strong>' + d.name + '</strong></td><td>' + (d.zone || '—') + '</td><td>' + (d.reader || '—') + '</td><td>' + (d.lock || '—') + '</td><td>' + (d.powered || '—') + '</td><td>' + getStatusBadgeHTML(d.status) + '</td><td>' + (d.tech || '—') + '</td><td>' + (d.install_date || '—') + '</td></tr>';
+      }).join('');
+    }
+    
+    updateLastUpdated('door-last-updated');
+  }
+
+  function setDoorStatusFilter(status) {
+    doorStatusFilter = status;
+    renderDoors();
+  }
+
+  function openDoorDetail(name) {
+    var door = clientData.assets.doors.find(function(d) { return d.name === name; });
+    if (!door) return;
+    document.getElementById('door-detail-title').textContent = door.name;
+    document.getElementById('door-detail-sub').textContent = 'Site: ' + (door.zone || '—') + ' · Status: ' + door.status;
+    
+    document.getElementById('door-detail-grid').innerHTML =
+      '<div class="modal-field"><label>Name</label><span>' + door.name + '</span></div>' +
+      '<div class="modal-field"><label>Site</label><span>' + (door.zone || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Status</label>' + getStatusBadgeHTML(door.status) + '</div>' +
+      '<div class="modal-field"><label>Reader</label><span>' + (door.reader || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Lock Type</label><span>' + (door.lock || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Powered</label><span>' + (door.powered || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Technician</label><span>' + (door.tech || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Door Swing</label><span>' + (door.doorSwing || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Access Type</label><span>' + (door.accessType || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Anti-Passback</label><span>' + (door.antiPassback || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Controller Type</label><span>' + (door.controllerType || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Install Date</label><span>' + (door.install_date || '—') + '</span></div>';
+    
+    var historyContainer = document.getElementById('door-detail-history');
+    if (door.history && door.history.length > 0) {
+      historyContainer.innerHTML = door.history.map(function(h) {
+        return '<div class="history-item"><span class="h-time">' + h.date + '</span>' + h.event + '</div>';
+      }).join('');
+    } else {
+      historyContainer.innerHTML = '<div style="color:#999;font-size:12px;">No maintenance history</div>';
+    }
+    
+    document.getElementById('door-detail-comments').value = door.comments || '';
+    document.getElementById('door-detail-modal').classList.add('open');
+  }
+
   function closeDoorDetailModal() {
     document.getElementById('door-detail-modal').classList.remove('open');
   }
+
+  // ============================================================
+  // ── SERVERS ──────────────────────────────────────────────────
+  // ============================================================
+
+  function renderServers() {
+    if (!clientData) return;
+    var servers = clientData.assets.servers || [];
+    var search = document.getElementById('srv-search') ? document.getElementById('srv-search').value.toLowerCase() : '';
+    
+    var filtered = servers.filter(function(s) {
+      var matchSearch = (s.location || '').toLowerCase().indexOf(search) !== -1 || 
+                       (s.serial || '').toLowerCase().indexOf(search) !== -1 ||
+                       (s.apps || '').toLowerCase().indexOf(search) !== -1 ||
+                       (s.make || '').toLowerCase().indexOf(search) !== -1 ||
+                       (s.model || '').toLowerCase().indexOf(search) !== -1;
+      var matchStatus = srvStatusFilter === 'All' || 
+                       (srvStatusFilter === 'Online' && s.status === 'ONLINE') ||
+                       (srvStatusFilter === 'Offline' && s.status === 'OFFLINE');
+      return matchSearch && matchStatus;
+    });
+    
+    renderFilterPills('srv-filter-pills', servers, srvStatusFilter, 'setSrvStatusFilter');
+    
+    var body = document.getElementById('srv-table-body');
+    if (filtered.length === 0) {
+      body.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#999;padding:16px;">No servers found</td></tr>';
+    } else {
+      body.innerHTML = filtered.map(function(s) {
+        var capacityNum = parseFloat(s.capacity);
+        var usedNum = parseFloat(s.used);
+        var pct = (!isNaN(capacityNum) && !isNaN(usedNum) && capacityNum > 0) ? Math.round((usedNum / capacityNum) * 100) : 0;
+        var barColor = pct > 85 ? 'red' : pct > 70 ? 'yellow' : 'green';
+        var storageDisplay = s.used && s.capacity ? s.used + ' / ' + s.capacity : s.capacity || s.used || '—';
+        return '<tr class="clickable" onclick="openServerDetail(\'' + s.name + '\')"><td>' + (s.location || '—') + '</td><td style="font-family:monospace;">' + (s.serial || '—') + '</td><td>' + (s.make || '—') + '</td><td>' + (s.model || '—') + '</td><td><div style="display:flex;flex-direction:column;gap:2px;"><span>' + storageDisplay + '</span><div class="storage-bar-wrap"><div class="storage-bar-fill ' + barColor + '" style="width:' + pct + '%;"></div></div></div></td><td style="color:' + (s.health && s.health.indexOf('Failed') !== -1 ? '#ef4444' : '#22c55e') + ';">' + (s.health || '—') + '</td><td>' + (s.apps || '—') + '</td><td>' + getStatusBadgeHTML(s.status) + '</td><td>' + (s.install_date || '—') + '</td></tr>';
+      }).join('');
+    }
+    
+    updateLastUpdated('srv-last-updated');
+  }
+
+  function setSrvStatusFilter(status) {
+    srvStatusFilter = status;
+    renderServers();
+  }
+
+  function openServerDetail(name) {
+    var server = clientData.assets.servers.find(function(s) { return s.name === name; });
+    if (!server) return;
+    document.getElementById('server-detail-title').textContent = server.name;
+    document.getElementById('server-detail-sub').textContent = 'Location: ' + (server.zone || '—') + ' · Status: ' + server.status;
+    
+    document.getElementById('server-detail-grid').innerHTML =
+      '<div class="modal-field"><label>Name</label><span>' + server.name + '</span></div>' +
+      '<div class="modal-field"><label>Location</label><span>' + (server.zone || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Status</label>' + getStatusBadgeHTML(server.status) + '</div>' +
+      '<div class="modal-field"><label>Serial</label><span>' + (server.serial || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Make</label><span>' + (server.make || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Model</label><span>' + (server.model || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Capacity</label><span>' + (server.capacity || '—') + '</span></div>' +
+      '<div class="modal-field"><label>In Use</label><span>' + (server.used || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Health</label><span>' + (server.health || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Applications</label><span>' + (server.apps || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Install Date</label><span>' + (server.install_date || '—') + '</span></div>';
+    
+    var historyContainer = document.getElementById('server-detail-history');
+    if (server.history && server.history.length > 0) {
+      historyContainer.innerHTML = server.history.map(function(h) {
+        return '<div class="history-item"><span class="h-time">' + h.date + '</span>' + h.event + '</div>';
+      }).join('');
+    } else {
+      historyContainer.innerHTML = '<div style="color:#999;font-size:12px;">No maintenance history</div>';
+    }
+    
+    document.getElementById('server-detail-comments').value = server.comments || '';
+    document.getElementById('server-detail-modal').classList.add('open');
+  }
+
   function closeServerDetailModal() {
     document.getElementById('server-detail-modal').classList.remove('open');
   }
+
+  // ============================================================
+  // ── SWITCHES ──────────────────────────────────────────────────
+  // ============================================================
+
+  function renderSwitches() {
+    if (!clientData) return;
+    var switches = clientData.assets.switches || [];
+    var search = document.getElementById('sw-search') ? document.getElementById('sw-search').value.toLowerCase() : '';
+    var modelFilterEl = document.getElementById('sw-model-filter');
+    swModelFilter = modelFilterEl ? modelFilterEl.value : 'All';
+    
+    var filtered = switches.filter(function(s) {
+      var matchSearch = (s.name || '').toLowerCase().indexOf(search) !== -1 || 
+                       (s.location || '').toLowerCase().indexOf(search) !== -1 ||
+                       (s.ip_address || '').toLowerCase().indexOf(search) !== -1 ||
+                       (s.model || '').toLowerCase().indexOf(search) !== -1;
+      var matchModel = swModelFilter === 'All' || s.model === swModelFilter;
+      var matchStatus = swStatusFilter === 'All' || 
+                       (swStatusFilter === 'Online' && s.status === 'Online') ||
+                       (swStatusFilter === 'Offline' && s.status === 'Offline') ||
+                       (swStatusFilter === 'Maintenance' && s.status === 'Maintenance');
+      return matchSearch && matchModel && matchStatus;
+    });
+    
+    renderFilterPills('sw-filter-pills', switches, swStatusFilter, 'setSwStatusFilter');
+    
+    var body = document.getElementById('sw-table-body');
+    if (filtered.length === 0) {
+      body.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;padding:16px;">No switches found</td></tr>';
+    } else {
+      body.innerHTML = filtered.map(function(s) {
+        return '<tr class="clickable" onclick="openSwitchDetail(\'' + s.name + '\')"><td><strong>' + s.name + '</strong></td><td>' + (s.location || '—') + '</td><td>' + (s.model || '—') + '</td><td>' + (s.ip_address || '—') + '</td><td>' + (s.firmware || '—') + '</td><td>' + getStatusBadgeHTML(s.status) + '</td><td>' + (s.install_date || '—') + '</td></tr>';
+      }).join('');
+    }
+    
+    updateLastUpdated('sw-last-updated');
+  }
+
+  function setSwStatusFilter(status) {
+    swStatusFilter = status;
+    renderSwitches();
+  }
+
+  function openSwitchDetail(name) {
+    var sw = clientData.assets.switches.find(function(s) { return s.name === name; });
+    if (!sw) return;
+    document.getElementById('switch-detail-title').textContent = sw.name;
+    document.getElementById('switch-detail-sub').textContent = 'Location: ' + (sw.zone || '—') + ' · Status: ' + sw.status;
+    
+    document.getElementById('switch-detail-grid').innerHTML =
+      '<div class="modal-field"><label>Name</label><span>' + sw.name + '</span></div>' +
+      '<div class="modal-field"><label>Location</label><span>' + (sw.zone || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Status</label>' + getStatusBadgeHTML(sw.status) + '</div>' +
+      '<div class="modal-field"><label>Model</label><span>' + (sw.model || '—') + '</span></div>' +
+      '<div class="modal-field"><label>IP Address</label><span>' + (sw.ip_address || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Firmware</label><span>' + (sw.firmware || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Install Date</label><span>' + (sw.install_date || '—') + '</span></div>';
+    
+    var historyContainer = document.getElementById('switch-detail-history');
+    if (sw.history && sw.history.length > 0) {
+      historyContainer.innerHTML = sw.history.map(function(h) {
+        return '<div class="history-item"><span class="h-time">' + h.date + '</span>' + h.event + '</div>';
+      }).join('');
+    } else {
+      historyContainer.innerHTML = '<div style="color:#999;font-size:12px;">No maintenance history</div>';
+    }
+    
+    document.getElementById('switch-detail-comments').value = sw.comments || '';
+    document.getElementById('switch-detail-modal').classList.add('open');
+  }
+
   function closeSwitchDetailModal() {
     document.getElementById('switch-detail-modal').classList.remove('open');
   }
@@ -1922,6 +2328,17 @@
     renderDashboard();
     renderServiceRequests();
     switchPage('service-requests');
+  }
+
+  // ============================================================
+  // ── UTILITY FUNCTIONS ────────────────────────────────────────
+  // ============================================================
+
+  function updateLastUpdated(elementId) {
+    var now = new Date();
+    var timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    var el = document.getElementById(elementId);
+    if (el) el.textContent = 'Last updated: Today ' + timeStr;
   }
 
   // ============================================================
