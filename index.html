@@ -1491,7 +1491,7 @@
       name: 'KFTL',
       logo: 'logo-kftl.png',
       color: '#e31b23',
-      secondary: '#8b0000',
+      secondary: '#b91c1c',
       assets: {
         cameras: [
           { name: 'HM3 PTZ', zone: 'NORTH', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.19.1.150', install_date: '2024-01-15', history: [{ date: '2024-06-15', event: 'Firmware updated' }, { date: '2024-03-10', event: 'Lens cleaned' }] },
@@ -1528,8 +1528,8 @@
     'kwl': {
       name: 'KWL',
       logo: 'logo-kwl.png',
-      color: '#8b5cf6',
-      secondary: '#6d28d9',
+      color: '#1e3a8a',
+      secondary: '#1e40af',
       assets: {
         cameras: [
           { name: 'TP-01', zone: 'Tinson Pen', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '172.16.19.91', install_date: '2024-04-01', history: [{ date: '2024-07-10', event: 'Camera recalibrated' }] },
@@ -1558,8 +1558,8 @@
     'lasco': {
       name: 'Lasco',
       logo: 'logo-lasco.png',
-      color: '#059669',
-      secondary: '#047857',
+      color: '#ec4899',
+      secondary: '#db2777',
       assets: {
         cameras: [
           { name: 'LP-01', zone: 'Liquid Plant', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.20.1.10', install_date: '2024-02-01', history: [{ date: '2024-06-10', event: 'Firmware updated' }] },
@@ -1588,8 +1588,8 @@
     'nestle': {
       name: 'Nestle',
       logo: 'logo-nestle.png',
-      color: '#f59e0b',
-      secondary: '#d97706',
+      color: '#dc2626',
+      secondary: '#b91c1c',
       assets: {
         cameras: [
           { name: 'NE-01', zone: 'Main Plant', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.21.1.10', install_date: '2024-03-01', history: [] },
@@ -1615,8 +1615,8 @@
     'nids': {
       name: 'NIDS',
       logo: 'logo-nids.png',
-      color: '#3b82f6',
-      secondary: '#2563eb',
+      color: '#059669',
+      secondary: '#d4af37',
       assets: {
         cameras: [
           { name: 'NIDS-01', zone: 'Main Office', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.22.1.10', install_date: '2024-01-15', history: [{ date: '2024-06-01', event: 'Firmware updated' }] },
@@ -1640,8 +1640,8 @@
     'nutrien': {
       name: 'Nutrien',
       logo: 'logo-nutrien.png',
-      color: '#ec4899',
-      secondary: '#db2777',
+      color: '#22c55e',
+      secondary: '#16a34a',
       assets: {
         cameras: [
           { name: 'NU-01', zone: 'Main Plant', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.23.1.10', install_date: '2024-03-15', history: [{ date: '2024-06-30', event: 'Firmware updated' }] },
@@ -1662,6 +1662,35 @@
       activity: [
         { time: '08:00', msg: 'System health check - all nominal', type: 'success' },
         { time: '10:30', msg: 'Camera NU-03 lens cleaned', type: 'info' }
+      ]
+    },
+    'fidelity': {
+      name: 'Fidelity Motors',
+      logo: 'logo-fidelity.png',
+      color: '#b91c1c',
+      secondary: '#7f1d1d',
+      assets: {
+        cameras: [
+          { name: 'FM-01', zone: 'Showroom', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.24.1.10', install_date: '2024-03-15', history: [{ date: '2024-06-20', event: 'Firmware updated' }] },
+          { name: 'FM-02', zone: 'Showroom', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.24.1.11', install_date: '2024-04-01', history: [] },
+          { name: 'FM-03', zone: 'Service Center', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.24.2.20', install_date: '2024-02-15', history: [{ date: '2024-06-10', event: 'Lens cleaned' }] },
+          { name: 'FM-04', zone: 'Service Center', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.24.2.21', install_date: '2024-05-01', history: [] }
+        ],
+        doors: [
+          { name: 'Showroom Main', zone: 'Showroom', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Shanice Vernon', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-03-01', history: [{ date: '2024-06-15', event: 'Routine maintenance' }] },
+          { name: 'Service Center Main', zone: 'Service Center', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Marvin Grant', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-04-01', history: [] }
+        ],
+        servers: [
+          { name: 'FIDELITY-SRV-01', zone: 'Showroom', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', serial: 'FIDELITY-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-02-01', history: [] }
+        ],
+        switches: [
+          { name: 'FM Switch 1', zone: 'Showroom', status: 'Online', model: 'AXIS T8508', ip_address: '10.24.1.21', firmware: '6.54.2739', install_date: '2024-03-15', history: [{ date: '2024-06-01', event: 'Port configuration updated' }] }
+        ]
+      },
+      srs: [],
+      activity: [
+        { time: '08:30', msg: 'All systems online', type: 'success' },
+        { time: '10:00', msg: 'Camera FM-04 installed', type: 'info' }
       ]
     }
   };
@@ -1752,7 +1781,8 @@
       'lasco': { password: 'lasco123', client: 'lasco' },
       'nestle': { password: 'nestle123', client: 'nestle' },
       'nids': { password: 'nids123', client: 'nids' },
-      'nutrien': { password: 'nutrien123', client: 'nutrien' }
+      'nutrien': { password: 'nutrien123', client: 'nutrien' },
+      'fidelity': { password: 'fidelity123', client: 'fidelity' }
     };
     
     setTimeout(function() {
@@ -1807,13 +1837,9 @@
       el.onerror = function() { this.src = 'logo.png'; };
     });
     
-    // Set ETech logo - use light mode for white background clients
+    // Set ETech logo - use light mode for all white background clients
     var etechLogo = document.getElementById('etech-logo');
-    if (primaryColor === '#e31b23' || primaryColor === '#8b5cf6' || primaryColor === '#059669' || primaryColor === '#f59e0b' || primaryColor === '#3b82f6' || primaryColor === '#ec4899') {
-      etechLogo.src = 'logo-light.png';
-    } else {
-      etechLogo.src = 'logo.png';
-    }
+    etechLogo.src = 'logo-light.png';
     etechLogo.onerror = function() { this.src = 'logo.png'; };
     
     // Set names
@@ -2461,6 +2487,7 @@
   console.log('   nestle / nestle123');
   console.log('   nids / nids123');
   console.log('   nutrien / nutrien123');
+  console.log('   fidelity / fidelity123');
 </script>
 </body>
 </html>
