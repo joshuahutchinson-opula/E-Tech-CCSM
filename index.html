@@ -6,7 +6,7 @@
 <title>Client Portal</title>
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   /* ============================================================
      ── RESET & BASE ───────────────────────────────────────────
@@ -15,20 +15,23 @@
   
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #0b0d15;
+    background: #f5f5f5;
     min-height: 100vh;
-    color: #f0f4ff;
+    color: #1a1a2e;
   }
 
   /* ── Client Brand Colors (set by JS) ── */
   :root {
-    --client-primary: #4f8cf7;
-    --client-secondary: #00d4ff;
-    --client-gradient: linear-gradient(135deg, #4f8cf7, #00d4ff);
-    --client-glow: rgba(79, 140, 247, 0.3);
-    --client-dark: #0b0d15;
-    --client-card: rgba(255, 255, 255, 0.03);
-    --client-border: rgba(255, 255, 255, 0.06);
+    --client-primary: #e31b23;
+    --client-secondary: #8b0000;
+    --client-gradient: linear-gradient(135deg, #e31b23, #8b0000);
+    --client-glow: rgba(227, 27, 35, 0.3);
+    --client-light: #ffffff;
+    --client-dark: #1a1a2e;
+    --client-card: #ffffff;
+    --client-border: rgba(0, 0, 0, 0.08);
+    --client-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    --client-shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
   }
 
   /* ── Toast ── */
@@ -45,7 +48,7 @@
     padding: 12px 18px;
     border-radius: 8px;
     font-size: 12px;
-    color: #fff;
+    color: #1a1a2e;
     background: var(--client-card);
     border: 1px solid var(--client-border);
     animation: slideIn 0.25s ease;
@@ -54,26 +57,27 @@
     gap: 8px;
     backdrop-filter: blur(10px);
     min-width: 200px;
+    box-shadow: var(--client-shadow);
   }
   @keyframes slideIn {
     from { opacity: 0; transform: translateX(20px); }
     to { opacity: 1; transform: translateX(0); }
   }
-  .toast.success { border-color: #34d399; color: #34d399; }
-  .toast.error { border-color: #ff5e7a; color: #ff5e7a; }
-  .toast.warning { border-color: #ffb347; color: #ffb347; }
+  .toast.success { border-color: #22c55e; color: #22c55e; }
+  .toast.error { border-color: #ef4444; color: #ef4444; }
+  .toast.warning { border-color: #f59e0b; color: #f59e0b; }
   .toast.info { border-color: var(--client-primary); color: var(--client-primary); }
 
   /* ── Confirm ── */
   .confirm-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0,0,0,0.5);
     z-index: 1000;
     display: none;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(6px);
+    backdrop-filter: blur(4px);
   }
   .confirm-overlay.open { display: flex; }
   .confirm-dialog {
@@ -83,17 +87,17 @@
     padding: 28px 32px;
     max-width: 440px;
     width: 90%;
-    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.15);
   }
   .confirm-dialog .confirm-title {
     font-size: 16px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--client-dark);
     margin-bottom: 6px;
   }
   .confirm-dialog .confirm-desc {
     font-size: 13px;
-    color: var(--text-secondary);
+    color: #666;
     margin-bottom: 20px;
     line-height: 1.5;
   }
@@ -107,7 +111,7 @@
   #login-page {
     position: fixed;
     inset: 0;
-    background: #0a0a0a;
+    background: #f5f5f5;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -116,22 +120,24 @@
     gap: 20px;
   }
   #login-page .login-box {
-    background: rgba(255,255,255,0.03);
+    background: #ffffff;
     backdrop-filter: blur(20px);
     padding: 40px 48px;
     border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.06);
+    border: 1px solid rgba(0,0,0,0.06);
     width: 400px;
     max-width: 90%;
     text-align: center;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.08);
   }
   #login-page .login-box h2 {
-    color: #f0f4ff;
+    color: #1a1a2e;
     font-size: 22px;
+    font-weight: 700;
     margin-bottom: 4px;
   }
   #login-page .login-box p {
-    color: rgba(255,255,255,0.4);
+    color: #888;
     font-size: 13px;
     margin-bottom: 24px;
   }
@@ -139,9 +145,9 @@
     width: 100%;
     padding: 10px 14px;
     border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.1);
-    background: rgba(255,255,255,0.04);
-    color: #f0f4ff;
+    border: 1px solid rgba(0,0,0,0.1);
+    background: #f8f9fa;
+    color: #1a1a2e;
     margin-bottom: 10px;
     font-size: 14px;
     font-family: var(--font);
@@ -168,7 +174,7 @@
     box-shadow: 0 6px 24px var(--client-glow);
   }
   .login-error {
-    color: #f87171;
+    color: #ef4444;
     font-size: 12px;
     margin-top: 12px;
     display: none;
@@ -178,7 +184,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    color: rgba(255,255,255,0.5);
+    color: #888;
     font-size: 13px;
     margin-top: 12px;
   }
@@ -194,7 +200,7 @@
 
   /* ── Topbar ── */
   .client-topbar {
-    background: rgba(18, 18, 30, 0.95);
+    background: #ffffff;
     border-bottom: 1px solid var(--client-border);
     padding: 0 32px;
     height: 64px;
@@ -204,7 +210,7 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    backdrop-filter: blur(12px);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
   .client-topbar .brand {
     display: flex;
@@ -219,13 +225,13 @@
   .client-topbar .brand .client-name {
     font-size: 17px;
     font-weight: 700;
-    color: #f0f4ff;
+    color: #1a1a2e;
     letter-spacing: -0.02em;
   }
   .client-topbar .brand .client-name .tag {
     font-weight: 400;
     font-size: 10px;
-    color: rgba(255,255,255,0.3);
+    color: #999;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     margin-left: 6px;
@@ -242,7 +248,7 @@
     padding: 4px 14px 4px 4px;
     border-radius: 8px;
     border: 1px solid var(--client-border);
-    background: rgba(255,255,255,0.03);
+    background: #f8f9fa;
     cursor: pointer;
   }
   .client-topbar .topbar-actions .user-profile .avatar {
@@ -260,22 +266,22 @@
   .client-topbar .topbar-actions .user-profile .name {
     font-size: 12px;
     font-weight: 500;
-    color: #f0f4ff;
+    color: #1a1a2e;
   }
   .client-topbar .topbar-actions .logout-btn {
     padding: 6px 14px;
     border-radius: 6px;
     border: 1px solid var(--client-border);
-    background: rgba(255,255,255,0.03);
-    color: rgba(255,255,255,0.4);
+    background: transparent;
+    color: #999;
     cursor: pointer;
     font-size: 11px;
     font-family: var(--font);
     transition: all 0.2s;
   }
   .client-topbar .topbar-actions .logout-btn:hover {
-    border-color: #ff5e7a;
-    color: #ff5e7a;
+    border-color: var(--client-primary);
+    color: var(--client-primary);
   }
 
   /* ── Layout ── */
@@ -286,8 +292,8 @@
 
   /* ── Sidebar ── */
   .client-sidebar {
-    width: 210px;
-    background: rgba(18, 18, 30, 0.92);
+    width: 200px;
+    background: #ffffff;
     border-right: 1px solid var(--client-border);
     padding: 20px 12px;
     flex-shrink: 0;
@@ -296,7 +302,7 @@
   .client-sidebar .nav-section {
     font-size: 10px;
     font-weight: 600;
-    color: rgba(255,255,255,0.25);
+    color: #999;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     padding: 8px 12px 6px;
@@ -309,7 +315,7 @@
     gap: 10px;
     padding: 10px 14px;
     border-radius: 8px;
-    color: rgba(255,255,255,0.5);
+    color: #666;
     cursor: pointer;
     transition: all 0.2s;
     font-size: 13px;
@@ -322,8 +328,8 @@
     text-align: left;
   }
   .client-sidebar .nav-item:hover {
-    background: rgba(255,255,255,0.04);
-    color: #f0f4ff;
+    background: #f0f0f0;
+    color: #1a1a2e;
   }
   .client-sidebar .nav-item.active {
     background: var(--client-primary);
@@ -337,7 +343,7 @@
   }
   .client-sidebar .nav-item .badge {
     margin-left: auto;
-    background: rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.06);
     padding: 1px 8px;
     border-radius: 10px;
     font-size: 10px;
@@ -351,16 +357,10 @@
     border-bottom: 1px solid var(--client-border);
     margin-bottom: 12px;
   }
-  .client-sidebar .client-branding .mini-logo {
-    height: 26px;
-    width: auto;
-    display: block;
-    margin-bottom: 4px;
-  }
   .client-sidebar .client-branding .client-label {
-    font-size: 11px;
-    color: rgba(255,255,255,0.35);
-    font-weight: 500;
+    font-size: 12px;
+    color: #666;
+    font-weight: 600;
   }
 
   /* ── Content ── */
@@ -368,7 +368,7 @@
     flex: 1;
     padding: 28px 32px;
     overflow-y: auto;
-    background: #0b0d15;
+    background: #f5f5f5;
   }
   .client-content .page-section {
     display: none;
@@ -384,7 +384,7 @@
   .welcome-banner {
     background: var(--client-gradient);
     border-radius: 12px;
-    padding: 28px 36px;
+    padding: 32px 36px;
     margin-bottom: 24px;
     position: relative;
     overflow: hidden;
@@ -406,21 +406,21 @@
   }
   .welcome-banner .welcome-content .greeting {
     font-size: 13px;
-    color: rgba(255,255,255,0.7);
+    color: rgba(255,255,255,0.8);
     font-weight: 500;
     margin-bottom: 2px;
     letter-spacing: 0.04em;
   }
   .welcome-banner .welcome-content h1 {
-    font-size: 26px;
-    font-weight: 700;
+    font-size: 28px;
+    font-weight: 800;
     color: #fff;
     letter-spacing: -0.02em;
     margin-bottom: 4px;
   }
   .welcome-banner .welcome-content .sub {
-    font-size: 13px;
-    color: rgba(255,255,255,0.7);
+    font-size: 14px;
+    color: rgba(255,255,255,0.8);
   }
   .welcome-banner .welcome-content .sub strong {
     color: #fff;
@@ -429,71 +429,73 @@
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    background: rgba(255,255,255,0.1);
-    padding: 4px 14px 4px 10px;
+    background: rgba(255,255,255,0.12);
+    padding: 4px 16px 4px 12px;
     border-radius: 20px;
     margin-top: 10px;
     backdrop-filter: blur(4px);
   }
   .welcome-banner .welcome-content .client-badge img {
-    height: 22px;
+    height: 24px;
     width: auto;
-    border-radius: 3px;
+    border-radius: 4px;
   }
   .welcome-banner .welcome-content .client-badge span {
-    color: rgba(255,255,255,0.8);
+    color: rgba(255,255,255,0.9);
     font-weight: 500;
-    font-size: 12px;
+    font-size: 13px;
   }
 
   /* ── Stats Grid ── */
   .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
+    gap: 16px;
     margin-bottom: 24px;
   }
   .stat-card {
-    background: rgba(255,255,255,0.03);
+    background: #ffffff;
     border: 1px solid var(--client-border);
     border-radius: 10px;
-    padding: 16px 20px;
+    padding: 18px 22px;
     transition: all 0.2s;
+    box-shadow: var(--client-shadow);
   }
   .stat-card:hover {
-    border-color: var(--client-primary);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    box-shadow: var(--client-shadow-hover);
+    transform: translateY(-2px);
   }
   .stat-card .stat-label {
     font-size: 10px;
-    color: rgba(255,255,255,0.35);
+    color: #999;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     font-weight: 600;
   }
   .stat-card .stat-value {
-    font-size: 28px;
+    font-size: 30px;
     font-weight: 700;
-    color: #f0f4ff;
+    color: #1a1a2e;
     line-height: 1.2;
     margin-top: 2px;
   }
   .stat-card .stat-sub {
     font-size: 11px;
-    color: rgba(255,255,255,0.4);
+    color: #888;
     margin-top: 2px;
   }
-  .stat-card .stat-sub .online { color: #34d399; }
-  .stat-card .stat-sub .offline { color: #ff5e7a; }
-  .stat-card .stat-sub .warning { color: #ffb347; }
+  .stat-card .stat-sub .online { color: #22c55e; }
+  .stat-card .stat-sub .offline { color: #ef4444; }
+  .stat-card .stat-sub .warning { color: #f59e0b; }
 
   /* ── Panel ── */
   .panel {
-    background: rgba(255,255,255,0.03);
+    background: #ffffff;
     border: 1px solid var(--client-border);
     border-radius: 10px;
-    padding: 18px 20px;
+    padding: 20px 24px;
     margin-bottom: 16px;
+    box-shadow: var(--client-shadow);
   }
   .panel-header {
     display: flex;
@@ -502,9 +504,9 @@
     margin-bottom: 14px;
   }
   .panel-title {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
-    color: rgba(255,255,255,0.4);
+    color: #999;
     text-transform: uppercase;
     letter-spacing: 0.08em;
   }
@@ -513,62 +515,68 @@
     border: none;
     color: var(--client-primary);
     cursor: pointer;
-    font-size: 11px;
+    font-size: 12px;
     font-family: var(--font);
+    font-weight: 500;
   }
   .panel .link-btn:hover {
     text-decoration: underline;
   }
 
-  /* ── Zone Tabs ── */
-  .zone-tabs {
-    display: flex;
-    gap: 4px;
-    margin-bottom: 16px;
+  /* ── Tables ── */
+  .tbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .tbl th {
+    color: #999;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    padding: 10px 8px;
     border-bottom: 2px solid var(--client-border);
-    flex-wrap: wrap;
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
   }
-  .zone-tab {
-    padding: 8px 18px;
-    font-size: 12px;
-    font-weight: 500;
-    color: rgba(255,255,255,0.4);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -2px;
-    transition: all 0.15s;
-    background: none;
-    border-top: none;
-    border-left: none;
-    border-right: none;
-    font-family: var(--font);
+  .tbl td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #555;
   }
-  .zone-tab:hover {
-    color: rgba(255,255,255,0.7);
+  .tbl tr:hover td {
+    background: #f8f9fa;
   }
-  .zone-tab.active {
-    color: var(--client-primary);
-    border-bottom-color: var(--client-primary);
-  }
-  .zone-tab .zone-count {
+  .tbl .status-badge {
+    display: inline-block;
+    padding: 2px 12px;
+    border-radius: 12px;
     font-size: 10px;
-    color: rgba(255,255,255,0.2);
-    margin-left: 4px;
+    font-weight: 600;
   }
+  .tbl .status-badge.online { background: #dcfce7; color: #22c55e; }
+  .tbl .status-badge.offline { background: #fee2e2; color: #ef4444; }
+  .tbl .status-badge.maintenance { background: #fef3c7; color: #f59e0b; }
+  .tbl .status-badge.open { background: #fef3c7; color: #f59e0b; }
+  .tbl .status-badge.in-progress { background: #dbeafe; color: #3b82f6; }
+  .tbl .status-badge.resolved { background: #dcfce7; color: #22c55e; }
+  .tbl .pri-high { color: #ef4444; font-weight: 600; }
+  .tbl .pri-med { color: #f59e0b; font-weight: 600; }
+  .tbl .pri-low { color: #22c55e; font-weight: 600; }
 
   /* ── Search & Filter ── */
   .search-filter-bar {
     display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
+    gap: 10px;
+    margin-bottom: 14px;
     flex-wrap: wrap;
   }
   .search-filter-bar input,
   .search-filter-bar select {
-    background: rgba(255,255,255,0.04);
+    background: #f8f9fa;
     border: 1px solid var(--client-border);
-    color: #f0f4ff;
-    padding: 6px 10px;
+    color: #1a1a2e;
+    padding: 8px 12px;
     border-radius: 6px;
     font-size: 12px;
     font-family: var(--font);
@@ -580,8 +588,8 @@
     border-color: var(--client-primary);
   }
   .search-filter-bar select option {
-    background: #0b0d15;
-    color: #f0f4ff;
+    background: #ffffff;
+    color: #1a1a2e;
   }
 
   /* ── Tag Filters ── */
@@ -592,19 +600,19 @@
     margin-bottom: 12px;
   }
   .tag-filter {
-    padding: 3px 12px;
+    padding: 4px 14px;
     border-radius: 12px;
     font-size: 10px;
     font-weight: 500;
-    color: rgba(255,255,255,0.4);
-    background: rgba(255,255,255,0.04);
+    color: #888;
+    background: #f8f9fa;
     border: 1px solid var(--client-border);
     cursor: pointer;
     transition: all 0.15s;
   }
   .tag-filter:hover {
     border-color: var(--client-primary);
-    color: #f0f4ff;
+    color: #1a1a2e;
   }
   .tag-filter.active {
     background: var(--client-primary);
@@ -612,68 +620,29 @@
     border-color: var(--client-primary);
   }
 
-  /* ── Tables ── */
-  .tbl {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-  }
-  .tbl th {
-    color: rgba(255,255,255,0.35);
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    padding: 8px 6px;
-    border-bottom: 1px solid var(--client-border);
-    text-align: left;
-  }
-  .tbl td {
-    padding: 8px 6px;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
-    color: rgba(255,255,255,0.7);
-  }
-  .tbl tr:hover td {
-    background: rgba(255,255,255,0.02);
-  }
-  .tbl .status-badge {
-    display: inline-block;
-    padding: 2px 10px;
-    border-radius: 12px;
-    font-size: 10px;
-    font-weight: 500;
-  }
-  .tbl .status-badge.online { background: rgba(52,211,153,0.15); color: #34d399; }
-  .tbl .status-badge.offline { background: rgba(255,94,122,0.15); color: #ff5e7a; }
-  .tbl .status-badge.maintenance { background: rgba(255,179,71,0.15); color: #ffb347; }
-  .tbl .status-badge.open { background: rgba(255,179,71,0.15); color: #ffb347; }
-  .tbl .status-badge.in-progress { background: rgba(96,165,250,0.15); color: #93c5fd; }
-  .tbl .status-badge.resolved { background: rgba(52,211,153,0.15); color: #34d399; }
-  .tbl .pri-high { color: #ff5e7a; font-weight: 600; }
-  .tbl .pri-med { color: #ffb347; font-weight: 600; }
-  .tbl .pri-low { color: #34d399; font-weight: 600; }
-
   /* ── Timeline ── */
   .timeline-item {
     display: flex;
-    gap: 12px;
-    padding: 6px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
+    gap: 14px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
   }
   .timeline-item:last-child { border-bottom: none; }
   .timeline-item .tl-time {
     font-size: 11px;
-    color: rgba(255,255,255,0.3);
+    color: #999;
     font-weight: 500;
     min-width: 50px;
     flex-shrink: 0;
   }
   .timeline-item .tl-content .tl-title {
-    font-size: 12px;
-    color: #f0f4ff;
+    font-size: 13px;
+    color: #1a1a2e;
     font-weight: 500;
   }
   .timeline-item .tl-content .tl-desc {
-    font-size: 11px;
-    color: rgba(255,255,255,0.4);
+    font-size: 12px;
+    color: #888;
   }
   .timeline-item .tl-badge {
     font-size: 10px;
@@ -683,29 +652,29 @@
     align-self: center;
     flex-shrink: 0;
   }
-  .timeline-item .tl-badge.urgent { color: #ff5e7a; background: rgba(255,94,122,0.1); }
-  .timeline-item .tl-badge.info { color: #60a5fa; background: rgba(96,165,250,0.1); }
-  .timeline-item .tl-badge.success { color: #34d399; background: rgba(52,211,153,0.1); }
+  .timeline-item .tl-badge.urgent { color: #ef4444; background: #fee2e2; }
+  .timeline-item .tl-badge.info { color: #3b82f6; background: #dbeafe; }
+  .timeline-item .tl-badge.success { color: #22c55e; background: #dcfce7; }
 
   /* ── Form ── */
-  .sr-form .form-group { margin-bottom: 14px; }
+  .sr-form .form-group { margin-bottom: 16px; }
   .sr-form .form-group label {
     display: block;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
-    color: rgba(255,255,255,0.4);
-    margin-bottom: 3px;
+    color: #666;
+    margin-bottom: 4px;
   }
   .sr-form .form-group input,
   .sr-form .form-group select,
   .sr-form .form-group textarea {
     width: 100%;
-    padding: 8px 12px;
+    padding: 10px 14px;
     border-radius: 6px;
     border: 1px solid var(--client-border);
-    background: rgba(255,255,255,0.04);
-    color: #f0f4ff;
-    font-size: 12px;
+    background: #f8f9fa;
+    color: #1a1a2e;
+    font-size: 13px;
     font-family: var(--font);
     transition: border-color 0.2s;
   }
@@ -716,13 +685,13 @@
     border-color: var(--client-primary);
   }
   .sr-form .form-group textarea {
-    min-height: 100px;
+    min-height: 120px;
     resize: vertical;
   }
   .sr-form .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px;
+    gap: 16px;
   }
   .sr-form .form-actions {
     display: flex;
@@ -730,59 +699,165 @@
     margin-top: 6px;
   }
   .btn-primary {
-    padding: 8px 20px;
+    padding: 10px 24px;
     border-radius: 6px;
     border: none;
     background: var(--client-gradient);
     color: #fff;
     font-weight: 600;
-    font-size: 12px;
+    font-size: 13px;
     cursor: pointer;
     font-family: var(--font);
     transition: all 0.2s;
     box-shadow: 0 4px 12px var(--client-glow);
   }
   .btn-primary:hover {
-    transform: translateY(-1px);
+    transform: translateY(-2px);
     box-shadow: 0 6px 20px var(--client-glow);
   }
   .btn-secondary {
-    padding: 8px 18px;
+    padding: 10px 20px;
     border-radius: 6px;
     border: 1px solid var(--client-border);
-    background: transparent;
-    color: rgba(255,255,255,0.4);
+    background: #ffffff;
+    color: #666;
     font-weight: 500;
-    font-size: 12px;
+    font-size: 13px;
     cursor: pointer;
     font-family: var(--font);
     transition: all 0.2s;
   }
   .btn-secondary:hover {
     border-color: var(--client-primary);
-    color: #f0f4ff;
+    color: var(--client-primary);
   }
 
   /* ── Empty State ── */
   .empty-state {
     text-align: center;
     padding: 40px 20px;
-    color: rgba(255,255,255,0.25);
+    color: #999;
   }
   .empty-state .empty-icon {
     font-size: 40px;
-    opacity: 0.2;
+    opacity: 0.3;
     margin-bottom: 8px;
     display: block;
   }
   .empty-state .empty-title {
     font-size: 15px;
     font-weight: 600;
-    color: rgba(255,255,255,0.4);
+    color: #666;
     margin-bottom: 2px;
   }
   .empty-state .empty-desc {
     font-size: 12px;
+  }
+
+  /* ── Modal Override ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #ffffff;
+    border-radius: 12px;
+    width: 580px;
+    max-height: 86vh;
+    overflow-y: auto;
+    padding: 28px 32px;
+    position: relative;
+    font-family: var(--font);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.2);
+    max-width: 95%;
+  }
+  .modal.wide { width: 680px; }
+  .modal.xwide { width: 760px; }
+  .modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    font-size: 18px;
+    z-index: 10;
+  }
+  .modal-close:hover { color: #1a1a2e; }
+  .modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 4px;
+    padding-right: 40px;
+  }
+  .modal-sub {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 18px;
+  }
+  .modal-section { margin-bottom: 18px; }
+  .modal-section-title {
+    font-size: 10px;
+    font-weight: 600;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--client-border);
+  }
+  .modal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .modal-field label {
+    font-size: 10px;
+    color: #999;
+    display: block;
+    margin-bottom: 3px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .modal-field span {
+    display: block;
+    padding: 6px 0;
+    font-size: 13px;
+    color: #1a1a2e;
+  }
+  .modal-field input,
+  .modal-field select {
+    background: #f8f9fa;
+    border: 1px solid var(--client-border);
+    color: #1a1a2e;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    width: 100%;
+    font-family: var(--font);
+  }
+  .modal-field input:focus,
+  .modal-field select:focus {
+    outline: none;
+    border-color: var(--client-primary);
+  }
+  .modal-footer {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid var(--client-border);
   }
 
   /* ── Responsive ── */
@@ -796,7 +871,6 @@
     .client-sidebar .nav-item { justify-content: center; padding: 10px 0; }
     .client-sidebar .nav-item i { margin: 0; }
     .client-sidebar .client-branding { padding: 0 8px 12px; }
-    .client-sidebar .client-branding .mini-logo { margin: 0 auto; }
     .client-content { padding: 20px; }
   }
   @media (max-width: 600px) {
@@ -807,6 +881,8 @@
     .welcome-banner { padding: 20px; }
     .welcome-banner .welcome-content h1 { font-size: 20px; }
     .sr-form .form-row { grid-template-columns: 1fr; }
+    .modal { padding: 16px; }
+    .modal-grid { grid-template-columns: 1fr; }
     .client-sidebar {
       position: fixed;
       left: -280px;
@@ -814,7 +890,7 @@
       bottom: 0;
       width: 280px;
       z-index: 99;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
       transition: left 0.3s;
     }
     .client-sidebar.open { left: 0; }
@@ -824,17 +900,14 @@
     .client-sidebar .nav-item .badge { display: inline; }
     .client-sidebar .nav-item { justify-content: flex-start; padding: 10px 14px; }
     .client-sidebar .nav-item i { margin: 0 6px 0 0; }
-    .client-sidebar .client-branding .mini-logo { margin: 0; }
     .mobile-menu-btn { display: flex !important; }
-    .zone-tabs { overflow-x: auto; flex-wrap: nowrap; }
-    .zone-tab { padding: 6px 12px; font-size: 11px; white-space: nowrap; }
   }
 
   .mobile-menu-btn {
     display: none;
     background: none;
     border: none;
-    color: #f0f4ff;
+    color: #1a1a2e;
     font-size: 20px;
     cursor: pointer;
     padding: 4px;
@@ -882,7 +955,7 @@
       <button class="login-btn" onclick="clientLogin()">Sign In</button>
       <div class="login-error" id="login-error"></div>
       <div class="login-loading" id="login-loading"><i class="ti ti-loader"></i> Signing in...</div>
-      <p style="color:rgba(255,255,255,0.2);font-size:11px;margin-top:16px;">Demo: kftl / kftl123</p>
+      <p style="color:#999;font-size:11px;margin-top:16px;">Demo: kftl / kftl123</p>
     </div>
   </div>
 
@@ -911,7 +984,6 @@
       <!-- Sidebar -->
       <nav class="client-sidebar" id="client-sidebar">
         <div class="client-branding">
-          <img class="mini-logo" id="sidebar-logo" src="logo.png" alt="Logo">
           <div class="client-label" id="sidebar-name">Client Name</div>
         </div>
         <div class="nav-section">Main</div>
@@ -961,29 +1033,18 @@
             </div>
             <div class="stat-card">
               <div class="stat-label">Online</div>
-              <div class="stat-value" id="stat-online" style="color:#34d399">0</div>
+              <div class="stat-value" id="stat-online" style="color:#22c55e">0</div>
               <div class="stat-sub"><span class="online">●</span> Operational</div>
             </div>
             <div class="stat-card">
               <div class="stat-label">Offline / Issues</div>
-              <div class="stat-value" id="stat-offline" style="color:#ff5e7a">0</div>
+              <div class="stat-value" id="stat-offline" style="color:#ef4444">0</div>
               <div class="stat-sub"><span class="offline">●</span> Needs attention</div>
             </div>
             <div class="stat-card">
               <div class="stat-label">Open Service Requests</div>
-              <div class="stat-value" id="stat-srs" style="color:#ffb347">0</div>
+              <div class="stat-value" id="stat-srs" style="color:#f59e0b">0</div>
               <div class="stat-sub"><span class="warning">●</span> Pending resolution</div>
-            </div>
-          </div>
-
-          <!-- Zone Tabs -->
-          <div class="panel">
-            <div class="panel-header">
-              <span class="panel-title">Assets by Zone</span>
-            </div>
-            <div class="zone-tabs" id="zone-tabs"></div>
-            <div id="zone-assets-content">
-              <!-- Dynamic content per zone -->
             </div>
           </div>
 
@@ -1014,7 +1075,7 @@
 
         <!-- Assets -->
         <section class="page-section" id="page-assets">
-          <h2 style="font-size:18px;font-weight:600;color:#f0f4ff;margin-bottom:16px;">Your Assets</h2>
+          <h2 style="font-size:20px;font-weight:700;color:#1a1a2e;margin-bottom:20px;">Your Assets</h2>
           
           <div class="stats-grid" style="margin-bottom:16px;">
             <div class="stat-card"><div class="stat-value" id="asset-cameras">0</div><div class="stat-label">Cameras</div></div>
@@ -1025,7 +1086,7 @@
 
           <div class="panel">
             <div class="search-filter-bar">
-              <input type="text" id="asset-search" placeholder="Search assets..." oninput="renderAssets()">
+              <input type="text" id="asset-search" placeholder="Search assets by name or location..." oninput="renderAssets()">
               <select id="asset-type-filter" onchange="renderAssets()">
                 <option value="all">All Types</option>
                 <option value="Camera">Cameras</option>
@@ -1042,7 +1103,7 @@
             </div>
             <div class="tbl-wrap" style="overflow-x:auto;">
               <table class="tbl" id="assets-table">
-                <thead><tr><th>Name</th><th>Type</th><th>Location</th><th>Status</th></tr></thead>
+                <thead><tr><th>Name</th><th>Type</th><th>Location</th><th>Status</th><th>Details</th></tr></thead>
                 <tbody id="assets-table-body"></tbody>
               </table>
             </div>
@@ -1051,7 +1112,7 @@
 
         <!-- Service Requests -->
         <section class="page-section" id="page-service-requests">
-          <h2 style="font-size:18px;font-weight:600;color:#f0f4ff;margin-bottom:16px;">Service Requests</h2>
+          <h2 style="font-size:20px;font-weight:700;color:#1a1a2e;margin-bottom:20px;">Service Requests</h2>
           
           <div class="panel">
             <div class="search-filter-bar">
@@ -1075,7 +1136,7 @@
 
         <!-- Create SR -->
         <section class="page-section" id="page-create-sr">
-          <h2 style="font-size:18px;font-weight:600;color:#f0f4ff;margin-bottom:16px;">Create Service Request</h2>
+          <h2 style="font-size:20px;font-weight:700;color:#1a1a2e;margin-bottom:20px;">Create Service Request</h2>
           
           <div class="panel">
             <form class="sr-form" id="sr-form" onsubmit="submitSR(event)">
@@ -1117,31 +1178,111 @@
 
         <!-- Contact -->
         <section class="page-section" id="page-contact">
-          <h2 style="font-size:18px;font-weight:600;color:#f0f4ff;margin-bottom:16px;">Contact Support</h2>
+          <h2 style="font-size:20px;font-weight:700;color:#1a1a2e;margin-bottom:20px;">Contact Support</h2>
           
           <div class="panel">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:500px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:500px;">
               <div>
-                <div style="font-size:10px;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Email</div>
-                <div style="font-size:14px;color:#f0f4ff;font-weight:500;">support@etechsystems.com</div>
+                <div style="font-size:10px;color:#999;text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Email</div>
+                <div style="font-size:14px;color:#1a1a2e;font-weight:500;">support@etechsystems.com</div>
               </div>
               <div>
-                <div style="font-size:10px;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Phone</div>
-                <div style="font-size:14px;color:#f0f4ff;font-weight:500;">+1 (876) 555-0199</div>
+                <div style="font-size:10px;color:#999;text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Phone</div>
+                <div style="font-size:14px;color:#1a1a2e;font-weight:500;">+1 (876) 555-0199</div>
               </div>
               <div>
-                <div style="font-size:10px;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Hours</div>
-                <div style="font-size:14px;color:#f0f4ff;font-weight:500;">Mon-Fri 8:00am - 6:00pm</div>
+                <div style="font-size:10px;color:#999;text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Hours</div>
+                <div style="font-size:14px;color:#1a1a2e;font-weight:500;">Mon-Fri 8:00am - 6:00pm</div>
               </div>
               <div>
-                <div style="font-size:10px;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Emergency</div>
-                <div style="font-size:14px;color:#ff5e7a;font-weight:600;">+1 (876) 555-0911</div>
+                <div style="font-size:10px;color:#999;text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Emergency</div>
+                <div style="font-size:14px;color:#ef4444;font-weight:600;">+1 (876) 555-0911</div>
               </div>
             </div>
           </div>
         </section>
 
       </main>
+    </div>
+  </div>
+
+  <!-- Camera Detail Modal -->
+  <div class="modal-overlay" id="camera-detail-modal">
+    <div class="modal wide">
+      <button class="modal-close" onclick="closeCameraDetailModal()"><i class="ti ti-x"></i></button>
+      <div class="modal-title" id="cam-detail-title">Camera Name</div>
+      <div class="modal-sub" id="cam-detail-sub">Zone: NORTH · Status: Online</div>
+      <div class="modal-section">
+        <div class="modal-section-title">Details</div>
+        <div class="modal-grid" id="camera-detail-grid"></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Comments</div>
+        <textarea class="notes-area" id="cam-detail-comments" style="width:100%;background:#f8f9fa;border:1px solid var(--client-border);border-radius:6px;color:#1a1a2e;padding:10px 12px;min-height:60px;font-family:var(--font);resize:vertical;font-size:12px;"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeCameraDetailModal()" style="padding:8px 16px;border:1px solid var(--client-border);border-radius:6px;background:transparent;color:#666;cursor:pointer;font-family:var(--font);">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Door Detail Modal -->
+  <div class="modal-overlay" id="door-detail-modal">
+    <div class="modal wide">
+      <button class="modal-close" onclick="closeDoorDetailModal()"><i class="ti ti-x"></i></button>
+      <div class="modal-title" id="door-detail-title">Door Name</div>
+      <div class="modal-sub" id="door-detail-sub">Site: Security Office · Status: Online</div>
+      <div class="modal-section">
+        <div class="modal-section-title">Details</div>
+        <div class="modal-grid" id="door-detail-grid"></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Comments</div>
+        <textarea class="notes-area" id="door-detail-comments" style="width:100%;background:#f8f9fa;border:1px solid var(--client-border);border-radius:6px;color:#1a1a2e;padding:10px 12px;min-height:60px;font-family:var(--font);resize:vertical;font-size:12px;"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeDoorDetailModal()" style="padding:8px 16px;border:1px solid var(--client-border);border-radius:6px;background:transparent;color:#666;cursor:pointer;font-family:var(--font);">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Server Detail Modal -->
+  <div class="modal-overlay" id="server-detail-modal">
+    <div class="modal wide">
+      <button class="modal-close" onclick="closeServerDetailModal()"><i class="ti ti-x"></i></button>
+      <div class="modal-title" id="server-detail-title">Server Name</div>
+      <div class="modal-sub" id="server-detail-sub">Location: Kingport · Status: Online</div>
+      <div class="modal-section">
+        <div class="modal-section-title">Details</div>
+        <div class="modal-grid" id="server-detail-grid"></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Comments</div>
+        <textarea class="notes-area" id="server-detail-comments" style="width:100%;background:#f8f9fa;border:1px solid var(--client-border);border-radius:6px;color:#1a1a2e;padding:10px 12px;min-height:60px;font-family:var(--font);resize:vertical;font-size:12px;"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeServerDetailModal()" style="padding:8px 16px;border:1px solid var(--client-border);border-radius:6px;background:transparent;color:#666;cursor:pointer;font-family:var(--font);">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Switch Detail Modal -->
+  <div class="modal-overlay" id="switch-detail-modal">
+    <div class="modal wide">
+      <button class="modal-close" onclick="closeSwitchDetailModal()"><i class="ti ti-x"></i></button>
+      <div class="modal-title" id="switch-detail-title">Switch Name</div>
+      <div class="modal-sub" id="switch-detail-sub">Location: Security Office · Status: Online</div>
+      <div class="modal-section">
+        <div class="modal-section-title">Details</div>
+        <div class="modal-grid" id="switch-detail-grid"></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Comments</div>
+        <textarea class="notes-area" id="switch-detail-comments" style="width:100%;background:#f8f9fa;border:1px solid var(--client-border);border-radius:6px;color:#1a1a2e;padding:10px 12px;min-height:60px;font-family:var(--font);resize:vertical;font-size:12px;"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeSwitchDetailModal()" style="padding:8px 16px;border:1px solid var(--client-border);border-radius:6px;background:transparent;color:#666;cursor:pointer;font-family:var(--font);">Close</button>
+      </div>
     </div>
   </div>
 
@@ -1157,28 +1298,28 @@
     'kftl': {
       name: 'KFTL',
       logo: 'logo-kftl.png',
-      color: '#3b82f6',
-      secondary: '#60a5fa',
+      color: '#e31b23',
+      secondary: '#8b0000',
       assets: {
         cameras: [
-          { name: 'HM3 PTZ', zone: 'NORTH', status: 'Online', model: 'AXIS P5635' },
-          { name: 'HM11 PTZ', zone: 'NORTH', status: 'Defective', model: 'AXIS Q6075' },
-          { name: 'N25 PTZ', zone: 'NORTH', status: 'Online', model: 'AXIS P5635' },
-          { name: 'C1 PTZ', zone: 'SOUTH', status: 'Online', model: 'AXIS Q6075' },
-          { name: 'W1', zone: 'WEST', status: 'No Power', model: 'AXIS P5635' },
-          { name: 'A7 PTZ', zone: 'EAST', status: 'Online', model: 'AXIS P5635' }
+          { name: 'HM3 PTZ', zone: 'NORTH', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5' },
+          { name: 'HM11 PTZ', zone: 'NORTH', status: 'Defective', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5' },
+          { name: 'N25 PTZ', zone: 'NORTH', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM6' },
+          { name: 'C1 PTZ', zone: 'SOUTH', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5' },
+          { name: 'W1', zone: 'WEST', status: 'No Power', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5' },
+          { name: 'A7 PTZ', zone: 'EAST', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5' }
         ],
         doors: [
-          { name: 'Main Entrance', zone: 'Security Office', status: 'Online', reader: 'HID Prox' },
-          { name: '2nd Entrance', zone: 'SAL Duty Office', status: 'Offline', reader: 'HID Prox' }
+          { name: 'Main Entrance', zone: 'Security Office', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone' },
+          { name: '2nd Entrance', zone: 'SAL Duty Office', status: 'Offline', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', doorSwing: 'Out', accessType: 'Read In + Push Out', antiPassback: 'No', controllerType: 'Integrated' }
         ],
         servers: [
-          { name: 'J1013DDR', zone: 'Kingport', status: 'Online', make: 'Dell' },
-          { name: 'J1013DDV', zone: 'Kingport', status: 'Online', make: 'HP' }
+          { name: 'J1013DDR', zone: 'Kingport', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5, LPR' },
+          { name: 'J1013DDV', zone: 'Kingport', status: 'ONLINE', make: 'HP', model: 'ProLiant DL380', capacity: '6.11TB', used: '1.4TB', health: 'Good, Failed drive', apps: 'Ocularis DM6, Eyelock' }
         ],
         switches: [
-          { name: 'Main Entrance', zone: 'Security Office', status: 'Online', model: 'AXIS T8508' },
-          { name: '2nd entrance', zone: 'SAL Duty Office', status: 'Online', model: 'AXIS T8516' }
+          { name: 'Main Entrance', zone: 'Security Office', status: 'Online', model: 'AXIS T8508', ip_address: '10.19.1.21', firmware: '6.54.2739' },
+          { name: '2nd entrance', zone: 'SAL Duty Office', status: 'Online', model: 'AXIS T8516', ip_address: '10.19.1.23', firmware: '6.54.2739' }
         ]
       },
       srs: [
@@ -1196,21 +1337,21 @@
       name: 'KWL',
       logo: 'logo-kwl.png',
       color: '#8b5cf6',
-      secondary: '#a78bfa',
+      secondary: '#6d28d9',
       assets: {
         cameras: [
-          { name: 'TP-01', zone: 'Tinson Pen', status: 'Online', model: 'AXIS P5635' },
-          { name: 'TP-02', zone: 'Tinson Pen', status: 'Online', model: 'AXIS Q6075' },
-          { name: 'WH-01', zone: 'Warehouse 1', status: 'Online', model: 'AXIS P5635' }
+          { name: 'TP-01', zone: 'Tinson Pen', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5' },
+          { name: 'TP-02', zone: 'Tinson Pen', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5' },
+          { name: 'WH-01', zone: 'Warehouse 1', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5' }
         ],
         doors: [
-          { name: 'Warehouse Main', zone: 'Warehouse 1', status: 'Online', reader: 'HID Prox' }
+          { name: 'Warehouse Main', zone: 'Warehouse 1', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone' }
         ],
         servers: [
-          { name: 'KWL-SRV-01', zone: 'Tinson Pen', status: 'Online', make: 'Dell' }
+          { name: 'KWL-SRV-01', zone: 'Tinson Pen', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5' }
         ],
         switches: [
-          { name: 'TP Switch 1', zone: 'Tinson Pen', status: 'Online', model: 'AXIS T8508' }
+          { name: 'TP Switch 1', zone: 'Tinson Pen', status: 'Online', model: 'AXIS T8508', ip_address: '10.19.1.21', firmware: '6.54.2739' }
         ]
       },
       srs: [
@@ -1228,9 +1369,7 @@
   var currentUser = null;
   var clientData = null;
   var currentPage = 'dashboard';
-  var currentZone = null;
   var assetTagFilter = 'all';
-  var selectedZone = null;
 
   // ============================================================
   // ── TOAST ────────────────────────────────────────────────────
@@ -1334,8 +1473,8 @@
     if (!clientData) return;
     
     // Apply client brand colors
-    var primaryColor = clientData.color || '#4f8cf7';
-    var secondaryColor = clientData.secondary || '#00d4ff';
+    var primaryColor = clientData.color || '#e31b23';
+    var secondaryColor = clientData.secondary || '#8b0000';
     document.documentElement.style.setProperty('--client-primary', primaryColor);
     document.documentElement.style.setProperty('--client-secondary', secondaryColor);
     document.documentElement.style.setProperty('--client-gradient', 'linear-gradient(135deg, ' + primaryColor + ', ' + secondaryColor + ')');
@@ -1343,7 +1482,7 @@
     
     // Set logos
     var logo = clientData.logo || 'logo.png';
-    document.querySelectorAll('#client-logo, #sidebar-logo, #badge-logo').forEach(function(el) {
+    document.querySelectorAll('#client-logo, #badge-logo').forEach(function(el) {
       el.src = logo;
       el.onerror = function() { this.src = 'logo.png'; };
     });
@@ -1357,12 +1496,6 @@
     document.getElementById('user-name').textContent = currentUser.username;
     document.getElementById('user-avatar').textContent = currentUser.username.slice(0, 2).toUpperCase();
     
-    // Set first zone
-    var zones = getClientZones();
-    if (zones.length > 0) {
-      selectedZone = zones[0];
-    }
-    
     // Render everything
     renderDashboard();
     renderAssets();
@@ -1373,18 +1506,6 @@
   // ============================================================
   // ── HELPER FUNCTIONS ─────────────────────────────────────────
   // ============================================================
-
-  function getClientZones() {
-    if (!clientData) return [];
-    var zones = new Set();
-    var assets = clientData.assets;
-    Object.values(assets).forEach(function(assetArray) {
-      assetArray.forEach(function(asset) {
-        if (asset.zone) zones.add(asset.zone);
-      });
-    });
-    return Array.from(zones).sort();
-  }
 
   function getAllClientAssets() {
     if (!clientData) return [];
@@ -1397,14 +1518,8 @@
     return all;
   }
 
-  function getAssetsByZone(zone) {
-    var all = getAllClientAssets();
-    if (!zone) return all;
-    return all.filter(function(a) { return a.zone === zone; });
-  }
-
   function getStatusClass(status) {
-    if (status === 'Online') return 'online';
+    if (status === 'Online' || status === 'ONLINE') return 'online';
     if (status === 'Offline' || status === 'Defective' || status === 'No Power') return 'offline';
     return 'maintenance';
   }
@@ -1412,6 +1527,14 @@
   function getStatusBadgeHTML(status) {
     var cls = getStatusClass(status);
     return '<span class="status-badge ' + cls + '">' + status + '</span>';
+  }
+
+  function getGreeting() {
+    var hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return 'Good morning';
+    if (hour >= 12 && hour < 17) return 'Good afternoon';
+    if (hour >= 17 && hour < 21) return 'Good evening';
+    return 'Good night';
   }
 
   // ============================================================
@@ -1448,7 +1571,7 @@
     
     var allAssets = getAllClientAssets();
     var total = allAssets.length;
-    var online = allAssets.filter(function(a) { return a.status === 'Online'; }).length;
+    var online = allAssets.filter(function(a) { return a.status === 'Online' || a.status === 'ONLINE'; }).length;
     var offline = total - online;
     var openSRs = clientData.srs.filter(function(s) { return s.status !== 'Resolved'; }).length;
     
@@ -1459,68 +1582,17 @@
     document.getElementById('stat-srs').textContent = openSRs;
     document.getElementById('online-count').textContent = online;
     
-    // Welcome greeting
-    var hour = new Date().getHours();
-    var greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+    // Welcome greeting - time based
+    var greeting = getGreeting();
     document.getElementById('greeting-text').textContent = greeting;
     document.getElementById('welcome-title').textContent = 'Welcome back, ' + clientData.name;
     document.getElementById('welcome-sub').innerHTML = 'Your security systems are <strong>' + (online === total ? 'fully operational' : 'partially operational') + '</strong> · <span id="online-count">' + online + '</span> assets online';
-    
-    // Zone tabs
-    renderZoneTabs();
-    
-    // Zone assets
-    renderZoneAssets();
     
     // Client-specific timeline
     renderClientTimeline();
     
     // Dashboard SR table (client-specific)
     renderDashboardSRs();
-  }
-
-  function renderZoneTabs() {
-    var tabsContainer = document.getElementById('zone-tabs');
-    if (!tabsContainer) return;
-    
-    var zones = getClientZones();
-    if (zones.length === 0) {
-      tabsContainer.innerHTML = '<span style="color:rgba(255,255,255,0.3);font-size:12px;">No zones found</span>';
-      return;
-    }
-    
-    tabsContainer.innerHTML = zones.map(function(zone) {
-      var assets = getAssetsByZone(zone);
-      var count = assets.length;
-      var active = zone === selectedZone ? 'active' : '';
-      return '<button class="zone-tab ' + active + '" data-zone="' + zone + '" onclick="selectZone(\'' + zone + '\')">' + zone + ' <span class="zone-count">(' + count + ')</span></button>';
-    }).join('');
-  }
-
-  function selectZone(zone) {
-    selectedZone = zone;
-    renderZoneTabs();
-    renderZoneAssets();
-  }
-
-  function renderZoneAssets() {
-    var container = document.getElementById('zone-assets-content');
-    if (!container) return;
-    
-    var assets = getAssetsByZone(selectedZone);
-    
-    if (assets.length === 0) {
-      container.innerHTML = '<div class="empty-state"><span class="empty-icon">📭</span><div class="empty-title">No assets in this zone</div></div>';
-      return;
-    }
-    
-    var html = '<div style="overflow-x:auto;"><table class="tbl"><thead><tr><th>Name</th><th>Type</th><th>Status</th><th>Details</th></tr></thead><tbody>';
-    assets.forEach(function(asset) {
-      var details = asset.model || asset.reader || asset.make || '—';
-      html += '<tr><td><strong>' + asset.name + '</strong></td><td>' + asset.type + '</td><td>' + getStatusBadgeHTML(asset.status) + '</td><td style="color:rgba(255,255,255,0.4);font-size:11px;">' + details + '</td></tr>';
-    });
-    html += '</tbody></table></div>';
-    container.innerHTML = html;
   }
 
   function renderClientTimeline() {
@@ -1530,7 +1602,7 @@
     var activity = clientData.activity || [];
     
     if (activity.length === 0) {
-      container.innerHTML = '<div style="padding:8px 0;text-align:center;color:rgba(255,255,255,0.25);font-size:12px;">No activity today</div>';
+      container.innerHTML = '<div style="padding:8px 0;text-align:center;color:#999;font-size:13px;">No activity today</div>';
       return;
     }
     
@@ -1547,7 +1619,7 @@
     var openSRs = clientData.srs.filter(function(s) { return s.status !== 'Resolved'; }).slice(0, 5);
     
     if (openSRs.length === 0) {
-      body.innerHTML = '<tr><td colspan="4" style="text-align:center;color:rgba(255,255,255,0.25);padding:12px;">No open service requests</td></tr>';
+      body.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#999;padding:12px;">No open service requests</td></tr>';
       return;
     }
     
@@ -1588,11 +1660,15 @@
     // Render table
     var body = document.getElementById('assets-table-body');
     if (filtered.length === 0) {
-      body.innerHTML = '<tr><td colspan="4" style="text-align:center;color:rgba(255,255,255,0.25);padding:16px;">No assets found</td></tr>';
+      body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;padding:16px;">No assets found</td></tr>';
     } else {
       body.innerHTML = filtered.map(function(a) {
-        var details = a.model || a.reader || a.make || '—';
-        return '<tr><td><strong>' + a.name + '</strong></td><td>' + a.type + '</td><td>' + (a.zone || '—') + '</td><td>' + getStatusBadgeHTML(a.status) + '</td></tr>';
+        var details = '';
+        if (a.type === 'Camera') details = a.model || '—';
+        else if (a.type === 'Access Control') details = a.reader || '—';
+        else if (a.type === 'Server') details = a.make + ' ' + a.model || '—';
+        else if (a.type === 'Switch') details = a.model || '—';
+        return '<tr onclick="openAssetDetail(\'' + a.type + '\', \'' + a.name + '\')" style="cursor:pointer;"><td><strong>' + a.name + '</strong></td><td>' + a.type + '</td><td>' + (a.zone || '—') + '</td><td>' + getStatusBadgeHTML(a.status) + '</td><td style="color:#999;font-size:12px;">' + details + '</td></tr>';
       }).join('');
     }
   }
@@ -1604,6 +1680,98 @@
       if (el.dataset.tag === tag) el.classList.add('active');
     });
     renderAssets();
+  }
+
+  // ============================================================
+  // ── ASSET DETAIL MODALS ──────────────────────────────────────
+  // ============================================================
+
+  function openAssetDetail(type, name) {
+    if (!clientData) return;
+    
+    var asset = null;
+    var assetType = type.toLowerCase();
+    
+    if (assetType === 'camera') {
+      asset = clientData.assets.cameras.find(function(c) { return c.name === name; });
+      if (!asset) return;
+      document.getElementById('cam-detail-title').textContent = asset.name;
+      document.getElementById('cam-detail-sub').textContent = 'Zone: ' + (asset.zone || '—') + ' · Status: ' + asset.status;
+      document.getElementById('camera-detail-grid').innerHTML =
+        '<div class="modal-field"><label>Name</label><span>' + asset.name + '</span></div>' +
+        '<div class="modal-field"><label>Zone</label><span>' + (asset.zone || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Status</label>' + getStatusBadgeHTML(asset.status) + '</div>' +
+        '<div class="modal-field"><label>Model</label><span>' + (asset.model || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Resolution</label><span>' + (asset.resolution || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Archiver</label><span>' + (asset.archiver || '—') + '</span></div>';
+      document.getElementById('cam-detail-comments').value = asset.comments || '';
+      document.getElementById('camera-detail-modal').classList.add('open');
+    } 
+    else if (assetType === 'access control' || assetType === 'door') {
+      asset = clientData.assets.doors.find(function(d) { return d.name === name; });
+      if (!asset) return;
+      document.getElementById('door-detail-title').textContent = asset.name;
+      document.getElementById('door-detail-sub').textContent = 'Site: ' + (asset.zone || '—') + ' · Status: ' + asset.status;
+      document.getElementById('door-detail-grid').innerHTML =
+        '<div class="modal-field"><label>Name</label><span>' + asset.name + '</span></div>' +
+        '<div class="modal-field"><label>Site</label><span>' + (asset.zone || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Status</label>' + getStatusBadgeHTML(asset.status) + '</div>' +
+        '<div class="modal-field"><label>Reader</label><span>' + (asset.reader || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Lock Type</label><span>' + (asset.lock || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Powered</label><span>' + (asset.powered || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Door Swing</label><span>' + (asset.doorSwing || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Access Type</label><span>' + (asset.accessType || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Anti-Passback</label><span>' + (asset.antiPassback || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Controller Type</label><span>' + (asset.controllerType || '—') + '</span></div>';
+      document.getElementById('door-detail-comments').value = asset.comments || '';
+      document.getElementById('door-detail-modal').classList.add('open');
+    }
+    else if (assetType === 'server') {
+      asset = clientData.assets.servers.find(function(s) { return s.name === name; });
+      if (!asset) return;
+      document.getElementById('server-detail-title').textContent = asset.name;
+      document.getElementById('server-detail-sub').textContent = 'Location: ' + (asset.zone || '—') + ' · Status: ' + asset.status;
+      document.getElementById('server-detail-grid').innerHTML =
+        '<div class="modal-field"><label>Name</label><span>' + asset.name + '</span></div>' +
+        '<div class="modal-field"><label>Location</label><span>' + (asset.zone || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Status</label>' + getStatusBadgeHTML(asset.status) + '</div>' +
+        '<div class="modal-field"><label>Make</label><span>' + (asset.make || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Model</label><span>' + (asset.model || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Capacity</label><span>' + (asset.capacity || '—') + '</span></div>' +
+        '<div class="modal-field"><label>In Use</label><span>' + (asset.used || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Health</label><span>' + (asset.health || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Applications</label><span>' + (asset.apps || '—') + '</span></div>';
+      document.getElementById('server-detail-comments').value = asset.comments || '';
+      document.getElementById('server-detail-modal').classList.add('open');
+    }
+    else if (assetType === 'switch') {
+      asset = clientData.assets.switches.find(function(s) { return s.name === name; });
+      if (!asset) return;
+      document.getElementById('switch-detail-title').textContent = asset.name;
+      document.getElementById('switch-detail-sub').textContent = 'Location: ' + (asset.zone || '—') + ' · Status: ' + asset.status;
+      document.getElementById('switch-detail-grid').innerHTML =
+        '<div class="modal-field"><label>Name</label><span>' + asset.name + '</span></div>' +
+        '<div class="modal-field"><label>Location</label><span>' + (asset.zone || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Status</label>' + getStatusBadgeHTML(asset.status) + '</div>' +
+        '<div class="modal-field"><label>Model</label><span>' + (asset.model || '—') + '</span></div>' +
+        '<div class="modal-field"><label>IP Address</label><span>' + (asset.ip_address || '—') + '</span></div>' +
+        '<div class="modal-field"><label>Firmware</label><span>' + (asset.firmware || '—') + '</span></div>';
+      document.getElementById('switch-detail-comments').value = asset.comments || '';
+      document.getElementById('switch-detail-modal').classList.add('open');
+    }
+  }
+
+  function closeCameraDetailModal() {
+    document.getElementById('camera-detail-modal').classList.remove('open');
+  }
+  function closeDoorDetailModal() {
+    document.getElementById('door-detail-modal').classList.remove('open');
+  }
+  function closeServerDetailModal() {
+    document.getElementById('server-detail-modal').classList.remove('open');
+  }
+  function closeSwitchDetailModal() {
+    document.getElementById('switch-detail-modal').classList.remove('open');
   }
 
   // ============================================================
@@ -1624,12 +1792,12 @@
     
     var body = document.getElementById('sr-table-body');
     if (filtered.length === 0) {
-      body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:rgba(255,255,255,0.25);padding:16px;">No service requests found</td></tr>';
+      body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;padding:16px;">No service requests found</td></tr>';
     } else {
       body.innerHTML = filtered.map(function(sr) {
         var priClass = sr.priority === 'High' ? 'pri-high' : sr.priority === 'Medium' ? 'pri-med' : 'pri-low';
         var statusClass = sr.status === 'Open' ? 'open' : sr.status === 'In Progress' ? 'in-progress' : 'resolved';
-        return '<tr><td><strong>' + sr.id + '</strong></td><td>' + sr.subject + '</td><td><span class="' + priClass + '">' + sr.priority + '</span></td><td><span class="status-badge ' + statusClass + '">' + sr.status + '</span></td><td style="color:rgba(255,255,255,0.3);font-size:11px;">' + sr.date + '</td></tr>';
+        return '<tr><td><strong>' + sr.id + '</strong></td><td>' + sr.subject + '</td><td><span class="' + priClass + '">' + sr.priority + '</span></td><td><span class="status-badge ' + statusClass + '">' + sr.status + '</span></td><td style="color:#999;font-size:12px;">' + sr.date + '</td></tr>';
       }).join('');
     }
   }
