@@ -36,204 +36,103 @@
     --client-header-bg: rgba(18, 18, 30, 0.92);
     --client-button-gradient: linear-gradient(135deg, #4f8cf7, #00d4ff);
   }
-
-  /* Client Branding - KFTL (White, Red & Blue) */
-  :root.client-KFTL {
-    --sidebar-bg: rgba(0, 43, 92, 0.95);
-    --sidebar-border: rgba(255,255,255,0.08);
-    --main-bg: #0a0e1a;
-    --card-bg: rgba(0, 43, 92, 0.08);
-    --card-border: rgba(200, 16, 46, 0.15);
-    --text-primary: #e8f0ff;
-    --text-secondary: rgba(255,255,255,0.6);
-    --text-muted: rgba(255,255,255,0.3);
-    --accent-start: #002b5c;
-    --accent-end: #c8102e;
-    --accent: #0055a4;
-    --accent-glow: rgba(0, 85, 164, 0.3);
-    --client-primary: #002b5c;
-    --client-secondary: #c8102e;
-    --client-accent: #0055a4;
-    --client-header-bg: rgba(0, 43, 92, 0.98);
-    --client-button-gradient: linear-gradient(135deg, #002b5c, #c8102e);
+  :root.light-theme {
+    --sidebar-bg: rgba(245, 247, 250, 0.95);
+    --sidebar-border: rgba(0,0,0,0.08);
+    --main-bg: #f0f2f5;
+    --card-bg: rgba(255, 255, 255, 0.85);
+    --card-border: rgba(0, 0, 0, 0.08);
+    --text-primary: #1a1a2e;
+    --text-secondary: rgba(0, 0, 0, 0.6);
+    --text-muted: rgba(0, 0, 0, 0.35);
+    --accent-start: #4f8cf7;
+    --accent-end: #00d4ff;
+    --accent: #4f8cf7;
+    --accent-glow: rgba(79, 140, 247, 0.2);
+    --danger: #dc2626;
+    --warning: #d97706;
+    --success: #059669;
+    --info: #2563eb;
+    --skeleton-bg: rgba(0,0,0,0.06);
+    --skeleton-shine: rgba(0,0,0,0.1);
+    --tooltip-bg: rgba(255, 255, 255, 0.95);
+    --card-text: #1a1a2e;
+    --stat-val-color: #1a1a2e;
   }
-
-  /* Client Branding - KWL (White, Blue & Gold) */
-  :root.client-KWL {
-    --sidebar-bg: rgba(0, 59, 113, 0.95);
-    --sidebar-border: rgba(255,255,255,0.08);
-    --main-bg: #0a0e1a;
-    --card-bg: rgba(0, 59, 113, 0.08);
-    --card-border: rgba(242, 169, 0, 0.15);
-    --text-primary: #e8f0ff;
-    --text-secondary: rgba(255,255,255,0.6);
-    --text-muted: rgba(255,255,255,0.3);
-    --accent-start: #003b71;
-    --accent-end: #f2a900;
-    --accent: #0072b0;
-    --accent-glow: rgba(0, 114, 176, 0.3);
-    --client-primary: #003b71;
-    --client-secondary: #f2a900;
-    --client-accent: #0072b0;
-    --client-header-bg: rgba(0, 59, 113, 0.98);
-    --client-button-gradient: linear-gradient(135deg, #003b71, #f2a900);
+  :root.jet-black-theme {
+    --sidebar-bg: rgba(0, 0, 0, 0.99);
+    --sidebar-border: rgba(255,255,255,0.05);
+    --main-bg: #000000;
+    --card-bg: rgba(8, 8, 12, 0.98);
+    --card-border: rgba(255, 255, 255, 0.03);
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.65);
+    --text-muted: rgba(255, 255, 255, 0.2);
+    --accent-start: #00d4ff;
+    --accent-end: #7b2ffc;
+    --accent: #00d4ff;
+    --accent-glow: rgba(0, 212, 255, 0.12);
+    --danger: #ff0055;
+    --warning: #ffaa00;
+    --success: #00ff88;
+    --info: #00d4ff;
+    --skeleton-bg: rgba(255,255,255,0.01);
+    --skeleton-shine: rgba(255,255,255,0.02);
+    --tooltip-bg: rgba(0, 0, 0, 0.99);
+    --card-text: #ffffff;
+    --stat-val-color: #ffffff;
   }
-
-  /* Client Branding - Lasco (White & Pink) */
-  :root.client-Lasco {
-    --sidebar-bg: rgba(200, 20, 100, 0.95);
-    --sidebar-border: rgba(255,255,255,0.08);
-    --main-bg: #1a0a12;
-    --card-bg: rgba(233, 30, 140, 0.08);
-    --card-border: rgba(233, 30, 140, 0.15);
-    --text-primary: #ffe8f5;
-    --text-secondary: rgba(255,255,255,0.6);
-    --text-muted: rgba(255,255,255,0.3);
-    --accent-start: #e91e8c;
-    --accent-end: #f06292;
-    --accent: #ff80ab;
-    --accent-glow: rgba(233, 30, 140, 0.3);
-    --client-primary: #e91e8c;
-    --client-secondary: #f06292;
-    --client-accent: #ff80ab;
-    --client-header-bg: rgba(200, 20, 100, 0.98);
-    --client-button-gradient: linear-gradient(135deg, #e91e8c, #f06292);
-  }
-
-  /* Client Branding - Nestle (Nestle Red) */
-  :root.client-Nestle {
-    --sidebar-bg: rgba(200, 10, 20, 0.95);
-    --sidebar-border: rgba(255,255,255,0.08);
-    --main-bg: #1a0a0a;
-    --card-bg: rgba(227, 6, 19, 0.08);
-    --card-border: rgba(227, 6, 19, 0.15);
-    --text-primary: #ffe8e8;
-    --text-secondary: rgba(255,255,255,0.6);
-    --text-muted: rgba(255,255,255,0.3);
-    --accent-start: #e30613;
-    --accent-end: #c8102e;
-    --accent: #ff1a2e;
-    --accent-glow: rgba(227, 6, 19, 0.3);
-    --client-primary: #e30613;
-    --client-secondary: #c8102e;
-    --client-accent: #ff1a2e;
-    --client-header-bg: rgba(200, 10, 20, 0.98);
-    --client-button-gradient: linear-gradient(135deg, #e30613, #c8102e);
-  }
-
-  /* Client Branding - NIDS (White, Black, Green & Gold) */
-  :root.client-NIDS {
-    --sidebar-bg: rgba(20, 20, 20, 0.95);
-    --sidebar-border: rgba(255,255,255,0.08);
-    --main-bg: #0a0a0a;
-    --card-bg: rgba(0, 166, 81, 0.06);
-    --card-border: rgba(0, 166, 81, 0.12);
-    --text-primary: #e8f5e8;
-    --text-secondary: rgba(255,255,255,0.6);
-    --text-muted: rgba(255,255,255,0.3);
-    --accent-start: #00a651;
-    --accent-end: #f2a900;
-    --accent: #00a651;
-    --accent-glow: rgba(0, 166, 81, 0.3);
-    --client-primary: #1a1a1a;
-    --client-secondary: #00a651;
-    --client-accent: #f2a900;
-    --client-header-bg: rgba(20, 20, 20, 0.98);
-    --client-button-gradient: linear-gradient(135deg, #1a1a1a, #00a651);
-  }
-
-  /* Client Branding - Nutrien (Green, White & Black) */
-  :root.client-Nutrien {
-    --sidebar-bg: rgba(0, 60, 40, 0.95);
-    --sidebar-border: rgba(255,255,255,0.08);
-    --main-bg: #0a1a12;
-    --card-bg: rgba(0, 166, 81, 0.06);
-    --card-border: rgba(0, 166, 81, 0.12);
-    --text-primary: #e8fff0;
-    --text-secondary: rgba(255,255,255,0.6);
-    --text-muted: rgba(255,255,255,0.3);
-    --accent-start: #005a3c;
-    --accent-end: #00a651;
-    --accent: #00a651;
-    --accent-glow: rgba(0, 166, 81, 0.3);
-    --client-primary: #005a3c;
-    --client-secondary: #00a651;
-    --client-accent: #1a1a1a;
-    --client-header-bg: rgba(0, 60, 40, 0.98);
-    --client-button-gradient: linear-gradient(135deg, #005a3c, #00a651);
-  }
-
-  :root.light-theme.client-KFTL {
-    --sidebar-bg: rgba(200, 220, 240, 0.95);
-    --sidebar-border: rgba(0,43,92,0.15);
-    --main-bg: #e8ecf0;
-    --card-bg: rgba(255,255,255,0.9);
-    --card-border: rgba(0,43,92,0.1);
-    --text-primary: #002b5c;
-    --text-secondary: rgba(0,0,0,0.6);
-    --text-muted: rgba(0,0,0,0.35);
-    --client-header-bg: rgba(200, 220, 240, 0.98);
-  }
-
-  :root.light-theme.client-KWL {
-    --sidebar-bg: rgba(200, 220, 240, 0.95);
-    --sidebar-border: rgba(0,59,113,0.15);
-    --main-bg: #e8ecf0;
-    --card-bg: rgba(255,255,255,0.9);
-    --card-border: rgba(0,59,113,0.1);
-    --text-primary: #003b71;
-    --text-secondary: rgba(0,0,0,0.6);
-    --text-muted: rgba(0,0,0,0.35);
-    --client-header-bg: rgba(200, 220, 240, 0.98);
-  }
-
-  :root.light-theme.client-Lasco {
-    --sidebar-bg: rgba(240, 200, 220, 0.95);
-    --sidebar-border: rgba(233,30,140,0.15);
-    --main-bg: #f0e8ec;
-    --card-bg: rgba(255,255,255,0.9);
-    --card-border: rgba(233,30,140,0.1);
-    --text-primary: #8b1a4a;
-    --text-secondary: rgba(0,0,0,0.6);
-    --text-muted: rgba(0,0,0,0.35);
-    --client-header-bg: rgba(240, 200, 220, 0.98);
-  }
-
-  :root.light-theme.client-Nestle {
-    --sidebar-bg: rgba(240, 200, 200, 0.95);
-    --sidebar-border: rgba(227,6,19,0.15);
-    --main-bg: #f0e8e8;
-    --card-bg: rgba(255,255,255,0.9);
-    --card-border: rgba(227,6,19,0.1);
-    --text-primary: #8b1a1a;
-    --text-secondary: rgba(0,0,0,0.6);
-    --text-muted: rgba(0,0,0,0.35);
-    --client-header-bg: rgba(240, 200, 200, 0.98);
-  }
-
-  :root.light-theme.client-NIDS {
-    --sidebar-bg: rgba(220, 220, 220, 0.95);
-    --sidebar-border: rgba(0,166,81,0.15);
-    --main-bg: #e8ece8;
-    --card-bg: rgba(255,255,255,0.9);
-    --card-border: rgba(0,166,81,0.1);
-    --text-primary: #1a1a1a;
-    --text-secondary: rgba(0,0,0,0.6);
-    --text-muted: rgba(0,0,0,0.35);
-    --client-header-bg: rgba(220, 220, 220, 0.98);
-  }
-
-  :root.light-theme.client-Nutrien {
-    --sidebar-bg: rgba(200, 230, 210, 0.95);
-    --sidebar-border: rgba(0,166,81,0.15);
-    --main-bg: #e8f0ec;
-    --card-bg: rgba(255,255,255,0.9);
-    --card-border: rgba(0,166,81,0.1);
-    --text-primary: #005a3c;
-    --text-secondary: rgba(0,0,0,0.6);
-    --text-muted: rgba(0,0,0,0.35);
-    --client-header-bg: rgba(200, 230, 210, 0.98);
-  }
+  :root.jet-black-theme .panel, :root.jet-black-theme .stat-card, :root.jet-black-theme .analytics-card, :root.jet-black-theme .modal { background: rgba(8, 8, 12, 0.98) !important; border: 1px solid rgba(255, 255, 255, 0.03) !important; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.9) !important; }
+  :root.jet-black-theme .panel:hover, :root.jet-black-theme .stat-card:hover { border-color: rgba(0, 212, 255, 0.08) !important; box-shadow: 0 12px 48px rgba(0, 0, 0, 1), 0 0 40px rgba(0, 212, 255, 0.02) !important; }
+  :root.jet-black-theme .sidebar { background: rgba(0, 0, 0, 0.99) !important; border-right: 1px solid rgba(255, 255, 255, 0.03); }
+  :root.jet-black-theme .nav-item.active { background: linear-gradient(90deg, rgba(0, 212, 255, 0.06) 0%, rgba(123, 47, 252, 0.03) 100%) !important; border-left: 2px solid #00d4ff !important; color: #fff !important; }
+  :root.jet-black-theme .nav-item:hover { background: rgba(255, 255, 255, 0.01) !important; }
+  :root.jet-black-theme .tbl th { color: rgba(255, 255, 255, 0.3) !important; border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important; }
+  :root.jet-black-theme .tbl td { border-bottom: 1px solid rgba(255,255,255,0.015) !important; color: rgba(255,255,255,0.85) !important; }
+  :root.jet-black-theme .modal { background: rgba(8, 8, 12, 0.99) !important; border: 1px solid rgba(255,255,255,0.03) !important; box-shadow: 0 24px 80px rgba(0, 0, 0, 0.99) !important; }
+  :root.jet-black-theme .search-bar input, :root.jet-black-theme .search-bar select { background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.03); color: #fff; }
+  :root.jet-black-theme .search-bar select { background: #050508; }
+  :root.jet-black-theme .search-bar select option { background: #050508; color: #fff; }
+  :root.jet-black-theme .filter-pill { border: 1px solid rgba(255,255,255,0.03); color: rgba(255,255,255,0.4); }
+  :root.jet-black-theme .filter-pill.active { background: rgba(0, 212, 255, 0.06); border-color: #00d4ff; color: #fff; }
+  :root.jet-black-theme .modal-field label { color: rgba(255,255,255,0.3); }
+  :root.jet-black-theme .modal-field input, :root.jet-black-theme .modal-field select, :root.jet-black-theme .modal-field textarea { background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.03); color: #fff; }
+  :root.jet-black-theme .modal-field input:focus, :root.jet-black-theme .modal-field select:focus, :root.jet-black-theme .modal-field textarea:focus { border-color: #00d4ff; }
+  :root.jet-black-theme .modal-field select option { background: #050508; color: #fff; }
+  :root.jet-black-theme .btn { border: 1px solid rgba(255,255,255,0.04); color: #fff; background: rgba(255,255,255,0.005); }
+  :root.jet-black-theme .btn:hover { background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.08); }
+  :root.jet-black-theme .btn-accent { background: linear-gradient(135deg, #00d4ff, #7b2ffc) !important; border: none !important; color: #fff !important; box-shadow: 0 4px 20px rgba(0, 212, 255, 0.1); }
+  :root.jet-black-theme .btn-accent:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(0, 212, 255, 0.2); }
+  :root.jet-black-theme .status-select, :root.jet-black-theme .priority-select { background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.03); color: #fff; }
+  :root.jet-black-theme .status-select option, :root.jet-black-theme .priority-select option { background: #050508; color: #fff; }
+  :root.jet-black-theme .outlook-container { background: rgba(8,8,12,0.98); border: 1px solid rgba(255,255,255,0.03); }
+  :root.jet-black-theme .outlook-email { border-bottom: 1px solid rgba(255,255,255,0.015); }
+  :root.jet-black-theme .outlook-email:hover { background: rgba(255,255,255,0.005); }
+  :root.jet-black-theme .outlook-email.active { background: rgba(0, 212, 255, 0.03); border-left: 2px solid #00d4ff; }
+  :root.jet-black-theme .file-explorer { background: rgba(255,255,255,0.002); border: 1px solid rgba(255,255,255,0.03); }
+  :root.jet-black-theme .file-explorer .file-item { border-bottom: 1px solid rgba(255,255,255,0.015); color: rgba(255,255,255,0.85); }
+  :root.jet-black-theme .file-explorer .file-item:hover { background: rgba(255,255,255,0.005); }
+  :root.jet-black-theme .breadcrumb { background: rgba(255,255,255,0.002); }
+  :root.jet-black-theme .topbar { border-bottom: 1px solid rgba(255,255,255,0.03); }
+  :root.jet-black-theme .cam-zone-header, :root.jet-black-theme .door-zone-header, :root.jet-black-theme .server-zone-header, :root.jet-black-theme .switch-zone-header { background: rgba(255,255,255,0.002); border: 1px solid rgba(255,255,255,0.03); }
+  :root.jet-black-theme .cam-zone-header:hover, :root.jet-black-theme .door-zone-header:hover, :root.jet-black-theme .server-zone-header:hover, :root.jet-black-theme .switch-zone-header:hover { background: rgba(255,255,255,0.005); border-color: rgba(255,255,255,0.04); }
+  :root.jet-black-theme .stat-card .stat-val { background: linear-gradient(135deg, #00d4ff 0%, #7b2ffc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  :root.jet-black-theme .stat-card .stat-label { color: rgba(255,255,255,0.35); }
+  :root.jet-black-theme .stat-card .stat-note { color: rgba(255,255,255,0.25); }
+  :root.jet-black-theme .add-btn { background: linear-gradient(135deg, #00d4ff, #7b2ffc) !important; box-shadow: 0 2px 12px rgba(0, 212, 255, 0.12); }
+  :root.jet-black-theme .add-btn:hover { box-shadow: 0 4px 20px rgba(0, 212, 255, 0.25); }
+  :root.jet-black-theme .add-dropdown { background: rgba(8, 8, 12, 0.99); border: 1px solid rgba(255,255,255,0.03); }
+  :root.jet-black-theme .add-dropdown .dd-item { color: rgba(255,255,255,0.8); }
+  :root.jet-black-theme .add-dropdown .dd-item:hover { background: rgba(0, 212, 255, 0.03); }
+  :root.jet-black-theme .add-dropdown .dd-sep { background: rgba(255,255,255,0.03); }
+  :root.jet-black-theme .theme-dropdown { background: rgba(8, 8, 12, 0.99); border: 1px solid rgba(255,255,255,0.03); }
+  :root.jet-black-theme .theme-dropdown .theme-option { color: rgba(255,255,255,0.8); }
+  :root.jet-black-theme .theme-dropdown .theme-option:hover { background: rgba(0, 212, 255, 0.03); }
+  :root.jet-black-theme .badge.b-done { background: rgba(0, 255, 136, 0.06) !important; color: #00ff88 !important; }
+  :root.jet-black-theme .badge.b-high { background: rgba(255, 0, 85, 0.06) !important; color: #ff0055 !important; }
+  :root.jet-black-theme .badge.b-open { background: rgba(255, 170, 0, 0.06) !important; color: #ffaa00 !important; }
+  :root.jet-black-theme .badge.b-info { background: rgba(0, 212, 255, 0.06) !important; color: #00d4ff !important; }
+  :root.jet-black-theme .filter-pill.active { background: linear-gradient(135deg, rgba(0, 212, 255, 0.08), rgba(123, 47, 252, 0.05)) !important; border-color: #00d4ff !important; color: #fff !important; }
 
   .skeleton { background: var(--skeleton-bg); border-radius: 4px; height: 20px; position: relative; overflow: hidden; animation: shimmer 1.8s infinite; }
   .skeleton::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, var(--skeleton-shine), transparent); transform: translateX(-100%); animation: shimmer-slide 1.8s infinite; }
@@ -578,19 +477,6 @@
             <button class="dd-item" onclick="openAddClientModal();closeAddDropdown();">
               <span class="dd-icon">👤</span> Add Client
             </button>
-            <button class="dd-item" onclick="openAddStorageModal();closeAddDropdown();">
-              <span class="dd-icon">💾</span> Add Storage
-            </button>
-            <button class="dd-item" onclick="openAddStationModal();closeAddDropdown();">
-              <span class="dd-icon">💻</span> Add Client Station
-            </button>
-            <button class="dd-item" onclick="openAddMonitorModal();closeAddDropdown();">
-              <span class="dd-icon">🖥</span> Add Monitor
-            </button>
-            <div class="dd-sep"></div>
-            <button class="dd-item" onclick="openAddSoftwareModal();closeAddDropdown();">
-              <span class="dd-icon">📦</span> Add Software
-            </button>
           </div>
           <span class="topbar-date" id="topbar-date"></span>
           <span class="unsaved-indicator" id="unsaved-indicator"><i class="ti ti-alert-circle"></i> Unsaved changes</span>
@@ -645,13 +531,6 @@
               <thead><tr><th>ID</th><th>Client</th><th>Site</th><th>Subject</th><th>Priority</th><th>Status</th></tr></thead>
               <tbody id="dash-sr-tbody"></tbody>
             </table>
-          </div>
-          <div class="panel">
-            <div class="panel-header"><span class="panel-title">Warranty & SMA Alerts</span></div>
-            <div id="dash-warranty-alerts" style="font-size:12px;color:var(--text-secondary);">
-              <div style="padding:8px 0;color:var(--warning);">⚠️ 2 warranties expiring within 30 days</div>
-              <div style="padding:8px 0;color:var(--text-muted);">📦 1 SMA expiring in 2 months</div>
-            </div>
           </div>
         </div>
 
@@ -898,83 +777,6 @@
             </div>
             <div class="loading-overlay" id="sw-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading switches...</span></div></div>
             <div id="sw-groups-container"></div>
-          </div>
-        </div>
-
-        <!-- Software Tab -->
-        <div class="tab" id="tab-software">
-          <div class="panel">
-            <div class="panel-header">
-              <span class="panel-title">Software & SMA</span>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <button class="btn btn-sm" onclick="exportSoftwareCSV()"><i class="ti ti-download"></i> Export CSV</button>
-                <button class="btn btn-sm" onclick="checkSMAAlerts()" title="Check Alerts"><i class="ti ti-bell"></i> Check Alerts</button>
-                <button class="btn btn-sm" onclick="refreshSoftware()" title="Refresh"><i class="ti ti-refresh"></i></button>
-              </div>
-            </div>
-            <div class="search-bar">
-              <input type="text" id="sw-software-search" placeholder="Search software by vendor or version…" oninput="debounceRenderSoftware()" />
-              <select id="sw-software-filter" onchange="renderSoftware()" style="flex:0 0 150px;">
-                <option value="All">All vendors</option>
-                <option value="Octave">Octave</option>
-                <option value="AMAG">AMAG</option>
-                <option value="Axis">Axis</option>
-                <option value="Inex Tech">Inex Tech</option>
-                <option value="Salto">Salto</option>
-                <option value="Eyelock">Eyelock</option>
-                <option value="Commend">Commend</option>
-                <option value="Southwest Microwave">Southwest Microwave</option>
-                <option value="Trackable">Trackable</option>
-                <option value="Corsight">Corsight</option>
-                <option value="Telaeris">Telaeris</option>
-                <option value="Ipsotek">Ipsotek</option>
-                <option value="IQGEO">IQGEO</option>
-                <option value="NTEST">NTEST</option>
-                <option value="Galaxy">Galaxy</option>
-                <option value="Lenel">Lenel</option>
-                <option value="Maxxess">Maxxess</option>
-              </select>
-            </div>
-            <div class="loading-overlay" id="software-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading software...</span></div></div>
-            <div id="software-container"></div>
-          </div>
-        </div>
-
-        <!-- Client Assets Tab -->
-        <div class="tab" id="tab-assets">
-          <div class="panel">
-            <div class="panel-header">
-              <span class="panel-title">Client Assets</span>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <button class="btn btn-sm" onclick="refreshAssets()" title="Refresh"><i class="ti ti-refresh"></i></button>
-              </div>
-            </div>
-            <div class="asset-sub-tabs" id="asset-sub-tabs">
-              <button class="asset-sub-tab active" data-asset-tab="storage" onclick="switchAssetTab('storage', this)">💾 Storage</button>
-              <button class="asset-sub-tab" data-asset-tab="stations" onclick="switchAssetTab('stations', this)">💻 Client Stations</button>
-              <button class="asset-sub-tab" data-asset-tab="monitors" onclick="switchAssetTab('monitors', this)">🖥 Monitors</button>
-            </div>
-            <div class="asset-sub-content active" id="asset-storage">
-              <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
-                <span style="font-size:12px;color:var(--text-muted);">Storage Assets</span>
-                <button class="btn btn-sm" onclick="exportStorageCSV()"><i class="ti ti-download"></i> Export CSV</button>
-              </div>
-              <div id="storage-container"></div>
-            </div>
-            <div class="asset-sub-content" id="asset-stations">
-              <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
-                <span style="font-size:12px;color:var(--text-muted);">Client Station Assets</span>
-                <button class="btn btn-sm" onclick="exportStationsCSV()"><i class="ti ti-download"></i> Export CSV</button>
-              </div>
-              <div id="stations-container"></div>
-            </div>
-            <div class="asset-sub-content" id="asset-monitors">
-              <div style="display:flex;justify-content:space-between;margin-bottom:12px;">
-                <span style="font-size:12px;color:var(--text-muted);">Monitor Assets</span>
-                <button class="btn btn-sm" onclick="exportMonitorsCSV()"><i class="ti ti-download"></i> Export CSV</button>
-              </div>
-              <div id="monitors-container"></div>
-            </div>
           </div>
         </div>
 
@@ -1328,121 +1130,6 @@
     </div>
   </div>
 
-  <!-- Add Storage Modal -->
-  <div class="modal-overlay" id="add-storage-modal">
-    <div class="modal">
-      <button class="modal-close" onclick="closeAddModal('add-storage-modal')"><i class="ti ti-x"></i></button>
-      <div class="modal-title">💾 Add Storage</div>
-      <div class="modal-sub">Add a new storage asset</div>
-      <div class="modal-section">
-        <div class="modal-grid">
-          <div class="modal-field"><label>Storage Name *</label><input type="text" id="storage-name" placeholder="e.g., NAS-01" /></div>
-          <div class="modal-field"><label>Client *</label><select id="storage-client"><option value="">Select Client</option></select></div>
-          <div class="modal-field"><label>Total Storage</label><input type="text" id="storage-total" placeholder="e.g., 24TB" /></div>
-          <div class="modal-field"><label>Usable Storage</label><input type="text" id="storage-usable" placeholder="e.g., 18.5TB" /></div>
-          <div class="modal-field"><label>Health (%)</label><input type="number" id="storage-health" placeholder="e.g., 95" min="0" max="100" /></div>
-          <div class="modal-field"><label>Make</label><input type="text" id="storage-make" placeholder="e.g., Synology" /></div>
-          <div class="modal-field"><label>Model</label><input type="text" id="storage-model" placeholder="e.g., RS3621xs+" /></div>
-          <div class="modal-field"><label>Warranty Expiry</label><input type="date" id="storage-warranty" /></div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn" onclick="closeAddModal('add-storage-modal')">Cancel</button>
-        <button class="btn btn-accent" onclick="saveNewStorage()"><i class="ti ti-device-floppy"></i> Add Storage</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add Station Modal -->
-  <div class="modal-overlay" id="add-station-modal">
-    <div class="modal">
-      <button class="modal-close" onclick="closeAddModal('add-station-modal')"><i class="ti ti-x"></i></button>
-      <div class="modal-title">💻 Add Client Station</div>
-      <div class="modal-sub">Add a new client station</div>
-      <div class="modal-section">
-        <div class="modal-grid">
-          <div class="modal-field"><label>Station Name *</label><input type="text" id="station-name" placeholder="e.g., WS-01" /></div>
-          <div class="modal-field"><label>Client *</label><select id="station-client"><option value="">Select Client</option></select></div>
-          <div class="modal-field"><label>Applications</label><input type="text" id="station-apps" placeholder="e.g., Ocularis, LPR" /></div>
-          <div class="modal-field"><label>Storage</label><input type="text" id="station-storage" placeholder="e.g., 500GB" /></div>
-          <div class="modal-field"><label>Health (%)</label><input type="number" id="station-health" placeholder="e.g., 92" min="0" max="100" /></div>
-          <div class="modal-field"><label>Make</label><input type="text" id="station-make" placeholder="e.g., Dell" /></div>
-          <div class="modal-field"><label>Model</label><input type="text" id="station-model" placeholder="e.g., OptiPlex 7080" /></div>
-          <div class="modal-field"><label>Warranty Expiry</label><input type="date" id="station-warranty" /></div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn" onclick="closeAddModal('add-station-modal')">Cancel</button>
-        <button class="btn btn-accent" onclick="saveNewStation()"><i class="ti ti-device-floppy"></i> Add Station</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add Monitor Modal -->
-  <div class="modal-overlay" id="add-monitor-modal">
-    <div class="modal">
-      <button class="modal-close" onclick="closeAddModal('add-monitor-modal')"><i class="ti ti-x"></i></button>
-      <div class="modal-title">🖥 Add Monitor</div>
-      <div class="modal-sub">Add a new monitor asset</div>
-      <div class="modal-section">
-        <div class="modal-grid">
-          <div class="modal-field"><label>Monitor Name *</label><input type="text" id="monitor-name" placeholder="e.g., M-01" /></div>
-          <div class="modal-field"><label>Client *</label><select id="monitor-client"><option value="">Select Client</option></select></div>
-          <div class="modal-field"><label>Size</label><input type="text" id="monitor-size" placeholder="e.g., 55\"" /></div>
-          <div class="modal-field"><label>Health (%)</label><input type="number" id="monitor-health" placeholder="e.g., 95" min="0" max="100" /></div>
-          <div class="modal-field"><label>Make</label><input type="text" id="monitor-make" placeholder="e.g., LG" /></div>
-          <div class="modal-field"><label>Model</label><input type="text" id="monitor-model" placeholder="e.g., 55UM7300" /></div>
-          <div class="modal-field"><label>Warranty Expiry</label><input type="date" id="monitor-warranty" /></div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn" onclick="closeAddModal('add-monitor-modal')">Cancel</button>
-        <button class="btn btn-accent" onclick="saveNewMonitor()"><i class="ti ti-device-floppy"></i> Add Monitor</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add Software Modal -->
-  <div class="modal-overlay" id="add-software-modal">
-    <div class="modal">
-      <button class="modal-close" onclick="closeAddModal('add-software-modal')"><i class="ti ti-x"></i></button>
-      <div class="modal-title">📦 Add Software</div>
-      <div class="modal-sub">Add software with SMA tracking</div>
-      <div class="modal-section">
-        <div class="modal-grid">
-          <div class="modal-field"><label>Client *</label><select id="software-client"><option value="">Select Client</option></select></div>
-          <div class="modal-field"><label>Vendor *</label><select id="software-vendor">
-            <option value="">Select Vendor</option>
-            <option value="Octave">Octave</option>
-            <option value="AMAG">AMAG</option>
-            <option value="Axis">Axis</option>
-            <option value="Inex Tech">Inex Tech</option>
-            <option value="Salto">Salto</option>
-            <option value="Eyelock">Eyelock</option>
-            <option value="Commend">Commend</option>
-            <option value="Southwest Microwave">Southwest Microwave</option>
-            <option value="Trackable">Trackable</option>
-            <option value="Corsight">Corsight</option>
-            <option value="Telaeris">Telaeris</option>
-            <option value="Ipsotek">Ipsotek</option>
-            <option value="IQGEO">IQGEO</option>
-            <option value="NTEST">NTEST</option>
-            <option value="Galaxy">Galaxy</option>
-            <option value="Lenel">Lenel</option>
-            <option value="Maxxess">Maxxess</option>
-          </select></div>
-          <div class="modal-field"><label>Version *</label><input type="text" id="software-version" placeholder="e.g., 5.2.1" /></div>
-          <div class="modal-field"><label>SMA Expiry</label><input type="date" id="software-sma-expiry" /></div>
-          <div class="modal-field"><label>License Count</label><input type="number" id="software-license-count" placeholder="Number of licenses" /></div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn" onclick="closeAddModal('add-software-modal')">Cancel</button>
-        <button class="btn btn-accent" onclick="saveNewSoftware()"><i class="ti ti-device-floppy"></i> Add Software</button>
-      </div>
-    </div>
-  </div>
-
   <!-- ============================================================
        ── JAVASCRIPT ──────────────────────────────────────────────
        ============================================================ -->
@@ -1459,7 +1146,7 @@
     var API_URL = '/api';
     var token = localStorage.getItem('token');
     var currentUser = JSON.parse(localStorage.getItem('user') || 'null');
-    
+
     // Data stores
     var CAMERAS = [];
     var DOORS = [];
@@ -1468,15 +1155,10 @@
     var SERVICE_REQUESTS = [];
     var AUDIT_LOG = [];
     var EMAILS = [];
-    var STORAGE = [];
-    var STATIONS = [];
-    var MONITORS = [];
-    var SOFTWARE = [];
     var CLIENTS = JSON.parse(localStorage.getItem('ccsm_clients') || '["KFTL","KWL","Lasco","Nestle","NIDS","Nutrien"]');
     var CLIENT_LOGO_DATA = JSON.parse(localStorage.getItem('ccsm_client_logos') || '{}');
     var PINNED_FILES = JSON.parse(localStorage.getItem('ccsm_pinned') || '[]');
-    var WARRANTY_ALERTS = JSON.parse(localStorage.getItem('ccsm_warranty_alerts') || '[]');
-    
+
     var SENT_EMAILS = [];
     var DRAFT_EMAILS = [];
     var DELETED_EMAILS = [];
@@ -1487,79 +1169,15 @@
     var currentZoneFilter = null;
     var userClient = null;
     var isAdmin = true;
-    var editingAsset = null;
-    var editingAssetType = null;
+    var editingClient = null;
 
     // ============================================================
     // ── CLIENT BRANDING ──────────────────────────────────────────
     // ============================================================
 
-    var CLIENT_BRANDING = {
-      'KFTL': {
-        primary: '#002b5c',
-        secondary: '#c8102e',
-        accent: '#0055a4',
-        sidebarBg: 'rgba(0, 43, 92, 0.95)',
-        buttonGradient: 'linear-gradient(135deg, #002b5c, #c8102e)'
-      },
-      'KWL': {
-        primary: '#003b71',
-        secondary: '#f2a900',
-        accent: '#0072b0',
-        sidebarBg: 'rgba(0, 59, 113, 0.95)',
-        buttonGradient: 'linear-gradient(135deg, #003b71, #f2a900)'
-      },
-      'Lasco': {
-        primary: '#e91e8c',
-        secondary: '#f06292',
-        accent: '#ff80ab',
-        sidebarBg: 'rgba(200, 20, 100, 0.95)',
-        buttonGradient: 'linear-gradient(135deg, #e91e8c, #f06292)'
-      },
-      'Nestle': {
-        primary: '#e30613',
-        secondary: '#c8102e',
-        accent: '#ff1a2e',
-        sidebarBg: 'rgba(200, 10, 20, 0.95)',
-        buttonGradient: 'linear-gradient(135deg, #e30613, #c8102e)'
-      },
-      'NIDS': {
-        primary: '#1a1a1a',
-        secondary: '#00a651',
-        accent: '#f2a900',
-        sidebarBg: 'rgba(20, 20, 20, 0.95)',
-        buttonGradient: 'linear-gradient(135deg, #1a1a1a, #00a651)'
-      },
-      'Nutrien': {
-        primary: '#005a3c',
-        secondary: '#00a651',
-        accent: '#1a1a1a',
-        sidebarBg: 'rgba(0, 60, 40, 0.95)',
-        buttonGradient: 'linear-gradient(135deg, #005a3c, #00a651)'
-      }
-    };
-
     function applyClientBranding(client) {
-      var root = document.documentElement;
-      
-      // Remove existing client classes
-      root.classList.remove('client-KFTL', 'client-KWL', 'client-Lasco', 'client-Nestle', 'client-NIDS', 'client-Nutrien');
-      
-      if (!client) return;
-      
-      // Add the client class
-      var clientClass = 'client-' + client;
-      root.classList.add(clientClass);
-      
-      // Apply CSS custom properties
-      var branding = CLIENT_BRANDING[client];
-      if (branding) {
-        root.style.setProperty('--client-primary', branding.primary);
-        root.style.setProperty('--client-secondary', branding.secondary);
-        root.style.setProperty('--client-accent', branding.accent);
-        root.style.setProperty('--client-sidebar-bg', branding.sidebarBg);
-        root.style.setProperty('--client-button-gradient', branding.buttonGradient);
-      }
+      // Placeholder - will be implemented later
+      console.log('Client branding applied for:', client);
     }
 
     // ============================================================
@@ -1585,9 +1203,9 @@
       var btn = document.getElementById('theme-toggle-btn');
       var logo = document.getElementById('logo-img');
       var dropdown = document.getElementById('theme-dropdown');
-      
+
       root.classList.remove('light-theme', 'jet-black-theme');
-      
+
       if (theme === 'light') {
         root.classList.add('light-theme');
         if (btn) btn.innerHTML = '<i class="ti ti-moon"></i> Theme';
@@ -1598,16 +1216,10 @@
         if (logo) logo.src = 'logo-black.png';
         if (logo) logo.onerror = function() { this.src = 'logo.png'; };
       } else {
-        // Dark (default)
         if (btn) btn.innerHTML = '<i class="ti ti-sun"></i> Theme';
         if (logo) logo.src = 'logo.png';
       }
-      
-      // Re-apply client branding if there is a client
-      if (userClient) {
-        applyClientBranding(userClient);
-      }
-      
+
       localStorage.setItem('ccsm_theme', theme);
       if (dropdown) dropdown.style.display = 'none';
       toast('Theme: ' + theme.charAt(0).toUpperCase() + theme.slice(1), 'success');
@@ -1679,17 +1291,13 @@
     function openAddServerModal() { openAddModal('add-server-modal'); }
     function openAddSwitchModal() { openAddModal('add-switch-modal'); }
     function openAddClientModal() { openAddModal('add-client-modal'); }
-    function openAddStorageModal() { openAddModal('add-storage-modal'); }
-    function openAddStationModal() { openAddModal('add-station-modal'); }
-    function openAddMonitorModal() { openAddModal('add-monitor-modal'); }
-    function openAddSoftwareModal() { openAddModal('add-software-modal'); }
 
     function closeAddModal(modalId) {
       document.getElementById(modalId).classList.remove('open');
     }
 
     function populateClientDropdowns() {
-      var selects = document.querySelectorAll('#sr-client, #cam-client, #door-client, #server-client, #switch-client, #storage-client, #station-client, #monitor-client, #software-client');
+      var selects = document.querySelectorAll('#sr-client, #cam-client, #door-client, #server-client, #switch-client');
       selects.forEach(function(select) {
         var currentVal = select.value;
         select.innerHTML = '<option value="">Select Client</option>';
@@ -1743,12 +1351,12 @@
       var newName = document.getElementById('edit-client-name').value.trim();
       var oldName = editingClient;
       if (!newName) { toast('Please enter a client name', 'warning'); return; }
-      
+
       var index = CLIENTS.indexOf(oldName);
       if (index !== -1) {
         CLIENTS[index] = newName;
       }
-      
+
       var preview = document.getElementById('edit-client-logo-preview');
       if (preview.style.display !== 'none' && preview.src) {
         CLIENT_LOGO_DATA[newName] = preview.src;
@@ -1756,10 +1364,10 @@
           delete CLIENT_LOGO_DATA[oldName];
         }
       }
-      
+
       localStorage.setItem('ccsm_clients', JSON.stringify(CLIENTS));
       localStorage.setItem('ccsm_client_logos', JSON.stringify(CLIENT_LOGO_DATA));
-      
+
       closeAddModal('edit-client-modal');
       toast('Client updated successfully!', 'success');
       updateClientNavVisibility();
@@ -1800,8 +1408,6 @@
       doors: 'Access Control',
       servers: 'Servers',
       switches: 'Switches',
-      software: 'Software & SMA',
-      assets: 'Client Assets',
       files: 'Files & Logs'
     };
     var currentTab = 'dashboard';
@@ -1813,14 +1419,14 @@
         if (!n.classList.contains('nav-client-parent')) n.classList.remove('active');
       });
       document.getElementById('tab-' + id).classList.add('active');
-      
+
       var title = titles[id] || id;
       var titleHTML = title;
       if (currentClientFilter) {
         titleHTML = getClientLogo(currentClientFilter) + ' ' + currentClientFilter + ' — ' + title;
       }
       document.getElementById('page-title').innerHTML = titleHTML;
-      
+
       if (id === 'inbox') renderInbox();
       if (id === 'dashboard') renderDashboard();
       if (id === 'files') { renderAuditLog(); renderFileExplorer(); }
@@ -1828,8 +1434,6 @@
       if (id === 'doors') { renderDoorsEnhanced(); }
       if (id === 'servers') { renderServersEnhanced(); }
       if (id === 'switches') { renderSwitchesEnhanced(); }
-      if (id === 'software') { renderSoftware(); }
-      if (id === 'assets') { renderStorage(); renderStations(); renderMonitors(); }
     }
 
     document.getElementById('nav').addEventListener('click', function(e) {
@@ -1880,7 +1484,7 @@
         closeComposeModal();
         hideContextMenu();
       }
-      var tabs = ['dashboard', 'inbox', 'service', 'cameras', 'doors', 'servers', 'switches', 'software', 'assets', 'files'];
+      var tabs = ['dashboard', 'inbox', 'service', 'cameras', 'doors', 'servers', 'switches', 'files'];
       var num = parseInt(e.key);
       if (num >= 1 && num <= tabs.length) switchTab(tabs[num - 1]);
       if (e.key === 'n' || e.key === 'N') switchTab('service');
@@ -1971,14 +1575,9 @@
         renderDoorsEnhanced();
         renderServersEnhanced();
         renderSwitchesEnhanced();
-        renderSoftware();
-        renderStorage();
-        renderStations();
-        renderMonitors();
         renderInbox();
         renderFileExplorer();
         document.title = '(' + SERVICE_REQUESTS.filter(function(r) { return r.status !== 'Resolved'; }).length + ') CAMS — Client Assessment Management System';
-        checkWarrantyAlerts();
       } catch (error) {
         console.error('Failed to load data:', error);
         loadMockData();
@@ -1990,18 +1589,14 @@
       DOORS = JSON.parse(localStorage.getItem('ccsm_doors') || '[]');
       SERVICE_REQUESTS = JSON.parse(localStorage.getItem('ccsm_sr') || '[]');
       AUDIT_LOG = JSON.parse(localStorage.getItem('ccsm_audit_log') || '[]');
-      STORAGE = JSON.parse(localStorage.getItem('ccsm_storage') || '[]');
-      STATIONS = JSON.parse(localStorage.getItem('ccsm_stations') || '[]');
-      MONITORS = JSON.parse(localStorage.getItem('ccsm_monitors') || '[]');
-      SOFTWARE = JSON.parse(localStorage.getItem('ccsm_software') || '[]');
-      
+
       var serversFallback = [
         { location: "Kingport", serial: "J1013DDR", make: "Dell", model: "PowerEdge R740", capacity: "6.11TB", used: "1.4TB", health: "Good (23%)", apps: "Ocularis DM5, LPR", status: "ONLINE", comments: "", purchase_date: "2024-01-15", warranty_expiry: "2026-01-15" },
         { location: "Kingport", serial: "J1013DDV", make: "HP", model: "ProLiant DL380", capacity: "6.11TB", used: "1.4TB", health: "Good, Failed drive", apps: "Ocularis DM6, Eyelock", status: "ONLINE", comments: "", purchase_date: "2023-06-01", warranty_expiry: "2025-06-01" },
         { location: "Kingport", serial: "J1013DDX", make: "Lenovo", model: "ThinkSystem SR650", capacity: "45TB", used: "178GB", health: "Excellent", apps: "—", status: "ONLINE", comments: "", purchase_date: "2024-08-15", warranty_expiry: "2026-08-15" }
       ];
       SERVERS = serversFallback;
-      
+
       SWITCHES = JSON.parse(localStorage.getItem('ccsm_switches') || '[]');
       if (SWITCHES.length === 0) {
         SWITCHES = [
@@ -2009,12 +1604,12 @@
           { name: "2nd entrance", location: "SAL Duty Office", model: "AXIS T8516", ip_address: "10.19.1.23", firmware: "6.54.2739", username: "root", password: "pass", mac: "AC:CC:8E:B6:DF:99", comments: "", purchase_date: "2024-03-15", warranty_expiry: "2026-03-15" }
         ];
       }
-      
+
       EMAILS = [
         { id: "e1", from_name: "David Chen", from_email: "facilities@kftl.com", to_email: "support@etechsystems.com", subject: "Replace defective cameras - NORTH zone", body: "We did a walk-through of the NORTH zone and counted at least 8 cameras showing as defective, including HM3, HM11, HM23, and N25. Can someone confirm a timeline for repair?", date: "Jun 15, 2026 14:22", attachments: [], is_sr: true, sr_linked: "SR-1847", urgent: true, client: "KFTL", read: true, flagged: true },
         { id: "e2", from_name: "Andrea Williams", from_email: "security@kwl.com", to_email: "support@etechsystems.com", subject: "URGENT: 5 Cameras Offline - Tinson Pen", body: "This is urgent — we have 5 cameras down simultaneously at Tinson Pen as of this morning. Given recent perimeter alarm activity, we need eyes back up there ASAP.", date: "Jun 15, 2026 11:05", attachments: [], is_sr: true, sr_linked: "SR-1848", urgent: true, client: "KWL", read: false, flagged: true }
       ];
-      
+
       renderDashboard();
       renderSR();
       renderAuditLog();
@@ -2023,10 +1618,6 @@
       renderDoorsEnhanced();
       renderServersEnhanced();
       renderSwitchesEnhanced();
-      renderSoftware();
-      renderStorage();
-      renderStations();
-      renderMonitors();
       renderInbox();
       renderFileExplorer();
     }
@@ -2050,10 +1641,10 @@
       var password = document.getElementById('login-password').value;
       var errorDiv = document.getElementById('login-error');
       var loadingDiv = document.getElementById('login-loading');
-      
+
       errorDiv.style.display = 'none';
       loadingDiv.classList.add('active');
-      
+
       var clientCredentials = {
         'kftl': { password: 'kftl123', client: 'KFTL' },
         'kwl': { password: 'kwl123', client: 'KWL' },
@@ -2062,10 +1653,10 @@
         'nids': { password: 'nids123', client: 'NIDS' },
         'nutrien': { password: 'nutrien123', client: 'Nutrien' }
       };
-      
+
       var lowerUser = username.toLowerCase();
       var lowerPass = password.toLowerCase();
-      
+
       var foundClient = null;
       for (var client in clientCredentials) {
         if (lowerUser === client && lowerPass === clientCredentials[client].password) {
@@ -2073,7 +1664,7 @@
           break;
         }
       }
-      
+
       try {
         if (foundClient) {
           currentUser = {
@@ -2086,34 +1677,34 @@
           isAdmin = false;
           currentClientFilter = foundClient;
           currentZoneFilter = null;
-          
+
           localStorage.setItem('user', JSON.stringify(currentUser));
           token = 'client-token-' + Date.now();
           localStorage.setItem('token', token);
-          
+
           hideLogin();
           document.getElementById('user-name-display').textContent = currentUser.username;
           document.getElementById('user-role-display').textContent = 'Client User';
           document.getElementById('user-avatar').textContent = currentUser.username.slice(0, 2).toUpperCase();
-          
+
           applyClientBranding(foundClient);
           updateClientNavVisibility();
           toast('Welcome, ' + currentUser.username + ' (Client View)!', 'success');
           loadMockData();
           return;
         }
-        
+
         try {
           var result = await apiCall('POST', '/auth/login', {
             username: username,
             password: password
           });
-          
+
           token = result.token;
           currentUser = result.user;
           userClient = currentUser.client || null;
           isAdmin = currentUser.isAdmin !== false;
-          
+
           if (userClient && !isAdmin) {
             currentClientFilter = userClient;
             applyClientBranding(userClient);
@@ -2121,15 +1712,15 @@
             currentClientFilter = null;
             applyClientBranding(null);
           }
-          
+
           localStorage.setItem('token', token);
           localStorage.setItem('user', JSON.stringify(currentUser));
-          
+
           hideLogin();
           document.getElementById('user-name-display').textContent = currentUser.username;
           document.getElementById('user-role-display').textContent = currentUser.role || (isAdmin ? 'Administrator' : 'Client User');
           document.getElementById('user-avatar').textContent = currentUser.username.slice(0, 2).toUpperCase();
-          
+
           updateClientNavVisibility();
           toast('Welcome, ' + currentUser.username + '!', 'success');
           await loadData();
@@ -2145,16 +1736,16 @@
             isAdmin = true;
             currentClientFilter = null;
             currentZoneFilter = null;
-            
+
             localStorage.setItem('user', JSON.stringify(currentUser));
             token = 'admin-token-' + Date.now();
             localStorage.setItem('token', token);
-            
+
             hideLogin();
             document.getElementById('user-name-display').textContent = 'admin';
             document.getElementById('user-role-display').textContent = 'Administrator';
             document.getElementById('user-avatar').textContent = 'AD';
-            
+
             applyClientBranding(null);
             updateClientNavVisibility();
             toast('Welcome, Admin! (Offline Mode)', 'success');
@@ -2163,7 +1754,7 @@
           }
           throw backendError;
         }
-        
+
       } catch (error) {
         errorDiv.textContent = error.message || 'Login failed. Try: admin/admin123 or kftl/kftl123';
         errorDiv.style.display = 'block';
@@ -2300,19 +1891,19 @@
       var totalDevices = CAMERAS.length + DOORS.length + SERVERS.length + SWITCHES.length;
       var onlineDevices = (CAMERAS.length - defective) + (DOORS.length - acOffline) + srvOnline + swOnline;
       var health = totalDevices > 0 ? Math.round((onlineDevices / totalDevices) * 100) : 100;
-      
+
       document.getElementById('dash-health').textContent = health + '%';
       document.getElementById('dash-alerts').textContent = defective + acOffline;
       document.getElementById('dash-offline').textContent = defective + acOffline + (SWITCHES.length - swOnline);
       document.getElementById('dash-srs').textContent = SERVICE_REQUESTS.filter(function(r) { return r.status !== 'Resolved'; }).length;
-      
+
       renderTimeline();
-      
+
       var active = SERVICE_REQUESTS.filter(function(r) { return r.status !== 'Resolved'; });
       var urgent = active.slice().sort(function(a, b) {
         return ({ High: 0, Medium: 1, Low: 2 }[a.priority] ?? 3) - ({ High: 0, Medium: 1, Low: 2 }[b.priority] ?? 3);
       }).slice(0, 7);
-      
+
       document.getElementById('dash-sr-tbody').innerHTML = urgent.map(function(r) {
         return '<tr class="clickable" onclick="switchTab(\'service\');openModal(\'' + r.id + '\')">' +
           '<td style="font-size:11px;color:var(--text-muted);">' + r.id + '</td>' +
@@ -2625,7 +2216,6 @@
     function debounceRenderServers() { debounce(renderServersEnhanced, 'srv', 250); }
     function debounceRenderSwitches() { debounce(renderSwitchesEnhanced, 'sw', 250); }
     function debounceRenderFiles() { debounce(renderFileExplorer, 'file', 250); }
-    function debounceRenderSoftware() { debounce(renderSoftware, 'software', 250); }
 
     function setUnsaved(show) {
       var el = document.getElementById('unsaved-indicator');
@@ -2650,11 +2240,13 @@
       var counts = { All: CAMERAS.length };
       CAMERAS.forEach(function(c) { if (!counts[c.status]) counts[c.status] = 0; counts[c.status]++; });
       var offlineTotal = (counts['Defective'] || 0) + (counts['No Power'] || 0) + (counts['No Camera'] || 0) + (counts['Offline'] || 0) + (counts['Needs Check'] || 0);
-      counts['Offline'] = offlineTotal; return counts;
+      counts['Offline'] = offlineTotal;
+      return counts;
     }
 
     function renderStatusFilters() {
-      var counts = getStatusCounts(); var container = document.getElementById('cam-status-filters');
+      var counts = getStatusCounts();
+      var container = document.getElementById('cam-status-filters');
       var statuses = ['All', 'Online', 'Offline', 'Defective', 'Needs Check', 'No Camera', 'No Power'];
       container.innerHTML = statuses.map(function(s) {
         var count = counts[s] || 0;
@@ -2662,12 +2254,20 @@
       }).join('');
     }
 
-    function setCamStatusFilter(status) { camStatusFilter = status; camCurrentPage = {}; renderStatusFilters(); renderCamerasOptimized(); }
+    function setCamStatusFilter(status) {
+      camStatusFilter = status;
+      camCurrentPage = {};
+      renderStatusFilters();
+      renderCamerasOptimized();
+    }
 
     function getFilteredCameras() {
       var filtered = CAMERAS.slice();
-      if (camStatusFilter === 'Offline') { filtered = filtered.filter(function(c) { return c.status !== 'Online'; }); }
-      else if (camStatusFilter !== 'All') { filtered = filtered.filter(function(c) { return c.status === camStatusFilter; }); }
+      if (camStatusFilter === 'Offline') {
+        filtered = filtered.filter(function(c) { return c.status !== 'Online'; });
+      } else if (camStatusFilter !== 'All') {
+        filtered = filtered.filter(function(c) { return c.status === camStatusFilter; });
+      }
       if (camSearchQuery) {
         var q = camSearchQuery.toLowerCase();
         filtered = filtered.filter(function(c) {
@@ -2685,15 +2285,7 @@
       var col = camSortColumn;
       sorted.sort(function(a, b) {
         var valA, valB;
-        if (col === 'ip') { valA = getCameraIP(a) || ''; valB = getCameraIP(b) || ''; }
-        else if (col === 'name') { valA = a.name; valB = b.name; }
-        else if (col === 'zone') { valA = a.zone; valB = b.zone; }
-        else if (col === 'status') { valA = a.status; valB = b.status; }
-        else if (col === 'comments') { valA = a.comments || ''; valB = b.comments || ''; }
-        else if (col === 'model') { valA = a.model || ''; valB = b.model || ''; }
-        else if (col === 'resolution') { valA = a.resolution || ''; valB = b.resolution || ''; }
-        else if (col === 'warranty') { valA = a.warranty_expiry || ''; valB = b.warranty_expiry || ''; }
-        else { valA = ''; valB = ''; }
+        if (col === 'ip') { valA = getCameraIP(a) || ''; valB = getCameraIP(b) || ''; } else if (col === 'name') { valA = a.name; valB = b.name; } else if (col === 'zone') { valA = a.zone; valB = b.zone; } else if (col === 'status') { valA = a.status; valB = b.status; } else if (col === 'comments') { valA = a.comments || ''; valB = b.comments || ''; } else if (col === 'model') { valA = a.model || ''; valB = b.model || ''; } else if (col === 'resolution') { valA = a.resolution || ''; valB = b.resolution || ''; } else if (col === 'warranty') { valA = a.warranty_expiry || ''; valB = b.warranty_expiry || ''; } else { valA = ''; valB = ''; }
         if (valA < valB) return camSortDirection === 'asc' ? -1 : 1;
         if (valA > valB) return camSortDirection === 'asc' ? 1 : -1;
         return 0;
@@ -2708,8 +2300,12 @@
       showLoading('cam-loading');
       setTimeout(function() {
         var filtered = getFilteredCameras();
-        if (currentClientFilter) { filtered = filtered.filter(function(c) { return getClient(c.zone) === currentClientFilter; }); }
-        if (currentZoneFilter) { filtered = filtered.filter(function(c) { return c.zone === currentZoneFilter; }); }
+        if (currentClientFilter) {
+          filtered = filtered.filter(function(c) { return getClient(c.zone) === currentClientFilter; });
+        }
+        if (currentZoneFilter) {
+          filtered = filtered.filter(function(c) { return c.zone === currentZoneFilter; });
+        }
         var sorted = getSortedCameras(filtered);
         var zones = {};
         sorted.forEach(function(c) { if (!zones[c.zone]) zones[c.zone] = []; zones[c.zone].push(c); });
@@ -2767,8 +2363,12 @@
 
     function changePage(zone, page) {
       var filtered = getFilteredCameras();
-      if (currentClientFilter) { filtered = filtered.filter(function(c) { return getClient(c.zone) === currentClientFilter; }); }
-      if (currentZoneFilter) { filtered = filtered.filter(function(c) { return c.zone === currentZoneFilter; }); }
+      if (currentClientFilter) {
+        filtered = filtered.filter(function(c) { return getClient(c.zone) === currentClientFilter; });
+      }
+      if (currentZoneFilter) {
+        filtered = filtered.filter(function(c) { return c.zone === currentZoneFilter; });
+      }
       var sorted = getSortedCameras(filtered);
       var inZone = sorted.filter(function(c) { return c.zone === zone; }).length;
       var totalPages = Math.ceil(inZone / camPerPage);
@@ -2860,7 +2460,11 @@
       });
     }
 
-    function refreshCameras() { toast('Camera data refreshed', 'success'); updateLastUpdated(); loadData(); }
+    function refreshCameras() {
+      toast('Camera data refreshed', 'success');
+      updateLastUpdated();
+      loadData();
+    }
 
     function updateLastUpdated() {
       var now = new Date();
@@ -2928,7 +2532,9 @@
       }, 1500);
     }
 
-    function closeCameraDetailModal() { document.getElementById('camera-detail-modal').classList.remove('open'); }
+    function closeCameraDetailModal() {
+      document.getElementById('camera-detail-modal').classList.remove('open');
+    }
 
     function saveModalDateField(name, field, value) {
       var endpoint = currentTab === 'cameras' ? '/cameras/' :
@@ -3021,23 +2627,17 @@
       toggle.classList.toggle('collapsed');
     }
 
-    function sortDoors(column) {
-      if (doorSortColumn === column) {
-        doorSortDirection = doorSortDirection === 'asc' ? 'desc' : 'asc';
-      } else {
-        doorSortColumn = column;
-        doorSortDirection = 'asc';
-      }
-      renderDoorsEnhanced();
-    }
-
     function updateDoorLastUpdated() {
       var now = new Date();
       var timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
       document.getElementById('door-last-updated').textContent = 'Last updated: Today ' + timeStr;
     }
 
-    function refreshDoors() { toast('Door data refreshed', 'success'); updateDoorLastUpdated(); loadData(); }
+    function refreshDoors() {
+      toast('Door data refreshed', 'success');
+      updateDoorLastUpdated();
+      loadData();
+    }
 
     function openDoorDetail(index) {
       currentDoorIndex = index;
@@ -3130,18 +2730,9 @@
       }, 1500);
     }
 
-    function pingDoorReaderFromTable(ip) {
-      if (!ip || ip === 'N/A') return;
-      toast('Pinging ' + ip + '...', 'info');
-    }
-
     function openDoorController() {
       var door = DOORS[currentDoorIndex];
       if (door && door.ip) window.open('http://' + door.ip, '_blank');
-    }
-
-    function openDoorControllerFromTable(ip) {
-      if (ip && ip !== 'N/A') window.open('http://' + ip, '_blank');
     }
 
     // ============================================================
@@ -3230,16 +2821,6 @@
       toggle.classList.toggle('collapsed');
     }
 
-    function sortServers(column) {
-      if (srvSortColumn === column) {
-        srvSortDirection = srvSortDirection === 'asc' ? 'desc' : 'asc';
-      } else {
-        srvSortColumn = column;
-        srvSortDirection = 'asc';
-      }
-      renderServersEnhanced();
-    }
-
     function updateSrvLastUpdated() {
       var now = new Date();
       var timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
@@ -3247,7 +2828,11 @@
       if (el) el.textContent = 'Last updated: Today ' + timeStr;
     }
 
-    function refreshServers() { toast('Server data refreshed', 'success'); updateSrvLastUpdated(); loadData(); }
+    function refreshServers() {
+      toast('Server data refreshed', 'success');
+      updateSrvLastUpdated();
+      loadData();
+    }
 
     function openServerDetail(index) {
       currentServerIndex = index;
@@ -3313,8 +2898,6 @@
         resultDiv.innerHTML = Math.random() > 0.15 ? '<span class="ping-result success">✅ Online</span>' : '<span class="ping-result fail">❌ Unreachable</span>';
       }, 1500);
     }
-
-    function pingServerFromTable(serial) { toast('Pinging ' + serial + '...', 'info'); }
 
     function openServerConsole() {
       var server = SERVERS[currentServerIndex];
@@ -3386,7 +2969,7 @@
               var totalPorts = 8 + Math.floor(Math.random() * 3) * 8;
               var pct = Math.round((portCount / totalPorts) * 100);
               var barColor = pct > 85 ? 'red' : pct > 70 ? 'yellow' : 'green';
-              html += '<tr class="clickable" onclick="openSwitchDetail(' + realIndex + ')"><td>' + s.name + '</td><td>' + s.location + '</td><td>' + s.model + '</td><td><span class="ip-link">' + s.ip_address + '</span></td><td><div><span>' + portCount + '/' + totalPorts + '</span><div class="port-bar-wrap"><div class="port-bar-fill ' + barColor + '" style="width:' + pct + '%;"></div></div></div></td><td><span class="switch-uptime ' + (isOffline ? 'offline' : '') + '">' + (isOffline ? '🔴 Offline' : getRandomUptime() + ' · ' + getRandomLatency() + 'ms') + '</span></td><td style="color:' + (parseFloat(s.firmware) < 5.0 || s.firmware.indexOf('5.20.15') !== -1 ? '#fbbf24' : 'var(--text-primary)') + ';">' + s.firmware + '</td><td>' + getWarrantyDisplay(s.warranty_expiry) + '</td><td><button class="btn btn-xs" onclick="event.stopPropagation();pingSwitchDetailFromTable(' + realIndex + ')"><i class="ti ti-network"></i></button> <button class="btn btn-xs" onclick="event.stopPropagation();window.open(\'http://' + s.ip_address + '\',\'_blank\')"><i class="ti ti-external-link"></i></button> <button class="btn btn-xs" onclick="event.stopPropagation();copyText(\'' + s.ip_address + '\')"><i class="ti ti-copy"></i></button></td></tr>';
+              html += '<tr class="clickable" onclick="openSwitchDetail(' + realIndex + ')"><td>' + s.name + '</td><td>' + s.location + '</td><td>' + s.model + '</td><td><span class="ip-link">' + s.ip_address + '</span></td><td><div><span>' + portCount + '/' + totalPorts + '</span><div class="port-bar-wrap"><div class="port-bar-fill ' + barColor + '" style="width:' + pct + '%;"></div></div></div></td><td><span class="switch-uptime ' + (isOffline ? 'offline' : '') + '">' + (isOffline ? '🔴 Offline' : getRandomUptime() + ' · ' + getRandomLatency() + 'ms') + '</span></td><td style="color:' + (parseFloat(s.firmware) < 5.0 || s.firmware.indexOf('5.20.15') !== -1 ? '#fbbf24' : 'var(--text-primary)') + ';">' + s.firmware + '</td><td>' + getWarrantyDisplay(s.warranty_expiry) + '</td><td><button class="btn btn-xs" onclick="event.stopPropagation();pingSwitchDetailFromTable(' + realIndex + ')"><i class="ti ti-network"></i></button> <button class="btn btn-xs" onclick="event.stopPropagation();window.open(\'http://' + s.ip_address + '\',\'_blank\')"><i class="ti ti-external-link"></i></button></td></tr>';
             });
             html += '</tbody></table></div></div>';
           });
@@ -3405,16 +2988,6 @@
       toggle.classList.toggle('collapsed');
     }
 
-    function sortSwitches(column) {
-      if (swSortColumn === column) {
-        swSortDirection = swSortDirection === 'asc' ? 'desc' : 'asc';
-      } else {
-        swSortColumn = column;
-        swSortDirection = 'asc';
-      }
-      renderSwitchesEnhanced();
-    }
-
     function updateSwLastUpdated() {
       var now = new Date();
       var timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
@@ -3422,7 +2995,11 @@
       if (el) el.textContent = 'Last updated: Today ' + timeStr;
     }
 
-    function refreshSwitches() { toast('Switch data refreshed', 'success'); updateSwLastUpdated(); loadData(); }
+    function refreshSwitches() {
+      toast('Switch data refreshed', 'success');
+      updateSwLastUpdated();
+      loadData();
+    }
 
     function openSwitchDetail(index) {
       currentSwitchIndex = index;
@@ -3491,557 +3068,6 @@
     }
 
     // ============================================================
-    // ── SOFTWARE ──────────────────────────────────────────────────
-    // ============================================================
-
-    let softwareFilter = 'All';
-    let softwareSearch = '';
-
-    function renderSoftware() {
-      var searchInput = document.getElementById('sw-software-search');
-      softwareSearch = searchInput ? searchInput.value : '';
-      softwareFilter = document.getElementById('sw-software-filter') ? document.getElementById('sw-software-filter').value : 'All';
-      showLoading('software-loading');
-      setTimeout(function() {
-        var filtered = SOFTWARE;
-        if (currentClientFilter) {
-          filtered = filtered.filter(function(s) { return s.client === currentClientFilter; });
-        }
-        if (softwareFilter !== 'All') {
-          filtered = filtered.filter(function(s) { return s.vendor === softwareFilter; });
-        }
-        if (softwareSearch) {
-          var q = softwareSearch.toLowerCase();
-          filtered = filtered.filter(function(s) {
-            return s.vendor.toLowerCase().indexOf(q) !== -1 ||
-              s.version.toLowerCase().indexOf(q) !== -1 ||
-              (s.client || '').toLowerCase().indexOf(q) !== -1;
-          });
-        }
-        var container = document.getElementById('software-container');
-        if (filtered.length === 0) {
-          container.innerHTML = '<div class="empty-state"><span class="empty-icon">📦</span><div class="empty-title">No software found</div></div>';
-          return;
-        }
-        var html = '<table class="tbl"><thead><tr><th>Vendor</th><th>Client</th><th>Version</th><th>SMA Expiry</th><th>Status</th><th>License Count</th><th>Actions</th></tr></thead><tbody>';
-        filtered.forEach(function(s, idx) {
-          var daysLeft = s.sma_expiry ? Math.ceil((new Date(s.sma_expiry) - new Date()) / (1000 * 60 * 60 * 24)) : null;
-          var status = '';
-          var statusClass = '';
-          if (daysLeft === null) { status = '—'; statusClass = ''; }
-          else if (daysLeft < 0) { status = 'Expired'; statusClass = 'critical'; }
-          else if (daysLeft <= 30) { status = daysLeft + 'd'; statusClass = 'critical'; }
-          else if (daysLeft <= 90) { status = daysLeft + 'd'; statusClass = 'warning'; }
-          else { status = daysLeft + 'd'; statusClass = 'good'; }
-          var globalIndex = SOFTWARE.indexOf(s);
-          html += '<tr><td>' + s.vendor + '</td><td>' + (s.client || '—') + '</td><td>' + s.version + '</td><td>' + (s.sma_expiry || '—') + '</td><td><span class="status-badge ' + statusClass + '">' + status + '</span></td><td>' + (s.license_count || '—') + '</td><td><button class="btn btn-xs" onclick="editSoftware(' + globalIndex + ')"><i class="ti ti-edit"></i></button> <button class="btn btn-xs btn-danger" onclick="deleteSoftware(' + globalIndex + ')"><i class="ti ti-trash"></i></button></td></tr>';
-        });
-        html += '</tbody></table>';
-        container.innerHTML = html;
-        document.querySelectorAll('.loading-overlay').forEach(function(el) { el.classList.remove('active'); });
-      }, 50);
-    }
-
-    function refreshSoftware() { renderSoftware(); toast('Software refreshed', 'success'); }
-
-    function exportSoftwareCSV() {
-      var headers = ['Vendor', 'Client', 'Version', 'SMA Expiry', 'License Count'];
-      var data = SOFTWARE.map(function(s) {
-        return {
-          Vendor: s.vendor,
-          Client: s.client || '',
-          Version: s.version,
-          'SMA Expiry': s.sma_expiry || '',
-          'License Count': s.license_count || ''
-        };
-      });
-      exportToCSV(data, headers, 'software');
-    }
-
-    function checkSMAAlerts() {
-      toast('Checking SMA alerts...', 'info');
-      checkWarrantyAlerts();
-    }
-
-    function saveNewSoftware() {
-      var client = document.getElementById('software-client').value;
-      var vendor = document.getElementById('software-vendor').value;
-      var version = document.getElementById('software-version').value.trim();
-      var smaExpiry = document.getElementById('software-sma-expiry').value;
-      var licenseCount = document.getElementById('software-license-count').value;
-
-      if (!client) { toast('Please select a client', 'warning'); return; }
-      if (!vendor) { toast('Please select a vendor', 'warning'); return; }
-      if (!version) { toast('Please enter a version', 'warning'); return; }
-
-      var newSoftware = {
-        id: 'sw-' + Date.now(),
-        client: client,
-        vendor: vendor,
-        version: version,
-        sma_expiry: smaExpiry || '',
-        license_count: licenseCount || '',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-
-      SOFTWARE.push(newSoftware);
-      localStorage.setItem('ccsm_software', JSON.stringify(SOFTWARE));
-      closeAddModal('add-software-modal');
-      document.getElementById('software-version').value = '';
-      document.getElementById('software-sma-expiry').value = '';
-      document.getElementById('software-license-count').value = '';
-      toast('Software added successfully!', 'success');
-      renderSoftware();
-    }
-
-    function editSoftware(index) {
-      var software = SOFTWARE[index];
-      if (!software) return;
-      editingAsset = index;
-      editingAssetType = 'software';
-      // Populate edit modal
-      document.getElementById('edit-software-client').value = software.client || '';
-      document.getElementById('edit-software-vendor').value = software.vendor || '';
-      document.getElementById('edit-software-version').value = software.version || '';
-      document.getElementById('edit-software-sma-expiry').value = software.sma_expiry || '';
-      document.getElementById('edit-software-license-count').value = software.license_count || '';
-      document.getElementById('edit-software-modal').classList.add('open');
-      populateClientDropdowns();
-    }
-
-    function saveEditSoftware() {
-      if (editingAsset === null || editingAssetType !== 'software') return;
-      var software = SOFTWARE[editingAsset];
-      if (!software) return;
-      software.client = document.getElementById('edit-software-client').value;
-      software.vendor = document.getElementById('edit-software-vendor').value;
-      software.version = document.getElementById('edit-software-version').value.trim();
-      software.sma_expiry = document.getElementById('edit-software-sma-expiry').value;
-      software.license_count = document.getElementById('edit-software-license-count').value;
-      software.updated_at = new Date().toISOString();
-      localStorage.setItem('ccsm_software', JSON.stringify(SOFTWARE));
-      closeAddModal('edit-software-modal');
-      toast('Software updated successfully!', 'success');
-      renderSoftware();
-      editingAsset = null;
-      editingAssetType = null;
-    }
-
-    function deleteSoftware(index) {
-      openConfirm('Delete Software?', 'Are you sure you want to delete this software entry?', function() {
-        SOFTWARE.splice(index, 1);
-        localStorage.setItem('ccsm_software', JSON.stringify(SOFTWARE));
-        renderSoftware();
-        toast('Software deleted', 'info');
-      }, true);
-    }
-
-    // ============================================================
-    // ── STORAGE ──────────────────────────────────────────────────
-    // ============================================================
-
-    function renderStorage() {
-      var container = document.getElementById('storage-container');
-      var filtered = STORAGE;
-      if (currentClientFilter) {
-        filtered = filtered.filter(function(s) { return s.client === currentClientFilter; });
-      }
-      if (filtered.length === 0) {
-        container.innerHTML = '<div class="empty-state"><span class="empty-icon">💾</span><div class="empty-title">No storage assets</div><div class="empty-desc">Add storage assets using the + button.</div></div>';
-        return;
-      }
-      var html = '<table class="tbl"><thead><tr><th>Name</th><th>Client</th><th>Total</th><th>Usable</th><th>Health</th><th>Make</th><th>Model</th><th>Warranty</th><th>Actions</th></tr></thead><tbody>';
-      filtered.forEach(function(s, idx) {
-        var globalIndex = STORAGE.indexOf(s);
-        var health = parseInt(s.health) || 0;
-        html += '<tr><td>' + s.name + '</td><td>' + (s.client || '—') + '</td><td>' + (s.total || '—') + '</td><td>' + (s.usable || '—') + '</td><td>' + getStatusBadge(health) + '</td><td>' + (s.make || '—') + '</td><td>' + (s.model || '—') + '</td><td>' + getWarrantyDisplay(s.warranty) + '</td><td><button class="btn btn-xs" onclick="editStorage(' + globalIndex + ')"><i class="ti ti-edit"></i></button> <button class="btn btn-xs btn-danger" onclick="deleteStorage(' + globalIndex + ')"><i class="ti ti-trash"></i></button></td></tr>';
-      });
-      html += '</tbody></table>';
-      container.innerHTML = html;
-    }
-
-    function refreshAssets() { renderStorage(); renderStations(); renderMonitors(); toast('Assets refreshed', 'success'); }
-
-    function exportStorageCSV() {
-      var headers = ['Name', 'Client', 'Total Storage', 'Usable Storage', 'Health', 'Make', 'Model', 'Warranty Expiry'];
-      var data = STORAGE.map(function(s) {
-        return {
-          Name: s.name,
-          Client: s.client || '',
-          'Total Storage': s.total || '',
-          'Usable Storage': s.usable || '',
-          Health: s.health || '',
-          Make: s.make || '',
-          Model: s.model || '',
-          'Warranty Expiry': s.warranty || ''
-        };
-      });
-      exportToCSV(data, headers, 'storage');
-    }
-
-    function saveNewStorage() {
-      var name = document.getElementById('storage-name').value.trim();
-      var client = document.getElementById('storage-client').value;
-      if (!name) { toast('Please enter a storage name', 'warning'); return; }
-      if (!client) { toast('Please select a client', 'warning'); return; }
-
-      var newStorage = {
-        id: 'st-' + Date.now(),
-        name: name,
-        client: client,
-        total: document.getElementById('storage-total').value || '',
-        usable: document.getElementById('storage-usable').value || '',
-        health: document.getElementById('storage-health').value || '',
-        make: document.getElementById('storage-make').value || '',
-        model: document.getElementById('storage-model').value || '',
-        warranty: document.getElementById('storage-warranty').value || '',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-
-      STORAGE.push(newStorage);
-      localStorage.setItem('ccsm_storage', JSON.stringify(STORAGE));
-      closeAddModal('add-storage-modal');
-      document.getElementById('storage-name').value = '';
-      document.getElementById('storage-total').value = '';
-      document.getElementById('storage-usable').value = '';
-      document.getElementById('storage-health').value = '';
-      document.getElementById('storage-make').value = '';
-      document.getElementById('storage-model').value = '';
-      document.getElementById('storage-warranty').value = '';
-      toast('Storage added successfully!', 'success');
-      renderStorage();
-    }
-
-    function editStorage(index) {
-      var storage = STORAGE[index];
-      if (!storage) return;
-      editingAsset = index;
-      editingAssetType = 'storage';
-      document.getElementById('edit-storage-name').value = storage.name || '';
-      document.getElementById('edit-storage-client').value = storage.client || '';
-      document.getElementById('edit-storage-total').value = storage.total || '';
-      document.getElementById('edit-storage-usable').value = storage.usable || '';
-      document.getElementById('edit-storage-health').value = storage.health || '';
-      document.getElementById('edit-storage-make').value = storage.make || '';
-      document.getElementById('edit-storage-model').value = storage.model || '';
-      document.getElementById('edit-storage-warranty').value = storage.warranty || '';
-      document.getElementById('edit-storage-modal').classList.add('open');
-      populateClientDropdowns();
-    }
-
-    function saveEditStorage() {
-      if (editingAsset === null || editingAssetType !== 'storage') return;
-      var storage = STORAGE[editingAsset];
-      if (!storage) return;
-      storage.name = document.getElementById('edit-storage-name').value.trim();
-      storage.client = document.getElementById('edit-storage-client').value;
-      storage.total = document.getElementById('edit-storage-total').value;
-      storage.usable = document.getElementById('edit-storage-usable').value;
-      storage.health = document.getElementById('edit-storage-health').value;
-      storage.make = document.getElementById('edit-storage-make').value;
-      storage.model = document.getElementById('edit-storage-model').value;
-      storage.warranty = document.getElementById('edit-storage-warranty').value;
-      storage.updated_at = new Date().toISOString();
-      localStorage.setItem('ccsm_storage', JSON.stringify(STORAGE));
-      closeAddModal('edit-storage-modal');
-      toast('Storage updated successfully!', 'success');
-      renderStorage();
-      editingAsset = null;
-      editingAssetType = null;
-    }
-
-    function deleteStorage(index) {
-      openConfirm('Delete Storage?', 'Are you sure you want to delete this storage asset?', function() {
-        STORAGE.splice(index, 1);
-        localStorage.setItem('ccsm_storage', JSON.stringify(STORAGE));
-        renderStorage();
-        toast('Storage deleted', 'info');
-      }, true);
-    }
-
-    // ============================================================
-    // ── STATIONS ──────────────────────────────────────────────────
-    // ============================================================
-
-    function renderStations() {
-      var container = document.getElementById('stations-container');
-      var filtered = STATIONS;
-      if (currentClientFilter) {
-        filtered = filtered.filter(function(s) { return s.client === currentClientFilter; });
-      }
-      if (filtered.length === 0) {
-        container.innerHTML = '<div class="empty-state"><span class="empty-icon">💻</span><div class="empty-title">No client stations</div><div class="empty-desc">Add client stations using the + button.</div></div>';
-        return;
-      }
-      var html = '<table class="tbl"><thead><tr><th>Name</th><th>Client</th><th>Apps</th><th>Storage</th><th>Health</th><th>Make</th><th>Model</th><th>Warranty</th><th>Actions</th></tr></thead><tbody>';
-      filtered.forEach(function(s, idx) {
-        var globalIndex = STATIONS.indexOf(s);
-        var health = parseInt(s.health) || 0;
-        html += '<tr><td>' + s.name + '</td><td>' + (s.client || '—') + '</td><td>' + (s.apps || '—') + '</td><td>' + (s.storage || '—') + '</td><td>' + getStatusBadge(health) + '</td><td>' + (s.make || '—') + '</td><td>' + (s.model || '—') + '</td><td>' + getWarrantyDisplay(s.warranty) + '</td><td><button class="btn btn-xs" onclick="editStation(' + globalIndex + ')"><i class="ti ti-edit"></i></button> <button class="btn btn-xs btn-danger" onclick="deleteStation(' + globalIndex + ')"><i class="ti ti-trash"></i></button></td></tr>';
-      });
-      html += '</tbody></table>';
-      container.innerHTML = html;
-    }
-
-    function exportStationsCSV() {
-      var headers = ['Name', 'Client', 'Applications', 'Storage', 'Health', 'Make', 'Model', 'Warranty Expiry'];
-      var data = STATIONS.map(function(s) {
-        return {
-          Name: s.name,
-          Client: s.client || '',
-          Applications: s.apps || '',
-          Storage: s.storage || '',
-          Health: s.health || '',
-          Make: s.make || '',
-          Model: s.model || '',
-          'Warranty Expiry': s.warranty || ''
-        };
-      });
-      exportToCSV(data, headers, 'stations');
-    }
-
-    function saveNewStation() {
-      var name = document.getElementById('station-name').value.trim();
-      var client = document.getElementById('station-client').value;
-      if (!name) { toast('Please enter a station name', 'warning'); return; }
-      if (!client) { toast('Please select a client', 'warning'); return; }
-
-      var newStation = {
-        id: 'stn-' + Date.now(),
-        name: name,
-        client: client,
-        apps: document.getElementById('station-apps').value || '',
-        storage: document.getElementById('station-storage').value || '',
-        health: document.getElementById('station-health').value || '',
-        make: document.getElementById('station-make').value || '',
-        model: document.getElementById('station-model').value || '',
-        warranty: document.getElementById('station-warranty').value || '',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-
-      STATIONS.push(newStation);
-      localStorage.setItem('ccsm_stations', JSON.stringify(STATIONS));
-      closeAddModal('add-station-modal');
-      document.getElementById('station-name').value = '';
-      document.getElementById('station-apps').value = '';
-      document.getElementById('station-storage').value = '';
-      document.getElementById('station-health').value = '';
-      document.getElementById('station-make').value = '';
-      document.getElementById('station-model').value = '';
-      document.getElementById('station-warranty').value = '';
-      toast('Client station added successfully!', 'success');
-      renderStations();
-    }
-
-    function editStation(index) {
-      var station = STATIONS[index];
-      if (!station) return;
-      editingAsset = index;
-      editingAssetType = 'station';
-      document.getElementById('edit-station-name').value = station.name || '';
-      document.getElementById('edit-station-client').value = station.client || '';
-      document.getElementById('edit-station-apps').value = station.apps || '';
-      document.getElementById('edit-station-storage').value = station.storage || '';
-      document.getElementById('edit-station-health').value = station.health || '';
-      document.getElementById('edit-station-make').value = station.make || '';
-      document.getElementById('edit-station-model').value = station.model || '';
-      document.getElementById('edit-station-warranty').value = station.warranty || '';
-      document.getElementById('edit-station-modal').classList.add('open');
-      populateClientDropdowns();
-    }
-
-    function saveEditStation() {
-      if (editingAsset === null || editingAssetType !== 'station') return;
-      var station = STATIONS[editingAsset];
-      if (!station) return;
-      station.name = document.getElementById('edit-station-name').value.trim();
-      station.client = document.getElementById('edit-station-client').value;
-      station.apps = document.getElementById('edit-station-apps').value;
-      station.storage = document.getElementById('edit-station-storage').value;
-      station.health = document.getElementById('edit-station-health').value;
-      station.make = document.getElementById('edit-station-make').value;
-      station.model = document.getElementById('edit-station-model').value;
-      station.warranty = document.getElementById('edit-station-warranty').value;
-      station.updated_at = new Date().toISOString();
-      localStorage.setItem('ccsm_stations', JSON.stringify(STATIONS));
-      closeAddModal('edit-station-modal');
-      toast('Station updated successfully!', 'success');
-      renderStations();
-      editingAsset = null;
-      editingAssetType = null;
-    }
-
-    function deleteStation(index) {
-      openConfirm('Delete Station?', 'Are you sure you want to delete this client station?', function() {
-        STATIONS.splice(index, 1);
-        localStorage.setItem('ccsm_stations', JSON.stringify(STATIONS));
-        renderStations();
-        toast('Station deleted', 'info');
-      }, true);
-    }
-
-    // ============================================================
-    // ── MONITORS ──────────────────────────────────────────────────
-    // ============================================================
-
-    function renderMonitors() {
-      var container = document.getElementById('monitors-container');
-      var filtered = MONITORS;
-      if (currentClientFilter) {
-        filtered = filtered.filter(function(s) { return s.client === currentClientFilter; });
-      }
-      if (filtered.length === 0) {
-        container.innerHTML = '<div class="empty-state"><span class="empty-icon">🖥</span><div class="empty-title">No monitors</div><div class="empty-desc">Add monitors using the + button.</div></div>';
-        return;
-      }
-      var html = '<table class="tbl"><thead><tr><th>Name</th><th>Client</th><th>Size</th><th>Health</th><th>Make</th><th>Model</th><th>Warranty</th><th>Actions</th></tr></thead><tbody>';
-      filtered.forEach(function(s, idx) {
-        var globalIndex = MONITORS.indexOf(s);
-        var health = parseInt(s.health) || 0;
-        html += '<tr><td>' + s.name + '</td><td>' + (s.client || '—') + '</td><td>' + (s.size || '—') + '</td><td>' + getStatusBadge(health) + '</td><td>' + (s.make || '—') + '</td><td>' + (s.model || '—') + '</td><td>' + getWarrantyDisplay(s.warranty) + '</td><td><button class="btn btn-xs" onclick="editMonitor(' + globalIndex + ')"><i class="ti ti-edit"></i></button> <button class="btn btn-xs btn-danger" onclick="deleteMonitor(' + globalIndex + ')"><i class="ti ti-trash"></i></button></td></tr>';
-      });
-      html += '</tbody></table>';
-      container.innerHTML = html;
-    }
-
-    function exportMonitorsCSV() {
-      var headers = ['Name', 'Client', 'Size', 'Health', 'Make', 'Model', 'Warranty Expiry'];
-      var data = MONITORS.map(function(s) {
-        return {
-          Name: s.name,
-          Client: s.client || '',
-          Size: s.size || '',
-          Health: s.health || '',
-          Make: s.make || '',
-          Model: s.model || '',
-          'Warranty Expiry': s.warranty || ''
-        };
-      });
-      exportToCSV(data, headers, 'monitors');
-    }
-
-    function saveNewMonitor() {
-      var name = document.getElementById('monitor-name').value.trim();
-      var client = document.getElementById('monitor-client').value;
-      if (!name) { toast('Please enter a monitor name', 'warning'); return; }
-      if (!client) { toast('Please select a client', 'warning'); return; }
-
-      var newMonitor = {
-        id: 'mon-' + Date.now(),
-        name: name,
-        client: client,
-        size: document.getElementById('monitor-size').value || '',
-        health: document.getElementById('monitor-health').value || '',
-        make: document.getElementById('monitor-make').value || '',
-        model: document.getElementById('monitor-model').value || '',
-        warranty: document.getElementById('monitor-warranty').value || '',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-
-      MONITORS.push(newMonitor);
-      localStorage.setItem('ccsm_monitors', JSON.stringify(MONITORS));
-      closeAddModal('add-monitor-modal');
-      document.getElementById('monitor-name').value = '';
-      document.getElementById('monitor-size').value = '';
-      document.getElementById('monitor-health').value = '';
-      document.getElementById('monitor-make').value = '';
-      document.getElementById('monitor-model').value = '';
-      document.getElementById('monitor-warranty').value = '';
-      toast('Monitor added successfully!', 'success');
-      renderMonitors();
-    }
-
-    function editMonitor(index) {
-      var monitor = MONITORS[index];
-      if (!monitor) return;
-      editingAsset = index;
-      editingAssetType = 'monitor';
-      document.getElementById('edit-monitor-name').value = monitor.name || '';
-      document.getElementById('edit-monitor-client').value = monitor.client || '';
-      document.getElementById('edit-monitor-size').value = monitor.size || '';
-      document.getElementById('edit-monitor-health').value = monitor.health || '';
-      document.getElementById('edit-monitor-make').value = monitor.make || '';
-      document.getElementById('edit-monitor-model').value = monitor.model || '';
-      document.getElementById('edit-monitor-warranty').value = monitor.warranty || '';
-      document.getElementById('edit-monitor-modal').classList.add('open');
-      populateClientDropdowns();
-    }
-
-    function saveEditMonitor() {
-      if (editingAsset === null || editingAssetType !== 'monitor') return;
-      var monitor = MONITORS[editingAsset];
-      if (!monitor) return;
-      monitor.name = document.getElementById('edit-monitor-name').value.trim();
-      monitor.client = document.getElementById('edit-monitor-client').value;
-      monitor.size = document.getElementById('edit-monitor-size').value;
-      monitor.health = document.getElementById('edit-monitor-health').value;
-      monitor.make = document.getElementById('edit-monitor-make').value;
-      monitor.model = document.getElementById('edit-monitor-model').value;
-      monitor.warranty = document.getElementById('edit-monitor-warranty').value;
-      monitor.updated_at = new Date().toISOString();
-      localStorage.setItem('ccsm_monitors', JSON.stringify(MONITORS));
-      closeAddModal('edit-monitor-modal');
-      toast('Monitor updated successfully!', 'success');
-      renderMonitors();
-      editingAsset = null;
-      editingAssetType = null;
-    }
-
-    function deleteMonitor(index) {
-      openConfirm('Delete Monitor?', 'Are you sure you want to delete this monitor?', function() {
-        MONITORS.splice(index, 1);
-        localStorage.setItem('ccsm_monitors', JSON.stringify(MONITORS));
-        renderMonitors();
-        toast('Monitor deleted', 'info');
-      }, true);
-    }
-
-    // ============================================================
-    // ── ASSET SUB TABS ───────────────────────────────────────────
-    // ============================================================
-
-    function switchAssetTab(tab, el) {
-      document.querySelectorAll('.asset-sub-tab').forEach(function(t) { t.classList.remove('active'); });
-      el.classList.add('active');
-      document.querySelectorAll('.asset-sub-content').forEach(function(c) { c.classList.remove('active'); });
-      document.getElementById('asset-' + tab).classList.add('active');
-    }
-
-    // ============================================================
-    // ── EXPORT FUNCTION ──────────────────────────────────────────
-    // ============================================================
-
-    function exportToCSV(data, headers, filename) {
-      if (!data || data.length === 0) {
-        toast('No data to export', 'warning');
-        return;
-      }
-      var headerRow = headers.join(',');
-      var rows = data.map(function(item) {
-        return headers.map(function(header) {
-          var value = item[header] || '';
-          if (typeof value === 'object') value = JSON.stringify(value);
-          return '"' + String(value).replace(/"/g, '""') + '"';
-        }).join(',');
-      });
-      var csv = [headerRow].concat(rows).join('\n');
-      var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      var link = document.createElement('a');
-      var url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', filename + '_' + new Date().toISOString().slice(0, 10) + '.csv');
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      toast('Exported ' + data.length + ' items', 'success');
-    }
-
-    // ============================================================
     // ── SERVICE REQUESTS ─────────────────────────────────────────
     // ============================================================
 
@@ -4058,8 +3084,7 @@
 
     function toggleSelectAll() {
       var checked = document.getElementById('sr-select-all').checked;
-      if (checked) { SERVICE_REQUESTS.forEach(function(r) { selectedSRs.add(r.id); }); }
-      else { selectedSRs.clear(); }
+      if (checked) { SERVICE_REQUESTS.forEach(function(r) { selectedSRs.add(r.id); }); } else { selectedSRs.clear(); }
       renderSR();
     }
 
@@ -4372,6 +3397,114 @@
         };
       });
       exportToCSV(data, headers, 'service_requests');
+    }
+
+    function exportCamerasCSV() {
+      var headers = ['name', 'zone', 'ip_address', 'status', 'comments', 'model', 'resolution', 'archiver', 'purchase_date', 'warranty_expiry'];
+      var data = CAMERAS.map(function(c) {
+        var ip = getCameraIP(c) || c.ip_address || '';
+        return {
+          name: c.name,
+          zone: c.zone,
+          ip_address: ip,
+          status: c.status,
+          comments: c.comments || '',
+          model: c.model || '',
+          resolution: c.resolution || '',
+          archiver: c.archiver || '',
+          purchase_date: c.purchase_date || '',
+          warranty_expiry: c.warranty_expiry || ''
+        };
+      });
+      exportToCSV(data, headers, 'cameras');
+    }
+
+    function exportDoorsCSV() {
+      var headers = ['name', 'site', 'client', 'reader', 'lock', 'powered', 'status', 'tech', 'ip', 'controller', 'doorSwing', 'accessType', 'antiPassback', 'controllerType', 'purchase_date', 'warranty_expiry'];
+      var data = DOORS.map(function(d) {
+        return {
+          name: d.name,
+          site: d.site,
+          client: d.client,
+          reader: d.reader || '',
+          lock: d.lock || '',
+          powered: d.powered || '',
+          status: d.status,
+          tech: d.tech,
+          ip: d.ip || '',
+          controller: d.controller || '',
+          doorSwing: d.doorSwing || '',
+          accessType: d.accessType || '',
+          antiPassback: d.antiPassback || '',
+          controllerType: d.controllerType || '',
+          purchase_date: d.purchase_date || '',
+          warranty_expiry: d.warranty_expiry || ''
+        };
+      });
+      exportToCSV(data, headers, 'doors');
+    }
+
+    function exportServersCSV() {
+      var headers = ['location', 'serial', 'make', 'model', 'capacity', 'used', 'health', 'apps', 'status', 'purchase_date', 'warranty_expiry'];
+      var data = SERVERS.map(function(s) {
+        return {
+          location: s.location,
+          serial: s.serial,
+          make: s.make || '',
+          model: s.model || '',
+          capacity: s.capacity || '',
+          used: s.used || '',
+          health: s.health || '',
+          apps: s.apps || '',
+          status: s.status,
+          purchase_date: s.purchase_date || '',
+          warranty_expiry: s.warranty_expiry || ''
+        };
+      });
+      exportToCSV(data, headers, 'servers');
+    }
+
+    function exportSwitchesCSV() {
+      var headers = ['name', 'location', 'model', 'ip_address', 'firmware', 'mac', 'purchase_date', 'warranty_expiry'];
+      var data = SWITCHES.map(function(s) {
+        return {
+          name: s.name,
+          location: s.location,
+          model: s.model,
+          ip_address: s.ip_address || '',
+          firmware: s.firmware || '',
+          mac: s.mac || '',
+          purchase_date: s.purchase_date || '',
+          warranty_expiry: s.warranty_expiry || ''
+        };
+      });
+      exportToCSV(data, headers, 'switches');
+    }
+
+    function exportToCSV(data, headers, filename) {
+      if (!data || data.length === 0) {
+        toast('No data to export', 'warning');
+        return;
+      }
+      var headerRow = headers.join(',');
+      var rows = data.map(function(item) {
+        return headers.map(function(header) {
+          var value = item[header] || '';
+          if (typeof value === 'object') value = JSON.stringify(value);
+          return '"' + String(value).replace(/"/g, '""') + '"';
+        }).join(',');
+      });
+      var csv = [headerRow].concat(rows).join('\n');
+      var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      var link = document.createElement('a');
+      var url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename + '_' + new Date().toISOString().slice(0, 10) + '.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast('Exported ' + data.length + ' items', 'success');
     }
 
     // ============================================================
@@ -4755,22 +3888,6 @@
           children: [
             { name: 'Network_Switch_List.csv', type: 'csv', size: '6.8 MB', modified: 'Jun 16, 2026', status: 'synced' }
           ]
-        },
-        {
-          name: 'Software',
-          type: 'folder',
-          children: [
-            { name: 'Software_SMA_Tracking.csv', type: 'csv', size: '1.2 MB', modified: 'Jun 18, 2026', status: 'synced' }
-          ]
-        },
-        {
-          name: 'Client Assets',
-          type: 'folder',
-          children: [
-            { name: 'Storage_Inventory.csv', type: 'csv', size: '0.8 MB', modified: 'Jun 17, 2026', status: 'synced' },
-            { name: 'Stations_Inventory.csv', type: 'csv', size: '0.6 MB', modified: 'Jun 17, 2026', status: 'synced' },
-            { name: 'Monitors_Inventory.csv', type: 'csv', size: '0.4 MB', modified: 'Jun 17, 2026', status: 'synced' }
-          ]
         }
       ]
     };
@@ -4909,8 +4026,7 @@
 
     function togglePin(name) {
       var idx = PINNED_FILES.indexOf(name);
-      if (idx > -1) { PINNED_FILES.splice(idx, 1); }
-      else { PINNED_FILES.push(name); }
+      if (idx > -1) { PINNED_FILES.splice(idx, 1); } else { PINNED_FILES.push(name); }
       localStorage.setItem('ccsm_pinned', JSON.stringify(PINNED_FILES));
       renderFileExplorer();
     }
@@ -4972,240 +4088,6 @@
     document.getElementById('file-preview-overlay').addEventListener('click', function(e) {
       if (e.target === this) closeFilePreview();
     });
-
-    // ============================================================
-    // ── WARRANTY ALERT SYSTEM ────────────────────────────────────
-    // ============================================================
-
-    function checkWarrantyAlerts() {
-      var now = new Date();
-      var alerts = [];
-      var alertThresholds = [90, 60, 30, 21, 14, 7];
-
-      // Check cameras
-      CAMERAS.forEach(function(item) {
-        if (item.warranty_expiry) {
-          var expiryDate = new Date(item.warranty_expiry);
-          var daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
-          alertThresholds.forEach(function(threshold) {
-            if (daysLeft === threshold || (threshold === 7 && daysLeft <= 7 && daysLeft > 0)) {
-              var alertKey = 'camera-' + (item.id || item.name) + '-' + threshold;
-              var existing = WARRANTY_ALERTS.find(function(a) { return a.key === alertKey; });
-              if (!existing) {
-                alerts.push({
-                  key: alertKey,
-                  assetType: 'Camera',
-                  assetName: item.name,
-                  client: getClient(item.zone) || 'Unknown',
-                  expiryDate: item.warranty_expiry,
-                  daysLeft: daysLeft,
-                  threshold: threshold
-                });
-              }
-            }
-          });
-        }
-      });
-
-      // Check doors
-      DOORS.forEach(function(item) {
-        if (item.warranty_expiry) {
-          var expiryDate = new Date(item.warranty_expiry);
-          var daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
-          alertThresholds.forEach(function(threshold) {
-            if (daysLeft === threshold || (threshold === 7 && daysLeft <= 7 && daysLeft > 0)) {
-              var alertKey = 'door-' + (item.id || item.name) + '-' + threshold;
-              var existing = WARRANTY_ALERTS.find(function(a) { return a.key === alertKey; });
-              if (!existing) {
-                alerts.push({
-                  key: alertKey,
-                  assetType: 'Door',
-                  assetName: item.name,
-                  client: item.client || 'Unknown',
-                  expiryDate: item.warranty_expiry,
-                  daysLeft: daysLeft,
-                  threshold: threshold
-                });
-              }
-            }
-          });
-        }
-      });
-
-      // Check servers
-      SERVERS.forEach(function(item) {
-        if (item.warranty_expiry) {
-          var expiryDate = new Date(item.warranty_expiry);
-          var daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
-          alertThresholds.forEach(function(threshold) {
-            if (daysLeft === threshold || (threshold === 7 && daysLeft <= 7 && daysLeft > 0)) {
-              var alertKey = 'server-' + (item.id || item.serial) + '-' + threshold;
-              var existing = WARRANTY_ALERTS.find(function(a) { return a.key === alertKey; });
-              if (!existing) {
-                alerts.push({
-                  key: alertKey,
-                  assetType: 'Server',
-                  assetName: item.serial,
-                  client: getClient(item.location) || 'Unknown',
-                  expiryDate: item.warranty_expiry,
-                  daysLeft: daysLeft,
-                  threshold: threshold
-                });
-              }
-            }
-          });
-        }
-      });
-
-      // Check switches
-      SWITCHES.forEach(function(item) {
-        if (item.warranty_expiry) {
-          var expiryDate = new Date(item.warranty_expiry);
-          var daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
-          alertThresholds.forEach(function(threshold) {
-            if (daysLeft === threshold || (threshold === 7 && daysLeft <= 7 && daysLeft > 0)) {
-              var alertKey = 'switch-' + (item.id || item.name) + '-' + threshold;
-              var existing = WARRANTY_ALERTS.find(function(a) { return a.key === alertKey; });
-              if (!existing) {
-                alerts.push({
-                  key: alertKey,
-                  assetType: 'Switch',
-                  assetName: item.name,
-                  client: getClient(item.location) || 'Unknown',
-                  expiryDate: item.warranty_expiry,
-                  daysLeft: daysLeft,
-                  threshold: threshold
-                });
-              }
-            }
-          });
-        }
-      });
-
-      // Check storage
-      STORAGE.forEach(function(item) {
-        if (item.warranty) {
-          var expiryDate = new Date(item.warranty);
-          var daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
-          alertThresholds.forEach(function(threshold) {
-            if (daysLeft === threshold || (threshold === 7 && daysLeft <= 7 && daysLeft > 0)) {
-              var alertKey = 'storage-' + (item.id || item.name) + '-' + threshold;
-              var existing = WARRANTY_ALERTS.find(function(a) { return a.key === alertKey; });
-              if (!existing) {
-                alerts.push({
-                  key: alertKey,
-                  assetType: 'Storage',
-                  assetName: item.name,
-                  client: item.client || 'Unknown',
-                  expiryDate: item.warranty,
-                  daysLeft: daysLeft,
-                  threshold: threshold
-                });
-              }
-            }
-          });
-        }
-      });
-
-      // Check stations
-      STATIONS.forEach(function(item) {
-        if (item.warranty) {
-          var expiryDate = new Date(item.warranty);
-          var daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
-          alertThresholds.forEach(function(threshold) {
-            if (daysLeft === threshold || (threshold === 7 && daysLeft <= 7 && daysLeft > 0)) {
-              var alertKey = 'station-' + (item.id || item.name) + '-' + threshold;
-              var existing = WARRANTY_ALERTS.find(function(a) { return a.key === alertKey; });
-              if (!existing) {
-                alerts.push({
-                  key: alertKey,
-                  assetType: 'Client Station',
-                  assetName: item.name,
-                  client: item.client || 'Unknown',
-                  expiryDate: item.warranty,
-                  daysLeft: daysLeft,
-                  threshold: threshold
-                });
-              }
-            }
-          });
-        }
-      });
-
-      // Check monitors
-      MONITORS.forEach(function(item) {
-        if (item.warranty) {
-          var expiryDate = new Date(item.warranty);
-          var daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
-          alertThresholds.forEach(function(threshold) {
-            if (daysLeft === threshold || (threshold === 7 && daysLeft <= 7 && daysLeft > 0)) {
-              var alertKey = 'monitor-' + (item.id || item.name) + '-' + threshold;
-              var existing = WARRANTY_ALERTS.find(function(a) { return a.key === alertKey; });
-              if (!existing) {
-                alerts.push({
-                  key: alertKey,
-                  assetType: 'Monitor',
-                  assetName: item.name,
-                  client: item.client || 'Unknown',
-                  expiryDate: item.warranty,
-                  daysLeft: daysLeft,
-                  threshold: threshold
-                });
-              }
-            }
-          });
-        }
-      });
-
-      // Check software SMA
-      SOFTWARE.forEach(function(item) {
-        if (item.sma_expiry) {
-          var expiryDate = new Date(item.sma_expiry);
-          var daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
-          alertThresholds.forEach(function(threshold) {
-            if (daysLeft === threshold || (threshold === 7 && daysLeft <= 7 && daysLeft > 0)) {
-              var alertKey = 'sma-' + (item.id || item.vendor) + '-' + threshold;
-              var existing = WARRANTY_ALERTS.find(function(a) { return a.key === alertKey; });
-              if (!existing) {
-                alerts.push({
-                  key: alertKey,
-                  assetType: 'Software SMA',
-                  assetName: item.vendor + ' (' + item.version + ')',
-                  client: item.client || 'Unknown',
-                  expiryDate: item.sma_expiry,
-                  daysLeft: daysLeft,
-                  threshold: threshold
-                });
-              }
-            }
-          });
-        }
-      });
-
-      // Store alerts and send email notifications
-      if (alerts.length > 0) {
-        WARRANTY_ALERTS = WARRANTY_ALERTS.concat(alerts);
-        localStorage.setItem('ccsm_warranty_alerts', JSON.stringify(WARRANTY_ALERTS));
-
-        // Send email notification (simulated)
-        alerts.forEach(function(alert) {
-          var subject = '[CAMS] Warranty Expiration Alert - ' + alert.assetType + ': ' + alert.assetName;
-          var body = 'This is a ' + alert.daysLeft + ' day notice that the warranty for ' +
-            alert.assetType + ' "' + alert.assetName + '" will expire on ' + alert.expiryDate +
-            '.\n\nClient: ' + alert.client +
-            '\n\nPlease take appropriate action.\n\n---\nCAMS - Client Assessment Management System';
-          console.log('📧 EMAIL ALERT: To: support@e-techsystemsja.com');
-          console.log('📧 Subject:', subject);
-          console.log('📧 Body:', body);
-          // Actual email sending would be handled by the server
-          // sendEmail('support@e-techsystemsja.com', subject, body);
-        });
-
-        // Update dashboard
-        if (currentTab === 'dashboard') renderDashboard();
-        toast(alerts.length + ' warranty alert(s) generated', 'warning');
-      }
-    }
 
     // ============================================================
     // ── CLIENT NAVIGATION VISIBILITY ────────────────────────────
@@ -5319,8 +4201,6 @@
         html += '<div class="nav-item nav-sub-item" data-tab="doors" data-client="' + client + '"><i class="ti ti-door"></i> <span>Access Control</span></div>';
         html += '<div class="nav-item nav-sub-item" data-tab="servers" data-client="' + client + '"><i class="ti ti-server"></i> <span>Servers</span></div>';
         html += '<div class="nav-item nav-sub-item" data-tab="switches" data-client="' + client + '"><i class="ti ti-router"></i> <span>Switches</span></div>';
-        html += '<div class="nav-item nav-sub-item" data-tab="software" data-client="' + client + '"><i class="ti ti-code"></i> <span>Software</span></div>';
-        html += '<div class="nav-item nav-sub-item" data-tab="assets" data-client="' + client + '"><i class="ti ti-devices"></i> <span>Client Assets</span></div>';
         html += '</div></div>';
       });
 
@@ -5381,26 +4261,7 @@
       doors: DOORS.length,
       servers: SERVERS.length,
       switches: SWITCHES.length,
-      storage: STORAGE.length,
-      stations: STATIONS.length,
-      monitors: MONITORS.length,
-      software: SOFTWARE.length,
       srs: SERVICE_REQUESTS.length
-    });
-
-    // Initial warranty check after 10 seconds
-    setTimeout(checkWarrantyAlerts, 10000);
-
-    // Close modals on ESC key
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        // Close all modals
-        document.querySelectorAll('.modal-overlay.open').forEach(function(modal) {
-          modal.classList.remove('open');
-        });
-        closeAddDropdown();
-        hideContextMenu();
-      }
     });
   </script>
 </body>
