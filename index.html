@@ -37,48 +37,6 @@
     --client-button-gradient: linear-gradient(135deg, #4f8cf7, #00d4ff);
   }
 
-  :root.light-theme {
-    --sidebar-bg: rgba(245, 247, 250, 0.95);
-    --sidebar-border: rgba(0,0,0,0.08);
-    --main-bg: #f0f2f5;
-    --card-bg: rgba(255, 255, 255, 0.85);
-    --card-border: rgba(0, 0, 0, 0.08);
-    --text-primary: #1a1a2e;
-    --text-secondary: rgba(0, 0, 0, 0.6);
-    --text-muted: rgba(0, 0, 0, 0.35);
-    --stat-val-color: #1a1a2e;
-    --client-header-bg: rgba(245, 247, 250, 0.95);
-  }
-
-  :root.jet-black-theme {
-    --sidebar-bg: rgba(0, 0, 0, 0.99);
-    --sidebar-border: rgba(255,255,255,0.05);
-    --main-bg: #000000;
-    --card-bg: rgba(8, 8, 12, 0.98);
-    --card-border: rgba(255, 255, 255, 0.03);
-    --text-primary: #ffffff;
-    --text-secondary: rgba(255, 255, 255, 0.65);
-    --text-muted: rgba(255, 255, 255, 0.2);
-    --accent: #00d4ff;
-    --accent-glow: rgba(0, 212, 255, 0.12);
-    --stat-val-color: #ffffff;
-    --client-header-bg: rgba(0, 0, 0, 0.99);
-  }
-
-  /* ── Client Brand Overrides (set by JS) ── */
-  .client-mode {
-    --sidebar-bg: #ffffff;
-    --sidebar-border: rgba(0, 0, 0, 0.08);
-    --main-bg: #f5f5f5;
-    --card-bg: #ffffff;
-    --card-border: rgba(0, 0, 0, 0.08);
-    --text-primary: #1a1a2e;
-    --text-secondary: rgba(0, 0, 0, 0.6);
-    --text-muted: rgba(0, 0, 0, 0.35);
-    --stat-val-color: #1a1a2e;
-    --client-header-bg: #ffffff;
-  }
-
   /* ============================================================
      ── TOAST ──────────────────────────────────────────────────
      ============================================================ */
@@ -99,16 +57,6 @@
   .confirm-dialog .confirm-title { font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
   .confirm-dialog .confirm-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.5; }
   .confirm-dialog .confirm-actions { display: flex; gap: 8px; justify-content: flex-end; }
-
-  /* ============================================================
-     ── CONTEXT MENU ────────────────────────────────────────────
-     ============================================================ */
-  .ctx-menu { position: fixed; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 4px 0; z-index: 2000; display: none; min-width: 160px; box-shadow: 0 12px 40px rgba(0,0,0,0.6); backdrop-filter: blur(20px); }
-  .ctx-menu.open { display: block; }
-  .ctx-menu .ctx-item { padding: 7px 14px; font-size: 12px; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.1s; border: none; background: none; width: 100%; font-family: var(--font); }
-  .ctx-menu .ctx-item:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
-  .ctx-menu .ctx-item i { font-size: 14px; width: 18px; text-align: center; }
-  .ctx-menu .ctx-sep { height: 1px; background: var(--card-border); margin: 4px 12px; }
 
   /* ============================================================
      ── BUTTONS ──────────────────────────────────────────────────
@@ -155,53 +103,6 @@
   .sla-critical { color: var(--danger); }
 
   /* ============================================================
-     ── STATUS SELECT ───────────────────────────────────────────
-     ============================================================ */
-  .status-select, .priority-select { background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); color: var(--text-primary); padding: 4px 8px; border-radius: 4px; font-size: 11px; font-family: var(--font); }
-  .status-select:focus, .priority-select:focus { outline: none; border-color: var(--accent); }
-
-  /* ============================================================
-     ── MODAL ────────────────────────────────────────────────────
-     ============================================================ */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.72); z-index: 100; display: none; align-items: center; justify-content: center; }
-  .modal-overlay.open { display: flex; }
-  .modal { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; width: 580px; max-height: 86vh; overflow-y: auto; padding: 26px; position: relative; font-family: var(--font); box-shadow: 0 24px 80px rgba(0,0,0,0.8); backdrop-filter: blur(24px); max-width: 95%; }
-  .modal.wide { width: 680px; }
-  .modal.xwide { width: 760px; }
-  .modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 18px; z-index: 10; }
-  .modal-close:hover { color: #fff; }
-  .modal-title { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; padding-right: 40px; }
-  .modal-sub { font-size: 11px; color: var(--text-muted); margin-bottom: 18px; }
-  .modal-section { margin-bottom: 18px; }
-  .modal-section-title { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--card-border); }
-  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .modal-field label { font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 3px; }
-  .modal-field input, .modal-field select, .modal-field textarea { background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); color: var(--text-primary); padding: 6px 10px; border-radius: 4px; font-size: 12px; width: 100%; font-family: var(--font); }
-  .modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus { outline: none; border-color: var(--accent); }
-  .modal-field textarea { min-height: 80px; resize: vertical; }
-  .modal-field span { display: block; padding: 6px 0; font-size: 12px; color: var(--text-primary); }
-  .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--card-border); }
-  .modal-body-text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; white-space: pre-wrap; padding: 8px 0; }
-  .notes-area { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); border-radius: 6px; color: var(--text-primary); font-size: 12px; padding: 10px 12px; min-height: 80px; font-family: var(--font); resize: vertical; }
-  .notes-area:focus { outline: none; border-color: var(--accent); }
-
-  .ticket-timeline { padding: 4px 0; }
-  .tt-item { display: flex; gap: 12px; padding: 4px 0; font-size: 12px; border-bottom: 1px solid var(--card-border); }
-  .tt-time { color: var(--text-muted); min-width: 60px; font-size: 11px; }
-  .tt-msg { color: var(--text-secondary); }
-
-  /* ============================================================
-     ── ATTACHMENT ──────────────────────────────────────────────
-     ============================================================ */
-  .att-upload-zone { border: 2px dashed var(--card-border); border-radius: 6px; padding: 20px; text-align: center; cursor: pointer; transition: border-color 0.2s; color: var(--text-muted); font-size: 12px; position: relative; }
-  .att-upload-zone:hover { border-color: var(--accent); }
-  .att-upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-  .att-grid { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 0; }
-  .att-item { position: relative; width: 80px; height: 80px; border: 1px solid var(--card-border); border-radius: 4px; overflow: hidden; }
-  .att-thumb { width: 100%; height: 100%; object-fit: cover; display: flex; align-items: center; justify-content: center; background: var(--card-bg); font-size: 24px; color: var(--text-muted); }
-  .att-remove { position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; border-radius: 50%; border: none; background: rgba(0,0,0,0.7); color: #fff; cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; }
-
-  /* ============================================================
      ── TABLE ────────────────────────────────────────────────────
      ============================================================ */
   .tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
@@ -227,13 +128,6 @@
   .empty-state .empty-desc { font-size: 13px; max-width: 400px; }
 
   /* ============================================================
-     ── SEARCH BAR ──────────────────────────────────────────────
-     ============================================================ */
-  .search-bar { display: flex; gap: 8px; margin: 12px 0; }
-  .search-bar input, .search-bar select { background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); color: var(--text-primary); padding: 6px 10px; border-radius: 4px; font-size: 12px; font-family: var(--font); flex: 1; }
-  .search-bar input:focus, .search-bar select:focus { outline: none; border-color: var(--accent); }
-
-  /* ============================================================
      ── FILTER PILLS ────────────────────────────────────────────
      ============================================================ */
   .filter-pill { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 11px; color: var(--text-secondary); background: var(--card-bg); border: 1px solid var(--card-border); cursor: pointer; margin-right: 4px; transition: all 0.15s; }
@@ -257,245 +151,29 @@
   .tl-msg { color: var(--text-secondary); }
 
   /* ============================================================
-     ── ZONE GROUPS ─────────────────────────────────────────────
+     ── STATS GRID ──────────────────────────────────────────────
      ============================================================ */
-  .cam-zone-group, .door-zone-group, .server-zone-group, .switch-zone-group, .software-zone-group, .assets-zone-group { margin-bottom: 12px; }
-  .cam-zone-header, .door-zone-header, .server-zone-header, .switch-zone-header, .software-zone-header, .assets-zone-header { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px; padding: 10px 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
-  .cam-zone-header:hover, .door-zone-header:hover, .server-zone-header:hover, .switch-zone-header:hover, .software-zone-header:hover, .assets-zone-header:hover { border-color: var(--accent); background: rgba(255,255,255,0.02); }
-  .cam-zone-body, .door-zone-body, .server-zone-body, .switch-zone-body, .software-zone-body, .assets-zone-body { padding: 8px 0; }
-  .cam-zone-body.hidden, .door-zone-body.hidden, .server-zone-body.hidden, .switch-zone-body.hidden, .software-zone-body.hidden, .assets-zone-body.hidden { display: none; }
-  .zone-name { font-weight: 500; color: var(--text-primary); }
-  .zone-client { font-size: 11px; color: var(--text-muted); margin-left: 8px; }
-  .zone-count { font-size: 11px; color: var(--text-muted); }
-  .zone-toggle { transition: transform 0.2s; margin-left: 6px; display: inline-block; }
-  .zone-toggle.collapsed { transform: rotate(-90deg); }
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+  .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 14px 16px; position: relative; overflow: hidden; transition: all 0.25s; }
+  .stat-card:hover { border-color: var(--accent); box-shadow: 0 12px 48px rgba(0,0,0,0.6), 0 0 30px var(--accent-glow); }
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--client-button-gradient); border-radius: 0 2px 2px 0; opacity: 0.8; }
+  .stat-label { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; font-weight: 700 !important; }
+  .stat-val { font-size: 26px; font-weight: 600; color: var(--stat-val-color); line-height: 1; }
+  .stat-note { font-size: 11px; margin-top: 4px; color: var(--text-secondary); }
+  .note-danger { color: var(--danger); }
+  .note-warn { color: var(--warning); }
+  .note-info { color: var(--info); }
+  .note-success { color: var(--success); }
 
-  /* ============================================================
-     ── PAGINATION ──────────────────────────────────────────────
-     ============================================================ */
-  .cam-pagination { display: flex; gap: 4px; padding: 12px 0; align-items: center; justify-content: center; }
-  .cam-pagination button { padding: 4px 10px; border: 1px solid var(--card-border); border-radius: 4px; background: var(--card-bg); color: var(--text-secondary); cursor: pointer; font-size: 12px; font-family: var(--font); }
-  .cam-pagination button:hover:not(:disabled) { border-color: var(--accent); color: var(--text-primary); }
-  .cam-pagination button:disabled { opacity: 0.3; cursor: not-allowed; }
-  .cam-pagination .page-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .cam-pagination .page-info { font-size: 11px; color: var(--text-muted); margin-left: 8px; }
-
-  .mono { font-family: monospace; font-size: 11px; }
-  .last-updated { font-size: 10px; color: var(--text-muted); }
-  .ip-link { color: var(--info); cursor: pointer; }
-  .ip-link:hover { text-decoration: underline; }
-
-  .comment-display { cursor: pointer; font-size: 11px; color: var(--text-secondary); }
-  .comment-display.placeholder { color: var(--text-muted); font-style: italic; }
-  .edit-comment-input { background: rgba(255,255,255,0.04); border: 1px solid var(--accent); color: var(--text-primary); padding: 2px 6px; border-radius: 3px; font-size: 11px; font-family: var(--font); }
-  .edit-comment-input:focus { outline: none; }
-
-  /* ============================================================
-     ── STORAGE BAR ─────────────────────────────────────────────
-     ============================================================ */
-  .storage-bar-wrap, .port-bar-wrap { width: 100%; height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; margin-top: 2px; }
-  .storage-bar-fill, .port-bar-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
-  .storage-bar-fill.green, .port-bar-fill.green { background: var(--success); }
-  .storage-bar-fill.yellow, .port-bar-fill.yellow { background: var(--warning); }
-  .storage-bar-fill.red, .port-bar-fill.red { background: var(--danger); }
-
-  .switch-uptime { font-size: 11px; color: var(--text-secondary); }
-  .switch-uptime.offline { color: var(--danger); }
-
-  /* ============================================================
-     ── OUTLOOK ─────────────────────────────────────────────────
-     ============================================================ */
-  .outlook-container { display: flex; height: 100%; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; overflow: hidden; min-height: 500px; }
-  .outlook-folder-pane { width: 180px; border-right: 1px solid var(--card-border); padding: 8px 0; flex-shrink: 0; overflow-y: auto; }
-  .outlook-folder-item { padding: 8px 16px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); transition: all 0.15s; }
-  .outlook-folder-item:hover { background: rgba(255,255,255,0.03); color: var(--text-primary); }
-  .outlook-folder-item.active { background: rgba(79,140,247,0.08); color: var(--text-primary); border-left: 2px solid var(--accent); }
-  .outlook-folder-item .folder-count { margin-left: auto; background: rgba(255,255,255,0.05); padding: 0 6px; border-radius: 8px; font-size: 10px; }
-  .outlook-folder-item .folder-count.unread { background: var(--accent); color: #fff; }
-  .outlook-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-  .outlook-toolbar { padding: 8px 12px; border-bottom: 1px solid var(--card-border); display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-  .toolbar-sep { width: 1px; height: 20px; background: var(--card-border); }
-  .outlook-search { padding: 8px 12px; border-bottom: 1px solid var(--card-border); }
-  .outlook-search input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); color: var(--text-primary); padding: 6px 10px; border-radius: 4px; font-size: 12px; font-family: var(--font); }
-  .outlook-search input:focus { outline: none; border-color: var(--accent); }
-  .outlook-content { display: flex; flex: 1; min-height: 0; }
-  .outlook-list-pane { width: 40%; border-right: 1px solid var(--card-border); overflow-y: auto; min-width: 200px; }
-  .outlook-list { padding: 4px 0; }
-  .outlook-reading-pane { flex: 1; padding: 16px; overflow-y: auto; }
-
-  .outlook-email { padding: 8px 12px; cursor: pointer; display: flex; align-items: flex-start; gap: 8px; border-bottom: 1px solid var(--card-border); transition: background 0.15s; }
-  .outlook-email:hover { background: rgba(255,255,255,0.02); }
-  .outlook-email.active { background: rgba(79,140,247,0.05); }
-  .outlook-email.unread .oe-subject { font-weight: 600; color: var(--text-primary); }
-  .oe-flag { cursor: pointer; font-size: 12px; opacity: 0.3; transition: opacity 0.2s; }
-  .oe-flag.flagged { opacity: 1; }
-  .oe-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #fff; flex-shrink: 0; background: var(--accent); }
-  .oe-avatar.kftl { background: #3b82f6; }
-  .oe-avatar.kwl { background: #8b5cf6; }
-  .oe-avatar.etech { background: #059669; }
-  .oe-content { flex: 1; min-width: 0; }
-  .oe-sender { font-size: 12px; font-weight: 500; color: var(--text-primary); }
-  .oe-subject { font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .oe-preview { font-size: 10px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .oe-meta { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-  .oe-date { font-size: 10px; color: var(--text-muted); white-space: nowrap; }
-
-  .outlook-reading-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); gap: 8px; }
-  .outlook-reading-empty i { font-size: 48px; opacity: 0.2; }
-  .outlook-reading-content { display: none; height: 100%; flex-direction: column; }
-  .outlook-reading-content.active { display: flex; }
-  .ore-header { border-bottom: 1px solid var(--card-border); padding-bottom: 12px; margin-bottom: 12px; }
-  .ore-subject { font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; }
-  .ore-sender-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-  .ore-sender-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #fff; flex-shrink: 0; background: var(--accent); }
-  .ore-sender-avatar.kftl { background: #3b82f6; }
-  .ore-sender-avatar.kwl { background: #8b5cf6; }
-  .ore-sender-avatar.etech { background: #059669; }
-  .ore-sender-info { flex: 1; }
-  .ore-sender-name { font-size: 13px; font-weight: 500; color: var(--text-primary); }
-  .ore-sender-meta { font-size: 11px; color: var(--text-muted); }
-  .ore-actions { display: flex; gap: 4px; flex-wrap: wrap; }
-  .ore-body { flex: 1; font-size: 13px; color: var(--text-secondary); line-height: 1.6; white-space: pre-wrap; padding: 8px 0; }
-  .ore-attachments { border-top: 1px solid var(--card-border); padding-top: 12px; margin-top: 12px; }
-  .ore-att-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
-  .att-chip { display: inline-block; padding: 4px 10px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 4px; font-size: 11px; color: var(--text-secondary); margin-right: 4px; }
-
-  .ore-compose-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; display: none; align-items: center; justify-content: center; }
-  .ore-compose-overlay.open { display: flex; }
-  .ore-compose-modal { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; width: 600px; max-width: 90%; max-height: 80vh; display: flex; flex-direction: column; }
-  .ore-compose-header { padding: 16px 20px; border-bottom: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; font-size: 15px; font-weight: 600; color: var(--text-primary); }
-  .ore-compose-body { padding: 16px 20px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-  .ore-compose-body input, .ore-compose-body textarea { background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); color: var(--text-primary); padding: 8px 12px; border-radius: 4px; font-size: 12px; font-family: var(--font); }
-  .ore-compose-body input:focus, .ore-compose-body textarea:focus { outline: none; border-color: var(--accent); }
-  .ore-compose-body textarea { min-height: 150px; resize: vertical; }
-  .ore-compose-footer { padding: 12px 20px; border-top: 1px solid var(--card-border); display: flex; justify-content: flex-end; gap: 8px; }
-
-  /* ============================================================
-     ── SR TOOLBAR ──────────────────────────────────────────────
-     ============================================================ */
-  .sr-toolbar { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
-  .sr-toolbar input, .sr-toolbar select { background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); color: var(--text-primary); padding: 6px 10px; border-radius: 4px; font-size: 12px; font-family: var(--font); }
-  .sr-toolbar input:focus, .sr-toolbar select:focus { outline: none; border-color: var(--accent); }
-
-  /* ============================================================
-     ── BULK BAR ────────────────────────────────────────────────
-     ============================================================ */
-  .bulk-bar { display: none; align-items: center; gap: 8px; padding: 8px 12px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px; margin-bottom: 12px; flex-wrap: wrap; }
-  .bulk-bar.active { display: flex; }
-  .bulk-bar select { background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); color: var(--text-primary); padding: 4px 8px; border-radius: 4px; font-size: 11px; font-family: var(--font); }
-
-  /* ============================================================
-     ── STATS CARDS ─────────────────────────────────────────────
-     ============================================================ */
-  .door-stats, .server-stats-grid, .switch-stats-grid, .assets-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
-  .door-stat-card, .server-stat-card, .switch-stat-card, .assets-stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px; padding: 10px 14px; }
-  .ds-label, .ss-label, .as-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
-  .ds-value, .ss-value, .as-value { font-size: 20px; font-weight: 600; color: var(--text-primary); margin: 4px 0; }
-  .ds-value.online { color: var(--success); }
-  .ds-value.offline { color: var(--danger); }
-  .ds-value.under-maintenance { color: var(--warning); }
-  .ss-value.green { color: var(--success); }
-  .ss-value.red { color: var(--danger); }
-  .ss-value.yellow { color: var(--warning); }
-  .ss-sub { font-size: 10px; color: var(--text-muted); }
-
-  /* ============================================================
-     ── FILE EXPLORER ───────────────────────────────────────────
-     ============================================================ */
-  .file-explorer { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px; overflow: hidden; margin-top: 8px; }
-  .file-item { display: grid; grid-template-columns: 30px 1fr 80px 80px 120px 100px 50px; padding: 8px 12px; border-bottom: 1px solid var(--card-border); align-items: center; cursor: pointer; transition: background 0.15s; font-size: 12px; color: var(--text-secondary); }
-  .file-item:hover { background: rgba(255,255,255,0.02); }
-  .file-item.folder { color: var(--text-primary); }
-  .file-item .file-icon { font-size: 16px; }
-  .file-item .file-name { color: var(--text-primary); }
-  .file-item .file-type, .file-item .file-size, .file-item .file-modified { color: var(--text-muted); font-size: 11px; }
-  .file-status .sync-status { font-size: 10px; }
-  .sync-status.synced { color: var(--success); }
-  .sync-status.pending { color: var(--warning); }
-  .sync-status.failed { color: var(--danger); }
-  .sync-status.processing { color: var(--info); }
-  .file-actions .pin-btn { background: none; border: none; cursor: pointer; font-size: 14px; opacity: 0.3; transition: opacity 0.2s; }
-  .file-actions .pin-btn:hover { opacity: 1; }
-  .file-actions .pin-btn.pinned { opacity: 1; }
-
-  .breadcrumb { display: flex; gap: 6px; padding: 8px 0; font-size: 12px; color: var(--text-secondary); flex-wrap: wrap; }
-  .breadcrumb .crumb { cursor: pointer; color: var(--text-secondary); }
-  .breadcrumb .crumb.current { color: var(--text-primary); }
-  .breadcrumb .crumb:hover { color: var(--text-primary); }
-  .breadcrumb .separator { color: var(--text-muted); }
-  .breadcrumb .back-btn { cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; margin-right: 8px; }
-  .breadcrumb .back-btn:hover { color: var(--text-primary); }
-  .folder-info { font-size: 11px; color: var(--text-muted); padding: 4px 0; }
-  .file-search-bar { display: flex; gap: 8px; margin: 8px 0; }
-  .file-search-bar input, .file-search-bar select { background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); color: var(--text-primary); padding: 6px 10px; border-radius: 4px; font-size: 12px; font-family: var(--font); }
-  .file-search-bar input:focus, .file-search-bar select:focus { outline: none; border-color: var(--accent); }
-  .file-search-bar input { flex: 1; }
-  .pinned-section { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 0 8px; }
-  .pinned-tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; font-size: 11px; color: var(--text-secondary); cursor: pointer; }
-  .pinned-tag:hover { border-color: var(--accent); }
-  .pinned-tag .unpin-btn { background: none; border: none; cursor: pointer; font-size: 10px; color: var(--text-muted); padding: 0 2px; }
-  .pinned-tag .unpin-btn:hover { color: var(--danger); }
-
-  /* ============================================================
-     ── CAMERA PREVIEW FULLSCREEN ──────────────────────────────
-     ============================================================ */
-  #cam-preview-large.fullscreen {
-    transition: all 0.3s ease;
-    background: rgba(0,0,0,0.95) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  #cam-preview-large.fullscreen img {
-    max-width: 100% !important;
-    max-height: 100% !important;
-    min-height: auto !important;
-    object-fit: contain !important;
-  }
-  #cam-preview-large.fullscreen .offline-msg {
-    font-size: 18px !important;
-  }
-  #cam-preview-large.fullscreen .offline-msg i {
-    font-size: 64px !important;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-  #camera-detail-modal .modal {
-    width: 800px !important;
-    max-width: 95% !important;
-  }
-  @media (max-width: 768px) {
-    #camera-detail-modal .modal { width: 98% !important; }
-    #cam-preview-large { min-height: 200px !important; }
-  }
-
-  /* ============================================================
-     ── AUDIT LOG ───────────────────────────────────────────────
-     ============================================================ */
-  .audit-filters { display: flex; gap: 8px; margin-bottom: 8px; }
-  .audit-filters select { background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); color: var(--text-primary); padding: 4px 8px; border-radius: 4px; font-size: 11px; font-family: var(--font); }
-  .audit-item { display: flex; gap: 12px; padding: 4px 0; font-size: 12px; border-bottom: 1px solid var(--card-border); color: var(--text-secondary); }
-  .audit-time { color: var(--text-muted); min-width: 50px; }
-  .audit-user { font-weight: 500; color: var(--text-primary); min-width: 80px; }
-  .audit-action .highlight { color: var(--text-primary); }
-
-  /* ============================================================
-     ── CLIENT ASSETS SUB-TABS ──────────────────────────────────
-     ============================================================ */
-  .asset-sub-tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 2px solid var(--card-border); }
-  .asset-sub-tab { padding: 8px 20px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; background: none; border-top: none; border-left: none; border-right: none; font-family: var(--font); }
-  .asset-sub-tab:hover { color: var(--text-primary); }
-  .asset-sub-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-  .asset-sub-content { display: none; }
-  .asset-sub-content.active { display: block; }
+  .panel { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 18px 20px; position: relative; }
+  .panel+.panel { margin-top: 14px; }
+  .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .panel-title { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
 
   /* ============================================================
      ── APP LAYOUT ──────────────────────────────────────────────
      ============================================================ */
   .app { display: flex; height: 100vh; width: 100%; max-width: 100%; background: var(--main-bg); overflow: hidden; display: none; }
-  .app.client-mode { background: #f5f5f5; }
 
   /* ============================================================
      ── SIDEBAR ──────────────────────────────────────────────────
@@ -519,20 +197,10 @@
   .nav-item.active { background: rgba(0,64,128,0.25); border-left: 2px solid var(--accent); color: #fff; }
   .nav-item i { font-size: 17px; flex-shrink: 0; width: 20px; text-align: center; }
   .nav-badge { margin-left: auto; background: var(--accent); color: #fff; font-size: 10px; border-radius: 10px; padding: 1px 7px; font-weight: 500; min-width: 20px; text-align: center; }
-  .nav-client-parent { font-weight: 500; display: flex; align-items: center; gap: 6px; cursor: pointer; }
-  .nav-client-parent .ti-chevron-right { transition: transform 0.2s; font-size: 12px; }
-  .nav-client-parent.open .ti-chevron-right { transform: rotate(90deg); }
-  .nav-sub-item { padding-left: 40px !important; font-size: 12px !important; }
-  .nav-sub-item.active { background: rgba(79,140,247,0.2); border-left: 2px solid var(--accent); color: #fff; }
-  .nav-zone-item { padding-left: 40px !important; font-size: 12px !important; }
-  .nav-zone-item.active { background: rgba(79,140,247,0.2); border-left: 2px solid var(--accent); color: #fff; }
   .nav-fixed-top { flex-shrink: 0; }
   .nav-scroll-bottom { flex: 1; overflow-y: auto; }
   .nav-scroll-bottom::-webkit-scrollbar { width: 3px; }
   .nav-scroll-bottom::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-  .nav-client-logo { width: 18px; height: 18px; border-radius: 3px; object-fit: contain; flex-shrink: 0; }
-  .client-dropdown { padding-left: 20px; display: none; }
-  .client-dropdown.open { display: block; }
   .sidebar-footer { padding: 14px 20px; border-top: 1px solid var(--sidebar-border); display: flex; align-items: center; gap: 10px; }
   .user-av { width: 32px; height: 32px; border-radius: 50%; background: var(--client-button-gradient); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; flex-shrink: 0; }
   .user-info { flex: 1; min-width: 0; }
@@ -548,23 +216,6 @@
   .page-client-logo { width: 20px; height: 20px; border-radius: 3px; object-fit: contain; vertical-align: middle; margin-right: 4px; }
   .topbar-right { display: flex; align-items: center; gap: 10px; position: relative; }
   .topbar-date { font-size: 12px; color: var(--text-secondary); }
-  .unsaved-indicator { display: none; align-items: center; gap: 6px; font-size: 11px; color: var(--warning); padding: 4px 10px; background: rgba(255,179,71,0.1); border-radius: 4px; border: 1px solid rgba(255,179,71,0.2); }
-  .unsaved-indicator.visible { display: inline-flex; }
-  .add-btn { width: 32px; height: 32px; border-radius: 50%; background: var(--client-button-gradient); color: #fff; border: none; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 2px 8px var(--accent-glow); }
-  .add-btn:hover { transform: scale(1.05); box-shadow: 0 4px 16px var(--accent-glow); }
-  .add-dropdown { display: none; position: absolute; right: 0; top: 100%; margin-top: 8px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; min-width: 200px; box-shadow: 0 12px 48px rgba(0,0,0,0.4); backdrop-filter: blur(20px); padding: 6px 0; z-index: 100; }
-  .add-dropdown.open { display: block; }
-  .add-dropdown .dd-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: var(--text-primary); cursor: pointer; font-size: 13px; transition: background 0.15s; border: none; background: none; width: 100%; font-family: var(--font); }
-  .add-dropdown .dd-item:hover { background: rgba(255,255,255,0.05); }
-  .add-dropdown .dd-item .dd-icon { width: 24px; text-align: center; }
-  .add-dropdown .dd-sep { height: 1px; background: var(--card-border); margin: 4px 12px; }
-
-  .theme-dropdown { display: none; position: absolute; right: 0; top: 100%; margin-top: 8px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 6px 0; min-width: 140px; z-index: 100; box-shadow: 0 12px 48px rgba(0,0,0,0.4); }
-  .theme-dropdown .theme-option { display: flex; align-items: center; gap: 10px; padding: 8px 16px; color: var(--text-primary); cursor: pointer; font-size: 13px; border: none; background: none; width: 100%; font-family: var(--font); }
-  .theme-dropdown .theme-option:hover { background: rgba(255,255,255,0.04); }
-  .theme-toggle-btn { padding: 6px 10px !important; border-radius: 6px !important; background: var(--card-bg) !important; border: 1px solid var(--card-border) !important; font-size: 14px !important; cursor: pointer !important; transition: all 0.2s !important; display: flex !important; align-items: center !important; gap: 4px !important; color: var(--text-primary) !important; }
-  .theme-toggle-btn:hover { background: rgba(255,255,255,0.06) !important; border-color: var(--accent) !important; }
-
   .content { flex: 1; overflow-y: auto; padding: 20px 24px; scroll-behavior: smooth; position: relative; }
   .content::-webkit-scrollbar { width: 6px; }
   .content::-webkit-scrollbar-track { background: transparent; }
@@ -573,40 +224,63 @@
   .tab.active { display: block; }
 
   /* ============================================================
-     ── STATS GRID ──────────────────────────────────────────────
+     ── CLIENT MODE OVERRIDES ──────────────────────────────────
      ============================================================ */
-  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
-  .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 14px 16px; position: relative; overflow: hidden; transition: all 0.25s; }
-  .stat-card:hover { border-color: var(--accent); box-shadow: 0 12px 48px rgba(0,0,0,0.6), 0 0 30px var(--accent-glow); }
-  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--client-button-gradient); border-radius: 0 2px 2px 0; opacity: 0.8; }
-  .stat-label { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; font-weight: 700 !important; }
-  .stat-val { font-size: 26px; font-weight: 600; color: var(--stat-val-color); line-height: 1; }
-  .stat-note { font-size: 11px; margin-top: 4px; color: var(--text-secondary); }
-  .note-danger { color: var(--danger); }
-  .note-warn { color: var(--warning); }
-  .note-info { color: var(--info); }
-  .note-success { color: var(--success); }
-
-  .panel { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 18px 20px; position: relative; }
-  .panel+.panel { margin-top: 14px; }
-  .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-  .panel-title { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
-
-  /* ============================================================
-     ── EMERGENCY BANNER ────────────────────────────────────────
-     ============================================================ */
-  .emergency-banner { background: rgba(255,0,0,0.08); border: 1px solid rgba(255,94,122,0.4); box-shadow: 0 0 40px rgba(255,0,0,0.1), inset 0 0 60px rgba(255,0,0,0.02); border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; display: none; align-items: center; gap: 12px; }
-  .emergency-banner.active { display: flex; }
-  .emergency-banner .em-icon { font-size: 20px; color: #ef4444; animation: pulse 1.5s infinite; }
-  .emergency-banner .em-text { flex: 1; }
-  .emergency-banner .em-title { font-size: 13px; font-weight: 600; color: #fca5a5; margin-bottom: 2px; }
-  .emergency-banner .em-detail { font-size: 11px; color: #f87171; }
-  .emergency-banner .em-time { font-size: 10px; color: rgba(248,113,113,0.6); }
+  .client-mode .sidebar {
+    background: #ffffff !important;
+    border-right: 1px solid rgba(0,0,0,0.08) !important;
+  }
+  .client-mode .sidebar .logo-img { content: url('logo-light.png'); }
+  .client-mode .topbar { background: #ffffff !important; border-bottom: 1px solid rgba(0,0,0,0.08) !important; }
+  .client-mode .topbar .page-title { color: #1a1a2e !important; }
+  .client-mode .topbar .topbar-date { color: rgba(0,0,0,0.6) !important; }
+  .client-mode .nav-item { color: rgba(0,0,0,0.6) !important; }
+  .client-mode .nav-item:hover { background: rgba(0,0,0,0.04) !important; color: #1a1a2e !important; }
+  .client-mode .nav-item.active { background: var(--client-primary) !important; color: #fff !important; }
+  .client-mode .nav-section { color: rgba(0,0,0,0.35) !important; }
+  .client-mode .stat-card { background: #ffffff !important; border: 1px solid rgba(0,0,0,0.08) !important; }
+  .client-mode .stat-card .stat-label { color: rgba(0,0,0,0.6) !important; }
+  .client-mode .stat-card .stat-val { color: #1a1a2e !important; }
+  .client-mode .panel { background: #ffffff !important; border: 1px solid rgba(0,0,0,0.08) !important; }
+  .client-mode .panel .panel-title { color: rgba(0,0,0,0.6) !important; }
+  .client-mode .sidebar-footer { border-top: 1px solid rgba(0,0,0,0.08) !important; }
+  .client-mode .sidebar-footer .user-name { color: #1a1a2e !important; }
+  .client-mode .sidebar-footer .user-role { color: rgba(0,0,0,0.35) !important; }
+  .client-mode .emergency-banner { background: rgba(255,0,0,0.05) !important; border-color: rgba(255,0,0,0.2) !important; }
 
   /* ============================================================
-     ── CAM STATUS FILTERS ──────────────────────────────────────
+     ── RESPONSIVE ──────────────────────────────────────────────
      ============================================================ */
-  .cam-status-filters { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0 12px; }
+  @media (max-width: 1024px) {
+    .app { height: 100vh; border-radius: 0; max-width: 100%; }
+    .sidebar { width: 56px; }
+    .sidebar .logo-area { padding: 12px 8px; }
+    .sidebar .logo-img { width: 32px; }
+    .sidebar .nav-item span, .sidebar .nav-badge, .sidebar .nav-section, .sidebar .user-info { display: none; }
+    .sidebar .nav-item { justify-content: center; padding: 10px 0; }
+    .sidebar .nav-item i { margin: 0; }
+    .sidebar .sidebar-footer { justify-content: center; padding: 10px; }
+    .sidebar .user-av { width: 28px; height: 28px; font-size: 10px; }
+    .collapse-toggle { display: none; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .stat-card { padding: 12px 14px !important; }
+    .stat-card .stat-val { font-size: 24px !important; }
+    .content { padding: 12px 10px; }
+    .topbar { padding: 0 12px; height: 48px; }
+    .page-title { font-size: 13px; }
+    .topbar-date { font-size: 10px; }
+    .tbl { font-size: 10px; }
+    .tbl th, .tbl td { padding: 5px 4px; }
+    .btn { font-size: 10px; padding: 5px 10px; }
+  }
+
+  @media (max-width: 600px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .topbar { height: 44px; padding: 0 8px; }
+    .page-title { font-size: 12px; }
+    .content { padding: 8px 6px; }
+    .panel { padding: 12px 10px; }
+  }
 
   /* ============================================================
      ── LOGIN ────────────────────────────────────────────────────
@@ -670,84 +344,21 @@
   .login-loading.active { display: flex; }
   .login-loading i { animation: spin 1s linear infinite; }
 
-  .logo-upload-preview { width: 60px; height: 60px; border-radius: 8px; object-fit: contain; border: 1px solid var(--card-border); margin-top: 4px; }
-
   /* ============================================================
-     ── CLIENT MODE OVERRIDES ──────────────────────────────────
+     ── CLIENT VIEW CONTAINER ──────────────────────────────────
      ============================================================ */
-  .client-mode .sidebar {
-    background: #ffffff !important;
-    border-right: 1px solid rgba(0,0,0,0.08) !important;
+  #client-view-container {
+    display: none;
+    height: 100vh;
+    overflow: hidden;
+    background: #0b0d15;
   }
-  .client-mode .sidebar .logo-img { content: url('logo-light.png'); }
-  .client-mode .topbar { background: #ffffff !important; border-bottom: 1px solid rgba(0,0,0,0.08) !important; }
-  .client-mode .topbar .page-title { color: #1a1a2e !important; }
-  .client-mode .topbar .topbar-date { color: rgba(0,0,0,0.6) !important; }
-  .client-mode .nav-item { color: rgba(0,0,0,0.6) !important; }
-  .client-mode .nav-item:hover { background: rgba(0,0,0,0.04) !important; color: #1a1a2e !important; }
-  .client-mode .nav-item.active { background: var(--client-primary) !important; color: #fff !important; }
-  .client-mode .nav-section { color: rgba(0,0,0,0.35) !important; }
-  .client-mode .stat-card { background: #ffffff !important; border: 1px solid rgba(0,0,0,0.08) !important; }
-  .client-mode .stat-card .stat-label { color: rgba(0,0,0,0.6) !important; }
-  .client-mode .stat-card .stat-val { color: #1a1a2e !important; }
-  .client-mode .panel { background: #ffffff !important; border: 1px solid rgba(0,0,0,0.08) !important; }
-  .client-mode .panel .panel-title { color: rgba(0,0,0,0.6) !important; }
-  .client-mode .sidebar-footer { border-top: 1px solid rgba(0,0,0,0.08) !important; }
-  .client-mode .sidebar-footer .user-name { color: #1a1a2e !important; }
-  .client-mode .sidebar-footer .user-role { color: rgba(0,0,0,0.35) !important; }
-
-  /* ============================================================
-     ── RESPONSIVE ──────────────────────────────────────────────
-     ============================================================ */
-  @media (max-width: 1024px) {
-    .app { height: 100vh; border-radius: 0; max-width: 100%; }
-    .sidebar { width: 56px; }
-    .sidebar .logo-area { padding: 12px 8px; }
-    .sidebar .logo-img { width: 32px; }
-    .sidebar .nav-item span, .sidebar .nav-badge, .sidebar .nav-section, .sidebar .user-info { display: none; }
-    .sidebar .nav-item { justify-content: center; padding: 10px 0; }
-    .sidebar .nav-item i { margin: 0; }
-    .sidebar .sidebar-footer { justify-content: center; padding: 10px; }
-    .sidebar .user-av { width: 28px; height: 28px; font-size: 10px; }
-    .collapse-toggle { display: none; }
-    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    .stat-card { padding: 12px 14px !important; }
-    .stat-card .stat-val { font-size: 24px !important; }
-    .content { padding: 12px 10px; }
-    .topbar { padding: 0 12px; height: 48px; }
-    .page-title { font-size: 13px; }
-    .topbar-date { font-size: 10px; }
-    .modal { width: 95% !important; max-width: 95% !important; padding: 16px; max-height: 90vh; }
-    .modal-grid { grid-template-columns: 1fr; }
-    .modal-close { top: 10px; right: 10px; font-size: 16px; }
-    .search-bar { flex-direction: column; }
-    .search-bar input, .search-bar select { width: 100%; }
-    .tbl { font-size: 10px; }
-    .tbl th, .tbl td { padding: 5px 4px; }
-    .btn { font-size: 10px; padding: 5px 10px; }
-    .outlook-folder-pane { width: 120px; }
-    .outlook-list-pane { width: 35%; }
-    .door-stats, .server-stats-grid, .switch-stats-grid, .assets-stats-grid { grid-template-columns: repeat(2, 1fr); }
-    .file-item { grid-template-columns: 30px 1fr 60px 60px; }
-    .file-item .file-modified { display: none; }
-  }
-
-  @media (max-width: 600px) {
-    .stats-grid { grid-template-columns: 1fr; }
-    .topbar { height: 44px; padding: 0 8px; }
-    .page-title { font-size: 12px; }
-    .content { padding: 8px 6px; }
-    .panel { padding: 12px 10px; }
-    .modal { padding: 12px; }
-    .modal-title { font-size: 13px; }
-    .outlook-container { flex-direction: column; min-height: 400px; }
-    .outlook-folder-pane { width: 100%; border-right: none; border-bottom: 1px solid var(--card-border); max-height: 120px; }
-    .outlook-content { flex-direction: column; }
-    .outlook-list-pane { width: 100%; border-right: none; border-bottom: 1px solid var(--card-border); max-height: 200px; }
-    .door-stats, .server-stats-grid, .switch-stats-grid, .assets-stats-grid { grid-template-columns: 1fr 1fr; }
-    .file-item { grid-template-columns: 30px 1fr; gap: 4px; }
-    .file-item .file-type, .file-item .file-size, .file-item .file-modified { display: none; }
-    .ore-actions { flex-wrap: wrap; }
+  #client-view-container .app {
+    display: flex !important;
+    height: 100vh;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
   }
 </style>
 </head>
@@ -755,9 +366,6 @@
 
   <!-- Toast -->
   <div class="toast-container" id="toast-container"></div>
-  
-  <!-- Context Menu -->
-  <div class="ctx-menu" id="ctx-menu"></div>
   
   <!-- Confirm -->
   <div class="confirm-overlay" id="confirm-overlay">
@@ -799,7 +407,9 @@
     </div>
   </div>
 
-  <!-- App -->
+  <!-- ============================================================
+       ── INTERNAL ADMIN APP ──────────────────────────────────────
+       ============================================================ -->
   <div class="app" id="app">
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
@@ -1312,11 +922,17 @@
     </div>
   </div>
 
-  <!-- Client View Container (hidden by default, shown for client logins) -->
-  <div id="client-view-container" style="display:none;height:100vh;overflow:hidden;">
-    <!-- Client View will be injected here dynamically -->
+  <!-- ============================================================
+       ── CLIENT VIEW CONTAINER ──────────────────────────────────
+       ============================================================ -->
+  <div id="client-view-container">
+    <!-- Client view will be injected here dynamically with full sidebar -->
   </div>
 
+  <!-- ============================================================
+       ── MODALS (shared between admin and client) ────────────────
+       ============================================================ -->
+  
   <!-- Camera Detail Modal -->
   <div class="modal-overlay" id="camera-detail-modal">
     <div class="modal wide">
@@ -1919,6 +1535,12 @@
   var confirmCallback = null;
   var debounceTimers = {};
   var sidebarCollapsed = localStorage.getItem('ccsm_sidebar') === '1';
+  var isClientMode = false;
+
+  // Client view data
+  var clientViewUser = null;
+  var clientViewData = null;
+  var clientViewCurrentTab = 'dashboard';
 
   // ============================================================
   // ── THEME FUNCTIONS ──────────────────────────────────────────
@@ -2252,223 +1874,6 @@
   }
 
   // ============================================================
-  // ── CLIENT VIEW ──────────────────────────────────────────────
-  // ============================================================
-
-  // Client data for client view
-  var CLIENTS_VIEW_DATA = {
-    'kftl': {
-      name: 'KFTL',
-      logo: 'logo-kftl.png',
-      color: '#e31b23',
-      secondary: '#b91c1c',
-      assets: {
-        cameras: [
-          { name: 'HM3 PTZ', zone: 'NORTH', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.19.1.150', install_date: '2024-01-15', history: [{ date: '2024-06-15', event: 'Firmware updated' }, { date: '2024-03-10', event: 'Lens cleaned' }] },
-          { name: 'HM11 PTZ', zone: 'NORTH', status: 'Defective', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.19.1.159', install_date: '2023-06-01', history: [{ date: '2024-05-20', event: 'Reported defective' }] },
-          { name: 'N25 PTZ', zone: 'NORTH', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM6', ip: '10.19.1.175', install_date: '2024-08-15', history: [{ date: '2024-09-01', event: 'Initial setup complete' }] },
-          { name: 'C1 PTZ', zone: 'SOUTH', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.19.1.140', install_date: '2023-11-01', history: [{ date: '2024-07-12', event: 'Replaced power supply' }] },
-          { name: 'W1', zone: 'WEST', status: 'No Power', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.19.1.180', install_date: '2024-03-15', history: [{ date: '2024-08-05', event: 'Power outage reported' }] },
-          { name: 'A7 PTZ', zone: 'EAST', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.19.1.130', install_date: '2024-05-20', history: [] }
-        ],
-        doors: [
-          { name: 'Main Entrance', zone: 'Security Office', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Shanice Vernon', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-01-01', history: [{ date: '2024-06-10', event: 'Routine maintenance' }] },
-          { name: '2nd Entrance', zone: 'SAL Duty Office', status: 'Offline', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Marvin Grant', doorSwing: 'Out', accessType: 'Read In + Push Out', antiPassback: 'No', controllerType: 'Integrated', install_date: '2024-02-15', history: [{ date: '2024-05-30', event: 'Offline alert' }] }
-        ],
-        servers: [
-          { name: 'J1013DDR', zone: 'Kingport', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', serial: 'J1013DDR', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5, LPR', install_date: '2024-01-15', history: [{ date: '2024-07-01', event: 'Firmware update' }] },
-          { name: 'J1013DDV', zone: 'Kingport', status: 'ONLINE', make: 'HP', model: 'ProLiant DL380', serial: 'J1013DDV', capacity: '6.11TB', used: '1.4TB', health: 'Good, Failed drive', apps: 'Ocularis DM6, Eyelock', install_date: '2023-06-01', history: [{ date: '2024-06-20', event: 'Drive replacement advised' }] }
-        ],
-        switches: [
-          { name: 'Main Entrance', zone: 'Security Office', status: 'Online', model: 'AXIS T8508', ip_address: '10.19.1.21', firmware: '6.54.2739', install_date: '2024-02-01', history: [{ date: '2024-07-15', event: 'Firmware updated' }] },
-          { name: '2nd entrance', zone: 'SAL Duty Office', status: 'Online', model: 'AXIS T8516', ip_address: '10.19.1.23', firmware: '6.54.2739', install_date: '2024-03-15', history: [] }
-        ]
-      },
-      srs: [
-        { id: 'SR-1847', subject: '8 Cameras Defective in NORTH Zone', priority: 'High', status: 'Open', date: 'Jun 15, 2026' },
-        { id: 'SR-1849', subject: 'Door 2nd Entrance Offline', priority: 'Medium', status: 'In Progress', date: 'Jun 16, 2026' }
-      ],
-      activity: [
-        { time: '08:30', msg: 'SR-1847 assigned to Shanice Vernon', type: 'info' },
-        { time: '09:15', msg: 'Camera HM11 PTZ marked as Defective', type: 'warning' },
-        { time: '10:00', msg: 'Server J1013DDR health check passed', type: 'success' },
-        { time: '11:45', msg: 'Door 2nd Entrance offline alert', type: 'urgent' }
-      ]
-    },
-    'kwl': {
-      name: 'KWL',
-      logo: 'logo-kwl.png',
-      color: '#1e3a8a',
-      secondary: '#1e40af',
-      assets: {
-        cameras: [
-          { name: 'TP-01', zone: 'Tinson Pen', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '172.16.19.91', install_date: '2024-04-01', history: [{ date: '2024-07-10', event: 'Camera recalibrated' }] },
-          { name: 'TP-02', zone: 'Tinson Pen', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '172.16.19.92', install_date: '2024-05-15', history: [] },
-          { name: 'WH-01', zone: 'Warehouse 1', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '172.16.20.10', install_date: '2024-03-01', history: [{ date: '2024-06-20', event: 'Lens cleaned' }] }
-        ],
-        doors: [
-          { name: 'Warehouse Main', zone: 'Warehouse 1', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Ackeem', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-02-01', history: [{ date: '2024-05-15', event: 'Battery replaced' }] }
-        ],
-        servers: [
-          { name: 'KWL-SRV-01', zone: 'Tinson Pen', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', serial: 'KWL-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-01-01', history: [] }
-        ],
-        switches: [
-          { name: 'TP Switch 1', zone: 'Tinson Pen', status: 'Online', model: 'AXIS T8508', ip_address: '10.19.1.21', firmware: '6.54.2739', install_date: '2024-02-15', history: [{ date: '2024-06-01', event: 'Port configuration updated' }] }
-        ]
-      },
-      srs: [
-        { id: 'SR-1848', subject: '5 Cameras Offline - Tinson Pen', priority: 'High', status: 'In Progress', date: 'Jun 15, 2026' }
-      ],
-      activity: [
-        { time: '07:00', msg: 'SR-1848 escalated to High priority', type: 'urgent' },
-        { time: '09:30', msg: 'Marvin dispatched to Tinson Pen', type: 'info' },
-        { time: '13:00', msg: 'Camera TP-01 back online', type: 'success' }
-      ]
-    },
-    'lasco': {
-      name: 'Lasco',
-      logo: 'logo-lasco.png',
-      color: '#ec4899',
-      secondary: '#db2777',
-      assets: {
-        cameras: [
-          { name: 'LP-01', zone: 'Liquid Plant', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.20.1.10', install_date: '2024-02-01', history: [{ date: '2024-06-10', event: 'Firmware updated' }] },
-          { name: 'LP-02', zone: 'Liquid Plant', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.20.1.11', install_date: '2024-03-15', history: [] },
-          { name: 'LDL-01', zone: 'LDL Warehouse', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.20.2.20', install_date: '2024-01-15', history: [{ date: '2024-05-20', event: 'Lens cleaned' }] },
-          { name: 'LML-01', zone: 'LML B Liquid Plant', status: 'Offline', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.20.3.30', install_date: '2023-12-01', history: [{ date: '2024-06-01', event: 'Power outage reported' }] }
-        ],
-        doors: [
-          { name: 'Main Gate', zone: 'Liquid Plant', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Shanice Vernon', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-01-15', history: [{ date: '2024-05-15', event: 'Routine maintenance' }] }
-        ],
-        servers: [
-          { name: 'LASCO-SRV-01', zone: 'Liquid Plant', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', serial: 'LASCO-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-01-01', history: [] }
-        ],
-        switches: [
-          { name: 'LP Switch 1', zone: 'Liquid Plant', status: 'Online', model: 'AXIS T8508', ip_address: '10.20.1.21', firmware: '6.54.2739', install_date: '2024-02-01', history: [{ date: '2024-06-01', event: 'Port configuration updated' }] }
-        ]
-      },
-      srs: [
-        { id: 'SR-1850', subject: 'Camera LML-01 Offline', priority: 'Medium', status: 'Open', date: 'Jun 17, 2026' }
-      ],
-      activity: [
-        { time: '06:30', msg: 'Camera LML-01 reported offline', type: 'urgent' },
-        { time: '08:00', msg: 'SR-1850 assigned to Marvin', type: 'info' }
-      ]
-    },
-    'nestle': {
-      name: 'Nestle',
-      logo: 'logo-nestle.png',
-      color: '#dc2626',
-      secondary: '#b91c1c',
-      assets: {
-        cameras: [
-          { name: 'NE-01', zone: 'Main Plant', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.21.1.10', install_date: '2024-03-01', history: [] },
-          { name: 'NE-02', zone: 'Main Plant', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.21.1.11', install_date: '2024-04-15', history: [{ date: '2024-07-01', event: 'Firmware updated' }] },
-          { name: 'NE-03', zone: 'Warehouse', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.21.2.20', install_date: '2024-02-15', history: [{ date: '2024-06-15', event: 'Lens cleaned' }] }
-        ],
-        doors: [
-          { name: 'Plant Main', zone: 'Main Plant', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Ackeem', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-03-01', history: [{ date: '2024-06-20', event: 'Battery replaced' }] }
-        ],
-        servers: [
-          { name: 'NESTLE-SRV-01', zone: 'Main Plant', status: 'ONLINE', make: 'HP', model: 'ProLiant DL380', serial: 'NESTLE-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-02-01', history: [] }
-        ],
-        switches: [
-          { name: 'NE Switch 1', zone: 'Main Plant', status: 'Online', model: 'AXIS T8516', ip_address: '10.21.1.21', firmware: '6.54.2739', install_date: '2024-03-15', history: [] }
-        ]
-      },
-      srs: [],
-      activity: [
-        { time: '09:00', msg: 'System health check passed', type: 'success' },
-        { time: '11:30', msg: 'Camera NE-03 lens cleaned', type: 'info' }
-      ]
-    },
-    'nids': {
-      name: 'NIDS',
-      logo: 'logo-nids.png',
-      color: '#059669',
-      secondary: '#d4af37',
-      assets: {
-        cameras: [
-          { name: 'NIDS-01', zone: 'Main Office', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.22.1.10', install_date: '2024-01-15', history: [{ date: '2024-06-01', event: 'Firmware updated' }] },
-          { name: 'NIDS-02', zone: 'Main Office', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.22.1.11', install_date: '2024-03-01', history: [] }
-        ],
-        doors: [
-          { name: 'Office Main', zone: 'Main Office', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Shavine', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-02-01', history: [{ date: '2024-05-20', event: 'Routine maintenance' }] }
-        ],
-        servers: [
-          { name: 'NIDS-SRV-01', zone: 'Main Office', status: 'ONLINE', make: 'Lenovo', model: 'ThinkSystem SR650', serial: 'NIDS-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-01-01', history: [] }
-        ],
-        switches: [
-          { name: 'NIDS Switch 1', zone: 'Main Office', status: 'Online', model: 'AXIS T8508', ip_address: '10.22.1.21', firmware: '6.54.2739', install_date: '2024-02-15', history: [] }
-        ]
-      },
-      srs: [],
-      activity: [
-        { time: '07:30', msg: 'System online - all assets operational', type: 'success' }
-      ]
-    },
-    'nutrien': {
-      name: 'Nutrien',
-      logo: 'logo-nutrien.png',
-      color: '#22c55e',
-      secondary: '#16a34a',
-      assets: {
-        cameras: [
-          { name: 'NU-01', zone: 'Main Plant', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.23.1.10', install_date: '2024-03-15', history: [{ date: '2024-06-30', event: 'Firmware updated' }] },
-          { name: 'NU-02', zone: 'Main Plant', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.23.1.11', install_date: '2024-04-01', history: [] },
-          { name: 'NU-03', zone: 'Warehouse', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.23.2.20', install_date: '2024-02-01', history: [{ date: '2024-06-20', event: 'Lens cleaned' }] }
-        ],
-        doors: [
-          { name: 'Plant Main', zone: 'Main Plant', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Marvin Grant', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-03-01', history: [{ date: '2024-06-10', event: 'Battery replaced' }] }
-        ],
-        servers: [
-          { name: 'NUTRIEN-SRV-01', zone: 'Main Plant', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', serial: 'NUTRIEN-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-02-15', history: [] }
-        ],
-        switches: [
-          { name: 'NU Switch 1', zone: 'Main Plant', status: 'Online', model: 'AXIS T8516', ip_address: '10.23.1.21', firmware: '6.54.2739', install_date: '2024-03-15', history: [{ date: '2024-06-01', event: 'Port configuration updated' }] }
-        ]
-      },
-      srs: [],
-      activity: [
-        { time: '08:00', msg: 'System health check - all nominal', type: 'success' },
-        { time: '10:30', msg: 'Camera NU-03 lens cleaned', type: 'info' }
-      ]
-    },
-    'fidelity': {
-      name: 'Fidelity Motors',
-      logo: 'logo-fidelity.png',
-      color: '#b91c1c',
-      secondary: '#7f1d1d',
-      assets: {
-        cameras: [
-          { name: 'FM-01', zone: 'Showroom', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.24.1.10', install_date: '2024-03-15', history: [{ date: '2024-06-20', event: 'Firmware updated' }] },
-          { name: 'FM-02', zone: 'Showroom', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.24.1.11', install_date: '2024-04-01', history: [] },
-          { name: 'FM-03', zone: 'Service Center', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.24.2.20', install_date: '2024-02-15', history: [{ date: '2024-06-10', event: 'Lens cleaned' }] },
-          { name: 'FM-04', zone: 'Service Center', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.24.2.21', install_date: '2024-05-01', history: [] }
-        ],
-        doors: [
-          { name: 'Showroom Main', zone: 'Showroom', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Shanice Vernon', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-03-01', history: [{ date: '2024-06-15', event: 'Routine maintenance' }] },
-          { name: 'Service Center Main', zone: 'Service Center', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Marvin Grant', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-04-01', history: [] }
-        ],
-        servers: [
-          { name: 'FIDELITY-SRV-01', zone: 'Showroom', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', serial: 'FIDELITY-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-02-01', history: [] }
-        ],
-        switches: [
-          { name: 'FM Switch 1', zone: 'Showroom', status: 'Online', model: 'AXIS T8508', ip_address: '10.24.1.21', firmware: '6.54.2739', install_date: '2024-03-15', history: [{ date: '2024-06-01', event: 'Port configuration updated' }] }
-        ]
-      },
-      srs: [],
-      activity: [
-        { time: '08:30', msg: 'All systems online', type: 'success' },
-        { time: '10:00', msg: 'Camera FM-04 installed', type: 'info' }
-      ]
-    }
-  };
-
-  var clientViewUser = null;
-  var clientViewData = null;
-
-  // ============================================================
   // ── ADD DROPDOWN FUNCTIONS ──────────────────────────────────
   // ============================================================
 
@@ -2791,9 +2196,10 @@
       if (lowerUser === client && lowerPass === clientCredentials[client].password) {
         // Client login - show client view
         clientViewUser = clientCredentials[client];
-        clientViewData = CLIENTS_VIEW_DATA[client];
+        var clientKey = client;
+        var clientDataFull = getClientViewData(clientKey);
         
-        if (!clientViewData) {
+        if (!clientDataFull) {
           errorDiv.textContent = 'Client data not found';
           errorDiv.style.display = 'block';
           loadingDiv.classList.remove('active');
@@ -2805,9 +2211,9 @@
         document.getElementById('client-view-container').style.display = 'block';
         
         // Initialize client view
-        initClientView(clientViewData, clientViewUser);
+        initClientView(clientDataFull, clientViewUser);
         
-        toast('Welcome, ' + clientViewData.name + '!', 'success');
+        toast('Welcome, ' + clientDataFull.name + '!', 'success');
         loadingDiv.classList.remove('active');
         return;
       }
@@ -2888,6 +2294,7 @@
     isAdmin = true;
     clientViewUser = null;
     clientViewData = null;
+    isClientMode = false;
     document.getElementById('app').style.display = 'none';
     document.getElementById('client-view-container').style.display = 'none';
     showLogin();
@@ -2932,13 +2339,233 @@
   }
 
   // ============================================================
-  // ── CLIENT VIEW INIT ─────────────────────────────────────────
+  // ── CLIENT VIEW DATA ─────────────────────────────────────────
+  // ============================================================
+
+  function getClientViewData(clientKey) {
+    var data = {
+      'kftl': {
+        name: 'KFTL',
+        logo: 'logo-kftl.png',
+        color: '#e31b23',
+        secondary: '#b91c1c',
+        assets: {
+          cameras: [
+            { name: 'HM3 PTZ', zone: 'NORTH', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.19.1.150', install_date: '2024-01-15', history: [{ date: '2024-06-15', event: 'Firmware updated' }, { date: '2024-03-10', event: 'Lens cleaned' }] },
+            { name: 'HM11 PTZ', zone: 'NORTH', status: 'Defective', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.19.1.159', install_date: '2023-06-01', history: [{ date: '2024-05-20', event: 'Reported defective' }] },
+            { name: 'N25 PTZ', zone: 'NORTH', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM6', ip: '10.19.1.175', install_date: '2024-08-15', history: [{ date: '2024-09-01', event: 'Initial setup complete' }] },
+            { name: 'C1 PTZ', zone: 'SOUTH', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.19.1.140', install_date: '2023-11-01', history: [{ date: '2024-07-12', event: 'Replaced power supply' }] },
+            { name: 'W1', zone: 'WEST', status: 'No Power', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.19.1.180', install_date: '2024-03-15', history: [{ date: '2024-08-05', event: 'Power outage reported' }] },
+            { name: 'A7 PTZ', zone: 'EAST', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.19.1.130', install_date: '2024-05-20', history: [] }
+          ],
+          doors: [
+            { name: 'Main Entrance', zone: 'Security Office', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Shanice Vernon', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-01-01', history: [{ date: '2024-06-10', event: 'Routine maintenance' }] },
+            { name: '2nd Entrance', zone: 'SAL Duty Office', status: 'Offline', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Marvin Grant', doorSwing: 'Out', accessType: 'Read In + Push Out', antiPassback: 'No', controllerType: 'Integrated', install_date: '2024-02-15', history: [{ date: '2024-05-30', event: 'Offline alert' }] }
+          ],
+          servers: [
+            { name: 'J1013DDR', zone: 'Kingport', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', serial: 'J1013DDR', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5, LPR', install_date: '2024-01-15', history: [{ date: '2024-07-01', event: 'Firmware update' }] },
+            { name: 'J1013DDV', zone: 'Kingport', status: 'ONLINE', make: 'HP', model: 'ProLiant DL380', serial: 'J1013DDV', capacity: '6.11TB', used: '1.4TB', health: 'Good, Failed drive', apps: 'Ocularis DM6, Eyelock', install_date: '2023-06-01', history: [{ date: '2024-06-20', event: 'Drive replacement advised' }] }
+          ],
+          switches: [
+            { name: 'Main Entrance', zone: 'Security Office', status: 'Online', model: 'AXIS T8508', ip_address: '10.19.1.21', firmware: '6.54.2739', install_date: '2024-02-01', history: [{ date: '2024-07-15', event: 'Firmware updated' }] },
+            { name: '2nd entrance', zone: 'SAL Duty Office', status: 'Online', model: 'AXIS T8516', ip_address: '10.19.1.23', firmware: '6.54.2739', install_date: '2024-03-15', history: [] }
+          ]
+        },
+        srs: [
+          { id: 'SR-1847', subject: '8 Cameras Defective in NORTH Zone', priority: 'High', status: 'Open', date: 'Jun 15, 2026' },
+          { id: 'SR-1849', subject: 'Door 2nd Entrance Offline', priority: 'Medium', status: 'In Progress', date: 'Jun 16, 2026' }
+        ],
+        activity: [
+          { time: '08:30', msg: 'SR-1847 assigned to Shanice Vernon', type: 'info' },
+          { time: '09:15', msg: 'Camera HM11 PTZ marked as Defective', type: 'warning' },
+          { time: '10:00', msg: 'Server J1013DDR health check passed', type: 'success' },
+          { time: '11:45', msg: 'Door 2nd Entrance offline alert', type: 'urgent' }
+        ]
+      },
+      'kwl': {
+        name: 'KWL',
+        logo: 'logo-kwl.png',
+        color: '#1e3a8a',
+        secondary: '#1e40af',
+        assets: {
+          cameras: [
+            { name: 'TP-01', zone: 'Tinson Pen', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '172.16.19.91', install_date: '2024-04-01', history: [{ date: '2024-07-10', event: 'Camera recalibrated' }] },
+            { name: 'TP-02', zone: 'Tinson Pen', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '172.16.19.92', install_date: '2024-05-15', history: [] },
+            { name: 'WH-01', zone: 'Warehouse 1', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '172.16.20.10', install_date: '2024-03-01', history: [{ date: '2024-06-20', event: 'Lens cleaned' }] }
+          ],
+          doors: [
+            { name: 'Warehouse Main', zone: 'Warehouse 1', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Ackeem', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-02-01', history: [{ date: '2024-05-15', event: 'Battery replaced' }] }
+          ],
+          servers: [
+            { name: 'KWL-SRV-01', zone: 'Tinson Pen', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', serial: 'KWL-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-01-01', history: [] }
+          ],
+          switches: [
+            { name: 'TP Switch 1', zone: 'Tinson Pen', status: 'Online', model: 'AXIS T8508', ip_address: '10.19.1.21', firmware: '6.54.2739', install_date: '2024-02-15', history: [{ date: '2024-06-01', event: 'Port configuration updated' }] }
+          ]
+        },
+        srs: [
+          { id: 'SR-1848', subject: '5 Cameras Offline - Tinson Pen', priority: 'High', status: 'In Progress', date: 'Jun 15, 2026' }
+        ],
+        activity: [
+          { time: '07:00', msg: 'SR-1848 escalated to High priority', type: 'urgent' },
+          { time: '09:30', msg: 'Marvin dispatched to Tinson Pen', type: 'info' },
+          { time: '13:00', msg: 'Camera TP-01 back online', type: 'success' }
+        ]
+      },
+      'lasco': {
+        name: 'Lasco',
+        logo: 'logo-lasco.png',
+        color: '#ec4899',
+        secondary: '#db2777',
+        assets: {
+          cameras: [
+            { name: 'LP-01', zone: 'Liquid Plant', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.20.1.10', install_date: '2024-02-01', history: [{ date: '2024-06-10', event: 'Firmware updated' }] },
+            { name: 'LP-02', zone: 'Liquid Plant', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.20.1.11', install_date: '2024-03-15', history: [] },
+            { name: 'LDL-01', zone: 'LDL Warehouse', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.20.2.20', install_date: '2024-01-15', history: [{ date: '2024-05-20', event: 'Lens cleaned' }] },
+            { name: 'LML-01', zone: 'LML B Liquid Plant', status: 'Offline', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.20.3.30', install_date: '2023-12-01', history: [{ date: '2024-06-01', event: 'Power outage reported' }] }
+          ],
+          doors: [
+            { name: 'Main Gate', zone: 'Liquid Plant', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Shanice Vernon', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-01-15', history: [{ date: '2024-05-15', event: 'Routine maintenance' }] }
+          ],
+          servers: [
+            { name: 'LASCO-SRV-01', zone: 'Liquid Plant', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', serial: 'LASCO-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-01-01', history: [] }
+          ],
+          switches: [
+            { name: 'LP Switch 1', zone: 'Liquid Plant', status: 'Online', model: 'AXIS T8508', ip_address: '10.20.1.21', firmware: '6.54.2739', install_date: '2024-02-01', history: [{ date: '2024-06-01', event: 'Port configuration updated' }] }
+          ]
+        },
+        srs: [
+          { id: 'SR-1850', subject: 'Camera LML-01 Offline', priority: 'Medium', status: 'Open', date: 'Jun 17, 2026' }
+        ],
+        activity: [
+          { time: '06:30', msg: 'Camera LML-01 reported offline', type: 'urgent' },
+          { time: '08:00', msg: 'SR-1850 assigned to Marvin', type: 'info' }
+        ]
+      },
+      'nestle': {
+        name: 'Nestle',
+        logo: 'logo-nestle.png',
+        color: '#dc2626',
+        secondary: '#b91c1c',
+        assets: {
+          cameras: [
+            { name: 'NE-01', zone: 'Main Plant', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.21.1.10', install_date: '2024-03-01', history: [] },
+            { name: 'NE-02', zone: 'Main Plant', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.21.1.11', install_date: '2024-04-15', history: [{ date: '2024-07-01', event: 'Firmware updated' }] },
+            { name: 'NE-03', zone: 'Warehouse', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.21.2.20', install_date: '2024-02-15', history: [{ date: '2024-06-15', event: 'Lens cleaned' }] }
+          ],
+          doors: [
+            { name: 'Plant Main', zone: 'Main Plant', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Ackeem', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-03-01', history: [{ date: '2024-06-20', event: 'Battery replaced' }] }
+          ],
+          servers: [
+            { name: 'NESTLE-SRV-01', zone: 'Main Plant', status: 'ONLINE', make: 'HP', model: 'ProLiant DL380', serial: 'NESTLE-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-02-01', history: [] }
+          ],
+          switches: [
+            { name: 'NE Switch 1', zone: 'Main Plant', status: 'Online', model: 'AXIS T8516', ip_address: '10.21.1.21', firmware: '6.54.2739', install_date: '2024-03-15', history: [] }
+          ]
+        },
+        srs: [],
+        activity: [
+          { time: '09:00', msg: 'System health check passed', type: 'success' },
+          { time: '11:30', msg: 'Camera NE-03 lens cleaned', type: 'info' }
+        ]
+      },
+      'nids': {
+        name: 'NIDS',
+        logo: 'logo-nids.png',
+        color: '#059669',
+        secondary: '#d4af37',
+        assets: {
+          cameras: [
+            { name: 'NIDS-01', zone: 'Main Office', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.22.1.10', install_date: '2024-01-15', history: [{ date: '2024-06-01', event: 'Firmware updated' }] },
+            { name: 'NIDS-02', zone: 'Main Office', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.22.1.11', install_date: '2024-03-01', history: [] }
+          ],
+          doors: [
+            { name: 'Office Main', zone: 'Main Office', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Shavine', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-02-01', history: [{ date: '2024-05-20', event: 'Routine maintenance' }] }
+          ],
+          servers: [
+            { name: 'NIDS-SRV-01', zone: 'Main Office', status: 'ONLINE', make: 'Lenovo', model: 'ThinkSystem SR650', serial: 'NIDS-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-01-01', history: [] }
+          ],
+          switches: [
+            { name: 'NIDS Switch 1', zone: 'Main Office', status: 'Online', model: 'AXIS T8508', ip_address: '10.22.1.21', firmware: '6.54.2739', install_date: '2024-02-15', history: [] }
+          ]
+        },
+        srs: [],
+        activity: [
+          { time: '07:30', msg: 'System online - all assets operational', type: 'success' }
+        ]
+      },
+      'nutrien': {
+        name: 'Nutrien',
+        logo: 'logo-nutrien.png',
+        color: '#22c55e',
+        secondary: '#16a34a',
+        assets: {
+          cameras: [
+            { name: 'NU-01', zone: 'Main Plant', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.23.1.10', install_date: '2024-03-15', history: [{ date: '2024-06-30', event: 'Firmware updated' }] },
+            { name: 'NU-02', zone: 'Main Plant', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.23.1.11', install_date: '2024-04-01', history: [] },
+            { name: 'NU-03', zone: 'Warehouse', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.23.2.20', install_date: '2024-02-01', history: [{ date: '2024-06-20', event: 'Lens cleaned' }] }
+          ],
+          doors: [
+            { name: 'Plant Main', zone: 'Main Plant', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Marvin Grant', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-03-01', history: [{ date: '2024-06-10', event: 'Battery replaced' }] }
+          ],
+          servers: [
+            { name: 'NUTRIEN-SRV-01', zone: 'Main Plant', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', serial: 'NUTRIEN-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-02-15', history: [] }
+          ],
+          switches: [
+            { name: 'NU Switch 1', zone: 'Main Plant', status: 'Online', model: 'AXIS T8516', ip_address: '10.23.1.21', firmware: '6.54.2739', install_date: '2024-03-15', history: [{ date: '2024-06-01', event: 'Port configuration updated' }] }
+          ]
+        },
+        srs: [],
+        activity: [
+          { time: '08:00', msg: 'System health check - all nominal', type: 'success' },
+          { time: '10:30', msg: 'Camera NU-03 lens cleaned', type: 'info' }
+        ]
+      },
+      'fidelity': {
+        name: 'Fidelity Motors',
+        logo: 'logo-fidelity.png',
+        color: '#b91c1c',
+        secondary: '#7f1d1d',
+        assets: {
+          cameras: [
+            { name: 'FM-01', zone: 'Showroom', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.24.1.10', install_date: '2024-03-15', history: [{ date: '2024-06-20', event: 'Firmware updated' }] },
+            { name: 'FM-02', zone: 'Showroom', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.24.1.11', install_date: '2024-04-01', history: [] },
+            { name: 'FM-03', zone: 'Service Center', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.24.2.20', install_date: '2024-02-15', history: [{ date: '2024-06-10', event: 'Lens cleaned' }] },
+            { name: 'FM-04', zone: 'Service Center', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.24.2.21', install_date: '2024-05-01', history: [] }
+          ],
+          doors: [
+            { name: 'Showroom Main', zone: 'Showroom', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Shanice Vernon', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-03-01', history: [{ date: '2024-06-15', event: 'Routine maintenance' }] },
+            { name: 'Service Center Main', zone: 'Service Center', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Marvin Grant', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-04-01', history: [] }
+          ],
+          servers: [
+            { name: 'FIDELITY-SRV-01', zone: 'Showroom', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', serial: 'FIDELITY-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-02-01', history: [] }
+          ],
+          switches: [
+            { name: 'FM Switch 1', zone: 'Showroom', status: 'Online', model: 'AXIS T8508', ip_address: '10.24.1.21', firmware: '6.54.2739', install_date: '2024-03-15', history: [{ date: '2024-06-01', event: 'Port configuration updated' }] }
+          ]
+        },
+        srs: [],
+        activity: [
+          { time: '08:30', msg: 'All systems online', type: 'success' },
+          { time: '10:00', msg: 'Camera FM-04 installed', type: 'info' }
+        ]
+      }
+    };
+    return data[clientKey] || null;
+  }
+
+  // ============================================================
+  // ── CLIENT VIEW BUILD ────────────────────────────────────────
   // ============================================================
 
   function initClientView(data, user) {
     if (!data) return;
     
-    // Apply client brand colors
+    clientViewData = data;
+    clientViewUser = user;
+    isClientMode = true;
+    
+    // Apply client brand colors to the container
     var primaryColor = data.color || '#e31b23';
     var secondaryColor = data.secondary || '#8b0000';
     document.documentElement.style.setProperty('--client-primary', primaryColor);
@@ -2946,11 +2573,7 @@
     document.documentElement.style.setProperty('--client-gradient', 'linear-gradient(135deg, ' + primaryColor + ', ' + secondaryColor + ')');
     document.documentElement.style.setProperty('--client-glow', primaryColor + '44');
     
-    // Apply client mode class
-    document.querySelector('.app').classList.add('client-mode');
-    document.getElementById('client-view-container').classList.add('client-mode');
-    
-    // Build client view HTML
+    // Build the client view with full sidebar
     buildClientView(data, user);
   }
 
@@ -2958,11 +2581,11 @@
     var container = document.getElementById('client-view-container');
     if (!container) return;
     
-    // Get greeting
-    var hour = new Date().getHours();
-    var greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
+    var clientName = data.name || 'Client';
+    var clientLogo = data.logo || 'logo.png';
+    var primaryColor = data.color || '#e31b23';
     
-    // Get health
+    // Get all assets for stats
     var allAssets = [];
     if (data.assets) {
       Object.values(data.assets).forEach(function(arr) {
@@ -2973,167 +2596,614 @@
     }
     var total = allAssets.length;
     var online = allAssets.filter(function(a) { return a.status === 'Online' || a.status === 'ONLINE'; }).length;
+    var offline = total - online;
     var health = total > 0 ? Math.round((online / total) * 100) : 100;
+    var openSRs = (data.srs || []).filter(function(s) { return s.status !== 'Resolved'; }).length;
     
     var healthMessage = health >= 100 ? 'All systems nominal' :
                         health >= 60 ? 'Your security systems are near peak operational level' :
                         health >= 30 ? 'Your security systems are partially operational' :
                         'Your security systems are being prioritized';
     
-    var clientLogo = data.logo || 'logo.png';
-    var clientName = data.name || 'Client';
+    var greeting = getClientGreeting();
     
-    // Build the client view HTML
+    // Build the HTML
     container.innerHTML = `
-      <div style="display:flex;flex-direction:column;height:100vh;background:#f5f5f5;font-family:'Inter',sans-serif;">
-        <!-- Top Bar -->
-        <header style="background:#ffffff;border-bottom:1px solid rgba(0,0,0,0.08);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
-          <div style="display:flex;align-items:center;gap:14px;">
-            <img src="${clientLogo}" alt="${clientName}" style="height:34px;width:auto;border-radius:4px;" onerror="this.src='logo.png'">
-            <span style="font-size:17px;font-weight:700;color:#1a1a2e;letter-spacing:-0.02em;">${clientName} <span style="font-weight:400;font-size:10px;color:#999;text-transform:uppercase;letter-spacing:0.06em;margin-left:6px;">· Client Portal</span></span>
+      <div class="app client-mode" id="client-app-instance">
+        <!-- Sidebar -->
+        <div class="sidebar" id="client-sidebar-instance">
+          <div class="logo-area">
+            <img class="logo-img" src="${clientLogo}" alt="${clientName}" onerror="this.src='logo.png'">
           </div>
-          <div style="display:flex;align-items:center;gap:12px;">
-            <img src="logo-light.png" alt="ETech" style="height:34px;width:auto;opacity:1;" onerror="this.src='logo.png'">
-            <div style="display:flex;align-items:center;gap:10px;padding:4px 14px 4px 4px;border-radius:8px;border:1px solid rgba(0,0,0,0.08);background:#f8f9fa;">
-              <div style="width:30px;height:30px;border-radius:6px;background:linear-gradient(135deg, ${data.color}, ${data.secondary});display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;">${user.client.toUpperCase().slice(0,2)}</div>
+          <nav class="nav" id="client-nav-instance">
+            <div class="nav-fixed-top">
+              <div class="nav-section">Main</div>
+              <div class="nav-item active" data-tab="dashboard" onclick="clientSwitchTab('dashboard')">
+                <i class="ti ti-layout-dashboard"></i> <span>Dashboard</span>
+              </div>
+              <div class="nav-item" data-tab="cameras" onclick="clientSwitchTab('cameras')">
+                <i class="ti ti-video"></i> <span>Cameras</span>
+                <span class="nav-badge" id="client-cam-badge">${(data.assets && data.assets.cameras) ? data.assets.cameras.length : 0}</span>
+              </div>
+              <div class="nav-item" data-tab="doors" onclick="clientSwitchTab('doors')">
+                <i class="ti ti-door"></i> <span>Access Control</span>
+                <span class="nav-badge" id="client-door-badge">${(data.assets && data.assets.doors) ? data.assets.doors.length : 0}</span>
+              </div>
+              <div class="nav-item" data-tab="servers" onclick="clientSwitchTab('servers')">
+                <i class="ti ti-server"></i> <span>Servers</span>
+                <span class="nav-badge" id="client-server-badge">${(data.assets && data.assets.servers) ? data.assets.servers.length : 0}</span>
+              </div>
+              <div class="nav-item" data-tab="switches" onclick="clientSwitchTab('switches')">
+                <i class="ti ti-router"></i> <span>Switches</span>
+                <span class="nav-badge" id="client-switch-badge">${(data.assets && data.assets.switches) ? data.assets.switches.length : 0}</span>
+              </div>
+              <div class="nav-item" data-tab="service-requests" onclick="clientSwitchTab('service-requests')">
+                <i class="ti ti-clipboard-list"></i> <span>Service Requests</span>
+                <span class="nav-badge" id="client-sr-badge">${openSRs}</span>
+              </div>
             </div>
-            <button onclick="logout()" style="padding:6px 14px;border-radius:6px;border:1px solid rgba(0,0,0,0.08);background:transparent;color:#999;cursor:pointer;font-size:11px;font-family:Inter,sans-serif;transition:all 0.2s;" onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444';" onmouseout="this.style.borderColor='rgba(0,0,0,0.08)';this.style.color='#999';">Logout</button>
+            <div class="nav-scroll-bottom">
+              <div class="nav-section">Support</div>
+              <div class="nav-item" data-tab="create-sr" onclick="clientSwitchTab('create-sr')">
+                <i class="ti ti-plus"></i> <span>New Request</span>
+              </div>
+              <div class="nav-item" data-tab="contact" onclick="clientSwitchTab('contact')">
+                <i class="ti ti-headset"></i> <span>Contact</span>
+              </div>
+            </div>
+          </nav>
+          <div class="sidebar-footer">
+            <div class="user-av" id="client-user-av">${(user && user.client) ? user.client.toUpperCase().slice(0,2) : 'CL'}</div>
+            <div class="user-info">
+              <div class="user-name">${(user && user.client) ? user.client.toUpperCase() : 'Client'}</div>
+              <div class="user-role">Client User</div>
+            </div>
+            <button class="btn btn-xs" onclick="logout()" style="color:var(--text-muted);"><i class="ti ti-logout"></i></button>
           </div>
-        </header>
-        
-        <!-- Content -->
-        <div style="flex:1;overflow-y:auto;padding:28px 32px;background:#f5f5f5;">
-          <!-- Welcome Banner -->
-          <div style="background:linear-gradient(135deg, ${data.color}, ${data.secondary});border-radius:12px;padding:32px 36px;margin-bottom:24px;position:relative;overflow:hidden;box-shadow:0 8px 32px ${data.color}44;">
-            <div style="position:relative;z-index:1;">
-              <div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:500;margin-bottom:2px;letter-spacing:0.04em;">${greeting}</div>
-              <h1 style="font-size:28px;font-weight:800;color:#fff;letter-spacing:-0.02em;margin-bottom:4px;">24/7 Support, ${clientName}</h1>
-              <div style="font-size:14px;color:rgba(255,255,255,0.8);font-weight:500;">${healthMessage}</div>
-              <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:10px;">
-                <div style="display:inline-flex;align-items:center;gap:12px;background:rgba(255,255,255,0.12);padding:6px 18px 6px 14px;border-radius:20px;backdrop-filter:blur(4px);">
-                  <span style="font-size:20px;font-weight:700;color:#fff;">${health}%</span>
-                  <span style="font-size:12px;color:rgba(255,255,255,0.7);font-weight:500;">System Health</span>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main">
+          <!-- Topbar -->
+          <div class="topbar">
+            <span class="page-title" id="client-page-title">Dashboard</span>
+            <div class="topbar-right">
+              <span class="topbar-date" id="client-topbar-date">${fullDateTime()}</span>
+              <button class="btn btn-xs" onclick="logout()" style="color:var(--text-muted);"><i class="ti ti-logout"></i> Logout</button>
+            </div>
+          </div>
+
+          <!-- Content -->
+          <div class="content" id="client-main-content">
+            <!-- Dashboard Tab -->
+            <div class="tab active" id="client-tab-dashboard">
+              <div class="welcome-banner" style="background:var(--client-gradient);border-radius:12px;padding:28px 32px;margin-bottom:24px;position:relative;overflow:hidden;box-shadow:0 8px 32px var(--client-glow);">
+                <div style="position:relative;z-index:1;">
+                  <div class="greeting" style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:500;margin-bottom:2px;letter-spacing:0.04em;">${greeting}</div>
+                  <h1 style="font-size:26px;font-weight:700;color:#fff;letter-spacing:-0.02em;margin-bottom:4px;">24/7 Support, ${clientName}</h1>
+                  <div style="font-size:14px;color:rgba(255,255,255,0.8);font-weight:500;">${healthMessage}</div>
+                  <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:10px;">
+                    <div style="display:inline-flex;align-items:center;gap:12px;background:rgba(255,255,255,0.12);padding:6px 18px 6px 14px;border-radius:20px;backdrop-filter:blur(4px);">
+                      <span style="font-size:20px;font-weight:700;color:#fff;">${health}%</span>
+                      <span style="font-size:12px;color:rgba(255,255,255,0.7);font-weight:500;">System Health</span>
+                    </div>
+                    <div style="display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,0.12);padding:4px 16px 4px 12px;border-radius:20px;backdrop-filter:blur(4px);">
+                      <img src="${clientLogo}" alt="${clientName}" style="height:24px;width:auto;border-radius:4px;" onerror="this.style.display='none'">
+                      <span style="color:rgba(255,255,255,0.9);font-weight:500;font-size:13px;">${clientName}</span>
+                    </div>
+                  </div>
                 </div>
-                <div style="display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,0.12);padding:4px 16px 4px 12px;border-radius:20px;backdrop-filter:blur(4px);">
-                  <img src="${clientLogo}" alt="${clientName}" style="height:24px;width:auto;border-radius:4px;" onerror="this.style.display='none'">
-                  <span style="color:rgba(255,255,255,0.9);font-weight:500;font-size:13px;">${clientName}</span>
+              </div>
+
+              <!-- Stats -->
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <div class="stat-label">Total Assets</div>
+                  <div class="stat-val" style="color:var(--text-primary);">${total}</div>
+                  <div class="stat-note">All systems</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Online</div>
+                  <div class="stat-val" style="color:var(--success);">${online}</div>
+                  <div class="stat-note note-success">Operational</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Offline / Issues</div>
+                  <div class="stat-val" style="color:var(--danger);">${offline}</div>
+                  <div class="stat-note note-danger">Needs attention</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Open Service Requests</div>
+                  <div class="stat-val" style="color:var(--warning);">${openSRs}</div>
+                  <div class="stat-note note-warn">Pending resolution</div>
+                </div>
+              </div>
+
+              <!-- Recent Activity -->
+              <div class="panel">
+                <div class="panel-header">
+                  <span class="panel-title">Today's Activity</span>
+                </div>
+                <div id="client-timeline-container">
+                  ${(data.activity || []).map(function(item) {
+                    var badgeClass = item.type === 'urgent' ? 'urgent' : item.type === 'success' ? 'success' : 'info';
+                    var badgeColors = {
+                      urgent: 'color:#ef4444;background:#fee2e2;',
+                      success: 'color:#22c55e;background:#dcfce7;',
+                      info: 'color:#3b82f6;background:#dbeafe;'
+                    };
+                    return '<div class="timeline-item" style="display:flex;gap:14px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);">' +
+                      '<span style="font-size:11px;color:var(--text-muted);font-weight:500;min-width:50px;flex-shrink:0;">' + item.time + '</span>' +
+                      '<div style="flex:1;"><div style="font-size:12px;color:var(--text-primary);font-weight:500;">' + item.msg + '</div></div>' +
+                      '<span style="font-size:10px;font-weight:500;padding:2px 10px;border-radius:12px;align-self:center;flex-shrink:0;' + (badgeColors[badgeClass] || '') + '">' + (item.type || 'info') + '</span>' +
+                      '</div>';
+                  }).join('') || '<div style="padding:8px 0;text-align:center;color:var(--text-muted);font-size:13px;">No activity today</div>'}
+                </div>
+              </div>
+
+              <!-- Open SRs -->
+              <div class="panel">
+                <div class="panel-header">
+                  <span class="panel-title">Open Service Requests</span>
+                  <button class="link-btn" onclick="clientSwitchTab('service-requests')">View all →</button>
+                </div>
+                <div style="overflow-x:auto;">
+                  <table class="tbl" id="client-dash-sr-table">
+                    <thead><tr><th>ID</th><th>Subject</th><th>Priority</th><th>Status</th></tr></thead>
+                    <tbody>
+                      ${(data.srs || []).filter(function(s) { return s.status !== 'Resolved'; }).map(function(sr) {
+                        var priClass = sr.priority === 'High' ? 'pri-high' : sr.priority === 'Medium' ? 'pri-med' : 'pri-low';
+                        var statusClass = sr.status === 'Open' ? 'open' : sr.status === 'In Progress' ? 'in-progress' : 'resolved';
+                        var statusColors = {
+                          open: 'color:#f59e0b;background:#fef3c7;',
+                          'in-progress': 'color:#3b82f6;background:#dbeafe;',
+                          resolved: 'color:#22c55e;background:#dcfce7;'
+                        };
+                        return '<tr><td><strong>' + sr.id + '</strong></td><td>' + sr.subject + '</td><td><span class="' + priClass + '">' + sr.priority + '</span></td><td><span style="display:inline-block;padding:2px 12px;border-radius:12px;font-size:10px;font-weight:600;' + (statusColors[statusClass] || '') + '">' + sr.status + '</span></td></tr>';
+                      }).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:16px;">No open service requests</td></tr>'}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
-          </div>
-          
-          <!-- Stats -->
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
-            <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:18px 22px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
-              <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">Total Assets</div>
-              <div style="font-size:30px;font-weight:700;color:#1a1a2e;line-height:1.2;margin-top:2px;">${total}</div>
-              <div style="font-size:11px;color:#888;margin-top:2px;">All systems</div>
-            </div>
-            <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:18px 22px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
-              <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">Online</div>
-              <div style="font-size:30px;font-weight:700;color:#22c55e;line-height:1.2;margin-top:2px;">${online}</div>
-              <div style="font-size:11px;color:#888;margin-top:2px;"><span style="color:#22c55e;">●</span> Operational</div>
-            </div>
-            <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:18px 22px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
-              <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">Offline / Issues</div>
-              <div style="font-size:30px;font-weight:700;color:#ef4444;line-height:1.2;margin-top:2px;">${total - online}</div>
-              <div style="font-size:11px;color:#888;margin-top:2px;"><span style="color:#ef4444;">●</span> Needs attention</div>
-            </div>
-            <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:18px 22px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
-              <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">Open Service Requests</div>
-              <div style="font-size:30px;font-weight:700;color:#f59e0b;line-height:1.2;margin-top:2px;">${(data.srs || []).filter(function(s) { return s.status !== 'Resolved'; }).length}</div>
-              <div style="font-size:11px;color:#888;margin-top:2px;"><span style="color:#f59e0b;">●</span> Pending resolution</div>
-            </div>
-          </div>
-          
-          <!-- Asset Overview -->
-          <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-              <span style="font-size:12px;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.08em;">Asset Overview</span>
-            </div>
-            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
-              ${Object.keys(data.assets || {}).map(function(key) {
-                var items = data.assets[key] || [];
-                var onlineCount = items.filter(function(a) { return a.status === 'Online' || a.status === 'ONLINE'; }).length;
-                var totalCount = items.length;
-                var icons = { cameras: '📷', doors: '🚪', servers: '🖥', switches: '🔌' };
-                var labels = { cameras: 'Cameras', doors: 'Access Control', servers: 'Servers', switches: 'Switches' };
-                var dots = '';
-                if (totalCount > 0) {
-                  dots = '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;margin-right:4px;"></span>';
-                  if (totalCount - onlineCount > 0) {
-                    dots += '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;margin-right:4px;"></span>';
-                  }
-                }
-                return '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:6px;background:#f8f9fa;border:1px solid rgba(0,0,0,0.04);">' +
-                  '<span style="font-size:18px;opacity:0.6;">' + (icons[key] || '📎') + '</span>' +
-                  '<div><div style="font-size:18px;font-weight:700;color:#1a1a2e;line-height:1.2;">' + totalCount + '</div>' +
-                  '<div style="font-size:10px;color:#999;text-transform:uppercase;letter-spacing:0.06em;">' + (labels[key] || key) + '</div></div>' +
-                  '<div style="margin-left:auto;display:flex;gap:4px;">' + dots + '</div></div>';
-              }).join('')}
-            </div>
-          </div>
-          
-          <!-- Activity -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-            <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-                <span style="font-size:12px;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.08em;">Today's Activity</span>
-              </div>
-              <div>
-                ${(data.activity || []).map(function(item) {
-                  var badgeClass = item.type === 'urgent' ? 'urgent' : item.type === 'success' ? 'success' : 'info';
-                  var badgeColors = {
-                    urgent: 'color:#ef4444;background:#fee2e2;',
-                    success: 'color:#22c55e;background:#dcfce7;',
-                    info: 'color:#3b82f6;background:#dbeafe;'
-                  };
-                  return '<div style="display:flex;gap:14px;padding:8px 0;border-bottom:1px solid #f0f0f0;">' +
-                    '<span style="font-size:11px;color:#999;font-weight:500;min-width:50px;flex-shrink:0;">' + item.time + '</span>' +
-                    '<div style="flex:1;"><div style="font-size:13px;color:#1a1a2e;font-weight:500;">' + item.msg + '</div></div>' +
-                    '<span style="font-size:10px;font-weight:500;padding:2px 10px;border-radius:12px;align-self:center;flex-shrink:0;' + (badgeColors[badgeClass] || '') + '">' + (item.type || 'info') + '</span>' +
-                    '</div>';
-                }).join('') || '<div style="padding:8px 0;text-align:center;color:#999;font-size:13px;">No activity today</div>'}
+
+            <!-- Cameras Tab -->
+            <div class="tab" id="client-tab-cameras">
+              <h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:16px;">Cameras</h2>
+              <div class="panel">
+                <div class="panel-header"><span class="panel-title">All Cameras</span></div>
+                <div style="overflow-x:auto;">
+                  <table class="tbl">
+                    <thead><tr><th>Name</th><th>Zone</th><th>IP</th><th>Status</th><th>Model</th><th>Resolution</th><th>Archiver</th><th>Install Date</th></tr></thead>
+                    <tbody>
+                      ${(data.assets && data.assets.cameras) ? data.assets.cameras.map(function(c) {
+                        return '<tr onclick="openClientCameraDetail(\'' + c.name + '\')" style="cursor:pointer;"><td><strong>' + c.name + '</strong></td><td>' + (c.zone || '—') + '</td><td>' + (c.ip || '—') + '</td><td>' + getStatusBadgeHTML(c.status) + '</td><td>' + (c.model || '—') + '</td><td>' + (c.resolution || '—') + '</td><td>' + (c.archiver || '—') + '</td><td>' + (c.install_date || '—') + '</td></tr>';
+                      }).join('') : '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:16px;">No cameras found</td></tr>'}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
-            <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-                <span style="font-size:12px;font-weight:700;color:#444;text-transform:uppercase;letter-spacing:0.08em;">Open Service Requests</span>
+
+            <!-- Doors Tab -->
+            <div class="tab" id="client-tab-doors">
+              <h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:16px;">Access Control — Doors</h2>
+              <div class="panel">
+                <div class="panel-header"><span class="panel-title">All Doors</span></div>
+                <div style="overflow-x:auto;">
+                  <table class="tbl">
+                    <thead><tr><th>Name</th><th>Site</th><th>Reader</th><th>Lock</th><th>Powered</th><th>Status</th><th>Tech</th><th>Install Date</th></tr></thead>
+                    <tbody>
+                      ${(data.assets && data.assets.doors) ? data.assets.doors.map(function(d) {
+                        return '<tr onclick="openClientDoorDetail(\'' + d.name + '\')" style="cursor:pointer;"><td><strong>' + d.name + '</strong></td><td>' + (d.zone || '—') + '</td><td>' + (d.reader || '—') + '</td><td>' + (d.lock || '—') + '</td><td>' + (d.powered || '—') + '</td><td>' + getStatusBadgeHTML(d.status) + '</td><td>' + (d.tech || '—') + '</td><td>' + (d.install_date || '—') + '</td></tr>';
+                      }).join('') : '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:16px;">No doors found</td></tr>'}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-              <div style="overflow-x:auto;">
-                <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                  <thead>
-                    <tr><th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">ID</th>
-                    <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Subject</th>
-                    <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Priority</th>
-                    <th style="color:#999;font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:2px solid rgba(0,0,0,0.08);text-align:left;font-size:11px;text-transform:uppercase;">Status</th></tr>
-                  </thead>
-                  <tbody>
-                    ${(data.srs || []).filter(function(s) { return s.status !== 'Resolved'; }).map(function(sr) {
-                      var priClass = sr.priority === 'High' ? 'color:#ef4444;font-weight:600;' : sr.priority === 'Medium' ? 'color:#f59e0b;font-weight:600;' : 'color:#22c55e;font-weight:600;';
-                      var statusClass = sr.status === 'Open' ? 'open' : sr.status === 'In Progress' ? 'in-progress' : 'resolved';
-                      var statusColors = {
-                        open: 'color:#f59e0b;background:#fef3c7;',
-                        'in-progress': 'color:#3b82f6;background:#dbeafe;',
-                        resolved: 'color:#22c55e;background:#dcfce7;'
-                      };
-                      return '<tr><td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><strong>' + sr.id + '</strong></td>' +
-                        '<td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;">' + sr.subject + '</td>' +
-                        '<td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><span style="' + priClass + '">' + sr.priority + '</span></td>' +
-                        '<td style="padding:8px 6px;border-bottom:1px solid #f0f0f0;color:#555;"><span style="display:inline-block;padding:2px 12px;border-radius:12px;font-size:10px;font-weight:600;' + (statusColors[statusClass] || '') + '">' + sr.status + '</span></td></tr>';
-                    }).join('') || '<tr><td colspan="4" style="text-align:center;color:#999;padding:16px;">No open service requests</td></tr>'}
-                  </tbody>
-                </table>
+            </div>
+
+            <!-- Servers Tab -->
+            <div class="tab" id="client-tab-servers">
+              <h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:16px;">Servers</h2>
+              <div class="panel">
+                <div class="panel-header"><span class="panel-title">All Servers</span></div>
+                <div style="overflow-x:auto;">
+                  <table class="tbl">
+                    <thead><tr><th>Location</th><th>Serial</th><th>Make</th><th>Model</th><th>Storage</th><th>Health</th><th>Apps</th><th>Status</th><th>Install Date</th></tr></thead>
+                    <tbody>
+                      ${(data.assets && data.assets.servers) ? data.assets.servers.map(function(s) {
+                        var capacityNum = parseFloat(s.capacity);
+                        var usedNum = parseFloat(s.used);
+                        var pct = (!isNaN(capacityNum) && !isNaN(usedNum) && capacityNum > 0) ? Math.round((usedNum / capacityNum) * 100) : 0;
+                        var barColor = pct > 85 ? 'red' : pct > 70 ? 'yellow' : 'green';
+                        var storageDisplay = s.used && s.capacity ? s.used + ' / ' + s.capacity : s.capacity || s.used || '—';
+                        return '<tr onclick="openClientServerDetail(\'' + s.name + '\')" style="cursor:pointer;"><td>' + (s.zone || '—') + '</td><td style="font-family:monospace;">' + (s.serial || '—') + '</td><td>' + (s.make || '—') + '</td><td>' + (s.model || '—') + '</td><td><div style="display:flex;flex-direction:column;gap:2px;"><span>' + storageDisplay + '</span><div class="storage-bar-wrap"><div class="storage-bar-fill ' + barColor + '" style="width:' + pct + '%;"></div></div></div></td><td style="color:' + (s.health && s.health.indexOf('Failed') !== -1 ? '#ef4444' : '#22c55e') + ';">' + (s.health || '—') + '</td><td>' + (s.apps || '—') + '</td><td>' + getStatusBadgeHTML(s.status) + '</td><td>' + (s.install_date || '—') + '</td></tr>';
+                      }).join('') : '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);padding:16px;">No servers found</td></tr>'}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Switches Tab -->
+            <div class="tab" id="client-tab-switches">
+              <h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:16px;">Network Switches</h2>
+              <div class="panel">
+                <div class="panel-header"><span class="panel-title">All Switches</span></div>
+                <div style="overflow-x:auto;">
+                  <table class="tbl">
+                    <thead><tr><th>Name</th><th>Location</th><th>Model</th><th>IP</th><th>Firmware</th><th>Status</th><th>Install Date</th></tr></thead>
+                    <tbody>
+                      ${(data.assets && data.assets.switches) ? data.assets.switches.map(function(s) {
+                        return '<tr onclick="openClientSwitchDetail(\'' + s.name + '\')" style="cursor:pointer;"><td><strong>' + s.name + '</strong></td><td>' + (s.zone || '—') + '</td><td>' + (s.model || '—') + '</td><td>' + (s.ip_address || '—') + '</td><td>' + (s.firmware || '—') + '</td><td>' + getStatusBadgeHTML(s.status) + '</td><td>' + (s.install_date || '—') + '</td></tr>';
+                      }).join('') : '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:16px;">No switches found</td></tr>'}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Service Requests Tab -->
+            <div class="tab" id="client-tab-service-requests">
+              <h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:16px;">Service Requests</h2>
+              <div class="panel">
+                <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
+                  <input type="text" id="client-sr-search" placeholder="Search requests..." style="flex:1;min-width:150px;background:var(--bg-input);border:1px solid var(--card-border);color:var(--text-primary);padding:6px 10px;border-radius:4px;font-size:12px;font-family:var(--font);" oninput="renderClientSRs()">
+                  <select id="client-sr-filter" style="background:var(--bg-input);border:1px solid var(--card-border);color:var(--text-primary);padding:6px 10px;border-radius:4px;font-size:12px;font-family:var(--font);" onchange="renderClientSRs()">
+                    <option value="all">All Status</option>
+                    <option value="Open">Open</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved</option>
+                  </select>
+                  <button class="btn btn-accent btn-sm" onclick="clientSwitchTab('create-sr')"><i class="ti ti-plus"></i> New</button>
+                </div>
+                <div style="overflow-x:auto;">
+                  <table class="tbl" id="client-sr-table">
+                    <thead><tr><th>ID</th><th>Subject</th><th>Priority</th><th>Status</th><th>Date</th></tr></thead>
+                    <tbody id="client-sr-body">
+                      ${(data.srs || []).map(function(sr) {
+                        var priClass = sr.priority === 'High' ? 'pri-high' : sr.priority === 'Medium' ? 'pri-med' : 'pri-low';
+                        var statusClass = sr.status === 'Open' ? 'open' : sr.status === 'In Progress' ? 'in-progress' : 'resolved';
+                        var statusColors = {
+                          open: 'color:#f59e0b;background:#fef3c7;',
+                          'in-progress': 'color:#3b82f6;background:#dbeafe;',
+                          resolved: 'color:#22c55e;background:#dcfce7;'
+                        };
+                        return '<tr><td><strong>' + sr.id + '</strong></td><td>' + sr.subject + '</td><td><span class="' + priClass + '">' + sr.priority + '</span></td><td><span style="display:inline-block;padding:2px 12px;border-radius:12px;font-size:10px;font-weight:600;' + (statusColors[statusClass] || '') + '">' + sr.status + '</span></td><td style="color:var(--text-muted);font-size:11px;">' + sr.date + '</td></tr>';
+                      }).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:16px;">No service requests found</td></tr>'}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Create SR Tab -->
+            <div class="tab" id="client-tab-create-sr">
+              <h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:16px;">Create Service Request</h2>
+              <div class="panel">
+                <form onsubmit="clientSubmitSR(event)">
+                  <div class="form-group" style="margin-bottom:14px;">
+                    <label style="display:block;font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:3px;">Subject *</label>
+                    <input type="text" id="client-sr-subject" placeholder="Brief description of the issue" required style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid var(--card-border);background:var(--bg-input);color:var(--text-primary);font-size:12px;font-family:var(--font);">
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                    <div class="form-group" style="margin-bottom:14px;">
+                      <label style="display:block;font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:3px;">Asset Type</label>
+                      <select id="client-sr-asset-type" style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid var(--card-border);background:var(--bg-input);color:var(--text-primary);font-size:12px;font-family:var(--font);">
+                        <option value="Camera">Camera</option>
+                        <option value="Access Control">Access Control</option>
+                        <option value="Server">Server</option>
+                        <option value="Switch">Switch</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:14px;">
+                      <label style="display:block;font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:3px;">Priority</label>
+                      <select id="client-sr-priority" style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid var(--card-border);background:var(--bg-input);color:var(--text-primary);font-size:12px;font-family:var(--font);">
+                        <option value="High">🔴 High</option>
+                        <option value="Medium" selected>🟡 Medium</option>
+                        <option value="Low">🟢 Low</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group" style="margin-bottom:14px;">
+                    <label style="display:block;font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:3px;">Description *</label>
+                    <textarea id="client-sr-description" placeholder="Detailed description of the issue..." required style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid var(--card-border);background:var(--bg-input);color:var(--text-primary);font-size:12px;font-family:var(--font);min-height:100px;resize:vertical;"></textarea>
+                  </div>
+                  <div style="display:flex;gap:10px;margin-top:6px;">
+                    <button type="submit" class="btn btn-accent"><i class="ti ti-send"></i> Submit Request</button>
+                    <button type="button" class="btn" onclick="clientSwitchTab('service-requests')">Cancel</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Contact Tab -->
+            <div class="tab" id="client-tab-contact">
+              <h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:16px;">Contact Support</h2>
+              <div class="panel">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:500px;">
+                  <div>
+                    <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Email</div>
+                    <div style="font-size:14px;color:var(--text-primary);font-weight:500;">support@etechsystems.com</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Phone</div>
+                    <div style="font-size:14px;color:var(--text-primary);font-weight:500;">+1 (876) 555-0199</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Hours</div>
+                    <div style="font-size:14px;color:var(--text-primary);font-weight:500;">Mon-Fri 8:00am - 6:00pm</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Emergency</div>
+                    <div style="font-size:14px;color:var(--danger);font-weight:600;">+1 (876) 555-0911</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     `;
+    
+    // Set up client tab switching
+    window.clientSwitchTab = clientSwitchTab;
+    window.clientSubmitSR = clientSubmitSR;
+    window.renderClientSRs = renderClientSRs;
+    window.openClientCameraDetail = openClientCameraDetail;
+    window.openClientDoorDetail = openClientDoorDetail;
+    window.openClientServerDetail = openClientServerDetail;
+    window.openClientSwitchDetail = openClientSwitchDetail;
+    
+    // Update topbar date
+    setInterval(function() {
+      var el = document.getElementById('client-topbar-date');
+      if (el) el.textContent = fullDateTime();
+    }, 30000);
   }
 
   // ============================================================
-  // ── DATA LOADING ─────────────────────────────────────────────
+  // ── CLIENT VIEW FUNCTIONS ────────────────────────────────────
+  // ============================================================
+
+  function getClientGreeting() {
+    var hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return 'Good Morning';
+    if (hour >= 12 && hour < 17) return 'Good Afternoon';
+    if (hour >= 17 && hour < 21) return 'Good Evening';
+    return 'Good Night';
+  }
+
+  function getStatusBadgeHTML(status) {
+    if (status === 'Online' || status === 'ONLINE') return '<span class="status-badge online" style="display:inline-block;padding:2px 12px;border-radius:12px;font-size:10px;font-weight:600;background:#dcfce7;color:#22c55e;">Online</span>';
+    if (status === 'Offline' || status === 'Defective' || status === 'No Power') return '<span class="status-badge offline" style="display:inline-block;padding:2px 12px;border-radius:12px;font-size:10px;font-weight:600;background:#fee2e2;color:#ef4444;">Offline</span>';
+    return '<span class="status-badge maintenance" style="display:inline-block;padding:2px 12px;border-radius:12px;font-size:10px;font-weight:600;background:#fef3c7;color:#f59e0b;">Maintenance</span>';
+  }
+
+  function clientSwitchTab(tab) {
+    if (!clientViewData) return;
+    
+    // Update sidebar
+    document.querySelectorAll('#client-nav-instance .nav-item').forEach(function(el) {
+      el.classList.remove('active');
+      if (el.dataset.tab === tab) el.classList.add('active');
+    });
+    
+    // Update content
+    document.querySelectorAll('#client-main-content .tab').forEach(function(el) {
+      el.classList.remove('active');
+    });
+    var target = document.getElementById('client-tab-' + tab);
+    if (target) target.classList.add('active');
+    
+    // Update title
+    var titles = {
+      dashboard: 'Dashboard',
+      cameras: 'Cameras',
+      doors: 'Access Control',
+      servers: 'Servers',
+      switches: 'Switches',
+      'service-requests': 'Service Requests',
+      'create-sr': 'Create Service Request',
+      contact: 'Contact Support'
+    };
+    var titleEl = document.getElementById('client-page-title');
+    if (titleEl) titleEl.textContent = titles[tab] || tab;
+    
+    // Refresh SR list if needed
+    if (tab === 'service-requests') renderClientSRs();
+  }
+
+  function renderClientSRs() {
+    if (!clientViewData) return;
+    
+    var search = document.getElementById('client-sr-search') ? document.getElementById('client-sr-search').value.toLowerCase() : '';
+    var filter = document.getElementById('client-sr-filter') ? document.getElementById('client-sr-filter').value : 'all';
+    
+    var filtered = (clientViewData.srs || []).filter(function(sr) {
+      var matchSearch = sr.subject.toLowerCase().indexOf(search) !== -1 || sr.id.toLowerCase().indexOf(search) !== -1;
+      var matchStatus = filter === 'all' || sr.status === filter;
+      return matchSearch && matchStatus;
+    });
+    
+    var body = document.getElementById('client-sr-body');
+    if (filtered.length === 0) {
+      body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:16px;">No service requests found</td></tr>';
+    } else {
+      body.innerHTML = filtered.map(function(sr) {
+        var priClass = sr.priority === 'High' ? 'pri-high' : sr.priority === 'Medium' ? 'pri-med' : 'pri-low';
+        var statusClass = sr.status === 'Open' ? 'open' : sr.status === 'In Progress' ? 'in-progress' : 'resolved';
+        var statusColors = {
+          open: 'color:#f59e0b;background:#fef3c7;',
+          'in-progress': 'color:#3b82f6;background:#dbeafe;',
+          resolved: 'color:#22c55e;background:#dcfce7;'
+        };
+        return '<tr><td><strong>' + sr.id + '</strong></td><td>' + sr.subject + '</td><td><span class="' + priClass + '">' + sr.priority + '</span></td><td><span style="display:inline-block;padding:2px 12px;border-radius:12px;font-size:10px;font-weight:600;' + (statusColors[statusClass] || '') + '">' + sr.status + '</span></td><td style="color:var(--text-muted);font-size:11px;">' + sr.date + '</td></tr>';
+      }).join('');
+    }
+  }
+
+  function clientSubmitSR(e) {
+    e.preventDefault();
+    
+    var subject = document.getElementById('client-sr-subject').value.trim();
+    var description = document.getElementById('client-sr-description').value.trim();
+    var assetType = document.getElementById('client-sr-asset-type').value;
+    var priority = document.getElementById('client-sr-priority').value;
+    
+    if (!subject) { toast('Please enter a subject', 'warning'); return; }
+    if (!description) { toast('Please enter a description', 'warning'); return; }
+    
+    var id = 'SR-' + String(Math.floor(Math.random() * 9000) + 1000);
+    var newSR = {
+      id: id,
+      subject: subject,
+      priority: priority,
+      status: 'Open',
+      date: new Date().toLocaleDateString('en-JM'),
+      description: description,
+      assetType: assetType
+    };
+    
+    clientViewData.srs.unshift(newSR);
+    
+    // Add to activity
+    var now = new Date();
+    var timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+    clientViewData.activity.unshift({
+      time: timeStr,
+      msg: 'SR-' + id + ' created: ' + subject,
+      type: 'info'
+    });
+    
+    document.getElementById('client-sr-subject').value = '';
+    document.getElementById('client-sr-description').value = '';
+    
+    toast('Service Request ' + id + ' created!', 'success');
+    
+    // Update badge
+    var badge = document.getElementById('client-sr-badge');
+    var openSRs = (clientViewData.srs || []).filter(function(s) { return s.status !== 'Resolved'; }).length;
+    if (badge) badge.textContent = openSRs;
+    
+    // Rebuild client view to refresh all
+    buildClientView(clientViewData, clientViewUser);
+    clientSwitchTab('service-requests');
+  }
+
+  // Client asset detail functions using shared modals
+  function openClientCameraDetail(name) {
+    var camera = (clientViewData.assets && clientViewData.assets.cameras) ? clientViewData.assets.cameras.find(function(c) { return c.name === name; }) : null;
+    if (!camera) return;
+    
+    document.getElementById('camera-detail-title').textContent = camera.name;
+    document.getElementById('camera-detail-sub').textContent = 'Zone: ' + (camera.zone || '—') + ' · Status: ' + camera.status;
+    
+    var preview = document.getElementById('cam-preview-large');
+    if (camera.status === 'Online' && camera.ip) {
+      preview.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;min-height:280px;">' +
+        '<img src="http://' + camera.ip + '/snapshot.jpg" onerror="this.parentElement.innerHTML=\'<div class=&quot;offline-msg&quot; style=&quot;color:var(--text-muted);padding:20px;text-align:center;&quot;><i class=&quot;ti ti-video-off&quot; style=&quot;font-size:32px;display:block;margin-bottom:8px;&quot;></i>Preview unavailable<br><span style=&quot;font-size:11px;&quot;>Camera may be offline</span></div>\'" style="max-width:100%;max-height:100%;min-height:280px;object-fit:contain;border-radius:4px;" />' +
+        '<div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.6);color:#4ade80;padding:4px 10px;border-radius:4px;font-size:10px;display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#4ade80;animation:pulse 1.5s infinite;"></span> LIVE</div>' +
+        '</div>';
+    } else {
+      preview.innerHTML = '<div class="offline-msg" style="color:var(--text-muted);padding:40px;text-align:center;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;"><i class="ti ti-video-off" style="font-size:48px;display:block;margin-bottom:12px;"></i>Camera ' + camera.status.toLowerCase() + '<br><span style="font-size:11px;opacity:0.6;">Preview unavailable</span></div>';
+    }
+    
+    document.getElementById('camera-detail-grid').innerHTML =
+      '<div class="modal-field"><label>Name</label><span>' + camera.name + '</span></div>' +
+      '<div class="modal-field"><label>Zone</label><span>' + (camera.zone || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Status</label>' + getStatusBadgeHTML(camera.status) + '</div>' +
+      '<div class="modal-field"><label>IP Address</label><span class="mono">' + (camera.ip || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Model</label><span>' + (camera.model || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Resolution</label><span>' + (camera.resolution || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Archiver</label><span>' + (camera.archiver || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Install Date</label><span>' + (camera.install_date || '—') + '</span></div>';
+    
+    document.getElementById('cam-modal-comments').value = camera.comments || '';
+    document.getElementById('camera-detail-modal').classList.add('open');
+  }
+
+  function openClientDoorDetail(name) {
+    var door = (clientViewData.assets && clientViewData.assets.doors) ? clientViewData.assets.doors.find(function(d) { return d.name === name; }) : null;
+    if (!door) return;
+    
+    document.getElementById('door-detail-title').textContent = door.name;
+    document.getElementById('door-detail-sub').textContent = 'Site: ' + (door.zone || '—') + ' · Status: ' + door.status;
+    
+    document.getElementById('door-detail-grid').innerHTML =
+      '<div class="modal-field"><label>Name</label><span>' + door.name + '</span></div>' +
+      '<div class="modal-field"><label>Site</label><span>' + (door.zone || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Status</label>' + getStatusBadgeHTML(door.status) + '</div>' +
+      '<div class="modal-field"><label>Reader</label><span>' + (door.reader || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Lock Type</label><span>' + (door.lock || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Powered</label><span>' + (door.powered || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Technician</label><span>' + (door.tech || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Door Swing</label><span>' + (door.doorSwing || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Access Type</label><span>' + (door.accessType || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Anti-Passback</label><span>' + (door.antiPassback || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Controller Type</label><span>' + (door.controllerType || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Install Date</label><span>' + (door.install_date || '—') + '</span></div>';
+    
+    document.getElementById('door-modal-comments').value = door.comments || '';
+    document.getElementById('door-detail-modal').classList.add('open');
+  }
+
+  function openClientServerDetail(name) {
+    var server = (clientViewData.assets && clientViewData.assets.servers) ? clientViewData.assets.servers.find(function(s) { return s.name === name; }) : null;
+    if (!server) return;
+    
+    document.getElementById('server-detail-title').textContent = server.name;
+    document.getElementById('server-detail-sub').textContent = 'Location: ' + (server.zone || '—') + ' · Status: ' + server.status;
+    
+    document.getElementById('server-detail-grid').innerHTML =
+      '<div class="modal-field"><label>Name</label><span>' + server.name + '</span></div>' +
+      '<div class="modal-field"><label>Location</label><span>' + (server.zone || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Status</label>' + getStatusBadgeHTML(server.status) + '</div>' +
+      '<div class="modal-field"><label>Serial</label><span>' + (server.serial || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Make</label><span>' + (server.make || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Model</label><span>' + (server.model || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Capacity</label><span>' + (server.capacity || '—') + '</span></div>' +
+      '<div class="modal-field"><label>In Use</label><span>' + (server.used || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Health</label><span>' + (server.health || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Applications</label><span>' + (server.apps || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Install Date</label><span>' + (server.install_date || '—') + '</span></div>';
+    
+    document.getElementById('server-modal-comments').value = server.comments || '';
+    document.getElementById('server-detail-modal').classList.add('open');
+  }
+
+  function openClientSwitchDetail(name) {
+    var sw = (clientViewData.assets && clientViewData.assets.switches) ? clientViewData.assets.switches.find(function(s) { return s.name === name; }) : null;
+    if (!sw) return;
+    
+    document.getElementById('switch-detail-title').textContent = sw.name;
+    document.getElementById('switch-detail-sub').textContent = 'Location: ' + (sw.zone || '—') + ' · Status: ' + sw.status;
+    
+    document.getElementById('switch-detail-grid').innerHTML =
+      '<div class="modal-field"><label>Name</label><span>' + sw.name + '</span></div>' +
+      '<div class="modal-field"><label>Location</label><span>' + (sw.zone || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Status</label>' + getStatusBadgeHTML(sw.status) + '</div>' +
+      '<div class="modal-field"><label>Model</label><span>' + (sw.model || '—') + '</span></div>' +
+      '<div class="modal-field"><label>IP Address</label><span>' + (sw.ip_address || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Firmware</label><span>' + (sw.firmware || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Install Date</label><span>' + (sw.install_date || '—') + '</span></div>';
+    
+    document.getElementById('switch-modal-comments').value = sw.comments || '';
+    document.getElementById('switch-detail-modal').classList.add('open');
+  }
+
+  // Close modal functions
+  function closeCameraDetailModal() { document.getElementById('camera-detail-modal').classList.remove('open'); }
+  function closeDoorDetailModal() { document.getElementById('door-detail-modal').classList.remove('open'); }
+  function closeServerDetailModal() { document.getElementById('server-detail-modal').classList.remove('open'); }
+  function closeSwitchDetailModal() { document.getElementById('switch-detail-modal').classList.remove('open'); }
+  function closeModal() { document.getElementById('sr-modal').classList.remove('open'); }
+  function closeFilePreview() { document.getElementById('file-preview-overlay').classList.remove('open'); }
+
+  // ============================================================
+  // ── DATA LOADING (ADMIN) ─────────────────────────────────────
   // ============================================================
 
   async function loadData() {
@@ -3403,7 +3473,7 @@
   }
 
   // ============================================================
-  // ── DASHBOARD ────────────────────────────────────────────────
+  // ── DASHBOARD (ADMIN) ────────────────────────────────────────
   // ============================================================
 
   function renderDashboard() {
@@ -3452,7 +3522,7 @@
   }
 
   // ============================================================
-  // ── CAMERAS ──────────────────────────────────────────────────
+  // ── CAMERAS (ADMIN) ──────────────────────────────────────────
   // ============================================================
 
   function getStatusCounts() {
@@ -3807,7 +3877,7 @@
   });
 
   // ============================================================
-  // ── DOORS ────────────────────────────────────────────────────
+  // ── DOORS (ADMIN) ────────────────────────────────────────────
   // ============================================================
 
   function renderDoorsEnhanced() {
@@ -3970,7 +4040,7 @@
   }
 
   // ============================================================
-  // ── SERVERS ──────────────────────────────────────────────────
+  // ── SERVERS (ADMIN) ──────────────────────────────────────────
   // ============================================================
 
   function renderServersEnhanced() {
@@ -4134,7 +4204,7 @@
   }
 
   // ============================================================
-  // ── SWITCHES ──────────────────────────────────────────────────
+  // ── SWITCHES (ADMIN) ─────────────────────────────────────────
   // ============================================================
 
   function renderSwitchesEnhanced() {
@@ -4297,7 +4367,7 @@
   }
 
   // ============================================================
-  // ── SOFTWARE ──────────────────────────────────────────────────
+  // ── SOFTWARE (ADMIN) ─────────────────────────────────────────
   // ============================================================
 
   function renderSoftware() {
@@ -4380,7 +4450,7 @@
   }
 
   // ============================================================
-  // ── CLIENT ASSETS ────────────────────────────────────────────
+  // ── CLIENT ASSETS (ADMIN) ────────────────────────────────────
   // ============================================================
 
   var currentAssetSubTab = 'storage';
@@ -4656,7 +4726,7 @@
   }
 
   // ============================================================
-  // ── SERVICE REQUESTS ─────────────────────────────────────────
+  // ── SERVICE REQUESTS (ADMIN) ─────────────────────────────────
   // ============================================================
 
   function setPillFilter(el) {
@@ -5093,7 +5163,7 @@
   }
 
   // ============================================================
-  // ── INBOX ────────────────────────────────────────────────────
+  // ── INBOX (ADMIN) ─────────────────────────────────────────────
   // ============================================================
 
   function getInitials(name) {
@@ -5392,7 +5462,7 @@
   }
 
   // ============================================================
-  // ── AUDIT LOG ────────────────────────────────────────────────
+  // ── AUDIT LOG (ADMIN) ────────────────────────────────────────
   // ============================================================
 
   function addAuditLogEntry(user, action, target) {
@@ -5441,7 +5511,7 @@
   function refreshAuditLog() { renderAuditLog(); toast('Refreshed', 'success'); }
 
   // ============================================================
-  // ── FILE EXPLORER ────────────────────────────────────────────
+  // ── FILE EXPLORER (ADMIN) ────────────────────────────────────
   // ============================================================
 
   var FILE_SYSTEM = {
@@ -5828,9 +5898,7 @@
   var savedTheme = localStorage.getItem('ccsm_theme') || 'dark';
   setTheme(savedTheme);
 
-  // Check if client already logged in from localStorage
   checkLogin();
-  
   if (localStorage.getItem('ccsm_sidebar') === '1') toggleSidebar();
   PINNED_FILES = JSON.parse(localStorage.getItem('ccsm_pinned') || '[]');
 
@@ -5850,17 +5918,6 @@
 
   console.log('🚀 CAMS - Client Assessment Management System loaded successfully.');
   console.log('📊 Client count:', CLIENTS.length);
-  console.log('📸 Assets loaded:', {
-    cameras: CAMERAS.length,
-    doors: DOORS.length,
-    servers: SERVERS.length,
-    switches: SWITCHES.length,
-    software: SOFTWARE.length,
-    storage: STORAGE.length,
-    stations: STATIONS.length,
-    monitors: MONITORS.length,
-    srs: SERVICE_REQUESTS.length
-  });
   console.log('🔐 Login with admin/admin123 or client credentials');
 </script>
 </body>
