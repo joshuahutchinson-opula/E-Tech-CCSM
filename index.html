@@ -1463,6 +1463,100 @@
        ============================================================ -->
   <script>
   // ============================================================
+  // ── DATA ──────────────────────────────────────────────────────
+  // ============================================================
+
+  // Lasco Cameras from CSV files
+  var LASCO_CAMERAS = [
+    // LDL Warehouse (P5-Warehouse)
+    { name: "LDL Warehouse - J3", zone: "LDL Warehouse", status: "Online", model: "P1427-E", resolution: "5 MP", archiver: "VM 2", ip: "10.1.7.133", mac: "AC:CC:8E:5E:DC:F9", comments: "Cleaned", client: "Lasco" },
+    { name: "LDL Warehouse - E1", zone: "LDL Warehouse", status: "Online", model: "P1405-E", resolution: "1.3 MP", archiver: "VM 2", ip: "10.1.7.134", mac: "AC:CC:8E:49:54:E1", comments: "Cleaned", client: "Lasco" },
+    { name: "LDL Warehouse - E2", zone: "LDL Warehouse", status: "Online", model: "P1427-E", resolution: "5 MP", archiver: "VM 2", ip: "10.1.7.135", mac: "AC:CC:8E:5E:DC:C2", comments: "Cleaned", client: "Lasco" },
+    { name: "LDL Warehouse - D2", zone: "LDL Warehouse", status: "Online", model: "P1405-E", resolution: "1.3 MP", archiver: "VM 2", ip: "10.1.7.136", mac: "AC:CC:8E:5E:3F:45", comments: "Cleaned", client: "Lasco" },
+    { name: "LDL Warehouse - J2", zone: "LDL Warehouse", status: "Online", model: "P1427-E", resolution: "5 MP", archiver: "VM 2", ip: "10.1.7.137", mac: "AC:CC:8E:5E:D5:53", comments: "Cleaned", client: "Lasco" },
+    { name: "LDL Warehouse - D3", zone: "LDL Warehouse", status: "Online", model: "P1405-E", resolution: "1.3 MP", archiver: "VM 2", ip: "10.1.7.138", mac: "AC:CC:8E:49:54:EF", comments: "Cleaned", client: "Lasco" },
+    { name: "LDL Warehouse - JW1", zone: "LDL Warehouse", status: "Needs Check", model: "P1427-E", resolution: "5 MP", archiver: "VM 2", ip: "10.1.7.139", mac: "AC:CC:8E:5E:CD:F6", comments: "Obstructed by racks need to be relocated", client: "Lasco" },
+    { name: "LDL Warehouse - JW2", zone: "LDL Warehouse", status: "Needs Check", model: "P1427-E", resolution: "5 MP", archiver: "VM 3", ip: "10.1.7.140", mac: "AC:CC:8E:5E:DC:DF", comments: "Obstructed by racks need to be relocated", client: "Lasco" },
+    { name: "LDL Warehouse - JW3", zone: "LDL Warehouse", status: "Online", model: "P1427-E", resolution: "5 MP", archiver: "VM 3", ip: "10.1.7.141", mac: "AC:CC:8E:5E:DD:03", comments: "Cleaned", client: "Lasco" },
+    { name: "LDL Warehouse - JW4", zone: "LDL Warehouse", status: "Needs Check", model: "P1427-E", resolution: "5 MP", archiver: "VM 3", ip: "10.1.7.142", mac: "AC:CC:8E:5E:DC:FB", comments: "Obstructed by racks need to be relocated", client: "Lasco" },
+    { name: "LDL Warehouse - Power Room", zone: "LDL Warehouse", status: "Online", model: "P1405-E", resolution: "1.3 MP", archiver: "VM 4", ip: "10.1.7.153", mac: "AC:CC:8E:48:E8:38", comments: "Cleaned", client: "Lasco" },
+    { name: "LDL Warehouse - Damage Repair 1", zone: "LDL Warehouse", status: "Online", model: "P1427-E", resolution: "5 MP", archiver: "VM 4", ip: "10.1.7.143", mac: "AC:CC:8E:5E:D5:51", comments: "Cleaned", client: "Lasco" },
+    { name: "LDL Warehouse - Damage Repair 2", zone: "LDL Warehouse", status: "Online", model: "P1427-E", resolution: "5 MP", archiver: "VM 4", ip: "10.1.7.144", mac: "AC:CC:8E:5E:CE:BE", comments: "Cleaned", client: "Lasco" },
+    { name: "LDL Warehouse - Damage Repair 3", zone: "LDL Warehouse", status: "Online", model: "P1427-E", resolution: "5 MP", archiver: "VM 1", ip: "10.1.7.145", mac: "AC:CC:8E:5E:DC:DC", comments: "Cleaned", client: "Lasco" },
+    { name: "JWest Shutter", zone: "LDL Warehouse", status: "Online", model: "P1427-E", resolution: "5 MP", archiver: "VM 1", ip: "10.1.7.146", mac: "AC:CC:8E:5E:DC:FA", comments: "Cleaned", client: "Lasco" },
+    { name: "LDL Warehouse - JC2", zone: "LDL Warehouse", status: "Needs Check", model: "P1427-E", resolution: "5 MP", archiver: "VM 3", ip: "10.1.7.147", mac: "AC:CC:8E:5E:D5:BC", comments: "Obstructed by racks need to be relocated", client: "Lasco" },
+    { name: "LDL Warehouse - JC1", zone: "LDL Warehouse", status: "Online", model: "P1427-E", resolution: "5 MP", archiver: "VM 4", ip: "10.1.7.148", mac: "AC:CC:8E:5E:D5:7B", comments: "Cleaned", client: "Lasco" },
+    { name: "LDL Warehouse - JC3", zone: "LDL Warehouse", status: "Needs Check", model: "P1427-E", resolution: "5 MP", archiver: "VM 1", ip: "10.1.7.149", mac: "AC:CC:8E:5E:D5:7C", comments: "Obstructed by racks need to be relocated", client: "Lasco" },
+    { name: "LDL Warehouse - Dock Shutter 1", zone: "LDL Warehouse", status: "Online", model: "12176DN", resolution: "5 MP", archiver: "VM 2", ip: "10.1.7.150", mac: "00:1A:07:13:BC:11", comments: "Forklift wasn't available", client: "Lasco" },
+    { name: "LDL Warehouse - Dock Shutter 2", zone: "LDL Warehouse", status: "Online", model: "12176DN", resolution: "5 MP", archiver: "VM 3", ip: "10.1.7.151", mac: "00:1A:07:13:BC:17", comments: "Forklift wasn't available", client: "Lasco" },
+    { name: "LDL Warehouse - Dock Shutter 3", zone: "LDL Warehouse", status: "Online", model: "12176DN", resolution: "5 MP", archiver: "VM 4", ip: "10.1.7.152", mac: "00:1A:07:13:BC:1B", comments: "Forklift wasn't available", client: "Lasco" },
+    // LDL New Warehouse
+    { name: "LDL Warehouse entrance", zone: "LDL New Warehouse", status: "Online", model: "P1405-E", resolution: "1.3 MP", archiver: "VM 2", ip: "10.1.7.167", mac: "AC:CC:8E:5E:3F:44", comments: "Cleaned", client: "Lasco" },
+    { name: "LDL New Warehouse - Dock Shutter 1", zone: "LDL New Warehouse", status: "Online", model: "12176DN", resolution: "5 MP", archiver: "VM 2", ip: "10.1.7.161", mac: "00:1A:07:15:A1:C7", comments: "Forklift wasn't available", client: "Lasco" },
+    { name: "LDL New Warehouse - Dock Shutter 2", zone: "LDL New Warehouse", status: "Online", model: "12176DN", resolution: "5 MP", archiver: "VM 2", ip: "10.1.7.162", mac: "00-1A-07-15-A1-DC", comments: "Forklift wasn't available", client: "Lasco" },
+    { name: "LDL New Warehouse Cashier Booth", zone: "LDL New Warehouse", status: "Online", model: "P1405-E", resolution: "1.3 MP", archiver: "VM 2", ip: "10.1.7.169", mac: "AC:CC:8E:49:54:D3", comments: "Cleaned", client: "Lasco" },
+    { name: "LDL New Warehouse Cashier windows", zone: "LDL New Warehouse", status: "Online", model: "P1405-E", resolution: "1.3 MP", archiver: "VM 2", ip: "10.1.7.168", mac: "AC:CC:8E:49:24:DE", comments: "Cleaned", client: "Lasco" },
+    { name: "LDL New Warehouse - Dock Shutter 3", zone: "LDL New Warehouse", status: "Online", model: "12176DN", resolution: "5 MP", archiver: "VM 2", ip: "10.1.7.163", mac: "00-1A-07-15-A1-CC", comments: "Forklift wasn't available", client: "Lasco" },
+    { name: "LDL New Warehouse - Dock Shutter 4", zone: "LDL New Warehouse", status: "Online", model: "12176DN", resolution: "5 MP", archiver: "VM 2", ip: "10.1.7.164", mac: "00-1A-07-15-A1-DF", comments: "Forklift wasn't available", client: "Lasco" },
+    { name: "LDL New Warehouse - Dock Shutter 5", zone: "LDL New Warehouse", status: "Online", model: "12176DN", resolution: "5 MP", archiver: "VM 2", ip: "10.1.7.165", mac: "00-1A-07-15-A1-E9", comments: "Forklift wasn't available", client: "Lasco" },
+    { name: "LDL New Warehouse - Dock Shutter 6", zone: "LDL New Warehouse", status: "Needs Check", model: "12176DN", resolution: "5 MP", archiver: "VM 2", ip: "10.1.7.166", mac: "00-1A-07-15-A1-D3", comments: "Forklift wasn't available - 5x Compatible: NO", client: "Lasco" },
+    { name: "LDL Warehouse - Repacking", zone: "LDL New Warehouse", status: "Online", model: "P1427-LE", resolution: "5 MP", archiver: "VM 2", ip: "10.1.7.171", mac: "AC:CC:8E:7C:E1:35", comments: "Cleaned", client: "Lasco" },
+    // Liquid Plant
+    { name: "Front Lobby", zone: "Liquid Plant", status: "Online", model: "2146DN", resolution: "1.3 MP", archiver: "VM 2", ip: "10.1.7.64", mac: "00:1A:07:08:1F:94", comments: "Cleaned", client: "Lasco" },
+    { name: "Time Clock", zone: "Liquid Plant", status: "Online", model: "1145DN", resolution: "1.3 MP", archiver: "VM 4", ip: "10.1.7.63", mac: "00:1A:07:06:26:2B", comments: "Cleaned", client: "Lasco" },
+    { name: "Finish Goods Staging Area", zone: "Liquid Plant", status: "Online", model: "5145DN", resolution: "5 MP", archiver: "VM 1", ip: "10.1.7.62", mac: "00:1A:07:06:45:5A", comments: "Cleaned", client: "Lasco" },
+    { name: "Processing Room Cam 1", zone: "Liquid Plant", status: "Online", model: "1145DN", resolution: "1.3 MP", archiver: "VM 4", ip: "10.1.7.61", mac: "00:1A:07:06:26:38", comments: "View blocked by new machine", client: "Lasco" },
+    { name: "Processing Room Cam 2", zone: "Liquid Plant", status: "Online", model: "1145DN", resolution: "1.3 MP", archiver: "VM 4", ip: "10.1.7.60", mac: "00:1A:07:06:26:1D", comments: "View blocked by new machine", client: "Lasco" },
+    { name: "RO Plant", zone: "Liquid Plant", status: "Online", model: "5145DN", resolution: "1.3 MP", archiver: "VM 2", ip: "10.1.7.59", mac: "00:1A:07:06:45:56", comments: "Cleaned", client: "Lasco" },
+    { name: "Filling Room Cam 1", zone: "Liquid Plant", status: "Online", model: "1145DN", resolution: "1.3 MP", archiver: "VM 4", ip: "10.1.7.58", mac: "00:1A:07:06:26:1E", comments: "Cleaned", client: "Lasco" },
+    { name: "Filling Room Cam 2", zone: "Liquid Plant", status: "Online", model: "1145DN", resolution: "1.3 MP", archiver: "VM 4", ip: "10.1.7.57", mac: "00:1A:07:06:25:E1", comments: "Cleaned", client: "Lasco" },
+    { name: "Large Bottle Line", zone: "Liquid Plant", status: "Online", model: "5145DN", resolution: "5 MP", archiver: "VM 2", ip: "10.1.7.56", mac: "00:1A:07:06:45:55", comments: "Cleaned", client: "Lasco" },
+    { name: "LML Shutter", zone: "Liquid Plant", status: "Online", model: "5145DN", resolution: "1.3 MP", archiver: "VM 2", ip: "10.1.7.55", mac: "00:1A:07:06:45:61", comments: "Cleaned", client: "Lasco" },
+    { name: "Blow Mold Fire Door & Shutter", zone: "Liquid Plant", status: "Online", model: "5145DN", resolution: "1.3 MP", archiver: "VM 3", ip: "10.1.7.53", mac: "00:1A:07:06:45:6B", comments: "Cleaned", client: "Lasco" },
+    { name: "Utilities Room Emergency Exit", zone: "Liquid Plant", status: "Online", model: "5145DN", resolution: "1.3 MP", archiver: "VM 3", ip: "10.1.7.52", mac: "00:1A:07:06:45:60", comments: "Cleaned", client: "Lasco" },
+    { name: "Sacmi conveyor line", zone: "Liquid Plant", status: "Online", model: "5145DN", resolution: "5 MP", archiver: "VM 3", ip: "10.1.7.50", mac: "00:1A:07:06:45:59", comments: "Cleaned", client: "Lasco" },
+    { name: "Inside Stores", zone: "Liquid Plant", status: "Online", model: "5145DN", resolution: "1.3 MP", archiver: "VM 4", ip: "10.1.7.70", mac: "00:1A:07:06:45:64", comments: "Cleaned", client: "Lasco" },
+    { name: "Stores & Sacmi Entrance", zone: "Liquid Plant", status: "Online", model: "5145DN", resolution: "1.3 MP", archiver: "VM 4", ip: "10.1.7.69", mac: "00:1A:07:06:45:57", comments: "Cleaned", client: "Lasco" },
+    { name: "Emergency Exit Door", zone: "Liquid Plant", status: "Online", model: "5145DN", resolution: "1.3 MP", archiver: "VM 4", ip: "10.1.7.68", mac: "00:1A:07:06:45:5D", comments: "Cleaned", client: "Lasco" },
+    { name: "Palletizing", zone: "Liquid Plant", status: "Online", model: "5145DN", resolution: "1.3 MP", archiver: "VM 4", ip: "10.1.7.65", mac: "00:1A:07:06:45:5C", comments: "Cleaned", client: "Lasco" },
+    // Liquid Plant Additions
+    { name: "Sacmi combo", zone: "Liquid Plant", status: "Online", model: "P1427", resolution: "5 MP", archiver: "VM 3", ip: "10.1.7.154", mac: "AC:CC:8E:5E:44:F2", comments: "Cleaned", client: "Lasco" },
+    { name: "Sacmi Paturizer", zone: "Liquid Plant", status: "Online", model: "P1427", resolution: "5 MP", archiver: "VM 3", ip: "10.1.7.155", mac: "AC:CC:8E:5E:46:54", comments: "Cleaned", client: "Lasco" },
+    { name: "SBO Blow mold", zone: "Liquid Plant", status: "Online", model: "P1427", resolution: "5 MP", archiver: "VM 3", ip: "10.1.7.156", mac: "AC:CC:8E:5E:46:53", comments: "Cleaned", client: "Lasco" },
+    { name: "Utilities Room", zone: "Liquid Plant", status: "Online", model: "P1427", resolution: "5 MP", archiver: "VM 3", ip: "10.1.7.157", mac: "AC:CC:8E:5E:44:EE", comments: "Cleaned", client: "Lasco" },
+    { name: "Sacmi Palletizer", zone: "Liquid Plant", status: "Online", model: "P1427", resolution: "5 MP", archiver: "VM 3", ip: "10.1.7.158", mac: "AC:CC:8E:5E:49:CE", comments: "Cleaned", client: "Lasco" },
+    { name: "Blow mold", zone: "Liquid Plant", status: "Online", model: "P1427", resolution: "5 MP", archiver: "VM 4", ip: "10.1.7.159", mac: "AC:CC:8E:5E:2E:9F", comments: "Cleaned", client: "Lasco" }
+  ];
+
+  // Lasco Doors from Access Control CSV
+  var LASCO_DOORS = [
+    { name: "Batching room", site: "LML B Liquid Plant", status: "Not In Use", comments: "No longer use equipment has been removed", client: "Lasco" },
+    { name: "Blow mold entrance 1", site: "LML B Liquid Plant", status: "Under Maintenance", comments: "Door needs repair - door drop", client: "Lasco", accessType: "Read In + Read Out", antiPassback: "Yes", controllerType: "Standalone" },
+    { name: "Blow mold entrance 2", site: "LML B Liquid Plant", status: "Under Maintenance", comments: "Door needs repair - door drop", client: "Lasco", accessType: "Read In + Read Out", antiPassback: "Yes", controllerType: "Standalone" },
+    { name: "Chemistry lab", site: "LML B Liquid Plant", status: "Online", comments: "", client: "Lasco", accessType: "Read In + Read Out", antiPassback: "Yes", controllerType: "Standalone" },
+    { name: "Electrical room to utilities", site: "LML B Liquid Plant", status: "Online", comments: "", client: "Lasco", accessType: "Read In + Read Out", antiPassback: "No", controllerType: "Standalone" },
+    { name: "Utilities to electrical room", site: "LML B Liquid Plant", status: "Online", comments: "", client: "Lasco", accessType: "RTE Only", antiPassback: "No" },
+    { name: "Entrance to upstairs offices - IN", site: "LML B Liquid Plant", status: "Online", comments: "", client: "Lasco", accessType: "Read In + Read Out", antiPassback: "Yes", controllerType: "Standalone" },
+    { name: "Entrance to upstairs offices - OUT", site: "LML B Liquid Plant", status: "Online", comments: "", client: "Lasco", accessType: "RTE Only", antiPassback: "No" },
+    { name: "Filling room 1", site: "LML B Liquid Plant", status: "Online", comments: "", client: "Lasco", accessType: "Read In + Read Out", antiPassback: "Yes", controllerType: "Standalone" },
+    { name: "Filling room 2", site: "LML B Liquid Plant", status: "Online", comments: "", client: "Lasco", accessType: "Read In + Read Out", antiPassback: "Yes", controllerType: "Standalone" },
+    { name: "Filling room 3", site: "LML B Liquid Plant", status: "Online", comments: "", client: "Lasco", accessType: "Read In + Read Out", antiPassback: "Yes", controllerType: "Standalone" },
+    { name: "Filling room 4", site: "LML B Liquid Plant", status: "Online", comments: "", client: "Lasco", accessType: "Read In + Read Out", antiPassback: "Yes", controllerType: "Standalone" },
+    { name: "Guest access - IN", site: "LML B Liquid Plant", status: "Online", comments: "", client: "Lasco", accessType: "Read In + Read Out", antiPassback: "Yes", controllerType: "Standalone" },
+    { name: "Guest access - OUT", site: "LML B Liquid Plant", status: "Online", comments: "", client: "Lasco", accessType: "RTE Only", antiPassback: "No" },
+    { name: "Lobby", site: "LML B Liquid Plant", status: "Online", comments: "", client: "Lasco", accessType: "Read In + Read Out", antiPassback: "Yes", controllerType: "Standalone" },
+    { name: "Microbiology lab", site: "LML B Liquid Plant", status: "Online", comments: "", client: "Lasco", accessType: "Read In + Read Out", antiPassback: "Yes", controllerType: "Standalone" },
+    { name: "Prep Room", site: "LML B Liquid Plant", status: "Online", comments: "", client: "Lasco", accessType: "Read In + Read Out", antiPassback: "Yes", controllerType: "Standalone" },
+    { name: "Processing room 1", site: "LML B Liquid Plant", status: "Not In Use", comments: "No longer use equipment has been removed", client: "Lasco" },
+    { name: "Processing room 2", site: "LML B Liquid Plant", status: "Online", comments: "", client: "Lasco", accessType: "Read In + Read Out", antiPassback: "Yes", controllerType: "Standalone" },
+    { name: "Product dev lab", site: "LML B Liquid Plant", status: "Online", comments: "", client: "Lasco", accessType: "Read In + Read Out", antiPassback: "Yes", controllerType: "Standalone" },
+    { name: "Production floor - IN", site: "LML B Liquid Plant", status: "Online", comments: "", client: "Lasco", accessType: "Read In + Read Out", antiPassback: "Yes", controllerType: "Standalone" },
+    { name: "Production floor - OUT", site: "LML B Liquid Plant", status: "Online", comments: "", client: "Lasco", accessType: "RTE Only", antiPassback: "No" },
+    { name: "QA office", site: "LML B Liquid Plant", status: "Online", comments: "", client: "Lasco", accessType: "Read In + Read Out", antiPassback: "Yes", controllerType: "Standalone" },
+    { name: "Shop and spare parts", site: "LML B Liquid Plant", status: "Online", comments: "", client: "Lasco", accessType: "Read In + Read Out", antiPassback: "Yes", controllerType: "Standalone" }
+  ];
+
+  // ============================================================
   // ── CONFIGURATION ────────────────────────────────────────────
   // ============================================================
 
@@ -1790,6 +1884,7 @@
     if (s === 'Online') return '<span class="badge b-done">Online</span>';
     if (s === 'Offline') return '<span class="badge b-high">Offline</span>';
     if (s === 'Under Maintenance') return '<span class="badge b-under-maintenance">Under Maintenance</span>';
+    if (s === 'Not In Use') return '<span class="badge b-open">Not In Use</span>';
     return '<span class="badge b-open">Unknown</span>';
   }
 
@@ -2283,85 +2378,85 @@
     });
   }
 
-// Add this function to reset client theme styles
-function resetClientTheme() {
-  // Remove client-mode class from app
-  var app = document.getElementById('app');
-  if (app) app.classList.remove('client-mode');
-  
-  // Reset client-view-container
-  var container = document.getElementById('client-view-container');
-  if (container) container.classList.remove('client-mode');
-  
-  // Reset client primary color variables to default
-  document.documentElement.style.setProperty('--client-primary', '#4f8cf7');
-  document.documentElement.style.setProperty('--client-secondary', '#00d4ff');
-  document.documentElement.style.setProperty('--client-gradient', 'linear-gradient(135deg, #4f8cf7, #00d4ff)');
-  document.documentElement.style.setProperty('--client-glow', 'rgba(79, 140, 247, 0.3)');
-  
-  // Reset sidebar logo
-  var logoImg = document.getElementById('logo-img');
-  if (logoImg) logoImg.src = 'logo.png';
-  
-  // Re-apply the saved theme
-  var savedTheme = localStorage.getItem('ccsm_theme') || 'dark';
-  setTheme(savedTheme);
-}
+  // Add this function to reset client theme styles
+  function resetClientTheme() {
+    // Remove client-mode class from app
+    var app = document.getElementById('app');
+    if (app) app.classList.remove('client-mode');
+    
+    // Reset client-view-container
+    var container = document.getElementById('client-view-container');
+    if (container) container.classList.remove('client-mode');
+    
+    // Reset client primary color variables to default
+    document.documentElement.style.setProperty('--client-primary', '#4f8cf7');
+    document.documentElement.style.setProperty('--client-secondary', '#00d4ff');
+    document.documentElement.style.setProperty('--client-gradient', 'linear-gradient(135deg, #4f8cf7, #00d4ff)');
+    document.documentElement.style.setProperty('--client-glow', 'rgba(79, 140, 247, 0.3)');
+    
+    // Reset sidebar logo
+    var logoImg = document.getElementById('logo-img');
+    if (logoImg) logoImg.src = 'logo.png';
+    
+    // Re-apply the saved theme
+    var savedTheme = localStorage.getItem('ccsm_theme') || 'dark';
+    setTheme(savedTheme);
+  }
 
-// Update the logout function
-function logout() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  token = null;
-  currentUser = null;
-  userClient = null;
-  currentClientFilter = null;
-  currentZoneFilter = null;
-  isAdmin = true;
-  clientViewUser = null;
-  clientViewData = null;
-  isClientMode = false;
-  
-  // Reset client theme styles before showing login
-  resetClientTheme();
-  
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('client-view-container').style.display = 'none';
-  showLogin();
-  toast('Logged out', 'info');
-}
+  // Update the logout function
+  function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    token = null;
+    currentUser = null;
+    userClient = null;
+    currentClientFilter = null;
+    currentZoneFilter = null;
+    isAdmin = true;
+    clientViewUser = null;
+    clientViewData = null;
+    isClientMode = false;
+    
+    // Reset client theme styles before showing login
+    resetClientTheme();
+    
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('client-view-container').style.display = 'none';
+    showLogin();
+    toast('Logged out', 'info');
+  }
 
-// Also update the loginLocal function for client logout flow
-// In the client login section, when a client logs in, we need to ensure 
-// the admin app gets reset properly
+  // Also update the loginLocal function for client logout flow
+  // In the client login section, when a client logs in, we need to ensure 
+  // the admin app gets reset properly
 
-// Update the client login section in loginLocal:
-if (validClients[username] && validClients[username].password === password) {
-  // Reset any admin theme first
-  resetClientTheme();
-  
-  clientViewUser = validClients[username];
-  var clientKey = username;
-  var clientDataFull = getClientViewData(clientKey);
-  
-  if (!clientDataFull) {
-    errorDiv.textContent = 'Client data not found';
-    errorDiv.style.display = 'block';
+  // Update the client login section in loginLocal:
+  if (validClients[username] && validClients[username].password === password) {
+    // Reset any admin theme first
+    resetClientTheme();
+    
+    clientViewUser = validClients[username];
+    var clientKey = username;
+    var clientDataFull = getClientViewData(clientKey);
+    
+    if (!clientDataFull) {
+      errorDiv.textContent = 'Client data not found';
+      errorDiv.style.display = 'block';
+      loadingDiv.classList.remove('active');
+      return;
+    }
+
+    hideLogin();
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('client-view-container').style.display = 'block';
+    
+    // Initialize client view
+    initClientView(clientDataFull, clientViewUser);
+    
+    toast('Welcome, ' + clientDataFull.name + '!', 'success');
     loadingDiv.classList.remove('active');
     return;
   }
-
-  hideLogin();
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('client-view-container').style.display = 'block';
-  
-  // Initialize client view
-  initClientView(clientDataFull, clientViewUser);
-  
-  toast('Welcome, ' + clientDataFull.name + '!', 'success');
-  loadingDiv.classList.remove('active');
-  return;
-}
 
   function applyClientBranding(client) {
     console.log('Client branding applied for:', client);
@@ -3289,22 +3384,82 @@ if (validClients[username] && validClients[username].password === password) {
     SERVICE_REQUESTS = JSON.parse(localStorage.getItem('ccsm_sr') || '[]');
     AUDIT_LOG = JSON.parse(localStorage.getItem('ccsm_audit_log') || '[]');
 
+    // If no data in localStorage, populate with Lasco data
     if (CAMERAS.length === 0) {
-      CAMERAS = [
-        { name: "HM3 PTZ", zone: "NORTH", status: "Online", comments: "Main entrance", model: "AXIS P5635", resolution: "1080p", archiver: "DM5", purchase_date: "2024-01-15", warranty_expiry: "2026-01-15" },
-        { name: "HM11 PTZ", zone: "NORTH", status: "Defective", comments: "Needs replacement", model: "AXIS Q6075", resolution: "4K", archiver: "DM5", purchase_date: "2023-06-01", warranty_expiry: "2025-06-01" },
-        { name: "N25 PTZ", zone: "NORTH", status: "Online", comments: "Perimeter", model: "AXIS P5635", resolution: "1080p", archiver: "DM6", purchase_date: "2024-08-15", warranty_expiry: "2026-08-15" },
-        { name: "C1 PTZ", zone: "SOUTH", status: "Online", comments: "Warehouse", model: "AXIS Q6075", resolution: "4K", archiver: "DM5", purchase_date: "2023-11-01", warranty_expiry: "2025-11-01" },
-        { name: "W1", zone: "WEST", status: "No Power", comments: "Power outage", model: "AXIS P5635", resolution: "1080p", archiver: "DM5", purchase_date: "2024-03-15", warranty_expiry: "2026-03-15" }
+      // Add Lasco cameras
+      LASCO_CAMERAS.forEach(function(cam) {
+        CAMERAS.push({
+          name: cam.name,
+          zone: cam.zone,
+          status: cam.status,
+          comments: cam.comments,
+          model: cam.model,
+          resolution: cam.resolution,
+          archiver: cam.archiver,
+          ip_address: cam.ip,
+          mac: cam.mac,
+          client: cam.client || 'Lasco'
+        });
+      });
+
+      // Add KFTL sample cameras (from client view data)
+      var kftlCameras = [
+        { name: "HM3 PTZ", zone: "NORTH", status: "Offline", comments: "Defective - Replace Camera", model: "PELCO P2820-ESR", ip_address: "172.17.102.218", mac: "00-04-7D-27-9F-CF", client: "KFTL" },
+        { name: "HM8 PTZ", zone: "NORTH", status: "Online", comments: "Up to date", model: "PELCO P2820-ESR", ip_address: "172.17.102.221", mac: "00-04-7D-27-9F-C9", client: "KFTL" },
+        { name: "N25 PTZ", zone: "NORTH", status: "Offline", comments: "Defective - Replace Camera", model: "PELCO P2820-ESR", ip_address: "172.17.102.216", mac: "00-04-7D-27-9F-BA", client: "KFTL" },
+        { name: "A7 PTZ", zone: "SOUTH", status: "Offline", comments: "Camera Defective - Replace", model: "PELCO P2820-ESR", ip_address: "172.17.103.36", mac: "00-04-7D-27-9F-CA", client: "KFTL" },
+        { name: "A8 PTZ", zone: "SOUTH", status: "Offline", comments: "Camera Defective - Replace", model: "PELCO P2820-ESR", ip_address: "172.17.103.37", mac: "00-04-7D-27-9F-F9", client: "KFTL" },
+        { name: "C1 PTZ", zone: "SOUTH", status: "Offline", comments: "Camera Defective", model: "PELCO P2820-ESR", ip_address: "172.17.103.81", mac: "00-04-7D-27-9F-F2", client: "KFTL" },
+        { name: "W1", zone: "WEST", status: "Offline", comments: "No network connection due to W2 being offline", model: "Avigilon 5.0C-H5A-DP2", ip_address: "172.17.103.155", mac: "00-18-85-30-A2-10", client: "KFTL" },
+        { name: "W2", zone: "WEST", status: "Offline", comments: "No power or network connectivity at Pole", model: "PELCO P2820-ESR", ip_address: "172.17.102.244", mac: "00-04-7D-27-F4-31", client: "KFTL" },
+        { name: "WB1 PTZ", zone: "WEST", status: "Offline", comments: "Camera defective - replaced with P-series", model: "AXIS P3267-LVE", ip_address: "172.17.102.198", mac: "B8-A4-4F-D3-36-33", client: "KFTL" },
+        { name: "Manager Car Park PTZ", zone: "NORTH", status: "Offline", comments: "Defective - Replace Camera", model: "PELCO P2820-ESR", ip_address: "172.17.102.186", mac: "00-04-7D-27-A0-06", client: "KFTL" },
+        { name: "Visitor Car Park PTZ 2", zone: "NORTH", status: "Offline", comments: "To be replaced - AXIS Q6318-LE", model: "PELCO P2820-ESR", ip_address: "172.17.102.185", mac: "00-04-7D-27-9F-E2", client: "KFTL" },
+        { name: "South Perim PTZ", zone: "SOUTH", status: "Offline", comments: "Camera defective - Replace", model: "PELCO P2820-ESR", ip_address: "172.17.103.86", mac: "00-04-7D-27-9F-CC", client: "KFTL" }
       ];
+
+      kftlCameras.forEach(function(cam) {
+        CAMERAS.push(cam);
+      });
+
       localStorage.setItem('ccsm_cameras', JSON.stringify(CAMERAS));
     }
 
     if (DOORS.length === 0) {
-      DOORS = [
-        { name: "Main Entrance", site: "Security Office", client: "KFTL", status: "Online", tech: "Shanice Vernon", reader: "HID Prox", lock: "Magnetic", powered: "Yes", ip: "10.19.1.100", controller: "Controller A", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "Yes", controllerType: "Standalone", purchase_date: "2024-01-01", warranty_expiry: "2026-01-01", history: [{ time: "08:00", event: "Door installed" }] },
-        { name: "2nd Entrance", site: "SAL Duty Office", client: "KFTL", status: "Offline", tech: "Marvin Grant", reader: "HID Prox", lock: "Magnetic", powered: "Yes", ip: "10.19.1.101", controller: "Controller B", doorSwing: "Out", accessType: "Read In + Push Out", antiPassback: "No", controllerType: "Integrated", purchase_date: "2024-02-15", warranty_expiry: "2026-02-15", history: [{ time: "09:30", event: "Offline reported" }] }
+      // Add Lasco doors
+      LASCO_DOORS.forEach(function(door) {
+        DOORS.push({
+          name: door.name,
+          site: door.site,
+          client: door.client || 'Lasco',
+          status: door.status || 'Online',
+          comments: door.comments || '',
+          tech: door.tech || 'Unassigned',
+          reader: door.reader || 'HID Prox',
+          lock: door.lock || 'Magnetic',
+          powered: door.powered || 'Yes',
+          doorSwing: door.doorSwing || 'In',
+          accessType: door.accessType || 'Read In + Read Out',
+          antiPassback: door.antiPassback || 'No',
+          controllerType: door.controllerType || 'Standalone',
+          ip: door.ip || '',
+          controller: door.controller || '',
+          purchase_date: door.purchase_date || '',
+          warranty_expiry: door.warranty_expiry || '',
+          history: door.history || []
+        });
+      });
+
+      // Add KFTL sample doors
+      var kftlDoors = [
+        { name: "Main Entrance", site: "Security Office", client: "KFTL", status: "Online", tech: "Shanice Vernon", reader: "HID Prox", lock: "Magnetic", powered: "Yes", ip: "10.19.1.100", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "Yes", controllerType: "Standalone" },
+        { name: "2nd Entrance", site: "SAL Duty Office", client: "KFTL", status: "Offline", tech: "Marvin Grant", reader: "HID Prox", lock: "Magnetic", powered: "Yes", ip: "10.19.1.101", doorSwing: "Out", accessType: "Read In + Push Out", antiPassback: "No", controllerType: "Integrated" }
       ];
+
+      kftlDoors.forEach(function(door) {
+        DOORS.push(door);
+      });
+
       localStorage.setItem('ccsm_doors', JSON.stringify(DOORS));
     }
 
@@ -3360,8 +3515,9 @@ if (validClients[username] && validClients[username].password === password) {
 
     if (SERVICE_REQUESTS.length === 0) {
       SERVICE_REQUESTS = [
-        { id: "SR-1847", client: "KFTL", site: "NORTH", subject: "8 Cameras Defective in NORTH Zone", from: "David Chen", category: "Camera", priority: "High", status: "Open", assigned: "Shanice Vernon", received: "Jun 15, 2026", body: "Multiple cameras showing as defective in NORTH zone. Need immediate attention.", notes: "Awaiting parts", history: [{ time: "14:22", msg: "Created" }, { time: "15:00", msg: "Assigned to Shanice" }], attachments: [] },
-        { id: "SR-1848", client: "KWL", site: "Tinson Pen", subject: "5 Cameras Offline - Urgent", from: "Andrea Williams", category: "Camera", priority: "High", status: "In Progress", assigned: "Marvin Grant", received: "Jun 15, 2026", body: "5 cameras down simultaneously at Tinson Pen. Need eyes back up ASAP.", notes: "On-site investigation", history: [{ time: "11:05", msg: "Created" }, { time: "12:30", msg: "Dispatched to site" }], attachments: [] }
+        { id: "SR-1847", client: "KFTL", site: "NORTH", subject: "8 Cameras Defective in NORTH Zone", from: "David Chen", category: "Camera", priority: "High", status: "Open", assigned: "Shanice Vernon", received: "Jun 15, 2026", body: "Multiple cameras showing as defective in NORTH zone. Need immediate attention. HM3 PTZ, HM11 PTZ, N25 PTZ, Manager Car Park PTZ, Visitor Car Park PTZ 2 all defective.", notes: "Awaiting parts", history: [{ time: "14:22", msg: "Created" }, { time: "15:00", msg: "Assigned to Shanice" }], attachments: [] },
+        { id: "SR-1848", client: "KWL", site: "Tinson Pen", subject: "5 Cameras Offline - Urgent", from: "Andrea Williams", category: "Camera", priority: "High", status: "In Progress", assigned: "Marvin Grant", received: "Jun 15, 2026", body: "5 cameras down simultaneously at Tinson Pen. Need eyes back up ASAP.", notes: "On-site investigation", history: [{ time: "11:05", msg: "Created" }, { time: "12:30", msg: "Dispatched to site" }], attachments: [] },
+        { id: "SR-1850", client: "Lasco", site: "LDL Warehouse", subject: "Camera LML-01 Offline", from: "Vincent Hoo", category: "Camera", priority: "Medium", status: "Open", assigned: "Marvin Grant", received: "Jun 17, 2026", body: "Camera LML-01 reported offline at LML B Liquid Plant. Power outage reported.", notes: "", history: [{ time: "06:30", msg: "Created" }], attachments: [] }
       ];
       localStorage.setItem('ccsm_sr', JSON.stringify(SERVICE_REQUESTS));
     }
@@ -3977,7 +4133,7 @@ if (validClients[username] && validClients[username].password === password) {
       document.getElementById('door-total').textContent = total;
       document.getElementById('door-online').textContent = DOORS.filter(function(d) { return d.status === 'Online'; }).length;
       document.getElementById('door-offline').textContent = DOORS.filter(function(d) { return d.status === 'Offline'; }).length;
-      document.getElementById('door-maintenance').textContent = DOORS.filter(function(d) { return d.status === 'Under Maintenance'; }).length;
+      document.getElementById('door-maintenance').textContent = DOORS.filter(function(d) { return d.status === 'Under Maintenance' || d.status === 'Not In Use'; }).length;
 
       var groups = {};
       filtered.forEach(function(d) { if (!groups[d.site]) groups[d.site] = []; groups[d.site].push(d); });
@@ -4039,7 +4195,7 @@ if (validClients[username] && validClients[username].password === password) {
       '<div class="modal-field"><label>Reader</label><span>' + (door.reader || '—') + '</span></div>' +
       '<div class="modal-field"><label>Lock Type</label><span>' + (door.lock || '—') + '</span></div>' +
       '<div class="modal-field"><label>Powered</label><span style="color:' + (door.powered === 'Not In Use' ? '#fbbf24' : '#4ade80') + ';">' + (door.powered || '—') + '</span></div>' +
-      '<div class="modal-field"><label>Status</label><select class="status-select" id="modal-door-status" onchange="door.status=this.value;renderDoorsEnhanced();"><option value="Online" ' + (door.status === 'Online' ? 'selected' : '') + '>Online</option><option value="Offline" ' + (door.status === 'Offline' ? 'selected' : '') + '>Offline</option><option value="Under Maintenance" ' + (door.status === 'Under Maintenance' ? 'selected' : '') + '>Under Maintenance</option></select></div>' +
+      '<div class="modal-field"><label>Status</label><select class="status-select" id="modal-door-status" onchange="door.status=this.value;renderDoorsEnhanced();"><option value="Online" ' + (door.status === 'Online' ? 'selected' : '') + '>Online</option><option value="Offline" ' + (door.status === 'Offline' ? 'selected' : '') + '>Offline</option><option value="Under Maintenance" ' + (door.status === 'Under Maintenance' ? 'selected' : '') + '>Under Maintenance</option><option value="Not In Use" ' + (door.status === 'Not In Use' ? 'selected' : '') + '>Not In Use</option></select></div>' +
       '<div class="modal-field"><label>Technician</label><select class="status-select" id="modal-door-tech" onchange="door.tech=this.value;renderDoorsEnhanced();"><option value="Shanice Vernon" ' + (door.tech === 'Shanice Vernon' ? 'selected' : '') + '>Shanice Vernon</option><option value="Shavine" ' + (door.tech === 'Shavine' ? 'selected' : '') + '>Shavine</option><option value="Marvin Grant" ' + (door.tech === 'Marvin Grant' ? 'selected' : '') + '>Marvin Grant</option><option value="Ackeem" ' + (door.tech === 'Ackeem' ? 'selected' : '') + '>Ackeem</option><option value="Unassigned" ' + (door.tech === 'Unassigned' ? 'selected' : '') + '>Unassigned</option></select></div>' +
       '<div class="modal-field"><label>Door Swing</label><select class="status-select" id="modal-door-swing" onchange="door.doorSwing=this.value;"><option value="In" ' + (door.doorSwing === 'In' ? 'selected' : '') + '>In</option><option value="Out" ' + (door.doorSwing === 'Out' ? 'selected' : '') + '>Out</option></select></div>' +
       '<div class="modal-field"><label>Access Type</label><select class="status-select" id="modal-door-access-type" onchange="door.accessType=this.value;"><option value="Read In + Read Out" ' + (door.accessType === 'Read In + Read Out' ? 'selected' : '') + '>Read In + Read Out</option><option value="Read In + Push Out" ' + (door.accessType === 'Read In + Push Out' ? 'selected' : '') + '>Read In + Push Out</option><option value="Read In Only" ' + (door.accessType === 'Read In Only' ? 'selected' : '') + '>Read In Only</option><option value="Push Out Only" ' + (door.accessType === 'Push Out Only' ? 'selected' : '') + '>Push Out Only</option><option value="RTE Only" ' + (door.accessType === 'RTE Only' ? 'selected' : '') + '>RTE Only</option><option value="Read In + RTE" ' + (door.accessType === 'Read In + RTE' ? 'selected' : '') + '>Read In + RTE</option></select></div>' +
@@ -5979,7 +6135,11 @@ if (validClients[username] && validClients[username].password === password) {
   });
 
   console.log('🚀 CAMS - Client Assessment Management System loaded successfully.');
-  console.log('📊 Client count:', CLIENTS.length);
+  console.log('📷 Total Lasco cameras loaded:', LASCO_CAMERAS.length);
+  console.log('🚪 Total Lasco doors loaded:', LASCO_DOORS.length);
+  console.log('📊 Total cameras in system:', CAMERAS.length);
+  console.log('📊 Total doors in system:', DOORS.length);
+  console.log('👤 Client count:', CLIENTS.length);
   console.log('🔐 Login with admin/admin123 or client credentials');
 </script>
 </body>
