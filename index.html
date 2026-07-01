@@ -2283,85 +2283,23 @@
     });
   }
 
-// Add this function to reset client theme styles
-function resetClientTheme() {
-  // Remove client-mode class from app
-  var app = document.getElementById('app');
-  if (app) app.classList.remove('client-mode');
-  
-  // Reset client-view-container
-  var container = document.getElementById('client-view-container');
-  if (container) container.classList.remove('client-mode');
-  
-  // Reset client primary color variables to default
-  document.documentElement.style.setProperty('--client-primary', '#4f8cf7');
-  document.documentElement.style.setProperty('--client-secondary', '#00d4ff');
-  document.documentElement.style.setProperty('--client-gradient', 'linear-gradient(135deg, #4f8cf7, #00d4ff)');
-  document.documentElement.style.setProperty('--client-glow', 'rgba(79, 140, 247, 0.3)');
-  
-  // Reset sidebar logo
-  var logoImg = document.getElementById('logo-img');
-  if (logoImg) logoImg.src = 'logo.png';
-  
-  // Re-apply the saved theme
-  var savedTheme = localStorage.getItem('ccsm_theme') || 'dark';
-  setTheme(savedTheme);
-}
-
-// Update the logout function
-function logout() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  token = null;
-  currentUser = null;
-  userClient = null;
-  currentClientFilter = null;
-  currentZoneFilter = null;
-  isAdmin = true;
-  clientViewUser = null;
-  clientViewData = null;
-  isClientMode = false;
-  
-  // Reset client theme styles before showing login
-  resetClientTheme();
-  
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('client-view-container').style.display = 'none';
-  showLogin();
-  toast('Logged out', 'info');
-}
-
-// Also update the loginLocal function for client logout flow
-// In the client login section, when a client logs in, we need to ensure 
-// the admin app gets reset properly
-
-// Update the client login section in loginLocal:
-if (validClients[username] && validClients[username].password === password) {
-  // Reset any admin theme first
-  resetClientTheme();
-  
-  clientViewUser = validClients[username];
-  var clientKey = username;
-  var clientDataFull = getClientViewData(clientKey);
-  
-  if (!clientDataFull) {
-    errorDiv.textContent = 'Client data not found';
-    errorDiv.style.display = 'block';
-    loadingDiv.classList.remove('active');
-    return;
+  function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    token = null;
+    currentUser = null;
+    userClient = null;
+    currentClientFilter = null;
+    currentZoneFilter = null;
+    isAdmin = true;
+    clientViewUser = null;
+    clientViewData = null;
+    isClientMode = false;
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('client-view-container').style.display = 'none';
+    showLogin();
+    toast('Logged out', 'info');
   }
-
-  hideLogin();
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('client-view-container').style.display = 'block';
-  
-  // Initialize client view
-  initClientView(clientDataFull, clientViewUser);
-  
-  toast('Welcome, ' + clientDataFull.name + '!', 'success');
-  loadingDiv.classList.remove('active');
-  return;
-}
 
   function applyClientBranding(client) {
     console.log('Client branding applied for:', client);
