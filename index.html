@@ -268,6 +268,15 @@
     font-weight: 500;
     color: #1a1a2e;
   }
+  .client-topbar .topbar-actions .etech-logo {
+    height: 28px;
+    width: auto;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+  .client-topbar .topbar-actions .etech-logo:hover {
+    opacity: 1;
+  }
   .client-topbar .topbar-actions .logout-btn {
     padding: 6px 14px;
     border-radius: 6px;
@@ -421,9 +430,30 @@
   .welcome-banner .welcome-content .sub {
     font-size: 14px;
     color: rgba(255,255,255,0.8);
+    font-weight: 500;
   }
   .welcome-banner .welcome-content .sub strong {
     color: #fff;
+  }
+  .welcome-banner .welcome-content .health-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255,255,255,0.12);
+    padding: 6px 18px 6px 14px;
+    border-radius: 20px;
+    margin-top: 10px;
+    backdrop-filter: blur(4px);
+  }
+  .welcome-banner .welcome-content .health-display .health-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .welcome-banner .welcome-content .health-display .health-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 500;
   }
   .welcome-banner .welcome-content .client-badge {
     display: inline-flex;
@@ -434,6 +464,7 @@
     border-radius: 20px;
     margin-top: 10px;
     backdrop-filter: blur(4px);
+    margin-left: 12px;
   }
   .welcome-banner .welcome-content .client-badge img {
     height: 24px;
@@ -470,7 +501,7 @@
     color: #999;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    font-weight: 600;
+    font-weight: 700;
   }
   .stat-card .stat-value {
     font-size: 30px;
@@ -505,8 +536,8 @@
   }
   .panel-title {
     font-size: 12px;
-    font-weight: 600;
-    color: #999;
+    font-weight: 700;
+    color: #666;
     text-transform: uppercase;
     letter-spacing: 0.08em;
   }
@@ -877,6 +908,7 @@
     .stats-grid { grid-template-columns: 1fr; }
     .client-topbar { padding: 0 16px; height: 56px; }
     .client-topbar .brand .client-name .tag { display: none; }
+    .client-topbar .topbar-actions .etech-logo { display: none; }
     .client-content { padding: 12px; }
     .welcome-banner { padding: 20px; }
     .welcome-banner .welcome-content h1 { font-size: 20px; }
@@ -970,6 +1002,7 @@
         <span class="client-name" id="client-name">Client Name <span class="tag">· Client Portal</span></span>
       </div>
       <div class="topbar-actions">
+        <img class="etech-logo" id="etech-logo" src="logo-light.png" alt="ETech">
         <div class="user-profile">
           <div class="avatar" id="user-avatar">JD</div>
           <span class="name" id="user-name">User</span>
@@ -1016,10 +1049,16 @@
             <div class="welcome-content">
               <div class="greeting" id="greeting-text">Good morning</div>
               <h1 id="welcome-title">Welcome back, Client</h1>
-              <div class="sub" id="welcome-sub">Your security systems are <strong>operational</strong> · <span id="online-count">0</span> assets online</div>
-              <div class="client-badge">
-                <img id="badge-logo" src="logo.png" alt="Logo">
-                <span id="badge-name">Client Name</span>
+              <div class="sub" id="welcome-sub">Your security systems are <strong>operational</strong></div>
+              <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
+                <div class="health-display">
+                  <span class="health-value" id="health-percentage">98%</span>
+                  <span class="health-label">System Health</span>
+                </div>
+                <div class="client-badge">
+                  <img id="badge-logo" src="logo.png" alt="Logo">
+                  <span id="badge-name">Client Name</span>
+                </div>
               </div>
             </div>
           </div>
@@ -1487,6 +1526,17 @@
       el.onerror = function() { this.src = 'logo.png'; };
     });
     
+    // Set ETech logo - use light mode for white background, default for dark
+    var etechLogo = document.getElementById('etech-logo');
+    // Check if client uses light theme (white background)
+    if (primaryColor === '#e31b23' || primaryColor === '#8b5cf6') {
+      // Light background clients - use light mode logo
+      etechLogo.src = 'logo-light.png';
+    } else {
+      etechLogo.src = 'logo.png';
+    }
+    etechLogo.onerror = function() { this.src = 'logo.png'; };
+    
     // Set names
     document.getElementById('client-name').innerHTML = clientData.name + ' <span class="tag">· Client Portal</span>';
     document.getElementById('sidebar-name').textContent = clientData.name;
@@ -1537,6 +1587,20 @@
     return 'Good night';
   }
 
+  function getHealthStatus(percentage) {
+    if (percentage >= 100) return 'All systems nominal';
+    if (percentage >= 60) return 'Your security systems are near peak operational level';
+    if (percentage >= 30) return 'Your security systems are partially operational';
+    return 'Your security systems are being prioritized';
+  }
+
+  function calculateSystemHealth() {
+    var allAssets = getAllClientAssets();
+    if (allAssets.length === 0) return 100;
+    var online = allAssets.filter(function(a) { return a.status === 'Online' || a.status === 'ONLINE'; }).length;
+    return Math.round((online / allAssets.length) * 100);
+  }
+
   // ============================================================
   // ── NAVIGATION ──────────────────────────────────────────────
   // ============================================================
@@ -1574,19 +1638,23 @@
     var online = allAssets.filter(function(a) { return a.status === 'Online' || a.status === 'ONLINE'; }).length;
     var offline = total - online;
     var openSRs = clientData.srs.filter(function(s) { return s.status !== 'Resolved'; }).length;
+    var health = total > 0 ? Math.round((online / total) * 100) : 100;
     
     // Stats
     document.getElementById('stat-total').textContent = total;
     document.getElementById('stat-online').textContent = online;
     document.getElementById('stat-offline').textContent = offline;
     document.getElementById('stat-srs').textContent = openSRs;
-    document.getElementById('online-count').textContent = online;
     
     // Welcome greeting - time based
     var greeting = getGreeting();
     document.getElementById('greeting-text').textContent = greeting;
     document.getElementById('welcome-title').textContent = 'Welcome back, ' + clientData.name;
-    document.getElementById('welcome-sub').innerHTML = 'Your security systems are <strong>' + (online === total ? 'fully operational' : 'partially operational') + '</strong> · <span id="online-count">' + online + '</span> assets online';
+    
+    // Health status message
+    var healthMessage = getHealthStatus(health);
+    document.getElementById('welcome-sub').innerHTML = healthMessage;
+    document.getElementById('health-percentage').textContent = health + '%';
     
     // Client-specific timeline
     renderClientTimeline();
