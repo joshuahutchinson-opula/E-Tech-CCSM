@@ -125,8 +125,8 @@
     padding: 40px 48px;
     border-radius: 16px;
     border: 1px solid rgba(0,0,0,0.06);
-    width: 400px;
-    max-width: 90%;
+    width: 420px;
+    max-width: 92%;
     text-align: center;
     box-shadow: 0 8px 40px rgba(0,0,0,0.08);
   }
@@ -1554,6 +1554,115 @@
         { time: '09:30', msg: 'Marvin dispatched to Tinson Pen', type: 'info' },
         { time: '13:00', msg: 'Camera TP-01 back online', type: 'success' }
       ]
+    },
+    'lasco': {
+      name: 'Lasco',
+      logo: 'logo-lasco.png',
+      color: '#059669',
+      secondary: '#047857',
+      assets: {
+        cameras: [
+          { name: 'LP-01', zone: 'Liquid Plant', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.20.1.10', install_date: '2024-02-01', history: [{ date: '2024-06-10', event: 'Firmware updated' }] },
+          { name: 'LP-02', zone: 'Liquid Plant', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.20.1.11', install_date: '2024-03-15', history: [] },
+          { name: 'LDL-01', zone: 'LDL Warehouse', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.20.2.20', install_date: '2024-01-15', history: [{ date: '2024-05-20', event: 'Lens cleaned' }] },
+          { name: 'LML-01', zone: 'LML B Liquid Plant', status: 'Offline', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.20.3.30', install_date: '2023-12-01', history: [{ date: '2024-06-01', event: 'Power outage reported' }] }
+        ],
+        doors: [
+          { name: 'Main Gate', zone: 'Liquid Plant', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Shanice Vernon', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-01-15', history: [{ date: '2024-05-15', event: 'Routine maintenance' }] }
+        ],
+        servers: [
+          { name: 'LASCO-SRV-01', zone: 'Liquid Plant', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', serial: 'LASCO-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-01-01', history: [] }
+        ],
+        switches: [
+          { name: 'LP Switch 1', zone: 'Liquid Plant', status: 'Online', model: 'AXIS T8508', ip_address: '10.20.1.21', firmware: '6.54.2739', install_date: '2024-02-01', history: [{ date: '2024-06-01', event: 'Port configuration updated' }] }
+        ]
+      },
+      srs: [
+        { id: 'SR-1850', subject: 'Camera LML-01 Offline', priority: 'Medium', status: 'Open', date: 'Jun 17, 2026' }
+      ],
+      activity: [
+        { time: '06:30', msg: 'Camera LML-01 reported offline', type: 'urgent' },
+        { time: '08:00', msg: 'SR-1850 assigned to Marvin', type: 'info' }
+      ]
+    },
+    'nestle': {
+      name: 'Nestle',
+      logo: 'logo-nestle.png',
+      color: '#f59e0b',
+      secondary: '#d97706',
+      assets: {
+        cameras: [
+          { name: 'NE-01', zone: 'Main Plant', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.21.1.10', install_date: '2024-03-01', history: [] },
+          { name: 'NE-02', zone: 'Main Plant', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.21.1.11', install_date: '2024-04-15', history: [{ date: '2024-07-01', event: 'Firmware updated' }] },
+          { name: 'NE-03', zone: 'Warehouse', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.21.2.20', install_date: '2024-02-15', history: [{ date: '2024-06-15', event: 'Lens cleaned' }] }
+        ],
+        doors: [
+          { name: 'Plant Main', zone: 'Main Plant', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Ackeem', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-03-01', history: [{ date: '2024-06-20', event: 'Battery replaced' }] }
+        ],
+        servers: [
+          { name: 'NESTLE-SRV-01', zone: 'Main Plant', status: 'ONLINE', make: 'HP', model: 'ProLiant DL380', serial: 'NESTLE-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-02-01', history: [] }
+        ],
+        switches: [
+          { name: 'NE Switch 1', zone: 'Main Plant', status: 'Online', model: 'AXIS T8516', ip_address: '10.21.1.21', firmware: '6.54.2739', install_date: '2024-03-15', history: [] }
+        ]
+      },
+      srs: [],
+      activity: [
+        { time: '09:00', msg: 'System health check passed', type: 'success' },
+        { time: '11:30', msg: 'Camera NE-03 lens cleaned', type: 'info' }
+      ]
+    },
+    'nids': {
+      name: 'NIDS',
+      logo: 'logo-nids.png',
+      color: '#3b82f6',
+      secondary: '#2563eb',
+      assets: {
+        cameras: [
+          { name: 'NIDS-01', zone: 'Main Office', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.22.1.10', install_date: '2024-01-15', history: [{ date: '2024-06-01', event: 'Firmware updated' }] },
+          { name: 'NIDS-02', zone: 'Main Office', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.22.1.11', install_date: '2024-03-01', history: [] }
+        ],
+        doors: [
+          { name: 'Office Main', zone: 'Main Office', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Shavine', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-02-01', history: [{ date: '2024-05-20', event: 'Routine maintenance' }] }
+        ],
+        servers: [
+          { name: 'NIDS-SRV-01', zone: 'Main Office', status: 'ONLINE', make: 'Lenovo', model: 'ThinkSystem SR650', serial: 'NIDS-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-01-01', history: [] }
+        ],
+        switches: [
+          { name: 'NIDS Switch 1', zone: 'Main Office', status: 'Online', model: 'AXIS T8508', ip_address: '10.22.1.21', firmware: '6.54.2739', install_date: '2024-02-15', history: [] }
+        ]
+      },
+      srs: [],
+      activity: [
+        { time: '07:30', msg: 'System online - all assets operational', type: 'success' }
+      ]
+    },
+    'nutrien': {
+      name: 'Nutrien',
+      logo: 'logo-nutrien.png',
+      color: '#ec4899',
+      secondary: '#db2777',
+      assets: {
+        cameras: [
+          { name: 'NU-01', zone: 'Main Plant', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.23.1.10', install_date: '2024-03-15', history: [{ date: '2024-06-30', event: 'Firmware updated' }] },
+          { name: 'NU-02', zone: 'Main Plant', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.23.1.11', install_date: '2024-04-01', history: [] },
+          { name: 'NU-03', zone: 'Warehouse', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.23.2.20', install_date: '2024-02-01', history: [{ date: '2024-06-20', event: 'Lens cleaned' }] }
+        ],
+        doors: [
+          { name: 'Plant Main', zone: 'Main Plant', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Marvin Grant', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-03-01', history: [{ date: '2024-06-10', event: 'Battery replaced' }] }
+        ],
+        servers: [
+          { name: 'NUTRIEN-SRV-01', zone: 'Main Plant', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', serial: 'NUTRIEN-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-02-15', history: [] }
+        ],
+        switches: [
+          { name: 'NU Switch 1', zone: 'Main Plant', status: 'Online', model: 'AXIS T8516', ip_address: '10.23.1.21', firmware: '6.54.2739', install_date: '2024-03-15', history: [{ date: '2024-06-01', event: 'Port configuration updated' }] }
+        ]
+      },
+      srs: [],
+      activity: [
+        { time: '08:00', msg: 'System health check - all nominal', type: 'success' },
+        { time: '10:30', msg: 'Camera NU-03 lens cleaned', type: 'info' }
+      ]
     }
   };
 
@@ -1639,7 +1748,11 @@
     
     var validClients = {
       'kftl': { password: 'kftl123', client: 'kftl' },
-      'kwl': { password: 'kwl123', client: 'kwl' }
+      'kwl': { password: 'kwl123', client: 'kwl' },
+      'lasco': { password: 'lasco123', client: 'lasco' },
+      'nestle': { password: 'nestle123', client: 'nestle' },
+      'nids': { password: 'nids123', client: 'nids' },
+      'nutrien': { password: 'nutrien123', client: 'nutrien' }
     };
     
     setTimeout(function() {
@@ -1696,7 +1809,7 @@
     
     // Set ETech logo - use light mode for white background clients
     var etechLogo = document.getElementById('etech-logo');
-    if (primaryColor === '#e31b23' || primaryColor === '#8b5cf6') {
+    if (primaryColor === '#e31b23' || primaryColor === '#8b5cf6' || primaryColor === '#059669' || primaryColor === '#f59e0b' || primaryColor === '#3b82f6' || primaryColor === '#ec4899') {
       etechLogo.src = 'logo-light.png';
     } else {
       etechLogo.src = 'logo.png';
@@ -2341,7 +2454,13 @@
   // ============================================================
 
   console.log('🚀 Client Portal loaded successfully.');
-  console.log('📋 Demo credentials: kftl / kftl123 or kwl / kwl123');
+  console.log('📋 Demo credentials:');
+  console.log('   kftl / kftl123');
+  console.log('   kwl / kwl123');
+  console.log('   lasco / lasco123');
+  console.log('   nestle / nestle123');
+  console.log('   nids / nids123');
+  console.log('   nutrien / nutrien123');
 </script>
 </body>
 </html>
