@@ -1847,9 +1847,9 @@
     document.getElementById('sidebar-name').textContent = clientData.name;
     document.getElementById('badge-name').textContent = clientData.name;
     
-    // Set user
-    document.getElementById('user-name').textContent = currentUser.username;
-    document.getElementById('user-avatar').textContent = currentUser.username.slice(0, 2).toUpperCase();
+// Set user - only show avatar, no client name
+document.getElementById('user-name').textContent = '';
+document.getElementById('user-avatar').textContent = currentUser.username.slice(0, 2).toUpperCase();
     
     // Update badges
     updateBadges();
