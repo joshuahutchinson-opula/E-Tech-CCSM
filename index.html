@@ -249,7 +249,6 @@
     border-radius: 8px;
     border: 1px solid var(--client-border);
     background: #f8f9fa;
-    cursor: pointer;
   }
   .client-topbar .topbar-actions .user-profile .avatar {
     width: 30px;
@@ -260,7 +259,7 @@
     align-items: center;
     justify-content: center;
     color: #fff;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 12px;
   }
   .client-topbar .topbar-actions .user-profile .name {
@@ -271,10 +270,6 @@
   .client-topbar .topbar-actions .etech-logo {
     height: 34px;
     width: auto;
-    opacity: 0.7;
-    transition: opacity 0.2s;
-  }
-  .client-topbar .topbar-actions .etech-logo:hover {
     opacity: 1;
   }
   .client-topbar .topbar-actions .logout-btn {
@@ -1125,7 +1120,7 @@
           <div class="welcome-banner">
             <div class="welcome-content">
               <div class="greeting" id="greeting-text">Good morning</div>
-              <h1 id="welcome-title">Welcome back, Client</h1>
+              <h1 id="welcome-title">24/7 Support, Client</h1>
               <div class="sub" id="welcome-sub">Your security systems are <strong>operational</strong></div>
               <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
                 <div class="health-display">
@@ -1511,8 +1506,8 @@
           { name: '2nd Entrance', zone: 'SAL Duty Office', status: 'Offline', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Marvin Grant', doorSwing: 'Out', accessType: 'Read In + Push Out', antiPassback: 'No', controllerType: 'Integrated', install_date: '2024-02-15', history: [{ date: '2024-05-30', event: 'Offline alert' }] }
         ],
         servers: [
-          { name: 'J1013DDR', zone: 'Kingport', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5, LPR', install_date: '2024-01-15', history: [{ date: '2024-07-01', event: 'Firmware update' }] },
-          { name: 'J1013DDV', zone: 'Kingport', status: 'ONLINE', make: 'HP', model: 'ProLiant DL380', capacity: '6.11TB', used: '1.4TB', health: 'Good, Failed drive', apps: 'Ocularis DM6, Eyelock', install_date: '2023-06-01', history: [{ date: '2024-06-20', event: 'Drive replacement advised' }] }
+          { name: 'J1013DDR', zone: 'Kingport', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', serial: 'J1013DDR', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5, LPR', install_date: '2024-01-15', history: [{ date: '2024-07-01', event: 'Firmware update' }] },
+          { name: 'J1013DDV', zone: 'Kingport', status: 'ONLINE', make: 'HP', model: 'ProLiant DL380', serial: 'J1013DDV', capacity: '6.11TB', used: '1.4TB', health: 'Good, Failed drive', apps: 'Ocularis DM6, Eyelock', install_date: '2023-06-01', history: [{ date: '2024-06-20', event: 'Drive replacement advised' }] }
         ],
         switches: [
           { name: 'Main Entrance', zone: 'Security Office', status: 'Online', model: 'AXIS T8508', ip_address: '10.19.1.21', firmware: '6.54.2739', install_date: '2024-02-01', history: [{ date: '2024-07-15', event: 'Firmware updated' }] },
@@ -1545,7 +1540,7 @@
           { name: 'Warehouse Main', zone: 'Warehouse 1', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Ackeem', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-02-01', history: [{ date: '2024-05-15', event: 'Battery replaced' }] }
         ],
         servers: [
-          { name: 'KWL-SRV-01', zone: 'Tinson Pen', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-01-01', history: [] }
+          { name: 'KWL-SRV-01', zone: 'Tinson Pen', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', serial: 'KWL-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-01-01', history: [] }
         ],
         switches: [
           { name: 'TP Switch 1', zone: 'Tinson Pen', status: 'Online', model: 'AXIS T8508', ip_address: '10.19.1.21', firmware: '6.54.2739', install_date: '2024-02-15', history: [{ date: '2024-06-01', event: 'Port configuration updated' }] }
@@ -1758,10 +1753,10 @@
 
   function getGreeting() {
     var hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) return 'Good morning';
-    if (hour >= 12 && hour < 17) return 'Good afternoon';
-    if (hour >= 17 && hour < 21) return 'Good evening';
-    return 'Good night';
+    if (hour >= 5 && hour < 12) return 'Good Morning';
+    if (hour >= 12 && hour < 17) return 'Good Afternoon';
+    if (hour >= 17 && hour < 21) return 'Good Evening';
+    return 'Good Night';
   }
 
   function getHealthStatus(percentage) {
@@ -1861,7 +1856,7 @@
     // Welcome greeting - time based
     var greeting = getGreeting();
     document.getElementById('greeting-text').textContent = greeting;
-    document.getElementById('welcome-title').textContent = 'Welcome back, ' + clientData.name;
+    document.getElementById('welcome-title').textContent = '24/7 Support, ' + clientData.name;
     
     // Health status message
     var healthMessage = getHealthStatus(health);
