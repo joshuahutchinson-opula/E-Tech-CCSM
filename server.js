@@ -1,714 +1,995 @@
 // ============================================================
-// CCSM BACKEND — Full API
+// ── CAMS SERVER ──────────────────────────────────────────────
+// ── Client Assessment Management System Backend ────────────
 // ============================================================
 
 const express = require('express');
 const cors = require('cors');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { Pool } = require('pg');
-const rateLimit = require('express-rate-limit');
-const helmet = require('helmet');
+const bcrypt = require('bcryptjs');
+const fs = require('fs');
 const path = require('path');
-require('dotenv').config();
+const nodemailer = require('nodemailer');
 
 const app = express();
-app.set('trust proxy', 1);
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
+const JWT_SECRET = process.env.JWT_SECRET || 'cams-super-secret-key-2026';
 
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
-  console.error('❌ FATAL: JWT_SECRET environment variable is not set. Refusing to start.');
-  console.error('   Set JWT_SECRET in Railway → Variables before deploying.');
-  process.exit(1);
+// ============================================================
+// ── MIDDLEWARE ────────────────────────────────────────────────
+// ============================================================
+
+app.use(cors());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// ============================================================
+// ── DATA STORAGE ──────────────────────────────────────────────
+// ============================================================
+
+const DATA_PATH = path.join(__dirname, 'data');
+if (!fs.existsSync(DATA_PATH)) {
+  fs.mkdirSync(DATA_PATH, { recursive: true });
 }
 
-const pool = process.env.DATABASE_URL
-  ? new Pool({
-      connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false },
-      max: 20,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000,
-    })
-  : new Pool({
-      host: process.env.DB_HOST || 'localhost',
-      port: process.env.DB_PORT || 5432,
-      user: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD || 'postgres',
-      database: process.env.DB_NAME || 'ccsm',
-      max: 20,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000,
-    });
+// In-memory data store (with file persistence)
+let dataStore = {
+  users: [],
+  clients: ['KFTL', 'KWL', 'Lasco', 'Nestle', 'NIDS', 'Nutrien'],
+  clientLogos: {},
+  cameras: [],
+  doors: [],
+  servers: [],
+  switches: [],
+  storage: [],
+  stations: [],
+  monitors: [],
+  software: [],
+  serviceRequests: [],
+  auditLog: [],
+  emails: [],
+  warrantyAlerts: []
+};
 
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-      scriptSrcAttr: ["'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://cdn.jsdelivr.net", "https://fonts.gstatic.com", "data:"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "https:"],
-    },
-  },
-}));
+function loadData() {
+  try {
+    const dataFile = path.join(DATA_PATH, 'data.json');
+    if (fs.existsSync(dataFile)) {
+      const rawData = fs.readFileSync(dataFile, 'utf8');
+      const loaded = JSON.parse(rawData);
+      dataStore = { ...dataStore, ...loaded };
+      console.log('✅ Data loaded from disk');
+    }
+  } catch (err) {
+    console.error('⚠️ Error loading data:', err.message);
+  }
+}
 
-app.use(cors({ origin: true, credentials: true }));
-app.use(express.json({ limit: '10mb' }));
+function saveData() {
+  try {
+    const dataFile = path.join(DATA_PATH, 'data.json');
+    fs.writeFileSync(dataFile, JSON.stringify(dataStore, null, 2), 'utf8');
+  } catch (err) {
+    console.error('⚠️ Error saving data:', err.message);
+  }
+}
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  trustProxy: true,
-  message: { error: 'Too many requests, please try again later.' }
+// Load data on startup
+loadData();
+
+// ============================================================
+// ── DEFAULT USERS ─────────────────────────────────────────────
+// ============================================================
+
+function initializeUsers() {
+  if (dataStore.users.length === 0) {
+    const hashedPassword = bcrypt.hashSync('admin123', 10);
+    dataStore.users = [
+      {
+        id: 'user-1',
+        username: 'admin',
+        password: hashedPassword,
+        role: 'Administrator',
+        isAdmin: true,
+        client: null,
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'user-2',
+        username: 'kftl',
+        password: bcrypt.hashSync('kftl123', 10),
+        role: 'Client User',
+        isAdmin: false,
+        client: 'KFTL',
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'user-3',
+        username: 'kwl',
+        password: bcrypt.hashSync('kwl123', 10),
+        role: 'Client User',
+        isAdmin: false,
+        client: 'KWL',
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'user-4',
+        username: 'lasco',
+        password: bcrypt.hashSync('lasco123', 10),
+        role: 'Client User',
+        isAdmin: false,
+        client: 'Lasco',
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'user-5',
+        username: 'nestle',
+        password: bcrypt.hashSync('nestle123', 10),
+        role: 'Client User',
+        isAdmin: false,
+        client: 'Nestle',
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'user-6',
+        username: 'nids',
+        password: bcrypt.hashSync('nids123', 10),
+        role: 'Client User',
+        isAdmin: false,
+        client: 'NIDS',
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'user-7',
+        username: 'nutrien',
+        password: bcrypt.hashSync('nutrien123', 10),
+        role: 'Client User',
+        isAdmin: false,
+        client: 'Nutrien',
+        createdAt: new Date().toISOString()
+      }
+    ];
+    saveData();
+    console.log('✅ Default users created');
+  }
+}
+
+initializeUsers();
+
+// ============================================================
+// ── EMAIL CONFIGURATION ──────────────────────────────────────
+// ============================================================
+
+// Email transporter configuration (using environment variables or defaults)
+const emailTransporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: parseInt(process.env.SMTP_PORT) || 587,
+  secure: process.env.SMTP_SECURE === 'true',
+  auth: {
+    user: process.env.SMTP_USER || 'support@e-techsystemsja.com',
+    pass: process.env.SMTP_PASS || 'your-email-password'
+  }
 });
-app.use('/api/', limiter);
 
-const authenticate = async (req, res, next) => {
+// Fallback: Log emails instead of sending when in development
+function sendEmail(to, subject, body) {
+  const mailOptions = {
+    from: process.env.SMTP_USER || 'support@e-techsystemsja.com',
+    to: to,
+    subject: subject,
+    html: body
+  };
+
+  // For development, log the email
+  if (process.env.NODE_ENV === 'development' || !process.env.SMTP_USER) {
+    console.log('📧 [EMAIL] To:', to);
+    console.log('📧 [EMAIL] Subject:', subject);
+    console.log('📧 [EMAIL] Body:', body.substring(0, 200) + '...');
+    return Promise.resolve({ messageId: 'dev-' + Date.now() });
+  }
+
+  return emailTransporter.sendMail(mailOptions);
+}
+
+// ============================================================
+// ── AUTHENTICATION ────────────────────────────────────────────
+// ============================================================
+
+function generateToken(user) {
+  return jwt.sign(
+    { id: user.id, username: user.username, isAdmin: user.isAdmin, client: user.client },
+    JWT_SECRET,
+    { expiresIn: '7d' }
+  );
+}
+
+function authenticate(req, res, next) {
   const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ error: 'No token provided' });
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized - No token provided' });
+  }
+
   const token = authHeader.split(' ')[1];
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
     next();
-  } catch (error) {
-    return res.status(401).json({ error: 'Invalid token' });
+  } catch (err) {
+    return res.status(401).json({ error: 'Unauthorized - Invalid token' });
   }
-};
+}
 
-function requireRole(...allowedRoles) {
-  return (req, res, next) => {
-    if (!req.user || !req.user.role) return res.status(403).json({ error: 'No role on token' });
-    if (!allowedRoles.includes(req.user.role)) return res.status(403).json({ error: 'Insufficient permissions' });
-    next();
+function requireAdmin(req, res, next) {
+  if (!req.user || !req.user.isAdmin) {
+    return res.status(403).json({ error: 'Forbidden - Admin access required' });
+  }
+  next();
+}
+
+function requireClientAccess(req, res, next) {
+  if (!req.user) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  // If user is admin, allow all access
+  if (req.user.isAdmin) {
+    return next();
+  }
+  // If user has a client association, filter data later
+  // This middleware sets the client filter for the request
+  req.clientFilter = req.user.client;
+  next();
+}
+
+// ============================================================
+// ── AUTH ROUTES ──────────────────────────────────────────────
+// ============================================================
+
+app.post('/api/auth/login', (req, res) => {
+  const { username, password } = req.body;
+  
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password required' });
+  }
+
+  const user = dataStore.users.find(u => u.username === username);
+  if (!user) {
+    return res.status(401).json({ error: 'Invalid username or password' });
+  }
+
+  const validPassword = bcrypt.compareSync(password, user.password);
+  if (!validPassword) {
+    return res.status(401).json({ error: 'Invalid username or password' });
+  }
+
+  const token = generateToken(user);
+  res.json({
+    token,
+    user: {
+      id: user.id,
+      username: user.username,
+      role: user.role,
+      isAdmin: user.isAdmin,
+      client: user.client
+    }
+  });
+});
+
+app.post('/api/auth/microsoft', (req, res) => {
+  const { code, code_verifier } = req.body;
+  // For demo purposes, we'll create a user with the code
+  // In production, this would validate with Microsoft
+  const user = {
+    id: 'ms-user-' + Date.now(),
+    username: 'microsoft-user',
+    role: 'Administrator',
+    isAdmin: true,
+    client: null
   };
-}
-
-async function initDatabase() {
-  try {
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY, username VARCHAR(50) UNIQUE NOT NULL, password_hash VARCHAR(255) NOT NULL,
-        role VARCHAR(20) DEFAULT 'Technician', email VARCHAR(100), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-      CREATE TABLE IF NOT EXISTS cameras (
-        id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL, zone VARCHAR(50), status VARCHAR(20) DEFAULT 'Unknown',
-        ip_address VARCHAR(15), username VARCHAR(50), model VARCHAR(100), resolution VARCHAR(50),
-        archiver VARCHAR(50), purchase_date VARCHAR(50), warranty_expiry VARCHAR(50), comments TEXT,
-        last_seen TIMESTAMP, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(name, ip_address)
-      );
-      CREATE TABLE IF NOT EXISTS doors (
-        id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL UNIQUE, site VARCHAR(100), client VARCHAR(20),
-        reader VARCHAR(100), lock_type VARCHAR(50), powered VARCHAR(20), status VARCHAR(20) DEFAULT 'Offline',
-        tech VARCHAR(50), ip_address VARCHAR(15), controller VARCHAR(100), last_service VARCHAR(50),
-        access_direction VARCHAR(10) DEFAULT 'In', purchase_date VARCHAR(50), warranty_expiry VARCHAR(50),
-        history JSONB DEFAULT '[]', comments TEXT DEFAULT '',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-      CREATE TABLE IF NOT EXISTS servers (
-        id SERIAL PRIMARY KEY, location VARCHAR(100), serial VARCHAR(50) NOT NULL UNIQUE, capacity VARCHAR(20),
-        used VARCHAR(20), health VARCHAR(100), apps TEXT, status VARCHAR(20) DEFAULT 'ONLINE',
-        purchase_date VARCHAR(50), warranty_expiry VARCHAR(50), comments TEXT DEFAULT '',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-      CREATE TABLE IF NOT EXISTS switches (
-        id SERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL UNIQUE, location VARCHAR(100), model VARCHAR(100),
-        ip_address VARCHAR(15), firmware VARCHAR(20), username VARCHAR(50), password VARCHAR(100), mac VARCHAR(20),
-        purchase_date VARCHAR(50), warranty_expiry VARCHAR(50), comments TEXT DEFAULT '',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-      CREATE TABLE IF NOT EXISTS tickets (
-        id VARCHAR(20) PRIMARY KEY, client VARCHAR(20), site VARCHAR(100), subject VARCHAR(255) NOT NULL,
-        from_email VARCHAR(100), category VARCHAR(50), priority VARCHAR(20) DEFAULT 'Medium', status VARCHAR(20) DEFAULT 'Open',
-        assigned VARCHAR(50), received VARCHAR(50), body TEXT, notes TEXT, hardware JSONB DEFAULT '[]',
-        history JSONB DEFAULT '[]', attachments JSONB DEFAULT '[]',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-      CREATE TABLE IF NOT EXISTS audit_logs (
-        id SERIAL PRIMARY KEY, time VARCHAR(20), username VARCHAR(50), action VARCHAR(50), target TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-      CREATE TABLE IF NOT EXISTS emails (
-        id VARCHAR(20) PRIMARY KEY, from_name VARCHAR(100), from_email VARCHAR(100), to_email VARCHAR(100),
-        subject VARCHAR(255), body TEXT, date VARCHAR(50), attachments JSONB DEFAULT '[]',
-        is_sr BOOLEAN DEFAULT false, sr_linked VARCHAR(20), urgent BOOLEAN DEFAULT false, client VARCHAR(20),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-      CREATE TABLE IF NOT EXISTS dashboard_snapshots (
-        id SERIAL PRIMARY KEY, snapshot_date DATE NOT NULL UNIQUE, cameras_defective INT, doors_offline INT,
-        servers_online INT, servers_total INT, switches_online INT, switches_total INT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-
-    const adminCheck = await pool.query("SELECT * FROM users WHERE username = 'admin'");
-    if (adminCheck.rows.length === 0) {
-      const hashed = await bcrypt.hash('admin123', 10);
-      await pool.query("INSERT INTO users (username, password_hash, role, email) VALUES ($1, $2, $3, $4)", ['admin', hashed, 'Administrator', 'admin@etechsystems.com']);
-      console.log('✅ Default admin created: admin / admin123');
-    }
-    console.log('✅ Database initialized');
-  } catch (error) {
-    console.error('❌ Database init error:', error);
-  }
-}
-// ── SEED DATA ─────────────────────────────────────────────
-async function seedData() {
-  console.log('🌱 seedData() function starting...');
-  try {
-    const camerasCheck = await pool.query("SELECT COUNT(*) FROM cameras");
-    if (parseInt(camerasCheck.rows[0].count) === 0) {
-      console.log('🌱 Seeding cameras...');
-      const cameras = [
-        // ── ADMIN/HR ──
-        ['ATM Walkway','ADMIN/HR','Online','172.17.102.79','root','Axis P3227-LVE','','','Archiver 3','',''],
-        ['Board N Ceo Secretary','ADMIN/HR','Online','172.17.102.130','root','Axis P3245-LV','','','Archiver 4','',''],
-        ['Executive 2nd Fl Exit Stair Lower Case','ADMIN/HR','Online','172.17.102.132','root','Axis P3245-LV','','','Archiver 1','',''],
-        ['Executive 2nd Fl Exit Stair Top Case','ADMIN/HR','Online','172.17.102.134','root','Axis P3245-LV','','','Archiver 1','',''],
-        ['HR Meeting Rm Passage','ADMIN/HR','Online','172.17.102.131','root','Axis P3245-LV','','Camera refocused','Archiver 3','',''],
-        ['HR Waiting Area','ADMIN/HR','Online','172.17.102.133','root','Axis P3245-LV','','','Archiver 3','',''],
-        ['Lobby HR','ADMIN/HR','Online','172.17.102.80','root','Axis P3227-LVE','','','Archiver 3','',''],
-        ['Meeting RM Passage','ADMIN/HR','Online','172.17.102.128','root','Axis P3245-LV','','','Archiver 3','',''],
-        ['Payroll Walkway','ADMIN/HR','Online','172.17.102.93','root','Axis P3227-LVE','','','Archiver 3','',''],
-        ['Planning Main Entry','ADMIN/HR','Online','172.17.102.129','root','Axis P3245-LV','','','Archiver 3','',''],
-        ['Procurement Passage','ADMIN/HR','Online','172.17.102.92','root','Axis P3227-LVE','','','Archiver 2','',''],
-        // ── ENGINEERING ──
-        ['Bathroom Passage 1','ENGINEERING','Online','172.17.102.156','root','Axis P3227-LVE','','','Archiver 4','',''],
-        ['Bathroom Passage 2','ENGINEERING','Online','172.17.102.157','root','Axis P3227-LVE','','','Archiver 4','',''],
-        ['Battery Shop','ENGINEERING','Online','172.17.102.154','root','Axis P1447-LE','','Lift Required','Archiver 4','',''],
-        ['Data Center A','ENGINEERING','Online','172.17.103.153','root','Axis P3227-LVE','','','Archiver 2','',''],
-        ['F Changing Room Exit Passage','ENGINEERING','Online','172.17.102.149','root','Axis P3245-LV','','','Archiver 5','',''],
-        ['Eng Workshop 3','ENGINEERING','Online','172.17.102.152','root','Axis P3245-LV','','Lift Required','Archiver 5','',''],
-        ['Eng Rear Passage','ENGINEERING','Online','172.17.102.148','root','Axis P3227-LVE','','','Archiver 2','',''],
-        ['Engineering East Stair','ENGINEERING','Online','172.17.102.146','root','Axis P3245-LV','','','Archiver 5','',''],
-        ['Engineering West Stair','ENGINEERING','Online','172.17.102.147','root','Axis P3245-LV','','','Archiver 4','',''],
-        ['IT Entry','ENGINEERING','Online','172.17.103.152','root','Axis P3227-LVE','','','Archiver 2','',''],
-        ['IT Exit','ENGINEERING','Online','172.17.103.151','root','Axis P3227-LVE','','','Archiver 2','',''],
-        ['IT Stairwell','ENGINEERING','Online','172.17.102.145','root','Axis P3245-LV','','','Archiver 4','',''],
-        ['Engineering Lunch Room','ENGINEERING','Online','172.17.102.97','root','Axis P3227-LVE','','','Archiver 2','',''],
-        ['Engineering Entry','ENGINEERING','Online','172.17.102.151','root','Axis P3245-LV','','','Archiver 5','',''],
-        ['Engineering Gym','ENGINEERING','Online','172.17.102.150','root','Axis P3245-LV','','','Archiver 4','',''],
-        ['Training Room East','ENGINEERING','Online','172.17.102.84','root','Axis P3227-LVE','','','Archiver 5','',''],
-        ['Training Room West','ENGINEERING','Online','172.17.102.95','root','Axis P3227-LVE','','','Archiver 2','',''],
-        ['Eng Lunch RM Kitchen','ENGINEERING','Online','172.17.103.193','root','Axis M3085-V','','','Archiver 5','',''],
-        ['Engineering Entry Passage','ENGINEERING','Online','172.17.102.75','root','Axis P3227-LVE','','','Archiver 5','',''],
-        ['Tyre Shop','ENGINEERING','Online','172.17.102.153','root','Axis P1447-LE','','Lift Required','Archiver 2','',''],
-        // ── HIGH MAST ──
-        ['HM5(11)','HIGH MAST','Online','172.17.102.192','root','Axis P3227-LVE','','Camera had default IP reconfigured','Archiver 5','',''],
-        ['HM5(134)','HIGH MAST','Online','172.17.102.222','administrator','Avigilon 5.0C-H5A-DP2','','Camera lens damaged','Archiver 2','',''],
-        ['HM8','HIGH MAST','Online','172.17.102.220','administrator','Avigilon 5.0C-H5A-DP2','','','Archiver 5','',''],
-        ['HM14','HIGH MAST','Online','172.17.102.212','administrator','Avigilon 5.0C-H5A-DP2','','','Archiver 5','',''],
-        ['HM23','HIGH MAST','Online','172.17.102.201','root','Axis P3227-LVE','','','Archiver 5','',''],
-        ['HM24A','HIGH MAST','Defective','172.17.102.214','root','Axis P1447-LE','','No Fibre link','Archiver 5','',''],
-        ['Manager Car Park Dome','HIGH MAST','Online','172.17.102.187','root','Axis P3227-LVE','','Camera lens Damaged','Archiver 4','',''],
-        ['N30','HIGH MAST','Online','172.17.102.209','root','Axis P3227-LVE','','Pole','Archiver 3','',''],
-        ['N31','HIGH MAST','Online','172.17.102.208','root','Axis P3227-LVE','','Camera needs reset, POE replaced','Archiver 5','',''],
-        ['N33','HIGH MAST','Online','172.17.102.206','root','Axis P3227-LVE','','','Archiver 3','',''],
-        ['N34','HIGH MAST','Online','172.17.102.205','root','Axis P3227-LVE','','','Archiver 5','',''],
-        ['HM14 PTZ 2','HIGH MAST','Online','172.17.103.200','root','Axis P5655-E','','To be added to genetec','Archiver 3','',''],
-        // ── NORTH TERMINAL PERIMETER ──
-        ['N Fence','NORTH TERMINAL PERIMETER','Online','172.17.103.109','root','Axis P3227-LVE','','Analytics Applied','Archiver 4','',''],
-        ['East West Corner Perimeter Rest Bay','NORTH TERMINAL PERIMETER','Online','172.17.102.108','root','Axis P1447-LE','','Analytics Applied','Archiver 1','',''],
-        ['N Terminal NW Corner','NORTH TERMINAL PERIMETER','Online','172.17.102.227','root','Axis P1447-LE','','Analytics Applied','Archiver 2','',''],
-        ['North South Corner Rest Bay','NORTH TERMINAL PERIMETER','Online','172.17.102.107','root','Axis P1447-LE','','Analytics Applied','Archiver 4','',''],
-        ['PPE Store Perim N','NORTH TERMINAL PERIMETER','Online','172.17.102.162','root','Axis P1447-LE','','Analytics Applied','Archiver 3','',''],
-        ['PPE Store Perim S','NORTH TERMINAL PERIMETER','Online','172.17.102.159','root','Axis P1447-LE','','Analytics Applied','Archiver 4','',''],
-        ['Wharfage Perim','NORTH TERMINAL PERIMETER','Defective','172.17.102.180','root','Axis P1447-LE','','replacement needed','Archiver 1','',''],
-        // ── PTZ CAMERAS ──
-        ['Berth 9 PTZ','PTZ','Online','172.17.103.146','root','Axis P5655-E','','','Archiver 5','',''],
-        ['HM3 PTZ','PTZ','Defective','172.17.102.218','admin','Pelco P2820-ESR','','POE added, signs of being defective','Archiver 2','',''],
-        ['HM4 PTZ','PTZ','Online','172.17.102.219','admin','Pelco P2820-ESR','','','Archiver 1','',''],
-        ['HM5 PTZ','PTZ','Online','172.17.102.223','admin','Pelco P2820-ESR','','','Archiver 5','',''],
-        ['HM8 PTZ','PTZ','Online','172.17.102.221','administrator','Pelco P2820-ESR','','','Archiver 1','',''],
-        ['HM10 PTZ','PTZ','Online','172.17.102.224','admin','Pelco P2820-ESR','','Camera reconfigured, had default IP','Archiver 1','',''],
-        ['HM11 PTZ','PTZ','Online','172.17.102.225','admin','Pelco P2820-ESR','','','Archiver 3','',''],
-        ['HM14 PTZ','PTZ','Online','172.17.103.145','root','Axis P5655-E','','','Archiver 3','',''],
-        ['HM23 PTZ','PTZ','Defective','172.17.102.200','admin','Pelco P2820-ESR','','Cables corroded, recrimped. Camera overheating, deemed defective','Archiver 3','',''],
-        ['HM24A PTZ','PTZ','Defective','172.17.102.215','root','Axis P5655-E','','No Fibre link','Archiver 3','',''],
-        ['HM28 PTZ','PTZ','Online','172.17.102.202','admin','Pelco P2820-ESR','','','Archiver 3','',''],
-        ['Manager Car Park PTZ','PTZ','Defective','172.17.102.186','administrator','Pelco P2820-ESR','','Defective','Archiver 4','',''],
-        ['N Terminal NW Corner PTZ','PTZ','Online','172.17.102.226','root','Axis P5655-E','','','Archiver 2','',''],
-        ['N25 PTZ','PTZ','Defective','172.17.102.216','administrator','Pelco P2820-ESR','','Defective','Archiver 1','',''],
-        ['N30 PTZ','PTZ','Online','172.17.102.210','admin','Pelco P2820-ESR','','Reset needs to be done','Archiver 4','',''],
-        ['N31 PTZ- Context','PTZ','Defective','172.17.102.207','admin','FLIR DX-624','','POE injector changed, Camera needs reset','Archiver 4','',''],
-        ['N34 PTZ - Context','PTZ','Defective','172.17.102.204','admin','FLIR DX-624','','Defective','Archiver 1','',''],
-        ['Visitor Car Park PTZ 1','PTZ','Online','172.17.102.184','administrator','Pelco P2820-ESR','','','Archiver 2','',''],
-        ['Visitor Car Park PTZ 2','PTZ','Defective','172.17.102.185','administrator','Pelco P2820-ESR','','REPLACEMENT/AXIS Q6318-LE 60HZ to be installed','Archiver 2','',''],
-        ['B8 PTZ','PTZ','Online','172.17.103.66','administrator','Pelco P2820-ESR','','','Archiver 3','',''],
-        ['D12 PTZ','PTZ','Online','172.17.103.105','admin','Pelco P2820-ESR','','','Archiver 3','',''],
-        ['B9 PTZ','PTZ','Offline','172.17.103.67','administrator','Pelco P2820-ESR','','','Archiver 3','',''],
-        ['A2 PTZ','PTZ','Online','172.17.103.144','admin','Pelco P2820-ESR','','','Archiver 5','',''],
-        ['A5 PTZ','PTZ','Online','172.17.103.34','admin','Pelco P2820-ESR','','','Archiver 4','',''],
-        ['A7 PTZ','PTZ','Offline','172.17.103.36','admin','Pelco P2820-ESR','','','Archiver 4','',''],
-        ['A1 PTZ','PTZ','Online','172.17.103.30','admin','Pelco P2820-ESR','','','Archiver 1','',''],
-        ['South Perim PTZ','PTZ','Offline','172.17.103.86','admin','Pelco P2820-ESR','','','Archiver 1','',''],
-        ['C2 PTZ','PTZ','Online','172.17.103.82','administrator','Pelco P2820-ESR','','','Archiver 5','',''],
-        ['C9 PTZ','PTZ','Online','172.17.103.143','admin','Pelco P2820-ESR','','','Archiver 3','',''],
-        ['B5 PTZ','PTZ','Offline','172.17.103.63','admin','Pelco P2820-ESR','','','Archiver 3','',''],
-        ['W6 PTZ','PTZ','Online','172.17.102.248','admin','Pelco P2820-ESR','','','Archiver 2','',''],
-        ['C1 PTZ','PTZ','Offline','172.17.103.81','admin','Pelco P2820-ESR','','','Archiver 4','',''],
-        ['A10 PTZ','PTZ','Online','172.17.103.39','admin','Pelco P2820-ESR','','','Archiver 1','',''],
-        ['B12 PTZ','PTZ','Offline','172.17.103.70','admin','Pelco P2820-ESR','','','Archiver 3','',''],
-        ['B1 PTZ','PTZ','Online','172.17.103.60','admin','Pelco P2820-ESR','','','Archiver 3','',''],
-        ['B2 PTZ','PTZ','Online','172.17.103.61','admin','Pelco P2820-ESR','','','Archiver 3','',''],
-        ['B6 PTZ','PTZ','Online','172.17.103.64','admin','Pelco P2820-ESR','','','Archiver 3','',''],
-        ['A8 PTZ','PTZ','Offline','172.17.103.37','admin','Pelco P2820-ESR','','','Archiver 4','',''],
-        ['A6 PTZ','PTZ','Offline','172.17.103.35','administrator','Pelco P2820-ESR','','','Archiver 4','',''],
-        ['A12 PTZ','PTZ','Online','172.17.103.41','admin','Pelco P2820-ESR','','','Archiver 3','',''],
-        ['A4 PTZ','PTZ','Online','172.17.103.33','admin','Pelco P2820-ESR','','','Archiver 1','',''],
-        ['B10 PTZ','PTZ','Offline','172.17.103.68','admin','Pelco P2820-ESR','','','Archiver 3','',''],
-        ['SW Corner Perim PTZ','PTZ','Online','172.17.102.155','admin','Pelco P2820-ESR','','','Archiver 4','',''],
-        ['D4 PTZ','PTZ','Online','172.17.103.99','admin','Pelco P2820-ESR','','','Archiver 2','',''],
-        ['A11 PTZ','PTZ','Online','172.17.103.40','admin','Pelco P2820-ESR','','','Archiver 1','',''],
-        ['D10 PTZ','PTZ','Online','172.17.103.104','administrator','Pelco P2820-ESR','','','Archiver 5','',''],
-        ['C11 PTZ','PTZ','Offline','172.17.103.85','administrator','Pelco P2820-ESR','','','Archiver 1','',''],
-        ['D5 PTZ','PTZ','Online','172.17.103.100','administrator','Pelco P2820-ESR','','','Archiver 2','',''],
-        ['B11 PTZ','PTZ','Offline','172.17.103.69','administrator','Pelco P2820-ESR','','','Archiver 3','',''],
-        ['W2 PTZ','PTZ','Offline','172.17.102.244','administrator','Pelco P2820-ESR','','','Archiver 4','',''],
-        ['C4 PTZ','PTZ','Online','172.17.103.83','administrator','Pelco P2820-ESR','','','Archiver 1','',''],
-        ['SE Tower PTZ','PTZ','Online','172.17.103.165','admin','Opgal OP94-1200-0000','','','Archiver 4','',''],
-      ];
-      for (const cam of cameras) {
-        await pool.query(`INSERT INTO cameras (name, zone, status, ip_address, username, model, resolution, comments, archiver, purchase_date, warranty_expiry) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) ON CONFLICT (name, ip_address) DO NOTHING`, cam);
-      }
-      console.log('✅ Cameras seeded (' + cameras.length + ' cameras)');
-    }
-
-    const doorsCheck = await pool.query("SELECT COUNT(*) FROM doors");
-    if (parseInt(doorsCheck.rows[0].count) === 0) {
-      console.log('🌱 Seeding doors...');
-      const doors = [
-        ['Second Entrance Staff Entrance 2','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.100','eyeLock Panel 2','6/3/2026','In','','','[{"date":"Jun 18, 2026","event":"Reader replacement","tech":"Marvin Grant"}]',''],
-        ['Second Entrance Staff Exit 1','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.101','eyeLock Panel 1','6/3/2026','Out','','','[{"date":"Jun 18, 2026","event":"Reader replacement","tech":"Marvin Grant"}]',''],
-        ['Second Entrance Staff Entrance 1','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.102','eyeLock Panel 3','6/3/2026','In','','','[{"date":"Jun 18, 2026","event":"Reader replacement","tech":"Marvin Grant"}]',''],
-        ['Second Entrance Staff Exit 2','Second Entrance','KFTL','eyeLock (Biometric)','Turnstile','Not In Use','Offline','Marvin Grant','10.19.1.103','eyeLock Panel 4','6/3/2026','Out','','','[{"date":"Jun 18, 2026","event":"Reader replacement","tech":"Marvin Grant"}]',''],
-        ['Batching room','LML B Liquid Plant','Lasco','—','—','Not In Use','Offline','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]','No longer use, equipment removed'],
-        ['Blow mold entrance 1','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]','Door needs repair, door drop'],
-        ['Blow mold entrance 2','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]','Door needs repair, door drop'],
-        ['Chemistry lab','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Electrical room to utilites','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 1200','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Utilites to electrical room','LML B Liquid Plant','Lasco','eyeLock (Biometric)','—','Yes','Online','Unassigned','','','','Out','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Entrance to upstairs offices - IN','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Entrance to upstairs offices - OUT','LML B Liquid Plant','Lasco','eyeLock (Biometric)','—','Yes','Online','Unassigned','','','','Out','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Filling room 1','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Filling room 2','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Filling room 3','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Filling room 4','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Guest access - IN','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Guest access - OUT','LML B Liquid Plant','Lasco','eyeLock (Biometric)','—','Yes','Online','Unassigned','','','','Out','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Lobby','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Microbiology lab','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Prep Room','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Processing room 1','LML B Liquid Plant','Lasco','—','—','Not In Use','Offline','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]','No longer use, equipment removed'],
-        ['Processing room 2','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Product dev lab','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Production floor - IN','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Production floor - OUT','LML B Liquid Plant','Lasco','eyeLock (Biometric)','—','Yes','Online','Unassigned','','','','Out','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['QA office','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]',''],
-        ['Shop and spare parts','LML B Liquid Plant','Lasco','eyeLock (Biometric)','Maglock 600','Yes','Online','Unassigned','','','','In','','','[{"date":"Jun 25, 2026","event":"Assessed","tech":"Unassigned"}]','']
-      ];
-      for (const door of doors) {
-        await pool.query(`INSERT INTO doors (name, site, client, reader, lock_type, powered, status, tech, ip_address, controller, last_service, access_direction, purchase_date, warranty_expiry, history, comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15::jsonb,$16) ON CONFLICT (name) DO NOTHING`, door);
-      }
-      console.log('✅ Doors seeded (' + doors.length + ' doors)');
-    }
-
-    const serversCheck = await pool.query("SELECT COUNT(*) FROM servers");
-    if (parseInt(serversCheck.rows[0].count) === 0) {
-      console.log('🌱 Seeding servers...');
-      const servers = [
-        ['Kingport','J1013DDR','6.11TB','1.4TB','Good (23%)','Ocularis DM5, LPR','ONLINE'],
-        ['Kingport','9B0F842','930GB','74GB','Good','Ocularis, LPR','ONLINE'],
-        ['Kingport','J1013DDV','6.11TB','1.4TB','Good, Failed drive','Ocularis DM6, Eyelock','ONLINE'],
-        ['Kingport','J1013N50','32TB','—','Good','—','ONLINE'],
-        ['Kingport','J1013DDW','6.11TB','1.4TB','Good (23%)','Ocularis DM4, Access Control','ONLINE'],
-        ['Kingport','J1013N4Z','32TB','—','Good','—','ONLINE'],
-        ['Kingport','J1013DDT','6.11TB','1.37TB','Good (23%)','Node in Failure','ONLINE'],
-        ['Kingport','J1013N4Y','—','32TB','Good','—','ONLINE'],
-        ['Kingport','J1013DDX','45TB','178GB','Excellent','—','ONLINE']
-      ];
-      for (const srv of servers) {
-        await pool.query(`INSERT INTO servers (location, serial, capacity, used, health, apps, status) VALUES ($1,$2,$3,$4,$5,$6,$7) ON CONFLICT (serial) DO NOTHING`, srv);
-      }
-      console.log('✅ Servers seeded');
-    }
-
-    const switchesCheck = await pool.query("SELECT COUNT(*) FROM switches");
-    if (parseInt(switchesCheck.rows[0].count) === 0) {
-      console.log('🌱 Seeding switches...');
-      const switches = [
-        ['Main Entrance','Security Office','AXIS T8508','10.19.1.21','6.54.2739','root','$upp@rt@202O','AC:CC:8E:FA:4B:1B'],
-        ['2nd entrance','SAL Duty Office','AXIS T8516','10.19.1.23','6.54.2739','root','$upp@rt@202O','AC:CC:8E:B6:DF:99'],
-        ['Exit gate','Gate Pass Office','AXIS T8516','10.19.1.22','6.54.2739','root','$upp@rt@202O','AC:CC:8E:B6:DD:5F'],
-        ['LPR Overview','Gate Pass Office','AXIS T8516','10.19.1.32','6.54.2739','root','$upp@rt@202O','AC:CC:8E:B6:DD:26'],
-        ['CarPark 4/Berth 4','Car Park 4 wall','AXIS T8508','10.19.1.38','6.54.2739','root','$upp@rt@202O','AC:CC:8E:FA:4F:A9'],
-        ['Berth 5 Warehouse A','Upstairs','AXIS T8516','10.19.1.26','6.54.2739','root','$upp@rt@202O','AC:CC:8E:D7:8D:13'],
-        ['Berth 5 Warehouse B','Stripping Office','AXIS T8508','10.19.1.37','6.54.2739','root','$upp@rt@202O','AC:CC:8E:FA:4B:10'],
-        ['Berth 5 rear east','rear of warehouse','AXIS T8504-R','10.19.1.119','7.10.1595','root','$upp@rt@202O','AC:CC:8E:FA:E2:DF'],
-        ['Berth 1 perimeter-A','Berth 1 Corner Wall','AXIS T8508','10.19.1.35','6.54.2739','root','$upp@rt@202O','AC:CC:8E:FA:4B:31'],
-        ['Berth 1 perimeter-B','Berth 1 Middle Wall','AXIS T8508','10.19.1.36','6.54.2739','root','$upp@rt@202O','AC:CC:8E:FA:4F:B4'],
-        ['Warehouse 2 A','Upstairs','AXIS T8516','10.19.1.27','6.54.2739','root','$upp@rt@202O','AC:CC:8E:B6:DD:39'],
-        ['Warehouse 2 B','Down stairs','AXIS T8508','10.19.1.30','6.54.2739','root','$upp@rt@202O','AC:CC:8E:FA:49:9A'],
-        ['Warehouse 1','Warehouse1/Spectrum','AXIS T8516','10.19.1.20','6.54.2739','root','$upp@rt@202O','AC:CC:8E:B6:DD:72'],
-        ['Berth 8 B','Berth 8 East/West','AXIS T8504-R','10.19.1.33','7.10.1595','root','$upp@rt@202O','AC:CC:8E:FA:E3:1E'],
-        ['Berth 8 A','Berth 8 Perimeter','TL-SG2210P','10.19.1.39','5.20.20','admin','$upp@rt@2020','BO:19:21::20:FF:F2']
-      ];
-      for (const sw of switches) {
-        await pool.query(`INSERT INTO switches (name, location, model, ip_address, firmware, username, password, mac) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT (name) DO NOTHING`, sw);
-      }
-      console.log('✅ Switches seeded');
-    }
-
-    const ticketsCheck = await pool.query("SELECT COUNT(*) FROM tickets");
-    if (parseInt(ticketsCheck.rows[0].count) === 0) {
-      console.log('🌱 Seeding tickets...');
-      const tickets = [
-        ['SR-1847','KFTL','NORTH Zone','Replace defective cameras - NORTH zone','facilities@kftl.com','Camera','High','Open','Shanice Vernon','Jun 13, 2026','We need camera replacements in NORTH zone.','','[]','[{"time":"14:22","msg":"Created — assigned to Shanice (day shift)"}]','[]'],
-        ['SR-1848','KWL','Tinson Pen','Tinson Pen switches need firmware check','security@kwl.com','Network','Medium','Open','Shanice Vernon','Jun 15, 2026','Tinson Pen switches need firmware check.','','[]','[{"time":"11:05","msg":"Created — assigned to Shanice (day shift)"}]','[]'],
-        ['SR-1849','KFTL','Second Entrance','All 4 turnstiles offline','it@kftl.com','Access Control','High','In Progress','Marvin Grant','Jun 10, 2026','All turnstiles offline.','','[]','[{"time":"16:48","msg":"Created — assigned to Shavine (night shift)"},{"time":"17:00","msg":"Escalated to Marvin Grant for on-site repair"}]','[]'],
-        ['SR-1850','KFTL','Kingport','Server J1013DDV failed drive','marvin.grant@etechsystems.com','Server','Medium','Open','Shavine','Jun 8, 2026','Server J1013DDV has failed drive.','','[]','[{"time":"09:12","msg":"Created — assigned to Shavine (night shift)"}]','[]'],
-        ['SR-1851','KFTL','TLF','Cam 117 TLF Car Park PTZ — Pixelated Images','vincent@lascoja.com','Camera','High','Open','Unassigned','Dec 1, 2025','Camera needs to be physically checked. MANLIFT required.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1852','KFTL','KWC','Cam 280 Stripping Ramp 1 — Shifted Camera','vincent@lascoja.com','Camera','High','Open','Unassigned','May 19, 2026','Camera previously adjusted. Movement is from fan above.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1853','KFTL','TLF','Cam 068 TLF Warehouse Receival Bay 13 & 14 — Blurred','vincent@lascoja.com','Camera','High','Resolved','Unassigned','Jun 25, 2026','Blurred — Resolved.','','[]','[{"time":"14:06","msg":"Created"},{"time":"14:06","msg":"Status → Resolved"}]','[]'],
-        ['SR-1854','KFTL','TLF','Cam 027 TLF Warehouse Aisles 10 & 11 — Blurred','vincent@lascoja.com','Camera','High','Resolved','Unassigned','Jun 24, 2026','Blurred — Resolved.','','[]','[{"time":"15:40","msg":"Created"},{"time":"15:40","msg":"Status → Resolved"}]','[]'],
-        ['SR-1855','KFTL','KWC','Cam 248 KWC Stripping Ramp 5 — Out of Focus','vincent@lascoja.com','Camera','High','Open','Unassigned','Mar 17, 2026','Camera lens defective. Lens not responding to focus.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1856','KWL','GALC','Cam 263 TP Pole 47 Cam 1 — Out of Focus','vincent@lascoja.com','Camera','High','Open','Unassigned','Sep 16, 2025','Camera covering crystalized. Dome needs replacement.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1857','KWL','GALC','Cam 235 TP Pole 42 Cam 2 — Out of Focus','vincent@lascoja.com','Camera','High','Open','Unassigned','Sep 16, 2025','Camera covering crystalized. Dome needs replacement.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1858','KFTL','PORT','Cam 361 KWL Port Berth 1 Corner — Navigational Difficulty','vincent@lascoja.com','Camera','High','Open','Unassigned','Apr 28, 2026','Camera rebooted, settings changed. Will not accept config after reboot.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1859','KWL','GALC','Cam 246 TP Pole 11 PTZ — Intermittent Disconnections','vincent@lascoja.com','Camera','High','Open','Unassigned','Mar 14, 2026','Camera defective.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1860','KFTL','Port','Cam 402 Port Berth 1 OP South — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','Mar 22, 2026','CAMERA DEFECTIVE.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1861','KWL','GALC','Cam 282 TP Pole 21 Cam 1 — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','May 29, 2026','Camera defective needs replacement.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1862','KWL','GALC','Cam 209 TP Pole 2 Cam 2 — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','May 28, 2026','Cable needs to be replaced.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1863','KWL','GALC','Cam 215 TP Pole 37 Cam 2 — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','May 25, 2026','Cable needs to be replaced.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1864','KWL','GALC','Cam 208 TP Pole 6 Cam 2 — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','Feb 23, 2026','Switch only has 1 working port (Previously updated).','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1865','KFTL','Port','Cam 439 KWL Port Berth 4 Pylon East — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','Feb 3, 2026','Camera gets connection from Berth 5. Berth 5 is offline.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1866','KWL','GALC','Cam 219 TP Pole 25 cam 1 — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','Feb 1, 2026','Fibre damaged. Fibre needs repair.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1867','KWL','GALC','Cam 310 TP Pole 25 cam 2 — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','Feb 1, 2026','Fibre damaged. Fibre needs repair.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1868','KFTL','Port','Cam 254 TP Pole 33 Cam 1 — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','Jan 12, 2026','Switch Enclosure damaged. Switch damaged. Camera tested okay.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1869','KFTL','KWC','Cam 279 KWC Stripping Ramp PTZ — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','Jan 6, 2025','Camera defective.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1870','KFTL','KWC','Cam 303 KWC Vehicular Exit — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','Nov 18, 2025','CABLE NEEDS TO BE CHANGED.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1871','KWL','GALC','Cam 237 TP Pole 8 Cam 1 — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','Oct 24, 2025','Water inside of camera.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1872','KFTL','TLF','Cam 090 TLF Receival External Perimeter PTZ — Disconnected','vincent@lascoja.com','Camera','High','Open','Unassigned','Sep 15, 2025','CABLE NEEDS TO BE CHANGED.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1873','KFTL','PORT','Cam 346 Port Exit Gate Lane 6 LPR — Colour Scale Issues','vincent@lascoja.com','Camera','High','Open','Unassigned','May 16, 2026','Camera defective.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1874','KWL','GALC','Cam 308 TP Pole 34 PTZ — Colour Scale Issues','vincent@lascoja.com','Camera','High','Open','Unassigned','Feb 8, 2026','Camera defective, lens defective.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]'],
-        ['SR-1875','KWL','WH1','Cam 397 WH1 Receival Bay Door — Colour Scale Issues','vincent@lascoja.com','Camera','High','Open','Unassigned','Sep 30, 2025','IR lens defective.','','[]','[{"time":"07:00","msg":"Created from KWL Security log"}]','[]']
-      ];
-      for (const ticket of tickets) {
-        await pool.query(`INSERT INTO tickets (id, client, site, subject, from_email, category, priority, status, assigned, received, body, notes, hardware, history, attachments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13::jsonb,$14::jsonb,$15::jsonb)`, ticket);
-      }
-      console.log('✅ Tickets seeded (' + tickets.length + ' tickets)');
-    }
-
-    const auditCheck = await pool.query("SELECT COUNT(*) FROM audit_logs");
-    if (parseInt(auditCheck.rows[0].count) === 0) {
-      console.log('🌱 Seeding audit logs...');
-      const auditEntries = [
-        ['14:32','Shanice Vernon','updated','SR-1847 → In Progress'],
-        ['13:50','Marvin Grant','updated','HM3 PTZ comment → "Defective"'],
-        ['12:00','System','converted','David Chen → SR-1848'],
-        ['11:30','System','sync','Camera_Maintenance_2025.csv ✅'],
-        ['10:45','System','sync','Access_Control_Survey.csv ⚠️'],
-        ['07:00','System','created','25 KWL Security Control Centre tickets imported']
-      ];
-      for (const entry of auditEntries) {
-        await pool.query(`INSERT INTO audit_logs (time, username, action, target) VALUES ($1,$2,$3,$4)`, entry);
-      }
-      console.log('✅ Audit logs seeded');
-    }
-
-    const emailsCheck = await pool.query("SELECT COUNT(*) FROM emails");
-    if (parseInt(emailsCheck.rows[0].count) === 0) {
-      console.log('🌱 Seeding emails...');
-      const emails = [
-        ['e1','David Chen','facilities@kftl.com','support@etechsystems.com','Replace defective cameras - NORTH zone','Hi team,\n\nWe did a walk-through of the NORTH zone and counted at least 8 cameras showing as defective. Can someone confirm a timeline for replacement or repair?\n\nThanks,\nDavid','Jun 15, 2026 14:22','[]',true,'SR-1847',true,'KFTL'],
-        ['e2','Andrea Williams','security@kwl.com','support@etechsystems.com','URGENT: 5 Cameras Offline - Tinson Pen','This is urgent — we have 5 cameras down simultaneously at Tinson Pen. Please advise on ETA.\n\nAndrea Williams\nSecurity Manager, KWL','Jun 15, 2026 11:05','[]',true,'SR-1848',true,'KWL'],
-        ['e3','IT Department','it@kftl.com','support@etechsystems.com','ASAP: Access Doors - Second Entrance Offline','All four turnstiles at the Second Entrance are showing offline. Can you escalate for an on-site technician visit today?\n\nIT Department','Jun 14, 2026 16:48','[]',true,'SR-1849',true,'KFTL'],
-        ['e4','Marvin Grant','marvin.grant@etechsystems.com','support@etechsystems.com','Server J1013DDV - drive failure follow-up','Swapped the bad drive on J1013DDV this morning. Array is rebuilding. No action needed.\n\nMarvin','Jun 8, 2026 09:30','[]',true,'SR-1850',false,'KFTL'],
-        ['e5','Patricia Lowe','plowe@kwl.com','support@etechsystems.com','Question about camera coverage report','Our ops manager asked for a coverage summary for an insurance review. No rush.\n\nPatricia Lowe','Jun 12, 2026 10:15','[]',false,null,false,'KWL'],
-        ['e6','Gate Pass Office','gatepass@kftl.com','support@etechsystems.com','Switch firmware update window - LPR Overview','LPR Overview switch still on older firmware. Is this scheduled for update?\n\nGate Pass Office','Jun 17, 2026 08:50','[]',false,null,false,'KFTL'],
-        ['e7','Shanice Vernon','shanice.vernon@etechsystems.com','support@etechsystems.com','Heads up - recurring issue on HM3 PTZ','HM3 PTZ has gone defective for the third time this quarter. Might be worth a full unit swap.\n\nShanice','Jun 16, 2026 13:05','[]',false,null,false,'KFTL'],
-        ['e8','Wharfage Office','wharfage@kftl.com','support@etechsystems.com','Cashier window cameras - picture quality','Cameras covering Cashier Windows 1-3 have looked grainy. Not urgent.\n\nWharfage Office','Jun 19, 2026 15:40','[]',false,null,false,'KFTL']
-      ];
-      for (const email of emails) {
-        await pool.query(`INSERT INTO emails (id, from_name, from_email, to_email, subject, body, date, attachments, is_sr, sr_linked, urgent, client) VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb,$9,$10,$11,$12) ON CONFLICT (id) DO NOTHING`, email);
-      }
-      console.log('✅ Emails seeded');
-    }
-
-    console.log('✅ Seed data complete');
-  } catch (error) {
-    console.error('❌ Seed error:', error.message);
-  }
-}
-// ═══════════════════════════════════════════════════════════
-// ── ROUTES ────────────────────────────────────────────────
-// ═══════════════════════════════════════════════════════════
-
-// ── AUTH ─────────────────────────────────────────────────
-app.post('/api/auth/login', async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    if (!username || !password) return res.status(400).json({ error: 'Username and password required' });
-    const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
-    if (result.rows.length === 0) return res.status(401).json({ error: 'Invalid credentials' });
-    const user = result.rows[0];
-    const valid = await bcrypt.compare(password, user.password_hash);
-    if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
-    const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
-    res.json({ token, user: { id: user.id, username: user.username, role: user.role, email: user.email } });
-  } catch (error) { res.status(500).json({ error: error.message }); }
+  
+  const token = generateToken(user);
+  res.json({ access_token: token });
 });
 
-// ── MICROSOFT OAUTH TOKEN EXCHANGE ──────────────────────
-app.post('/api/auth/microsoft', async (req, res) => {
-  try {
-    const { code, code_verifier } = req.body;
-    if (!code) return res.status(400).json({ error: 'Authorization code required' });
-    const clientId = process.env.MS_CLIENT_ID || 'e87a6592-aaa5-4a13-9c85-8dbc8e9cd7b2';
-    const redirectUri = process.env.MS_REDIRECT_URI || 'https://e-tech-ccsm-production-19f0.up.railway.app';
-    const tenantId = process.env.MS_TENANT_ID || '799ae988-9d3d-40d3-bf5c-93197f5d8d44';
-    const params = new URLSearchParams({ client_id: clientId, scope: 'https://graph.microsoft.com/Sites.Read.All Files.Read.All User.Read', code: code, redirect_uri: redirectUri, grant_type: 'authorization_code' });
-    if (code_verifier) { params.append('code_verifier', code_verifier); }
-    const tokenResponse = await fetch(`https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString() });
-    const data = await tokenResponse.json();
-    if (data.error) { console.error('Token exchange error:', data); return res.status(400).json({ error: data.error_description || data.error }); }
-    res.json(data);
-  } catch (error) { console.error('Microsoft auth proxy error:', error); res.status(500).json({ error: 'Token exchange failed' }); }
+// ============================================================
+// ── USER ROUTES ──────────────────────────────────────────────
+// ============================================================
+
+app.get('/api/users', authenticate, requireAdmin, (req, res) => {
+  const users = dataStore.users.map(u => ({
+    id: u.id,
+    username: u.username,
+    role: u.role,
+    isAdmin: u.isAdmin,
+    client: u.client,
+    createdAt: u.createdAt
+  }));
+  res.json({ data: users });
 });
 
-// ── SHAREPOINT INTEGRATION ──────────────────────────────
-function getFileType(filename) {
-  const ext = filename.split('.').pop().toLowerCase();
-  const types = { csv: 'csv', xlsx: 'xlsx', xls: 'xlsx', docx: 'docx', doc: 'docx', pdf: 'pdf', txt: 'txt', jpg: 'image', jpeg: 'image', png: 'image' };
-  return types[ext] || 'file';
+app.post('/api/users', authenticate, requireAdmin, (req, res) => {
+  const { username, password, role, isAdmin, client } = req.body;
+  
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password required' });
+  }
+  
+  if (dataStore.users.find(u => u.username === username)) {
+    return res.status(400).json({ error: 'Username already exists' });
+  }
+  
+  const newUser = {
+    id: 'user-' + Date.now(),
+    username,
+    password: bcrypt.hashSync(password, 10),
+    role: role || 'User',
+    isAdmin: isAdmin || false,
+    client: client || null,
+    createdAt: new Date().toISOString()
+  };
+  
+  dataStore.users.push(newUser);
+  saveData();
+  res.status(201).json({
+    id: newUser.id,
+    username: newUser.username,
+    role: newUser.role,
+    isAdmin: newUser.isAdmin,
+    client: newUser.client
+  });
+});
+
+app.delete('/api/users/:id', authenticate, requireAdmin, (req, res) => {
+  const userId = req.params.id;
+  const index = dataStore.users.findIndex(u => u.id === userId);
+  if (index === -1) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+  dataStore.users.splice(index, 1);
+  saveData();
+  res.json({ success: true });
+});
+
+// ============================================================
+// ── CLIENT ROUTES ────────────────────────────────────────────
+// ============================================================
+
+app.get('/api/clients', authenticate, (req, res) => {
+  let clients = dataStore.clients;
+  if (req.user && !req.user.isAdmin && req.user.client) {
+    clients = clients.filter(c => c === req.user.client);
+  }
+  res.json({ data: clients });
+});
+
+app.post('/api/clients', authenticate, requireAdmin, (req, res) => {
+  const { name, email, phone, address, logo } = req.body;
+  if (!name) {
+    return res.status(400).json({ error: 'Client name required' });
+  }
+  if (dataStore.clients.includes(name)) {
+    return res.status(400).json({ error: 'Client already exists' });
+  }
+  dataStore.clients.push(name);
+  if (logo) {
+    dataStore.clientLogos[name] = logo;
+  }
+  saveData();
+  res.status(201).json({ data: { name, email, phone, address } });
+});
+
+app.put('/api/clients/:name', authenticate, requireAdmin, (req, res) => {
+  const oldName = req.params.name;
+  const { name, email, phone, address, logo } = req.body;
+  
+  const index = dataStore.clients.indexOf(oldName);
+  if (index === -1) {
+    return res.status(404).json({ error: 'Client not found' });
+  }
+  
+  if (name && name !== oldName) {
+    if (dataStore.clients.includes(name)) {
+      return res.status(400).json({ error: 'Client name already exists' });
+    }
+    dataStore.clients[index] = name;
+    // Update all references in other data
+    dataStore.cameras.forEach(c => { if (c.client === oldName) c.client = name; });
+    dataStore.doors.forEach(d => { if (d.client === oldName) d.client = name; });
+    dataStore.servers.forEach(s => { if (s.client === oldName) s.client = name; });
+    dataStore.switches.forEach(s => { if (s.client === oldName) s.client = name; });
+    dataStore.storage.forEach(s => { if (s.client === oldName) s.client = name; });
+    dataStore.stations.forEach(s => { if (s.client === oldName) s.client = name; });
+    dataStore.monitors.forEach(m => { if (m.client === oldName) m.client = name; });
+    dataStore.software.forEach(s => { if (s.client === oldName) s.client = name; });
+    dataStore.serviceRequests.forEach(sr => { if (sr.client === oldName) sr.client = name; });
+    // Update logo
+    if (dataStore.clientLogos[oldName]) {
+      dataStore.clientLogos[name] = dataStore.clientLogos[oldName];
+      delete dataStore.clientLogos[oldName];
+    }
+  }
+  
+  if (logo) {
+    dataStore.clientLogos[name || oldName] = logo;
+  }
+  
+  saveData();
+  res.json({ success: true });
+});
+
+app.delete('/api/clients/:name', authenticate, requireAdmin, (req, res) => {
+  const name = req.params.name;
+  const index = dataStore.clients.indexOf(name);
+  if (index === -1) {
+    return res.status(404).json({ error: 'Client not found' });
+  }
+  dataStore.clients.splice(index, 1);
+  delete dataStore.clientLogos[name];
+  saveData();
+  res.json({ success: true });
+});
+
+// ============================================================
+// ── GENERIC CRUD HELPERS ─────────────────────────────────────
+// ============================================================
+
+function filterByClient(items, req) {
+  if (req.user && !req.user.isAdmin && req.user.client) {
+    return items.filter(item => item.client === req.user.client || item.client === undefined);
+  }
+  return items;
 }
-function formatFileSize(bytes) {
-  if (!bytes) return '—';
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
-  return (bytes / 1048576).toFixed(1) + ' MB';
+
+function createCrudRoutes(basePath, storeKey, itemFields) {
+  // GET all
+  app.get(`/api/${basePath}`, authenticate, (req, res) => {
+    let items = dataStore[storeKey] || [];
+    items = filterByClient(items, req);
+    res.json({ data: items });
+  });
+
+  // GET single
+  app.get(`/api/${basePath}/:id`, authenticate, (req, res) => {
+    let items = dataStore[storeKey] || [];
+    const item = items.find(i => i.id === req.params.id || i.name === req.params.id);
+    if (!item) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+    // Check client access
+    if (req.user && !req.user.isAdmin && req.user.client && item.client !== req.user.client) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    res.json({ data: item });
+  });
+
+  // POST (create)
+  app.post(`/api/${basePath}`, authenticate, (req, res) => {
+    const newItem = {
+      id: `${storeKey}-${Date.now()}`,
+      ...req.body,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    // Auto-assign client if user is not admin
+    if (req.user && !req.user.isAdmin && req.user.client) {
+      newItem.client = req.user.client;
+    }
+    
+    if (!dataStore[storeKey]) dataStore[storeKey] = [];
+    dataStore[storeKey].push(newItem);
+    saveData();
+    res.status(201).json({ data: newItem });
+  });
+
+  // PUT (update)
+  app.put(`/api/${basePath}/:id`, authenticate, (req, res) => {
+    const id = req.params.id;
+    let items = dataStore[storeKey] || [];
+    const index = items.findIndex(i => i.id === id || i.name === id);
+    if (index === -1) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+    
+    const item = items[index];
+    // Check client access
+    if (req.user && !req.user.isAdmin && req.user.client && item.client !== req.user.client) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    
+    const updatedItem = {
+      ...item,
+      ...req.body,
+      updatedAt: new Date().toISOString()
+    };
+    
+    // Preserve client if not admin
+    if (req.user && !req.user.isAdmin && req.user.client) {
+      updatedItem.client = req.user.client;
+    }
+    
+    items[index] = updatedItem;
+    saveData();
+    res.json({ data: updatedItem });
+  });
+
+  // DELETE
+  app.delete(`/api/${basePath}/:id`, authenticate, (req, res) => {
+    const id = req.params.id;
+    let items = dataStore[storeKey] || [];
+    const index = items.findIndex(i => i.id === id || i.name === id);
+    if (index === -1) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+    
+    const item = items[index];
+    // Check client access
+    if (req.user && !req.user.isAdmin && req.user.client && item.client !== req.user.client) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+    
+    items.splice(index, 1);
+    saveData();
+    res.json({ success: true });
+  });
 }
-async function fetchSharePointFiles(accessToken) {
-  try {
-    const siteResponse = await fetch('https://graph.microsoft.com/v1.0/sites/etechsystemsltd.sharepoint.com:/sites/Share', { headers: { Authorization: 'Bearer ' + accessToken } });
-    const siteData = await siteResponse.json();
-    const driveResponse = await fetch('https://graph.microsoft.com/v1.0/sites/' + siteData.id + '/drives', { headers: { Authorization: 'Bearer ' + accessToken } });
-    const drives = await driveResponse.json();
-    const documentsDrive = drives.value.find(function(d) { return d.name === 'Documents'; });
-    const childrenResponse = await fetch('https://graph.microsoft.com/v1.0/drives/' + documentsDrive.id + '/root:/E-Tech%20Maintenance:/children', { headers: { Authorization: 'Bearer ' + accessToken } });
-    const folderData = await childrenResponse.json();
-    const allFiles = [];
-    for (let i = 0; i < folderData.value.length; i++) {
-      const item = folderData.value[i];
-      if (item.folder) {
-        const subResponse = await fetch('https://graph.microsoft.com/v1.0/drives/' + documentsDrive.id + '/items/' + item.id + '/children', { headers: { Authorization: 'Bearer ' + accessToken } });
-        const subData = await subResponse.json();
-        for (let j = 0; j < subData.value.length; j++) {
-          const file = subData.value[j];
-          if (!file.folder) { allFiles.push({ name: file.name, type: getFileType(file.name), size: formatFileSize(file.size), modified: new Date(file.lastModifiedDateTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), downloadUrl: file['@microsoft.graph.downloadUrl'], client: item.name, status: 'synced' }); }
+
+// ============================================================
+// ── REGISTER ROUTES ──────────────────────────────────────────
+// ============================================================
+
+// Create CRUD routes for all asset types
+createCrudRoutes('cameras', 'cameras');
+createCrudRoutes('doors', 'doors');
+createCrudRoutes('servers', 'servers');
+createCrudRoutes('switches', 'switches');
+createCrudRoutes('storage', 'storage');
+createCrudRoutes('stations', 'stations');
+createCrudRoutes('monitors', 'monitors');
+createCrudRoutes('software', 'software');
+createCrudRoutes('tickets', 'serviceRequests');
+createCrudRoutes('inbox', 'emails');
+
+// ============================================================
+// ── SERVICE REQUEST SPECIFIC ROUTES ─────────────────────────
+// ============================================================
+
+app.post('/api/tickets/:id/assign', authenticate, (req, res) => {
+  const id = req.params.id;
+  const { assigned } = req.body;
+  const ticket = dataStore.serviceRequests.find(t => t.id === id);
+  if (!ticket) {
+    return res.status(404).json({ error: 'Ticket not found' });
+  }
+  if (req.user && !req.user.isAdmin && req.user.client && ticket.client !== req.user.client) {
+    return res.status(403).json({ error: 'Access denied' });
+  }
+  ticket.assigned = assigned;
+  ticket.updatedAt = new Date().toISOString();
+  if (!ticket.history) ticket.history = [];
+  ticket.history.push({
+    time: new Date().toLocaleTimeString(),
+    msg: 'Assigned to ' + assigned
+  });
+  saveData();
+  res.json({ data: ticket });
+});
+
+app.post('/api/tickets/:id/status', authenticate, (req, res) => {
+  const id = req.params.id;
+  const { status } = req.body;
+  const ticket = dataStore.serviceRequests.find(t => t.id === id);
+  if (!ticket) {
+    return res.status(404).json({ error: 'Ticket not found' });
+  }
+  if (req.user && !req.user.isAdmin && req.user.client && ticket.client !== req.user.client) {
+    return res.status(403).json({ error: 'Access denied' });
+  }
+  ticket.status = status;
+  ticket.updatedAt = new Date().toISOString();
+  if (!ticket.history) ticket.history = [];
+  ticket.history.push({
+    time: new Date().toLocaleTimeString(),
+    msg: 'Status → ' + status
+  });
+  saveData();
+  res.json({ data: ticket });
+});
+
+// ============================================================
+// ── WARRANTY ALERT SYSTEM ────────────────────────────────────
+// ============================================================
+
+function checkWarrantyExpirations() {
+  const now = new Date();
+  const alerts = [];
+  const alertThresholds = [90, 60, 30, 21, 14, 7]; // days
+
+  // Check all assets with warranty_expiry
+  const assetTypes = [
+    { name: 'Camera', items: dataStore.cameras },
+    { name: 'Door', items: dataStore.doors },
+    { name: 'Server', items: dataStore.servers },
+    { name: 'Switch', items: dataStore.switches },
+    { name: 'Storage', items: dataStore.storage },
+    { name: 'Client Station', items: dataStore.stations },
+    { name: 'Monitor', items: dataStore.monitors }
+  ];
+
+  assetTypes.forEach(type => {
+    type.items.forEach(item => {
+      if (item.warranty_expiry) {
+        const expiryDate = new Date(item.warranty_expiry);
+        const daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
+        
+        // Check if any threshold matches
+        alertThresholds.forEach(threshold => {
+          if (daysLeft === threshold || (threshold === 7 && daysLeft <= 7 && daysLeft > 0)) {
+            // Check if alert already sent for this item at this threshold
+            const alertKey = `${item.id || item.name}-${threshold}`;
+            const existingAlert = dataStore.warrantyAlerts.find(a => a.key === alertKey);
+            if (!existingAlert) {
+              alerts.push({
+                key: alertKey,
+                assetType: type.name,
+                assetName: item.name || item.serial || 'Unknown',
+                client: item.client || 'Unknown',
+                expiryDate: item.warranty_expiry,
+                daysLeft: daysLeft,
+                threshold: threshold,
+                timestamp: new Date().toISOString()
+              });
+            }
+          }
+        });
+      }
+    });
+  });
+
+  // Check SMA expirations for software
+  dataStore.software.forEach(item => {
+    if (item.sma_expiry) {
+      const expiryDate = new Date(item.sma_expiry);
+      const daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
+      
+      alertThresholds.forEach(threshold => {
+        if (daysLeft === threshold || (threshold === 7 && daysLeft <= 7 && daysLeft > 0)) {
+          const alertKey = `sma-${item.id || item.vendor}-${threshold}`;
+          const existingAlert = dataStore.warrantyAlerts.find(a => a.key === alertKey);
+          if (!existingAlert) {
+            alerts.push({
+              key: alertKey,
+              assetType: 'Software SMA',
+              assetName: item.vendor + ' (' + item.version + ')',
+              client: item.client || 'Unknown',
+              expiryDate: item.sma_expiry,
+              daysLeft: daysLeft,
+              threshold: threshold,
+              timestamp: new Date().toISOString()
+            });
+          }
         }
-      } else {
-        allFiles.push({ name: item.name, type: getFileType(item.name), size: formatFileSize(item.size), modified: new Date(item.lastModifiedDateTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), downloadUrl: item['@microsoft.graph.downloadUrl'], client: 'Root', status: 'synced' });
-      }
+      });
     }
-    return allFiles;
-  } catch (error) { console.error('SharePoint fetch error:', error); return null; }
+  });
+
+  // Send email alerts for new alerts
+  alerts.forEach(alert => {
+    const subject = `[CAMS] Warranty Expiration Alert - ${alert.assetType}: ${alert.assetName}`;
+    const body = `
+      <h2>Warranty Expiration Alert</h2>
+      <p>This is a <strong>${alert.daysLeft} day</strong> notice that the warranty for <strong>${alert.assetType}</strong> "${alert.assetName}" will expire on <strong>${alert.expiryDate}</strong>.</p>
+      <ul>
+        <li><strong>Client:</strong> ${alert.client}</li>
+        <li><strong>Days Remaining:</strong> ${alert.daysLeft}</li>
+        <li><strong>Expiry Date:</strong> ${alert.expiryDate}</li>
+      </ul>
+      <p>Please take appropriate action.</p>
+      <hr>
+      <p style="color: #666; font-size: 12px;">CAMS - Client Assessment Management System</p>
+    `;
+    
+    sendEmail('support@e-techsystemsja.com', subject, body).catch(console.error);
+    
+    // Store the alert
+    dataStore.warrantyAlerts.push(alert);
+  });
+
+  if (alerts.length > 0) {
+    saveData();
+    console.log(`📧 Sent ${alerts.length} warranty alert emails`);
+  }
 }
-app.get('/api/sharepoint/sync', authenticate, async (req, res) => {
-  try {
-    const authHeader = req.headers.authorization;
-    const graphToken = authHeader ? authHeader.split(' ')[1] : null;
-    if (!graphToken) return res.status(401).json({ error: 'Microsoft Graph token required' });
-    const files = await fetchSharePointFiles(graphToken);
-    if (!files) return res.status(500).json({ error: 'Failed to fetch SharePoint files' });
-    res.json({ data: files, count: files.length });
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
-app.get('/api/sharepoint/file', authenticate, async (req, res) => {
-  try {
-    const { url } = req.query;
-    if (!url) return res.status(400).json({ error: 'File URL required' });
-    const authHeader = req.headers.authorization;
-    const graphToken = authHeader ? authHeader.split(' ')[1] : null;
-    const fileResponse = await fetch(url, { headers: { Authorization: 'Bearer ' + graphToken } });
-    const contentType = fileResponse.headers.get('content-type') || '';
-    const text = await fileResponse.text();
-    res.json({ data: text, contentType });
-  } catch (error) { res.status(500).json({ error: error.message }); }
+
+// ============================================================
+// ── WARRANTY ROUTES ──────────────────────────────────────────
+// ============================================================
+
+app.post('/api/warranty/check', authenticate, (req, res) => {
+  // Run warranty check
+  checkWarrantyExpirations();
+  res.json({ success: true, message: 'Warranty alerts checked' });
 });
 
-// ── CAMERAS ─────────────────────────────────────────────
-app.get('/api/cameras', authenticate, async (req, res) => {
-  try { const result = await pool.query('SELECT * FROM cameras ORDER BY zone, name'); res.json({ data: result.rows }); }
-  catch (error) { res.status(500).json({ error: error.message }); }
-});
-app.put('/api/cameras/:name', authenticate, async (req, res) => {
-  try {
-    const { name } = req.params; const { comments, status, model, resolution, archiver, purchase_date, warranty_expiry } = req.body;
-    const fields = []; const values = []; let counter = 1;
-    if (comments !== undefined) { fields.push('comments = $' + counter); values.push(comments); counter++; }
-    if (status !== undefined) { fields.push('status = $' + counter); values.push(status); counter++; }
-    if (model !== undefined) { fields.push('model = $' + counter); values.push(model); counter++; }
-    if (resolution !== undefined) { fields.push('resolution = $' + counter); values.push(resolution); counter++; }
-    if (archiver !== undefined) { fields.push('archiver = $' + counter); values.push(archiver); counter++; }
-    if (purchase_date !== undefined) { fields.push('purchase_date = $' + counter); values.push(purchase_date); counter++; }
-    if (warranty_expiry !== undefined) { fields.push('warranty_expiry = $' + counter); values.push(warranty_expiry); counter++; }
-    fields.push('updated_at = CURRENT_TIMESTAMP'); values.push(name);
-    await pool.query('UPDATE cameras SET ' + fields.join(', ') + ' WHERE name = $' + counter, values);
-    res.json({ success: true });
-  } catch (error) { res.status(500).json({ error: error.message }); }
+app.get('/api/warranty/alerts', authenticate, (req, res) => {
+  const alerts = dataStore.warrantyAlerts || [];
+  res.json({ data: alerts });
 });
 
-// ── DOORS ─────────────────────────────────────────────────
-app.get('/api/doors', authenticate, async (req, res) => {
-  try { const result = await pool.query('SELECT *, lock_type AS lock, ip_address AS ip, last_service AS date FROM doors ORDER BY site, name'); res.json({ data: result.rows }); }
-  catch (error) { res.status(500).json({ error: error.message }); }
-});
-app.put('/api/doors/:name', authenticate, async (req, res) => {
-  try {
-    const { name } = req.params; const { status, tech, comments, purchase_date, warranty_expiry } = req.body;
-    if (status !== undefined) await pool.query('UPDATE doors SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [status, name]);
-    if (tech !== undefined) await pool.query('UPDATE doors SET tech = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [tech, name]);
-    if (comments !== undefined) await pool.query('UPDATE doors SET comments = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [comments, name]);
-    if (purchase_date !== undefined) await pool.query('UPDATE doors SET purchase_date = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [purchase_date, name]);
-    if (warranty_expiry !== undefined) await pool.query('UPDATE doors SET warranty_expiry = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [warranty_expiry, name]);
-    res.json({ success: true });
-  } catch (error) { res.status(500).json({ error: error.message }); }
+app.delete('/api/warranty/alerts/:key', authenticate, requireAdmin, (req, res) => {
+  const key = req.params.key;
+  dataStore.warrantyAlerts = dataStore.warrantyAlerts.filter(a => a.key !== key);
+  saveData();
+  res.json({ success: true });
 });
 
-// ── SERVERS ──────────────────────────────────────────────
-app.get('/api/servers', authenticate, async (req, res) => {
-  try { const result = await pool.query('SELECT * FROM servers ORDER BY location, serial'); res.json({ data: result.rows }); }
-  catch (error) { res.status(500).json({ error: error.message }); }
-});
-app.put('/api/servers/:serial', authenticate, async (req, res) => {
-  try {
-    const { serial } = req.params; const { comments, purchase_date, warranty_expiry } = req.body;
-    if (comments !== undefined) await pool.query('UPDATE servers SET comments = $1, updated_at = CURRENT_TIMESTAMP WHERE serial = $2', [comments, serial]);
-    if (purchase_date !== undefined) await pool.query('UPDATE servers SET purchase_date = $1, updated_at = CURRENT_TIMESTAMP WHERE serial = $2', [purchase_date, serial]);
-    if (warranty_expiry !== undefined) await pool.query('UPDATE servers SET warranty_expiry = $1, updated_at = CURRENT_TIMESTAMP WHERE serial = $2', [warranty_expiry, serial]);
-    res.json({ success: true });
-  } catch (error) { res.status(500).json({ error: error.message }); }
+// ============================================================
+// ── AUDIT LOG ROUTES ─────────────────────────────────────────
+// ============================================================
+
+app.post('/api/audit', authenticate, (req, res) => {
+  const { user, action, target } = req.body;
+  const entry = {
+    id: 'audit-' + Date.now(),
+    time: new Date().toLocaleTimeString(),
+    user: user || req.user?.username || 'System',
+    action: action || 'unknown',
+    target: target || '',
+    timestamp: new Date().toISOString()
+  };
+  if (!dataStore.auditLog) dataStore.auditLog = [];
+  dataStore.auditLog.unshift(entry);
+  if (dataStore.auditLog.length > 1000) {
+    dataStore.auditLog = dataStore.auditLog.slice(0, 1000);
+  }
+  saveData();
+  res.status(201).json({ data: entry });
 });
 
-// ── SWITCHES ─────────────────────────────────────────────
-app.get('/api/switches', authenticate, async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM switches ORDER BY location, name');
-    const masked = result.rows.map(function(row) { return { ...row, password: row.password ? '••••••••' : null }; });
-    res.json({ data: masked });
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
-app.get('/api/switches/:id/reveal-password', authenticate, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const result = await pool.query('SELECT id, name, password FROM switches WHERE id = $1', [id]);
-    if (result.rows.length === 0) return res.status(404).json({ error: 'Switch not found' });
-    const now = new Date(); const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-    await pool.query('INSERT INTO audit_logs (time, username, action, target) VALUES ($1, $2, $3, $4)', [timeStr, req.user.username, 'revealed credential', 'Switch ' + result.rows[0].name + ' password']);
-    res.json({ password: result.rows[0].password });
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
-app.put('/api/switches/:name', authenticate, async (req, res) => {
-  try {
-    const { name } = req.params; const { comments, purchase_date, warranty_expiry } = req.body;
-    if (comments !== undefined) await pool.query('UPDATE switches SET comments = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [comments, name]);
-    if (purchase_date !== undefined) await pool.query('UPDATE switches SET purchase_date = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [purchase_date, name]);
-    if (warranty_expiry !== undefined) await pool.query('UPDATE switches SET warranty_expiry = $1, updated_at = CURRENT_TIMESTAMP WHERE name = $2', [warranty_expiry, name]);
-    res.json({ success: true });
-  } catch (error) { res.status(500).json({ error: error.message }); }
+app.get('/api/audit', authenticate, (req, res) => {
+  const log = dataStore.auditLog || [];
+  res.json({ data: log });
 });
 
-// ── TICKETS ──────────────────────────────────────────────
-app.get('/api/tickets', authenticate, async (req, res) => {
-  try { const result = await pool.query('SELECT * FROM tickets ORDER BY created_at DESC'); res.json({ data: result.rows }); }
-  catch (error) { res.status(500).json({ error: error.message }); }
-});
-app.post('/api/tickets', authenticate, async (req, res) => {
-  try {
-    const { id, client, site, subject, from_email, category, priority, status, assigned, received, body, notes, hardware, history, attachments } = req.body;
-    await pool.query('INSERT INTO tickets (id, client, site, subject, from_email, category, priority, status, assigned, received, body, notes, hardware, history, attachments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13::jsonb,$14::jsonb,$15::jsonb)', [id, client, site, subject, from_email, category, priority, status, assigned, received, body, notes, JSON.stringify(hardware || []), JSON.stringify(history || []), JSON.stringify(attachments || [])]);
-    res.json({ success: true, id });
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
-app.put('/api/tickets/:id', authenticate, async (req, res) => {
-  try {
-    const { id } = req.params; const { status, assigned, notes, priority, category } = req.body;
-    const fields = []; const values = []; let counter = 1;
-    if (status !== undefined) { fields.push('status = $' + counter); values.push(status); counter++; }
-    if (assigned !== undefined) { fields.push('assigned = $' + counter); values.push(assigned); counter++; }
-    if (notes !== undefined) { fields.push('notes = $' + counter); values.push(notes); counter++; }
-    if (priority !== undefined) { fields.push('priority = $' + counter); values.push(priority); counter++; }
-    if (category !== undefined) { fields.push('category = $' + counter); values.push(category); counter++; }
-    fields.push('updated_at = CURRENT_TIMESTAMP'); values.push(id);
-    await pool.query('UPDATE tickets SET ' + fields.join(', ') + ' WHERE id = $' + counter, values);
-    res.json({ success: true });
-  } catch (error) { res.status(500).json({ error: error.message }); }
+app.delete('/api/audit', authenticate, requireAdmin, (req, res) => {
+  dataStore.auditLog = [];
+  saveData();
+  res.json({ success: true });
 });
 
-// ── AUDIT LOG ────────────────────────────────────────────
-app.get('/api/audit', authenticate, async (req, res) => {
-  try { const limit = parseInt(req.query.limit) || 50; const result = await pool.query('SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT $1', [limit]); res.json({ data: result.rows }); }
-  catch (error) { res.status(500).json({ error: error.message }); }
+// ============================================================
+// ── FILE SYSTEM ROUTES ──────────────────────────────────────
+// ============================================================
+
+app.get('/api/files', authenticate, (req, res) => {
+  // Return file system structure for the file explorer
+  const fileSystem = {
+    name: 'CAMS Internal Database',
+    type: 'folder',
+    children: [
+      {
+        name: 'Cameras',
+        type: 'folder',
+        children: [
+          { name: 'Camera_Maintenance_2025.csv', type: 'csv', size: '2.4 MB', modified: 'Jun 15, 2026', status: 'synced' },
+          { name: 'Camera_Inventory_Master.xlsx', type: 'xlsx', size: '5.1 MB', modified: 'Jun 12, 2026', status: 'synced' }
+        ]
+      },
+      {
+        name: 'Access Control',
+        type: 'folder',
+        children: [
+          { name: 'Access_Control_Survey.csv', type: 'csv', size: '3.2 MB', modified: 'Jun 3, 2026', status: 'synced' },
+          { name: 'Door_Inventory.xlsx', type: 'xlsx', size: '1.7 MB', modified: 'Jun 10, 2026', status: 'synced' }
+        ]
+      },
+      {
+        name: 'Servers',
+        type: 'folder',
+        children: [
+          { name: 'Server_Maintenance.csv', type: 'csv', size: '4.6 MB', modified: 'Jun 14, 2026', status: 'synced' }
+        ]
+      },
+      {
+        name: 'Switches',
+        type: 'folder',
+        children: [
+          { name: 'Network_Switch_List.csv', type: 'csv', size: '6.8 MB', modified: 'Jun 16, 2026', status: 'synced' }
+        ]
+      },
+      {
+        name: 'Software',
+        type: 'folder',
+        children: [
+          { name: 'Software_SMA_Tracking.csv', type: 'csv', size: '1.2 MB', modified: 'Jun 18, 2026', status: 'synced' }
+        ]
+      },
+      {
+        name: 'Client Assets',
+        type: 'folder',
+        children: [
+          { name: 'Storage_Inventory.csv', type: 'csv', size: '0.8 MB', modified: 'Jun 17, 2026', status: 'synced' },
+          { name: 'Stations_Inventory.csv', type: 'csv', size: '0.6 MB', modified: 'Jun 17, 2026', status: 'synced' },
+          { name: 'Monitors_Inventory.csv', type: 'csv', size: '0.4 MB', modified: 'Jun 17, 2026', status: 'synced' }
+        ]
+      }
+    ]
+  };
+  res.json({ data: fileSystem });
 });
-app.post('/api/audit', authenticate, async (req, res) => {
-  try {
-    const { user, action, target } = req.body; const now = new Date(); const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-    await pool.query('INSERT INTO audit_logs (time, username, action, target) VALUES ($1, $2, $3, $4)', [timeStr, user || req.user.username, action, target]);
-    res.json({ success: true });
-  } catch (error) { res.status(500).json({ error: error.message }); }
+
+// ============================================================
+// ── EXPORT ROUTES ────────────────────────────────────────────
+// ============================================================
+
+app.get('/api/export/:type', authenticate, (req, res) => {
+  const type = req.params.type;
+  let data = [];
+  let headers = [];
+
+  switch (type) {
+    case 'cameras':
+      data = dataStore.cameras.map(c => ({
+        Name: c.name,
+        Zone: c.zone,
+        'IP Address': c.ip_address,
+        Status: c.status,
+        Comments: c.comments || '',
+        Model: c.model || '',
+        Resolution: c.resolution || '',
+        Archiver: c.archiver || '',
+        Client: c.client || '',
+        'Purchase Date': c.purchase_date || '',
+        'Warranty Expiry': c.warranty_expiry || ''
+      }));
+      headers = ['Name', 'Zone', 'IP Address', 'Status', 'Comments', 'Model', 'Resolution', 'Archiver', 'Client', 'Purchase Date', 'Warranty Expiry'];
+      break;
+    case 'doors':
+      data = dataStore.doors.map(d => ({
+        Name: d.name,
+        Site: d.site,
+        Client: d.client,
+        Reader: d.reader || '',
+        'Lock Type': d.lock || '',
+        Powered: d.powered || '',
+        Status: d.status,
+        Technician: d.tech,
+        'IP Address': d.ip || '',
+        Controller: d.controller || '',
+        'Door Swing': d.doorSwing || '',
+        'Access Type': d.accessType || '',
+        'Anti-Passback': d.antiPassback || '',
+        'Controller Type': d.controllerType || '',
+        'Purchase Date': d.purchase_date || '',
+        'Warranty Expiry': d.warranty_expiry || ''
+      }));
+      headers = ['Name', 'Site', 'Client', 'Reader', 'Lock Type', 'Powered', 'Status', 'Technician', 'IP Address', 'Controller', 'Door Swing', 'Access Type', 'Anti-Passback', 'Controller Type', 'Purchase Date', 'Warranty Expiry'];
+      break;
+    case 'servers':
+      data = dataStore.servers.map(s => ({
+        Location: s.location,
+        Serial: s.serial,
+        Make: s.make || '',
+        Model: s.model || '',
+        Capacity: s.capacity || '',
+        'In Use': s.used || '',
+        Health: s.health || '',
+        Applications: s.apps || '',
+        Status: s.status,
+        Client: s.client || '',
+        'Purchase Date': s.purchase_date || '',
+        'Warranty Expiry': s.warranty_expiry || ''
+      }));
+      headers = ['Location', 'Serial', 'Make', 'Model', 'Capacity', 'In Use', 'Health', 'Applications', 'Status', 'Client', 'Purchase Date', 'Warranty Expiry'];
+      break;
+    case 'switches':
+      data = dataStore.switches.map(s => ({
+        Name: s.name,
+        Location: s.location,
+        Model: s.model,
+        'IP Address': s.ip_address || '',
+        Firmware: s.firmware || '',
+        MAC: s.mac || '',
+        Client: s.client || '',
+        'Purchase Date': s.purchase_date || '',
+        'Warranty Expiry': s.warranty_expiry || ''
+      }));
+      headers = ['Name', 'Location', 'Model', 'IP Address', 'Firmware', 'MAC', 'Client', 'Purchase Date', 'Warranty Expiry'];
+      break;
+    case 'storage':
+      data = dataStore.storage.map(s => ({
+        Name: s.name,
+        Client: s.client || '',
+        'Total Storage': s.total || '',
+        'Usable Storage': s.usable || '',
+        Health: s.health || '',
+        Make: s.make || '',
+        Model: s.model || '',
+        'Warranty Expiry': s.warranty || ''
+      }));
+      headers = ['Name', 'Client', 'Total Storage', 'Usable Storage', 'Health', 'Make', 'Model', 'Warranty Expiry'];
+      break;
+    case 'stations':
+      data = dataStore.stations.map(s => ({
+        Name: s.name,
+        Client: s.client || '',
+        Applications: s.apps || '',
+        Storage: s.storage || '',
+        Health: s.health || '',
+        Make: s.make || '',
+        Model: s.model || '',
+        'Warranty Expiry': s.warranty || ''
+      }));
+      headers = ['Name', 'Client', 'Applications', 'Storage', 'Health', 'Make', 'Model', 'Warranty Expiry'];
+      break;
+    case 'monitors':
+      data = dataStore.monitors.map(m => ({
+        Name: m.name,
+        Client: m.client || '',
+        Size: m.size || '',
+        Health: m.health || '',
+        Make: m.make || '',
+        Model: m.model || '',
+        'Warranty Expiry': m.warranty || ''
+      }));
+      headers = ['Name', 'Client', 'Size', 'Health', 'Make', 'Model', 'Warranty Expiry'];
+      break;
+    case 'software':
+      data = dataStore.software.map(s => ({
+        Client: s.client || '',
+        Vendor: s.vendor,
+        Version: s.version,
+        'SMA Expiry': s.sma_expiry || '',
+        'License Count': s.license_count || ''
+      }));
+      headers = ['Client', 'Vendor', 'Version', 'SMA Expiry', 'License Count'];
+      break;
+    case 'service_requests':
+      data = dataStore.serviceRequests.map(sr => ({
+        ID: sr.id,
+        Client: sr.client || '',
+        Site: sr.site || '',
+        Subject: sr.subject,
+        Category: sr.category || '',
+        Priority: sr.priority || '',
+        Status: sr.status || '',
+        Assigned: sr.assigned || '',
+        Received: sr.received || ''
+      }));
+      headers = ['ID', 'Client', 'Site', 'Subject', 'Category', 'Priority', 'Status', 'Assigned', 'Received'];
+      break;
+    default:
+      return res.status(400).json({ error: 'Invalid export type' });
+  }
+
+  // Convert to CSV
+  let csv = headers.join(',') + '\n';
+  data.forEach(row => {
+    const values = headers.map(h => {
+      const val = row[h] || '';
+      return '"' + String(val).replace(/"/g, '""') + '"';
+    });
+    csv += values.join(',') + '\n';
+  });
+
+  res.setHeader('Content-Type', 'text/csv');
+  res.setHeader('Content-Disposition', `attachment; filename=${type}_${new Date().toISOString().slice(0,10)}.csv`);
+  res.send(csv);
 });
 
-// ── INBOX ────────────────────────────────────────────────
-app.get('/api/inbox', authenticate, async (req, res) => {
-  try { const result = await pool.query('SELECT * FROM emails ORDER BY created_at DESC'); res.json({ data: result.rows }); }
-  catch (error) { res.status(500).json({ error: error.message }); }
+// ============================================================
+// ── SERVER START ─────────────────────────────────────────────
+// ============================================================
+
+// Run warranty check every 6 hours
+setInterval(checkWarrantyExpirations, 6 * 60 * 60 * 1000);
+
+// Also check on server start
+setTimeout(checkWarrantyExpirations, 5000);
+
+app.listen(PORT, () => {
+  console.log(`🚀 CAMS Server running on port ${PORT}`);
+  console.log(`📊 Data stored at: ${DATA_PATH}`);
+  console.log(`📧 Email notifications configured`);
 });
 
-// ── DASHBOARD TRENDS ─────────────────────────────────────
-app.get('/api/dashboard/trends', authenticate, async (req, res) => {
-  try {
-    const [camRes, doorRes, srvRes, swRes] = await Promise.all([
-      pool.query("SELECT COUNT(*) FROM cameras WHERE status IN ('Defective','Offline')"),
-      pool.query("SELECT COUNT(*) FROM doors WHERE status = 'Offline'"),
-      pool.query("SELECT COUNT(*) FILTER (WHERE status = 'ONLINE') AS online, COUNT(*) AS total FROM servers"),
-      pool.query("SELECT COUNT(*) AS total FROM switches")
-    ]);
-    const camerasDefective = parseInt(camRes.rows[0].count); const doorsOffline = parseInt(doorRes.rows[0].count);
-    const serversOnline = parseInt(srvRes.rows[0].online); const serversTotal = parseInt(srvRes.rows[0].total);
-    const switchesTotal = parseInt(swRes.rows[0].total);
-    await pool.query('INSERT INTO dashboard_snapshots (snapshot_date, cameras_defective, doors_offline, servers_online, servers_total, switches_total) VALUES (CURRENT_DATE, $1, $2, $3, $4, $5) ON CONFLICT (snapshot_date) DO UPDATE SET cameras_defective = $1, doors_offline = $2, servers_online = $3, servers_total = $4, switches_total = $5', [camerasDefective, doorsOffline, serversOnline, serversTotal, switchesTotal]);
-    const baseline = await pool.query("SELECT * FROM dashboard_snapshots WHERE snapshot_date <= CURRENT_DATE - INTERVAL '7 days' ORDER BY snapshot_date DESC LIMIT 1");
-    function pctChange(current, past) { if (past === null || past === undefined || past === 0) return null; return Math.round(((current - past) / past) * 100); }
-    const base = baseline.rows[0] || null;
-    res.json({ data: { camerasDefective: { value: camerasDefective, trendPct: base ? pctChange(camerasDefective, base.cameras_defective) : null }, doorsOffline: { value: doorsOffline, trendPct: base ? pctChange(doorsOffline, base.doors_offline) : null }, serversOnline: { value: serversOnline, total: serversTotal, trendPct: base ? pctChange(serversOnline, base.servers_online) : null }, switchesTotal: { value: switchesTotal, trendPct: base ? pctChange(switchesTotal, base.switches_total) : null }, comparisonAvailable: !!base, comparisonPeriodDays: 7 } });
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
-// ── HEALTH CHECK ────────────────────────────────────────
-app.get('/api/health', (req, res) => { res.json({ status: 'ok', timestamp: new Date().toISOString() }); });
-
-// ── SERVE FRONTEND ───────────────────────────────────────
-app.use(express.static(__dirname));
-app.get('*', (req, res, next) => { if (req.path.startsWith('/api/')) return next(); res.sendFile(path.join(__dirname, 'index.html')); });
-
-// ── ERROR HANDLER ──────────────────────────────────────
-app.use((err, req, res, next) => { console.error('❌ Error:', err.stack); res.status(500).json({ error: err.message || 'Internal server error' }); });
-
-// ── START SERVER ────────────────────────────────────────
-async function startServer() {
-  try {
-    await initDatabase();
-    await seedData();
-    app.listen(PORT, () => { console.log('✅ CCSM Backend running on http://localhost:' + PORT); console.log('📡 API endpoint: http://localhost:' + PORT + '/api'); console.log('🔑 Default login: admin / admin123'); });
-  } catch (error) { console.error('❌ Failed to start server:', error.message); process.exit(1); }
-}
-startServer();
-
-process.on('SIGTERM', async () => { console.log('🛑 Shutting down...'); await pool.end(); process.exit(0); });
-process.on('SIGINT', async () => { console.log('🛑 Shutting down...'); await pool.end(); process.exit(0); });
+module.exports = app;
