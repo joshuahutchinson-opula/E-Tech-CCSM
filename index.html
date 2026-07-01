@@ -206,6 +206,73 @@
   .trend-badge.warn { background: rgba(255,179,71,0.15); color: #ffb347; }
   .trend-badge.down { background: rgba(255,94,122,0.15); color: #ff5e7a; }
 
+  /* Fix for dropdowns in modals - ensures text is visible */
+.modal-field select,
+.modal-field select option,
+#add-software-modal select,
+#add-software-modal select option,
+#add-storage-modal select,
+#add-storage-modal select option,
+#add-station-modal select,
+#add-station-modal select option,
+#add-monitor-modal select,
+#add-monitor-modal select option,
+#add-camera-modal select,
+#add-camera-modal select option,
+#add-door-modal select,
+#add-door-modal select option,
+#add-server-modal select,
+#add-server-modal select option,
+#add-switch-modal select,
+#add-switch-modal select option,
+#add-sr-modal select,
+#add-sr-modal select option {
+  background: #1a1a2e !important;
+  color: #f0f4ff !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+.modal-field select:focus,
+#add-software-modal select:focus,
+#add-storage-modal select:focus,
+#add-station-modal select:focus,
+#add-monitor-modal select:focus {
+  outline: none;
+  border-color: var(--accent) !important;
+}
+
+/* Light theme fix */
+.light-theme .modal-field select,
+.light-theme .modal-field select option,
+.light-theme #add-software-modal select,
+.light-theme #add-software-modal select option,
+.light-theme #add-storage-modal select,
+.light-theme #add-storage-modal select option,
+.light-theme #add-station-modal select,
+.light-theme #add-station-modal select option,
+.light-theme #add-monitor-modal select,
+.light-theme #add-monitor-modal select option {
+  background: #ffffff !important;
+  color: #1a1a2e !important;
+  border: 1px solid rgba(0,0,0,0.1) !important;
+}
+
+/* Jet Black theme fix */
+.jet-black-theme .modal-field select,
+.jet-black-theme .modal-field select option,
+.jet-black-theme #add-software-modal select,
+.jet-black-theme #add-software-modal select option,
+.jet-black-theme #add-storage-modal select,
+.jet-black-theme #add-storage-modal select option,
+.jet-black-theme #add-station-modal select,
+.jet-black-theme #add-station-modal select option,
+.jet-black-theme #add-monitor-modal select,
+.jet-black-theme #add-monitor-modal select option {
+  background: #050508 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255,255,255,0.05) !important;
+}
+
   /* Timeline */
   .timeline { display: flex; flex-direction: column; gap: 6px; }
   .tl-item { display: flex; gap: 12px; font-size: 12px; padding: 6px 0; border-bottom: 1px solid var(--card-border); }
@@ -471,7 +538,7 @@
   .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 14px 16px; position: relative; overflow: hidden; transition: all 0.25s; }
   .stat-card:hover { border-color: var(--accent); box-shadow: 0 12px 48px rgba(0,0,0,0.6), 0 0 30px var(--accent-glow); }
   .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--client-button-gradient); border-radius: 0 2px 2px 0; opacity: 0.8; }
-  .stat-label { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .stat-label { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; font-weight: 700 !important; }
   .stat-val { font-size: 26px; font-weight: 600; color: var(--stat-val-color); line-height: 1; }
   .stat-note { font-size: 11px; margin-top: 4px; color: var(--text-secondary); }
   .note-danger { color: var(--danger); }
@@ -690,7 +757,7 @@
             <div class="stat-card">
               <div class="stat-label">System Health <span class="trend-badge" id="trend-health"><i class="ti ti-trending-up"></i> +2%</span></div>
               <div class="stat-val" style="color:var(--success)" id="dash-health">98%</div>
-              <div class="stat-note note-success">All systems nominal</div>
+              <div class="stat-note note-success">Across all assets</div>
             </div>
             <div class="stat-card">
               <div class="stat-label">Active Alerts <span class="trend-badge warn" id="trend-alerts"><i class="ti ti-alert-circle"></i> 2</span></div>
@@ -2804,7 +2871,13 @@
     var onlineDevices = (CAMERAS.length - defective) + (DOORS.length - acOffline) + srvOnline + swOnline;
     var health = totalDevices > 0 ? Math.round((onlineDevices / totalDevices) * 100) : 100;
 
-    document.getElementById('dash-health').textContent = health + '%';
+document.getElementById('dash-health').textContent = health + '%';
+var note = document.getElementById('dash-health-note');
+if (note) {
+  if (health >= 95) note.textContent = 'All systems operational';
+  else if (health >= 80) note.textContent = 'System degradation detected';
+  else note.textContent = 'Critical system issues';
+}
     document.getElementById('dash-alerts').textContent = defective + acOffline;
     document.getElementById('dash-offline').textContent = defective + acOffline + (SWITCHES.length - swOnline);
     document.getElementById('dash-srs').textContent = SERVICE_REQUESTS.filter(function(r) { return r.status !== 'Resolved'; }).length;
