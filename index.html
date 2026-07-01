@@ -2802,6 +2802,8 @@
           loadingDiv.classList.remove('active');
           return;
         }
+        // After admin login, before hideLogin():
+document.getElementById('app').classList.remove('client-mode');
 
         hideLogin();
         document.getElementById('app').style.display = 'none';
@@ -2893,6 +2895,7 @@
     clientViewData = null;
     document.getElementById('app').style.display = 'none';
     document.getElementById('client-view-container').style.display = 'none';
+      document.getElementById('app').classList.remove('client-mode');
     showLogin();
     toast('Logged out', 'info');
   }
