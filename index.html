@@ -4048,30 +4048,33 @@
 
   function getEmbeddedDoors() {
     return [
-      {name: "Batching room", site: "LML B Liquid Plant", client: "Lasco", status: "Online", comments: "No longer use equipment has been removed"},
-      {name: "Blow mold entrance 1", site: "LML B Liquid Plant", client: "Lasco", status: "Online", comments: "Door needs repair door drop"},
-      {name: "Blow mold entrance 2", site: "LML B Liquid Plant", client: "Lasco", status: "Online", comments: "Door needs repair door drop"},
-      {name: "Chemistry lab", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
-      {name: "Electrical room to utilites", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
-      {name: "Utilites to electrical room", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
-      {name: "Entrance to uppstairs offices - IN", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
-      {name: "Entrance to uppstairs offices - OUT", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
-      {name: "Filling room 1", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
-      {name: "Filling room 2", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
-      {name: "Filling room 3", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
-      {name: "Filling room 4", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
-      {name: "Guest access - IN", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
-      {name: "Guest access - OUT", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
-      {name: "Lobby", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
-      {name: "Microbiology lab", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
-      {name: "Prep Room", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
-      {name: "Processing room 1", site: "LML B Liquid Plant", client: "Lasco", status: "Online", comments: "No longer use equipment has been removed"},
-      {name: "Processing room 2", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
-      {name: "Product dev lab", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
-      {name: "Production floor - IN", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
-      {name: "Production floor - OUT", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
-      {name: "QA office", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
-      {name: "Shop and spare parts", site: "LML B Liquid Plant", client: "Lasco", status: "Online"}
+      {name: "Batching room", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "600lb", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "In", accessType: "Read In Only", antiPassback: "No", controllerType: "Standalone", comments: "No longer use equipment has been removed", history: []},
+      {name: "Blow mold entrance 1", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "1200lb", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", controllerType: "Standalone", comments: "Door needs repair door drop", history: []},
+      {name: "Blow mold entrance 2", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "600lb", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", controllerType: "Standalone", comments: "Door needs repair door drop", history: []},
+      {name: "Chemistry lab", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "600lb", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", controllerType: "Integrated", comments: "", history: []},
+      {name: "Electrical room to utilites", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "Z", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "In", accessType: "Read In Only", antiPassback: "No", controllerType: "Standalone", comments: "", history: []},
+      {name: "Utilites to electrical room", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "Z", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "Out", accessType: "Push Out Only", antiPassback: "No", controllerType: "Standalone", comments: "", history: []},
+      {name: "Entrance to uppstairs offices - IN", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "600lb", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", controllerType: "Standalone", comments: "", history: []},
+      {name: "Entrance to uppstairs offices - OUT", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "600lb", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "Out", accessType: "Push Out Only", antiPassback: "No", controllerType: "Standalone", comments: "", history: []},
+      {name: "Filling room 1", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "600lb", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", controllerType: "Standalone", comments: "", history: []},
+      {name: "Filling room 2", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "600lb", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", controllerType: "Standalone", comments: "", history: []},
+      {name: "Filling room 3", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "600lb", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", controllerType: "Standalone", comments: "", history: []},
+      {name: "Filling room 4", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "1200lb", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", controllerType: "Standalone", comments: "", history: []},
+      {name: "Guest access - IN", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "600lb", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", controllerType: "Standalone", comments: "", history: []},
+      {name: "Guest access - OUT", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "600lb", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "Out", accessType: "Push Out Only", antiPassback: "No", controllerType: "Standalone", comments: "", history: []},
+      {name: "Lobby", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "600lb", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", controllerType: "Standalone", comments: "", history: []},
+      {name: "Microbiology lab", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "600lb", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", controllerType: "Integrated", comments: "", history: []},
+      {name: "Prep Room", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "600lb", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", controllerType: "Standalone", comments: "", history: []},
+      {name: "Processing room 1", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "600lb", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "In", accessType: "Read In Only", antiPassback: "No", controllerType: "Standalone", comments: "No longer use equipment has been removed", history: []},
+      {name: "Processing room 2", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "600lb", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", controllerType: "Standalone", comments: "", history: []},
+      {name: "Product dev lab", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "600lb", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", controllerType: "Standalone", comments: "", history: []},
+      {name: "Production floor - IN", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "600lb", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", controllerType: "Standalone", comments: "", history: []},
+      {name: "Production floor - OUT", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "600lb", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "Out", accessType: "Push Out Only", antiPassback: "No", controllerType: "Standalone", comments: "", history: []},
+      {name: "QA office", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "600lb", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", controllerType: "Standalone", comments: "", history: []},
+      {name: "Shop and spare parts", site: "LML B Liquid Plant", client: "Lasco", reader: "HID Prox", lock_type: "600lb", powered: "Yes", status: "Online", tech: "Unassigned", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", controllerType: "Standalone", comments: "", history: []},
+      // Add some KFTL doors with full data for demonstration
+      {name: "Main Entrance", site: "Security Office", client: "KFTL", reader: "HID Prox", lock_type: "Magnetic", powered: "Yes", status: "Online", tech: "Shanice Vernon", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "Yes", controllerType: "Standalone", comments: "Main entrance door", history: [{time: "08:00", event: "Door installed"}]},
+      {name: "2nd Entrance", site: "SAL Duty Office", client: "KFTL", reader: "HID Prox", lock_type: "Magnetic", powered: "Yes", status: "Offline", tech: "Marvin Grant", doorSwing: "Out", accessType: "Read In + Push Out", antiPassback: "No", controllerType: "Integrated", comments: "Offline - needs attention", history: [{time: "09:30", event: "Offline reported"}]}
     ];
   }
 
@@ -4704,7 +4707,8 @@
           (d.reader || '').toLowerCase().indexOf(search) !== -1 ||
           (d.tech || '').toLowerCase().indexOf(search) !== -1 ||
           (d.site || '').toLowerCase().indexOf(search) !== -1 ||
-          (d.client || '').toLowerCase().indexOf(search) !== -1;
+          (d.client || '').toLowerCase().indexOf(search) !== -1 ||
+          (d.lock_type || '').toLowerCase().indexOf(search) !== -1;
         return match && (doorStatusFilter === 'All' || d.status === doorStatusFilter);
       });
       if (currentClientFilter) {
@@ -4742,10 +4746,24 @@
         siteKeys.forEach(function(site) {
           var doors = groups[site];
           var client = doors[0].client || getClient(site);
-          html += '<div class="door-zone-group"><div class="door-zone-header" onclick="toggleDoorZone(\'zone-' + site + '\')"><div><span class="zone-name">' + site + '</span><span class="zone-client">(' + client + ')</span></div><div><span class="zone-count">' + doors.length + ' doors</span> <i class="ti ti-chevron-down zone-toggle" id="door-zone-toggle-' + site + '"></i></div></div><div class="door-zone-body" id="door-zone-body-' + site + '"><table class="tbl"><thead><tr><th>Door</th><th>Site</th><th>Client</th><th>Status</th><th>Comments</th></tr></thead><tbody>';
+          html += '<div class="door-zone-group"><div class="door-zone-header" onclick="toggleDoorZone(\'zone-' + site + '\')"><div><span class="zone-name">' + site + '</span><span class="zone-client">(' + client + ')</span></div><div><span class="zone-count">' + doors.length + ' doors</span> <i class="ti ti-chevron-down zone-toggle" id="door-zone-toggle-' + site + '"></i></div></div><div class="door-zone-body" id="door-zone-body-' + site + '"><table class="tbl"><thead><tr><th>Door</th><th>Site</th><th>Client</th><th>Reader</th><th>Lock Type</th><th>Powered</th><th>Status</th><th>Tech</th><th>Door Swing</th><th>Access Type</th><th>Anti-Passback</th><th>Controller Type</th><th>Comments</th></tr></thead><tbody>';
           doors.forEach(function(d) {
             var realIndex = DOORS.indexOf(d);
-            html += '<tr class="clickable" onclick="openDoorDetail(' + realIndex + ')"><td>' + d.name + '</td><td>' + d.site + '</td><td>' + d.client + '</td><td>' + doorBadge(d.status) + '</td><td><span class="comment-display ' + (!d.comments ? 'placeholder' : '') + '" data-door-index="' + realIndex + '" onclick="event.stopPropagation();editDoorComment(' + realIndex + ')">' + (d.comments || 'Click to add note') + '</span></td></tr>';
+            html += '<tr class="clickable" onclick="openDoorDetail(' + realIndex + ')">' +
+              '<td>' + d.name + '</td>' +
+              '<td>' + d.site + '</td>' +
+              '<td>' + d.client + '</td>' +
+              '<td>' + (d.reader || '—') + '</td>' +
+              '<td>' + (d.lock_type || '—') + '</td>' +
+              '<td><span style="color:' + (d.powered === 'Not In Use' ? '#fbbf24' : d.powered === 'Yes' ? '#4ade80' : '#f87171') + ';">' + (d.powered || '—') + '</span></td>' +
+              '<td>' + doorBadge(d.status) + '</td>' +
+              '<td>' + (d.tech || '—') + '</td>' +
+              '<td>' + (d.doorSwing || '—') + '</td>' +
+              '<td>' + (d.accessType || '—') + '</td>' +
+              '<td>' + (d.antiPassback || '—') + '</td>' +
+              '<td>' + (d.controllerType || '—') + '</td>' +
+              '<td><span class="comment-display ' + (!d.comments ? 'placeholder' : '') + '" data-door-index="' + realIndex + '" onclick="event.stopPropagation();editDoorComment(' + realIndex + ')">' + (d.comments || 'Click to add note') + '</span></td>' +
+              '</tr>';
           });
           html += '</tbody></table></div></div>';
         });
@@ -4855,8 +4873,21 @@
       '<div class="modal-field"><label>Door</label><span>' + door.name + '</span></div>' +
       '<div class="modal-field"><label>Site</label><span>' + door.site + '</span></div>' +
       '<div class="modal-field"><label>Client</label><span>' + door.client + '</span></div>' +
+      '<div class="modal-field"><label>Reader</label><input type="text" id="modal-door-reader" value="' + (door.reader || '') + '" onchange="door.reader=this.value;" placeholder="e.g., HID Prox" /></div>' +
+      '<div class="modal-field"><label>Lock Type</label><input type="text" id="modal-door-lock" value="' + (door.lock_type || '') + '" onchange="door.lock_type=this.value;" placeholder="e.g., 600lb, 1200lb, Z" /></div>' +
+      '<div class="modal-field"><label>Powered</label><select class="status-select" id="modal-door-powered" onchange="door.powered=this.value;"><option value="Yes" ' + (door.powered === 'Yes' ? 'selected' : '') + '>Yes</option><option value="No" ' + (door.powered === 'No' ? 'selected' : '') + '>No</option><option value="Not In Use" ' + (door.powered === 'Not In Use' ? 'selected' : '') + '>Not In Use</option></select></div>' +
       '<div class="modal-field"><label>Status</label><select class="status-select" id="modal-door-status" onchange="door.status=this.value;renderDoorsEnhanced();"><option value="Online" ' + (door.status === 'Online' ? 'selected' : '') + '>Online</option><option value="Offline" ' + (door.status === 'Offline' ? 'selected' : '') + '>Offline</option><option value="Under Maintenance" ' + (door.status === 'Under Maintenance' ? 'selected' : '') + '>Under Maintenance</option></select></div>' +
-      '<div class="modal-field"><label>Comments</label><textarea class="notes-area" id="door-modal-comments">' + (door.comments || '') + '</textarea></div>';
+      '<div class="modal-field"><label>Technician</label><select class="status-select" id="modal-door-tech" onchange="door.tech=this.value;renderDoorsEnhanced();"><option value="Shanice Vernon" ' + (door.tech === 'Shanice Vernon' ? 'selected' : '') + '>Shanice Vernon</option><option value="Shavine" ' + (door.tech === 'Shavine' ? 'selected' : '') + '>Shavine</option><option value="Marvin Grant" ' + (door.tech === 'Marvin Grant' ? 'selected' : '') + '>Marvin Grant</option><option value="Ackeem" ' + (door.tech === 'Ackeem' ? 'selected' : '') + '>Ackeem</option><option value="Unassigned" ' + (door.tech === 'Unassigned' ? 'selected' : '') + '>Unassigned</option></select></div>' +
+      '<div class="modal-field"><label>Door Swing</label><select class="status-select" id="modal-door-swing" onchange="door.doorSwing=this.value;"><option value="In" ' + (door.doorSwing === 'In' ? 'selected' : '') + '>In</option><option value="Out" ' + (door.doorSwing === 'Out' ? 'selected' : '') + '>Out</option></select></div>' +
+      '<div class="modal-field"><label>Access Type</label><select class="status-select" id="modal-door-access-type" onchange="door.accessType=this.value;"><option value="Read In + Read Out" ' + (door.accessType === 'Read In + Read Out' ? 'selected' : '') + '>Read In + Read Out</option><option value="Read In + Push Out" ' + (door.accessType === 'Read In + Push Out' ? 'selected' : '') + '>Read In + Push Out</option><option value="Read In Only" ' + (door.accessType === 'Read In Only' ? 'selected' : '') + '>Read In Only</option><option value="Push Out Only" ' + (door.accessType === 'Push Out Only' ? 'selected' : '') + '>Push Out Only</option><option value="RTE Only" ' + (door.accessType === 'RTE Only' ? 'selected' : '') + '>RTE Only</option><option value="Read In + RTE" ' + (door.accessType === 'Read In + RTE' ? 'selected' : '') + '>Read In + RTE</option></select></div>' +
+      '<div class="modal-field"><label>Anti-Passback</label><select class="status-select" id="modal-door-anti-passback" onchange="door.antiPassback=this.value;"><option value="Yes" ' + (door.antiPassback === 'Yes' ? 'selected' : '') + '>Yes</option><option value="No" ' + (door.antiPassback === 'No' ? 'selected' : '') + '>No</option></select></div>' +
+      '<div class="modal-field"><label>Controller Type</label><select class="status-select" id="modal-door-controller-type" onchange="door.controllerType=this.value;"><option value="Standalone" ' + (door.controllerType === 'Standalone' ? 'selected' : '') + '>Standalone</option><option value="Integrated" ' + (door.controllerType === 'Integrated' ? 'selected' : '') + '>Integrated</option><option value="Networked/IP" ' + (door.controllerType === 'Networked/IP' ? 'selected' : '') + '>Networked/IP</option><option value="Centralized/Panel-Based" ' + (door.controllerType === 'Centralized/Panel-Based' ? 'selected' : '') + '>Centralized/Panel-Based</option></select></div>' +
+      '<div class="modal-field"><label>IP Address</label><input type="text" id="modal-door-ip" value="' + (door.ip || '') + '" onchange="door.ip=this.value;" placeholder="e.g., 10.19.1.100" /></div>' +
+      '<div class="modal-field"><label>Controller</label><input type="text" id="modal-door-controller" value="' + (door.controller || '') + '" onchange="door.controller=this.value;" placeholder="e.g., Controller A" /></div>' +
+      '<div class="modal-field"><label>Purchase Date</label><input type="date" id="modal-door-purchase" value="' + (door.purchase_date || '') + '" onchange="door.purchase_date=this.value;" /></div>' +
+      '<div class="modal-field"><label>Warranty Expiry</label><input type="date" id="modal-door-warranty" value="' + (door.warranty_expiry || '') + '" onchange="door.warranty_expiry=this.value;" /></div>' +
+      '<div class="modal-field" style="grid-column: 1 / -1;"><label>Comments</label><textarea class="notes-area" id="door-modal-comments" rows="3">' + (door.comments || '') + '</textarea></div>';
+    
     var commentsSection = document.getElementById('door-detail-comments-section');
     if (commentsSection) {
       commentsSection.innerHTML = '<div class="modal-section-title">Comments</div><textarea class="notes-area" id="door-modal-comments">' + (door.comments || '') + '</textarea><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;"><button class="btn btn-sm btn-success" onclick="saveDoorModalComment()"><i class="ti ti-device-floppy"></i> Save</button></div>';
