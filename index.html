@@ -4092,18 +4092,19 @@
 
   function getEmbeddedSoftware() {
     return [
-      {vendor: "Genetec", client: "KFTL", version: "14.0.2.27", sma_expiry: "2026-12-31", status: "Good"},
-      {vendor: "Axis", client: "KFTL", version: "Various", sma_expiry: "2026-12-31", status: "Good"},
-      {vendor: "Avigilon", client: "KFTL", version: "4.8.0.12", sma_expiry: "2026-12-31", status: "Good"},
-      {vendor: "Pelco", client: "KFTL", version: "Various", sma_expiry: "2026-12-31", status: "Good"},
-      {vendor: "FLIR Systems", client: "KFTL", version: "v1.6.0.31", sma_expiry: "2026-12-31", status: "Good"},
-      {vendor: "AutoVu", client: "KFTL", version: "12.8.465.0", sma_expiry: "2026-12-31", status: "Good"},
-      {vendor: "Opgal Optronic Industries Ltd", client: "KFTL", version: "V 4.2.111", sma_expiry: "2026-12-31", status: "Good"},
-      {vendor: "Lenel", client: "KWL", version: "7.3.1", sma_expiry: "2026-06-15", status: "Warning"},
-      {vendor: "AMAG", client: "KFTL", version: "9.0.0", sma_expiry: "2025-01-01", status: "Expired"}
+      {vendor: "Genetec", client: "KFTL", version: "14.0.2.27", license_type: "Regular license (1)", sma_expiry: "2026-12-31", status: "Good"},
+      {vendor: "Axis", client: "KFTL", version: "Various", license_type: "Regular license (1)", sma_expiry: "2026-12-31", status: "Good"},
+      {vendor: "Avigilon", client: "KFTL", version: "4.8.0.12", license_type: "Regular license (1)", sma_expiry: "2026-12-31", status: "Good"},
+      {vendor: "Pelco", client: "KFTL", version: "Various", license_type: "Regular license (1)", sma_expiry: "2026-12-31", status: "Good"},
+      {vendor: "FLIR Systems", client: "KFTL", version: "v1.6.0.31", license_type: "Regular license (2)", sma_expiry: "2026-12-31", status: "Good"},
+      {vendor: "AutoVu", client: "KFTL", version: "12.8.465.0", license_type: "Regular license (1)", sma_expiry: "2026-12-31", status: "Good"},
+      {vendor: "Opgal Optronic Industries Ltd", client: "KFTL", version: "V 4.2.111", license_type: "Regular license (2)", sma_expiry: "2026-12-31", status: "Good"},
+      {vendor: "Lenel", client: "KWL", version: "7.3.1", license_type: "Enterprise", sma_expiry: "2026-06-15", status: "Warning"},
+      {vendor: "AMAG", client: "KFTL", version: "9.0.0", license_type: "Enterprise", sma_expiry: "2025-01-01", status: "Expired"},
+      {vendor: "Arecont Vision", client: "Lasco", version: "65200", license_type: "Regular license (1)", sma_expiry: "2026-12-31", status: "Good"},
+      {vendor: "Salto", client: "Lasco", version: "4.2.0", license_type: "Regular license (1)", sma_expiry: "2026-12-31", status: "Good"}
     ];
   }
-
   function getEmbeddedStorage() {
     return [
       {name: "NAS-01", client: "KFTL", total: "10TB", usable: "8.2TB", health: 85, make: "Dell", model: "PowerVault", warranty_expiry: "2027-01-15"},
@@ -4432,10 +4433,10 @@
           var pageCameras = cameras.slice(start, end);
           html += '<div class="cam-zone-group"><div class="cam-zone-header" onclick="toggleZone(\'zone-' + zone + '\')"><div><span class="zone-name">' + zone + '</span><span class="zone-client">(' + client + ')</span></div><div><span class="zone-count">' + totalInZone + ' cameras</span> <i class="ti ti-chevron-down zone-toggle" id="zone-toggle-' + zone + '"></i></div></div><div class="cam-zone-body" id="zone-body-' + zone + '">';
           if (pageCameras.length > 0) {
-            html += '<table class="tbl"><thead><tr><th>Zone</th><th>Camera</th><th>IP</th><th>Status</th><th>Comments</th><th>Model</th><th>Manufacturer</th><th>Archiver</th></tr></thead><tbody>';
+            html += '<table class="tbl"><thead><tr><th>Zone</th><th>Camera</th><th>IP</th><th>Status</th><th>Comments</th><th>Model</th><th>Manufacturer</th><th>Resolution</th><th>Archiver</th><th>MAC Address</th><th>Warranty</th></tr></thead><tbody>';
             pageCameras.forEach(function(c) {
               var globalIndex = CAMERAS.indexOf(c);
-              html += '<tr class="clickable" onclick="openCameraDetail(' + globalIndex + ')"><td>' + c.zone + '</td><td>' + c.name + '</td><td>' + (c.ip_address || '—') + '</td><td>' + camBadge(c.status) + '</td><td><span class="comment-display ' + (!c.comments ? 'placeholder' : '') + '" data-cam-index="' + globalIndex + '" onclick="event.stopPropagation();editComment(' + globalIndex + ')">' + (c.comments || 'Click to add note') + '</span></td><td>' + (c.model || '—') + '</td><td>' + (c.manufacturer || '—') + '</td><td>' + (c.archiver || '—') + '</td></tr>';
+              html += '<tr class="clickable" onclick="openCameraDetail(' + globalIndex + ')"><td>' + c.zone + '</td><td>' + c.name + '</td><td>' + (c.ip_address || '—') + '</td><td>' + camBadge(c.status) + '</td><td><span class="comment-display ' + (!c.comments ? 'placeholder' : '') + '" data-cam-index="' + globalIndex + '" onclick="event.stopPropagation();editComment(' + globalIndex + ')">' + (c.comments || 'Click to add note') + '</span></td><td>' + (c.model || '—') + '</td><td>' + (c.manufacturer || '—') + '</td><td>' + (c.resolution || '—') + '</td><td>' + (c.archiver || '—') + '</td><td class="mono">' + (c.mac_address || '—') + '</td><td>' + getWarrantyDisplay(c.warranty_expiry) + '</td></tr>';
             });
             html += '</tbody></table>';
             if (totalPages > 1) {
@@ -4964,14 +4965,14 @@
         html = '<div class="empty-state"><span class="empty-icon">🖥</span><div class="empty-title">No servers found</div></div>';
       } else {
         locKeys.forEach(function(loc) {
-          html += '<div class="server-zone-group"><div class="server-zone-header" onclick="toggleSrvZone(\'srv-zone-' + loc + '\')"><div><span class="zone-name">' + loc + '</span></div><div><span class="zone-count">' + groups[loc].length + ' servers</span> <i class="ti ti-chevron-down zone-toggle" id="srv-zone-toggle-' + loc + '"></i></div></div><div class="server-zone-body" id="srv-zone-body-' + loc + '"><table class="tbl"><thead><tr><th>Location</th><th>Serial</th><th>Make</th><th>Model</th><th>Storage</th><th>Health</th><th>Apps</th><th>Status</th></tr></thead><tbody>';
+          html += '<div class="server-zone-group"><div class="server-zone-header" onclick="toggleSrvZone(\'srv-zone-' + loc + '\')"><div><span class="zone-name">' + loc + '</span></div><div><span class="zone-count">' + groups[loc].length + ' servers</span> <i class="ti ti-chevron-down zone-toggle" id="srv-zone-toggle-' + loc + '"></i></div></div><div class="server-zone-body" id="srv-zone-body-' + loc + '"><table class="tbl"><thead><tr><th>Location</th><th>Serial</th><th>Make</th><th>Model</th><th>Storage</th><th>Used</th><th>Health</th><th>Apps</th><th>Status</th><th>Purchase Date</th><th>Warranty</th></tr></thead><tbody>';
           groups[loc].forEach(function(s) {
             var realIndex = SERVERS.indexOf(s);
             var capacityNum = parseFloat(s.capacity);
             var usedNum = parseFloat(s.used);
             var pct = (!isNaN(capacityNum) && !isNaN(usedNum) && capacityNum > 0) ? Math.round((usedNum / capacityNum) * 100) : 0;
             var barColor = pct > 85 ? 'red' : pct > 70 ? 'yellow' : 'green';
-            html += '<tr class="clickable" onclick="openServerDetail(' + realIndex + ')"><td>' + s.location + '</td><td style="font-family:monospace;">' + s.serial + '</td><td>' + (s.make || '—') + '</td><td>' + (s.model || '—') + '</td><td><div style="display:flex;flex-direction:column;gap:2px;"><span>' + (s.used && s.capacity ? s.used + ' / ' + s.capacity : s.capacity || s.used || '—') + '</span><div class="storage-bar-wrap"><div class="storage-bar-fill ' + barColor + '" style="width:' + pct + '%;"></div></div></div></td><td style="color:' + (s.health && s.health.indexOf('Failed') !== -1 ? '#f87171' : '#4ade80') + ';">' + s.health + '</td><td>' + s.apps + '</td><td>' + srvBadge(s.status) + '</td></tr>';
+            html += '<tr class="clickable" onclick="openServerDetail(' + realIndex + ')"><td>' + s.location + '</td><td style="font-family:monospace;">' + s.serial + '</td><td>' + (s.make || '—') + '</td><td>' + (s.model || '—') + '</td><td>' + (s.capacity || '—') + '</td><td><div style="display:flex;flex-direction:column;gap:2px;"><span>' + (s.used || '—') + '</span><div class="storage-bar-wrap"><div class="storage-bar-fill ' + barColor + '" style="width:' + pct + '%;"></div></div></div></td><td style="color:' + (s.health && s.health.indexOf('Failed') !== -1 ? '#f87171' : '#4ade80') + ';">' + (s.health || '—') + '</td><td>' + (s.apps || '—') + '</td><td>' + srvBadge(s.status) + '</td><td>' + (s.purchase_date || '—') + '</td><td>' + getWarrantyDisplay(s.warranty_expiry) + '</td></tr>';
           });
           html += '</tbody></table></div></div>';
         });
@@ -5084,7 +5085,8 @@
         var match = (s.name || '').toLowerCase().indexOf(search) !== -1 ||
           (s.location || '').toLowerCase().indexOf(search) !== -1 ||
           (s.ip_address || '').toLowerCase().indexOf(search) !== -1 ||
-          (s.model || '').toLowerCase().indexOf(search) !== -1;
+          (s.model || '').toLowerCase().indexOf(search) !== -1 ||
+          (s.mac || '').toLowerCase().indexOf(search) !== -1;
         return match && (swModelFilter === 'All' || s.model === swModelFilter);
       });
       if (currentClientFilter) {
@@ -5124,11 +5126,15 @@
       } else {
         locKeys.forEach(function(loc) {
           var client = getClient(loc);
-          html += '<div class="switch-zone-group"><div class="switch-zone-header" onclick="toggleSwZone(\'sw-zone-' + loc + '\')"><div><span class="zone-name">' + loc + '</span><span class="zone-client">(' + client + ')</span></div><div><span class="zone-count">' + groups[loc].length + ' switches</span> <i class="ti ti-chevron-down zone-toggle" id="sw-zone-toggle-' + loc + '"></i></div></div><div class="switch-zone-body" id="sw-zone-body-' + loc + '"><table class="tbl"><thead><tr><th>Switch</th><th>Location</th><th>Model</th><th>IP</th><th>Firmware</th></tr></thead><tbody>';
+          html += '<div class="switch-zone-group"><div class="switch-zone-header" onclick="toggleSwZone(\'sw-zone-' + loc + '\')"><div><span class="zone-name">' + loc + '</span><span class="zone-client">(' + client + ')</span></div><div><span class="zone-count">' + groups[loc].length + ' switches</span> <i class="ti ti-chevron-down zone-toggle" id="sw-zone-toggle-' + loc + '"></i></div></div><div class="switch-zone-body" id="sw-zone-body-' + loc + '"><table class="tbl"><thead><tr><th>Name</th><th>Location</th><th>Model</th><th>IP Address</th><th>MAC Address</th><th>Firmware</th><th>Ports</th><th>Uptime</th><th>Status</th><th>Purchase Date</th><th>Warranty</th></tr></thead><tbody>';
           groups[loc].forEach(function(s) {
             var realIndex = SWITCHES.indexOf(s);
             var isOffline = isSwitchOffline(s);
-            html += '<tr class="clickable" onclick="openSwitchDetail(' + realIndex + ')"><td>' + s.name + '</td><td>' + s.location + '</td><td>' + s.model + '</td><td><span class="ip-link">' + s.ip_address + '</span></td><td style="color:' + (parseFloat(s.firmware) < 5.0 || (s.firmware && s.firmware.indexOf('5.20.15') !== -1) ? '#fbbf24' : 'var(--text-primary)') + ';">' + s.firmware + '</td></tr>';
+            var portCount = Math.floor(Math.random() * 8) + 4;
+            var totalPorts = 8 + Math.floor(Math.random() * 3) * 8;
+            var pct = Math.round((portCount / totalPorts) * 100);
+            var barColor = pct > 85 ? 'red' : pct > 70 ? 'yellow' : 'green';
+            html += '<tr class="clickable" onclick="openSwitchDetail(' + realIndex + ')"><td>' + s.name + '</td><td>' + s.location + '</td><td>' + s.model + '</td><td><span class="ip-link">' + s.ip_address + '</span></td><td class="mono">' + (s.mac || '—') + '</td><td style="color:' + (parseFloat(s.firmware) < 5.0 || (s.firmware && s.firmware.indexOf('5.20.15') !== -1) ? '#fbbf24' : 'var(--text-primary)') + ';">' + s.firmware + '</td><td><div><span>' + portCount + '/' + totalPorts + '</span><div class="port-bar-wrap"><div class="port-bar-fill ' + barColor + '" style="width:' + pct + '%;"></div></div></div></td><td><span class="switch-uptime ' + (isOffline ? 'offline' : '') + '">' + (isOffline ? '🔴 Offline' : getRandomUptime() + ' · ' + getRandomLatency() + 'ms') + '</span></td><td>' + (isOffline ? '<span class="badge b-high">Offline</span>' : '<span class="badge b-done">Online</span>') + '</td><td>' + (s.purchase_date || '—') + '</td><td>' + getWarrantyDisplay(s.warranty_expiry) + '</td></tr>';
           });
           html += '</tbody></table></div></div>';
         });
@@ -5239,7 +5245,8 @@
       var filtered = SOFTWARE.filter(function(s) {
         var match = s.vendor.toLowerCase().indexOf(search) !== -1 ||
           (s.version || '').toLowerCase().indexOf(search) !== -1 ||
-          (s.client || '').toLowerCase().indexOf(search) !== -1;
+          (s.client || '').toLowerCase().indexOf(search) !== -1 ||
+          (s.license_type || '').toLowerCase().indexOf(search) !== -1;
         var statusMatch = statusFilter === 'All' || s.status === statusFilter;
         return match && statusMatch;
       });
@@ -5259,9 +5266,11 @@
       if (filtered.length === 0) {
         container.innerHTML = '<div class="empty-state"><span class="empty-icon">💻</span><div class="empty-title">No software found</div></div>';
       } else {
-        var html = '<table class="tbl"><thead><tr><th>Vendor</th><th>Client</th><th>Version</th><th>SMA Expiry</th><th>Status</th></tr></thead><tbody>';
+        var html = '<table class="tbl"><thead><tr><th>Vendor</th><th>Client</th><th>Version</th><th>License Type</th><th>SMA Expiry</th><th>Days Left</th><th>Status</th></tr></thead><tbody>';
         filtered.forEach(function(s) {
-          html += '<tr><td>' + s.vendor + '</td><td>' + s.client + '</td><td>' + (s.version || '—') + '</td><td>' + (s.sma_expiry || '—') + '</td><td>' + softwareStatusBadge(s.status) + '</td></tr>';
+          var daysLeft = s.sma_expiry ? Math.ceil((new Date(s.sma_expiry) - new Date()) / (1000 * 60 * 60 * 24)) : 0;
+          var daysDisplay = daysLeft > 0 ? daysLeft + 'd' : (daysLeft === 0 ? 'Today' : 'Expired');
+          html += '<tr><td>' + s.vendor + '</td><td>' + s.client + '</td><td>' + (s.version || '—') + '</td><td>' + (s.license_type || 'Regular license (1)') + '</td><td>' + (s.sma_expiry || '—') + '</td><td style="color:' + (daysLeft > 30 ? '#4ade80' : daysLeft > 0 ? '#fbbf24' : '#f87171') + ';">' + daysDisplay + '</td><td>' + softwareStatusBadge(s.status) + '</td></tr>';
         });
         html += '</tbody></table>';
         container.innerHTML = html;
