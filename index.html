@@ -9,11 +9,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #0b0d15; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; min-height: 100vh; }
+  body { background: #0b0d15; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; min-height: 100vh; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  html { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  input, select, textarea, button { font-family: var(--font); }
 
-  /* ============================================================
-     ── CORE VARIABLES ──────────────────────────────────────────
-     ============================================================ */
+  /* ── CORE VARIABLES ── */
   :root {
     --sidebar-bg: rgba(18, 18, 30, 0.92);
     --sidebar-border: rgba(255,255,255,0.06);
@@ -35,7 +35,7 @@
     --client-accent: #4f8cf7;
     --client-header-bg: rgba(18, 18, 30, 0.92);
     --client-button-gradient: linear-gradient(135deg, #4f8cf7, #00d4ff);
-     --font: 'Inter', sans-serif;  /* <-- ADD THIS LINE */
+    --font: 'Inter', sans-serif;
   }
 
   :root.light-theme {
@@ -49,7 +49,7 @@
     --text-muted: rgba(0, 0, 0, 0.35);
     --stat-val-color: #1a1a2e;
     --client-header-bg: rgba(245, 247, 250, 0.95);
-     --font: 'Inter', sans-serif;  /* <-- ADD THIS LINE */
+    --font: 'Inter', sans-serif;
   }
 
   :root.jet-black-theme {
@@ -65,10 +65,9 @@
     --accent-glow: rgba(0, 212, 255, 0.12);
     --stat-val-color: #ffffff;
     --client-header-bg: rgba(0, 0, 0, 0.99);
-     --font: 'Inter', sans-serif;  /* <-- ADD THIS LINE */
+    --font: 'Inter', sans-serif;
   }
 
-  /* ── Client Brand Overrides (set by JS) ── */
   .client-mode {
     --sidebar-bg: #ffffff;
     --sidebar-border: rgba(0, 0, 0, 0.08);
@@ -82,9 +81,47 @@
     --client-header-bg: #ffffff;
   }
 
-  /* ============================================================
-     ── TOAST ──────────────────────────────────────────────────
-     ============================================================ */
+  /* ── SCROLLBARS ── */
+  .content::-webkit-scrollbar { width: 5px; }
+  .content::-webkit-scrollbar-track { background: transparent; }
+  .content::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; }
+  .content::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+  
+  .sidebar::-webkit-scrollbar { width: 3px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; }
+  
+  .modal::-webkit-scrollbar { width: 4px; }
+  .modal::-webkit-scrollbar-track { background: transparent; }
+  .modal::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; }
+  
+  .outlook-list-pane::-webkit-scrollbar { width: 4px; }
+  .outlook-list-pane::-webkit-scrollbar-track { background: transparent; }
+  .outlook-list-pane::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; }
+  
+  .outlook-reading-pane::-webkit-scrollbar { width: 4px; }
+  .outlook-reading-pane::-webkit-scrollbar-track { background: transparent; }
+  .outlook-reading-pane::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; }
+  
+  .nav-scroll-bottom::-webkit-scrollbar { width: 3px; }
+  .nav-scroll-bottom::-webkit-scrollbar-track { background: transparent; }
+  .nav-scroll-bottom::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; }
+  
+  .nav-scroll-bottom::-webkit-scrollbar-thumb:hover,
+  .content::-webkit-scrollbar-thumb:hover,
+  .modal::-webkit-scrollbar-thumb:hover,
+  .outlook-list-pane::-webkit-scrollbar-thumb:hover,
+  .outlook-reading-pane::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+  }
+  
+  /* Firefox scrollbars */
+  .content, .sidebar, .modal, .outlook-list-pane, .outlook-reading-pane, .nav-scroll-bottom {
+    scrollbar-width: thin;
+    scrollbar-color: var(--text-muted) transparent;
+  }
+
+  /* ── TOAST ── */
   .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
   .toast { padding: 12px 18px; border-radius: 8px; font-size: 12px; color: #fff; background: var(--card-bg); border: 1px solid var(--card-border); animation: slideIn 0.25s ease; display: flex; align-items: center; gap: 8px; backdrop-filter: blur(10px); min-width: 200px; }
   @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
@@ -93,9 +130,6 @@
   .toast.warning { background: rgba(255,179,71,0.15); border-color: rgba(255,179,71,0.3); color: #fcd34d; }
   .toast.info { background: rgba(96,165,250,0.15); border-color: rgba(96,165,250,0.3); color: #93c5fd; }
 
-  /* ============================================================
-     ── CONFIRM ──────────────────────────────────────────────────
-     ============================================================ */
   .confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
   .confirm-overlay.open { display: flex; }
   .confirm-dialog { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 28px 32px; max-width: 440px; width: 90%; box-shadow: 0 24px 80px rgba(0,0,0,0.6); }
@@ -103,9 +137,6 @@
   .confirm-dialog .confirm-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.5; }
   .confirm-dialog .confirm-actions { display: flex; gap: 8px; justify-content: flex-end; }
 
-  /* ============================================================
-     ── CONTEXT MENU ────────────────────────────────────────────
-     ============================================================ */
   .ctx-menu { position: fixed; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 4px 0; z-index: 2000; display: none; min-width: 160px; box-shadow: 0 12px 40px rgba(0,0,0,0.6); backdrop-filter: blur(20px); }
   .ctx-menu.open { display: block; }
   .ctx-menu .ctx-item { padding: 7px 14px; font-size: 12px; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.1s; border: none; background: none; width: 100%; font-family: var(--font); }
@@ -113,9 +144,6 @@
   .ctx-menu .ctx-item i { font-size: 14px; width: 18px; text-align: center; }
   .ctx-menu .ctx-sep { height: 1px; background: var(--card-border); margin: 4px 12px; }
 
-  /* ============================================================
-     ── BUTTONS ──────────────────────────────────────────────────
-     ============================================================ */
   .btn { font-size: 12px; padding: 7px 14px; border: 1px solid var(--card-border); border-radius: 6px; background: transparent; color: var(--text-primary); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font); transition: all 0.15s; white-space: nowrap; }
   .btn:hover { background: rgba(255,255,255,0.06); border-color: var(--accent); }
   .btn-sm { font-size: 11px; padding: 5px 10px; }
@@ -127,9 +155,6 @@
   .link-btn { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 11px; font-family: var(--font); }
   .link-btn:hover { text-decoration: underline; }
 
-  /* ============================================================
-     ── BADGES ──────────────────────────────────────────────────
-     ============================================================ */
   .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 10px; font-weight: 500; }
   .b-done { background: rgba(52,211,153,0.15); color: #34d399; }
   .b-high { background: rgba(255,94,122,0.15); color: #ff5e7a; }
@@ -157,18 +182,23 @@
   .sla-warn { color: var(--warning); }
   .sla-critical { color: var(--danger); }
 
-  /* ============================================================
-     ── STATUS SELECT ───────────────────────────────────────────
-     ============================================================ */
-  .status-select, .priority-select { background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); color: var(--text-primary); padding: 4px 8px; border-radius: 4px; font-size: 11px; font-family: var(--font); }
-  .status-select:focus, .priority-select:focus { outline: none; border-color: var(--accent); }
+  .status-select, .priority-select { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-primary); padding: 4px 8px; border-radius: 4px; font-size: 11px; font-family: var(--font); cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; padding-right: 24px; transition: all 0.2s; }
+  .status-select:hover, .priority-select:hover { border-color: var(--accent); }
+  .status-select:focus, .priority-select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+  .status-select option, .priority-select option { background: var(--card-bg); color: var(--text-primary); }
+  
+  :root.light-theme .status-select, 
+  :root.light-theme .priority-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E"); }
+  
+  :root.jet-black-theme .status-select, 
+  :root.jet-black-theme .priority-select { background-color: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
 
-  /* ============================================================
-     ── MODAL ────────────────────────────────────────────────────
-     ============================================================ */
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.72); z-index: 100; display: none; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
-  .modal { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; width: 580px; max-height: 86vh; overflow-y: auto; padding: 26px; position: relative; font-family: var(--font); box-shadow: 0 24px 80px rgba(0,0,0,0.8); backdrop-filter: blur(24px); max-width: 95%; }
+  .modal { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; width: 580px; max-height: 86vh; overflow-y: auto; padding: 26px; position: relative; font-family: var(--font); box-shadow: 0 24px 80px rgba(0,0,0,0.8); backdrop-filter: blur(24px); max-width: 95%; scroll-behavior: smooth; }
+  .modal::-webkit-scrollbar { width: 4px; }
+  .modal::-webkit-scrollbar-track { background: transparent; }
+  .modal::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; }
   .modal.wide { width: 680px; }
   .modal.xwide { width: 760px; }
   .modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 18px; z-index: 10; }
@@ -193,9 +223,6 @@
   .tt-time { color: var(--text-muted); min-width: 60px; font-size: 11px; }
   .tt-msg { color: var(--text-secondary); }
 
-  /* ============================================================
-     ── ATTACHMENT ──────────────────────────────────────────────
-     ============================================================ */
   .att-upload-zone { border: 2px dashed var(--card-border); border-radius: 6px; padding: 20px; text-align: center; cursor: pointer; transition: border-color 0.2s; color: var(--text-muted); font-size: 12px; position: relative; }
   .att-upload-zone:hover { border-color: var(--accent); }
   .att-upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
@@ -204,9 +231,6 @@
   .att-thumb { width: 100%; height: 100%; object-fit: cover; display: flex; align-items: center; justify-content: center; background: var(--card-bg); font-size: 24px; color: var(--text-muted); }
   .att-remove { position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; border-radius: 50%; border: none; background: rgba(0,0,0,0.7); color: #fff; cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; }
 
-  /* ============================================================
-     ── TABLE ────────────────────────────────────────────────────
-     ============================================================ */
   .tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
   .tbl th { color: var(--text-secondary); font-weight: 600; letter-spacing: 0.08em; padding: 8px 6px; border-bottom: 1px solid var(--card-border); text-align: left; }
   .tbl td { padding: 8px 6px; border-bottom: 1px solid var(--card-border); color: var(--text-primary); vertical-align: middle; }
@@ -215,9 +239,6 @@
   .tbl tr.clickable:hover td { background: rgba(79,140,247,0.06); }
   .tbl tr.selected td { background: rgba(79,140,247,0.08); }
 
-  /* ============================================================
-     ── LOADING ──────────────────────────────────────────────────
-     ============================================================ */
   .loading-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 10; border-radius: 10px; backdrop-filter: blur(4px); }
   .loading-overlay.active { display: flex; }
   .loading-spinner { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; color: var(--text-muted); gap: 12px; }
@@ -229,39 +250,30 @@
   .empty-state .empty-title { font-size: 16px; font-weight: 600; color: var(--text-primary); }
   .empty-state .empty-desc { font-size: 13px; max-width: 400px; }
 
-  /* ============================================================
-     ── SEARCH BAR ──────────────────────────────────────────────
-     ============================================================ */
   .search-bar { display: flex; gap: 8px; margin: 12px 0; }
-  .search-bar input, .search-bar select { background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); color: var(--text-primary); padding: 6px 10px; border-radius: 4px; font-size: 12px; font-family: var(--font); flex: 1; }
-  .search-bar input:focus, .search-bar select:focus { outline: none; border-color: var(--accent); }
+  .search-bar input, .search-bar select { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-primary); padding: 6px 10px; border-radius: 4px; font-size: 12px; font-family: var(--font); flex: 1; transition: all 0.2s; }
+  .search-bar input::placeholder { color: var(--text-muted); font-size: 11px; }
+  .search-bar input:focus, .search-bar select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+  .search-bar select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; cursor: pointer; }
+  .search-bar select:hover { border-color: var(--accent); }
+  .search-bar select option { background: var(--card-bg); color: var(--text-primary); }
+  
+  :root.light-theme .search-bar select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E"); }
 
-  /* ============================================================
-     ── FILTER PILLS ────────────────────────────────────────────
-     ============================================================ */
   .filter-pill { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 11px; color: var(--text-secondary); background: var(--card-bg); border: 1px solid var(--card-border); cursor: pointer; margin-right: 4px; transition: all 0.15s; }
   .filter-pill:hover { border-color: var(--accent); color: var(--text-primary); }
   .filter-pill.active { background: rgba(79,140,247,0.15); border-color: var(--accent); color: var(--text-primary); }
   .filter-pill .count { background: rgba(255,255,255,0.05); padding: 0 6px; border-radius: 8px; font-size: 10px; margin-left: 4px; }
 
-  /* ============================================================
-     ── TRENDS ──────────────────────────────────────────────────
-     ============================================================ */
   .trend-badge { font-size: 10px; padding: 1px 6px; border-radius: 10px; background: rgba(52,211,153,0.15); color: #34d399; margin-left: 4px; display: inline-block; }
   .trend-badge.warn { background: rgba(255,179,71,0.15); color: #ffb347; }
   .trend-badge.down { background: rgba(255,94,122,0.15); color: #ff5e7a; }
 
-  /* ============================================================
-     ── TIMELINE ─────────────────────────────────────────────────
-     ============================================================ */
   .timeline { display: flex; flex-direction: column; gap: 6px; }
   .tl-item { display: flex; gap: 12px; font-size: 12px; padding: 6px 0; border-bottom: 1px solid var(--card-border); }
   .tl-time { color: var(--text-muted); flex-shrink: 0; font-weight: 500; min-width: 40px; }
   .tl-msg { color: var(--text-secondary); }
 
-  /* ============================================================
-     ── ZONE GROUPS ─────────────────────────────────────────────
-     ============================================================ */
   .cam-zone-group, .door-zone-group, .server-zone-group, .switch-zone-group, .software-zone-group, .assets-zone-group { margin-bottom: 12px; }
   .cam-zone-header, .door-zone-header, .server-zone-header, .switch-zone-header, .software-zone-header, .assets-zone-header { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px; padding: 10px 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
   .cam-zone-header:hover, .door-zone-header:hover, .server-zone-header:hover, .switch-zone-header:hover, .software-zone-header:hover, .assets-zone-header:hover { border-color: var(--accent); background: rgba(255,255,255,0.02); }
@@ -273,9 +285,6 @@
   .zone-toggle { transition: transform 0.2s; margin-left: 6px; display: inline-block; }
   .zone-toggle.collapsed { transform: rotate(-90deg); }
 
-  /* ============================================================
-     ── PAGINATION ──────────────────────────────────────────────
-     ============================================================ */
   .cam-pagination { display: flex; gap: 4px; padding: 12px 0; align-items: center; justify-content: center; }
   .cam-pagination button { padding: 4px 10px; border: 1px solid var(--card-border); border-radius: 4px; background: var(--card-bg); color: var(--text-secondary); cursor: pointer; font-size: 12px; font-family: var(--font); }
   .cam-pagination button:hover:not(:disabled) { border-color: var(--accent); color: var(--text-primary); }
@@ -293,9 +302,6 @@
   .edit-comment-input { background: rgba(255,255,255,0.04); border: 1px solid var(--accent); color: var(--text-primary); padding: 2px 6px; border-radius: 3px; font-size: 11px; font-family: var(--font); }
   .edit-comment-input:focus { outline: none; }
 
-  /* ============================================================
-     ── STORAGE BAR ─────────────────────────────────────────────
-     ============================================================ */
   .storage-bar-wrap, .port-bar-wrap { width: 100%; height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; margin-top: 2px; }
   .storage-bar-fill, .port-bar-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
   .storage-bar-fill.green, .port-bar-fill.green { background: var(--success); }
@@ -305,9 +311,6 @@
   .switch-uptime { font-size: 11px; color: var(--text-secondary); }
   .switch-uptime.offline { color: var(--danger); }
 
-  /* ============================================================
-     ── OUTLOOK ─────────────────────────────────────────────────
-     ============================================================ */
   .outlook-container { display: flex; height: 100%; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; overflow: hidden; min-height: 500px; }
   .outlook-folder-pane { width: 180px; border-right: 1px solid var(--card-border); padding: 8px 0; flex-shrink: 0; overflow-y: auto; }
   .outlook-folder-item { padding: 8px 16px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); transition: all 0.15s; }
@@ -373,23 +376,25 @@
   .ore-compose-body textarea { min-height: 150px; resize: vertical; }
   .ore-compose-footer { padding: 12px 20px; border-top: 1px solid var(--card-border); display: flex; justify-content: flex-end; gap: 8px; }
 
-  /* ============================================================
-     ── SR TOOLBAR ──────────────────────────────────────────────
-     ============================================================ */
   .sr-toolbar { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
-  .sr-toolbar input, .sr-toolbar select { background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); color: var(--text-primary); padding: 6px 10px; border-radius: 4px; font-size: 12px; font-family: var(--font); }
-  .sr-toolbar input:focus, .sr-toolbar select:focus { outline: none; border-color: var(--accent); }
+  .sr-toolbar input, .sr-toolbar select { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-primary); padding: 6px 10px; border-radius: 4px; font-size: 12px; font-family: var(--font); transition: all 0.2s; }
+  .sr-toolbar input::placeholder { color: var(--text-muted); font-size: 11px; }
+  .sr-toolbar input:focus, .sr-toolbar select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+  .sr-toolbar select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; cursor: pointer; }
+  .sr-toolbar select:hover { border-color: var(--accent); }
+  .sr-toolbar select option { background: var(--card-bg); color: var(--text-primary); }
+  
+  :root.light-theme .sr-toolbar select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E"); }
 
-  /* ============================================================
-     ── BULK BAR ────────────────────────────────────────────────
-     ============================================================ */
   .bulk-bar { display: none; align-items: center; gap: 8px; padding: 8px 12px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px; margin-bottom: 12px; flex-wrap: wrap; }
   .bulk-bar.active { display: flex; }
-  .bulk-bar select { background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); color: var(--text-primary); padding: 4px 8px; border-radius: 4px; font-size: 11px; font-family: var(--font); }
+  .bulk-bar select { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-primary); padding: 4px 8px; border-radius: 4px; font-size: 11px; font-family: var(--font); appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; padding-right: 24px; cursor: pointer; transition: all 0.2s; }
+  .bulk-bar select:hover { border-color: var(--accent); }
+  .bulk-bar select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+  .bulk-bar select option { background: var(--card-bg); color: var(--text-primary); }
+  
+  :root.light-theme .bulk-bar select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E"); }
 
-  /* ============================================================
-     ── STATS CARDS ─────────────────────────────────────────────
-     ============================================================ */
   .door-stats, .server-stats-grid, .switch-stats-grid, .assets-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
   .door-stat-card, .server-stat-card, .switch-stat-card, .assets-stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px; padding: 10px 14px; }
   .ds-label, .ss-label, .as-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
@@ -402,9 +407,6 @@
   .ss-value.yellow { color: var(--warning); }
   .ss-sub { font-size: 10px; color: var(--text-muted); }
 
-  /* ============================================================
-     ── FILE EXPLORER ───────────────────────────────────────────
-     ============================================================ */
   .file-explorer { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px; overflow: hidden; margin-top: 8px; }
   .file-item { display: grid; grid-template-columns: 30px 1fr 80px 80px 120px 100px 50px; padding: 8px 12px; border-bottom: 1px solid var(--card-border); align-items: center; cursor: pointer; transition: background 0.15s; font-size: 12px; color: var(--text-secondary); }
   .file-item:hover { background: rgba(255,255,255,0.02); }
@@ -430,18 +432,22 @@
   .breadcrumb .back-btn:hover { color: var(--text-primary); }
   .folder-info { font-size: 11px; color: var(--text-muted); padding: 4px 0; }
   .file-search-bar { display: flex; gap: 8px; margin: 8px 0; }
-  .file-search-bar input, .file-search-bar select { background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); color: var(--text-primary); padding: 6px 10px; border-radius: 4px; font-size: 12px; font-family: var(--font); }
-  .file-search-bar input:focus, .file-search-bar select:focus { outline: none; border-color: var(--accent); }
+  .file-search-bar input, .file-search-bar select { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-primary); padding: 6px 10px; border-radius: 4px; font-size: 12px; font-family: var(--font); transition: all 0.2s; }
+  .file-search-bar input::placeholder { color: var(--text-muted); font-size: 11px; }
+  .file-search-bar input:focus, .file-search-bar select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
   .file-search-bar input { flex: 1; }
+  .file-search-bar select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; cursor: pointer; }
+  .file-search-bar select:hover { border-color: var(--accent); }
+  .file-search-bar select option { background: var(--card-bg); color: var(--text-primary); }
+  
+  :root.light-theme .file-search-bar select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E"); }
+
   .pinned-section { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 0 8px; }
   .pinned-tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; font-size: 11px; color: var(--text-secondary); cursor: pointer; }
   .pinned-tag:hover { border-color: var(--accent); }
   .pinned-tag .unpin-btn { background: none; border: none; cursor: pointer; font-size: 10px; color: var(--text-muted); padding: 0 2px; }
   .pinned-tag .unpin-btn:hover { color: var(--danger); }
 
-  /* ============================================================
-     ── CAMERA PREVIEW FULLSCREEN ──────────────────────────────
-     ============================================================ */
   #cam-preview-large.fullscreen {
     transition: all 0.3s ease;
     background: rgba(0,0,0,0.95) !important;
@@ -474,19 +480,19 @@
     #cam-preview-large { min-height: 200px !important; }
   }
 
-  /* ============================================================
-     ── AUDIT LOG ───────────────────────────────────────────────
-     ============================================================ */
   .audit-filters { display: flex; gap: 8px; margin-bottom: 8px; }
-  .audit-filters select { background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); color: var(--text-primary); padding: 4px 8px; border-radius: 4px; font-size: 11px; font-family: var(--font); }
+  .audit-filters select { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-primary); padding: 4px 8px; border-radius: 4px; font-size: 11px; font-family: var(--font); appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; padding-right: 24px; cursor: pointer; transition: all 0.2s; }
+  .audit-filters select:hover { border-color: var(--accent); }
+  .audit-filters select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+  .audit-filters select option { background: var(--card-bg); color: var(--text-primary); }
+  
+  :root.light-theme .audit-filters select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E"); }
+
   .audit-item { display: flex; gap: 12px; padding: 4px 0; font-size: 12px; border-bottom: 1px solid var(--card-border); color: var(--text-secondary); }
   .audit-time { color: var(--text-muted); min-width: 50px; }
   .audit-user { font-weight: 500; color: var(--text-primary); min-width: 80px; }
   .audit-action .highlight { color: var(--text-primary); }
 
-  /* ============================================================
-     ── CLIENT ASSETS SUB-TABS ──────────────────────────────────
-     ============================================================ */
   .asset-sub-tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 2px solid var(--card-border); }
   .asset-sub-tab { padding: 8px 20px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; background: none; border-top: none; border-left: none; border-right: none; font-family: var(--font); }
   .asset-sub-tab:hover { color: var(--text-primary); }
@@ -494,15 +500,9 @@
   .asset-sub-content { display: none; }
   .asset-sub-content.active { display: block; }
 
-  /* ============================================================
-     ── APP LAYOUT ──────────────────────────────────────────────
-     ============================================================ */
   .app { display: flex; height: 100vh; width: 100%; max-width: 100%; background: var(--main-bg); overflow: hidden; display: none; }
   .app.client-mode { background: #f5f5f5; }
 
-  /* ============================================================
-     ── SIDEBAR ──────────────────────────────────────────────────
-     ============================================================ */
   .sidebar { width: 200px; background: var(--sidebar-bg); display: flex; flex-direction: column; flex-shrink: 0; border-right: 1px solid var(--sidebar-border); transition: width 0.2s; position: relative; }
   .sidebar.collapsed { width: 56px; }
   .sidebar.collapsed .logo-area { padding: 16px 12px; }
@@ -542,9 +542,6 @@
   .user-name { font-size: 13px; color: var(--text-primary); font-weight: 500; }
   .user-role { font-size: 10px; color: var(--text-muted); }
 
-  /* ============================================================
-     ── MAIN CONTENT ────────────────────────────────────────────
-     ============================================================ */
   .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; background: var(--main-bg); }
   .topbar { padding: 0 24px; height: 56px; border-bottom: 1px solid var(--sidebar-border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: var(--client-header-bg); }
   .page-title { font-size: 15px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 6px; }
@@ -569,15 +566,13 @@
   .theme-toggle-btn:hover { background: rgba(255,255,255,0.06) !important; border-color: var(--accent) !important; }
 
   .content { flex: 1; overflow-y: auto; padding: 20px 24px; scroll-behavior: smooth; position: relative; }
-  .content::-webkit-scrollbar { width: 6px; }
+  .content::-webkit-scrollbar { width: 5px; }
   .content::-webkit-scrollbar-track { background: transparent; }
-  .content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+  .content::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; }
+  .content::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
   .tab { display: none; }
   .tab.active { display: block; }
 
-  /* ============================================================
-     ── STATS GRID ──────────────────────────────────────────────
-     ============================================================ */
   .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
   .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 14px 16px; position: relative; overflow: hidden; transition: all 0.25s; }
   .stat-card:hover { border-color: var(--accent); box-shadow: 0 12px 48px rgba(0,0,0,0.6), 0 0 30px var(--accent-glow); }
@@ -595,9 +590,6 @@
   .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
   .panel-title { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
 
-  /* ============================================================
-     ── EMERGENCY BANNER ────────────────────────────────────────
-     ============================================================ */
   .emergency-banner { background: rgba(255,0,0,0.08); border: 1px solid rgba(255,94,122,0.4); box-shadow: 0 0 40px rgba(255,0,0,0.1), inset 0 0 60px rgba(255,0,0,0.02); border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; display: none; align-items: center; gap: 12px; }
   .emergency-banner.active { display: flex; }
   .emergency-banner .em-icon { font-size: 20px; color: #ef4444; animation: pulse 1.5s infinite; }
@@ -606,14 +598,8 @@
   .emergency-banner .em-detail { font-size: 11px; color: #f87171; }
   .emergency-banner .em-time { font-size: 10px; color: rgba(248,113,113,0.6); }
 
-  /* ============================================================
-     ── CAM STATUS FILTERS ──────────────────────────────────────
-     ============================================================ */
   .cam-status-filters { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0 12px; }
 
-  /* ============================================================
-     ── LOGIN ────────────────────────────────────────────────────
-     ============================================================ */
   #login-page {
     position: fixed;
     inset: 0;
@@ -675,9 +661,6 @@
 
   .logo-upload-preview { width: 60px; height: 60px; border-radius: 8px; object-fit: contain; border: 1px solid var(--card-border); margin-top: 4px; }
 
-  /* ============================================================
-     ── CLIENT MODE OVERRIDES ──────────────────────────────────
-     ============================================================ */
   .client-mode .sidebar {
     background: #ffffff !important;
     border-right: 1px solid rgba(0,0,0,0.08) !important;
@@ -699,9 +682,6 @@
   .client-mode .sidebar-footer .user-name { color: #1a1a2e !important; }
   .client-mode .sidebar-footer .user-role { color: rgba(0,0,0,0.35) !important; }
 
-  /* ============================================================
-     ── RESPONSIVE ──────────────────────────────────────────────
-     ============================================================ */
   @media (max-width: 1024px) {
     .app { height: 100vh; border-radius: 0; max-width: 100%; }
     .sidebar { width: 56px; }
@@ -1315,10 +1295,8 @@
     </div>
   </div>
 
-  <!-- Client View Container (hidden by default, shown for client logins) -->
-  <div id="client-view-container" style="display:none;height:100vh;overflow:hidden;">
-    <!-- Client View will be injected here dynamically -->
-  </div>
+  <!-- Client View Container -->
+  <div id="client-view-container" style="display:none;height:100vh;overflow:hidden;"></div>
 
   <!-- Camera Detail Modal -->
   <div class="modal-overlay" id="camera-detail-modal">
@@ -1874,7 +1852,7 @@
   var SERVICE_REQUESTS = [];
   var AUDIT_LOG = [];
   var EMAILS = [];
-  var CLIENTS = JSON.parse(localStorage.getItem('ccsm_clients') || '["KFTL","KWL","Lasco","Nestle","NIDS","Nutrien","Fidelity Motors"]');
+  var CLIENTS = [];
   var CLIENT_LOGO_DATA = JSON.parse(localStorage.getItem('ccsm_client_logos') || '{}');
   var PINNED_FILES = JSON.parse(localStorage.getItem('ccsm_pinned') || '[]');
 
@@ -2047,7 +2025,7 @@
       'NORTH': 'KFTL', 'WEST': 'KFTL', 'SOUTH': 'KFTL', 'EAST': 'KFTL',
       'ADMIN/HR': 'KFTL', 'ENGINEERING': 'KFTL', 'HIGH MAST': 'KFTL',
       'NORTH TERMINAL PERIMETER': 'KFTL', 'PTZ': 'KFTL',
-      'Liquid Plant': 'Lasco', 'LDL Warehouse': 'Lasco', 'LML B Liquid Plant': 'Lasco',
+      'LDL Warehouse': 'Lasco', 'LDL NEW WAREHOUSE': 'Lasco', 'LML B Liquid Plant': 'Lasco',
       'GALC': 'KWL', 'WH1': 'KWL', 'PORT': 'KFTL',
       'Showroom': 'Fidelity Motors', 'Service Center': 'Fidelity Motors'
     };
@@ -2258,7 +2236,6 @@
   // ── CLIENT VIEW ──────────────────────────────────────────────
   // ============================================================
 
-  // Client data for client view
   var CLIENTS_VIEW_DATA = {
     'kftl': {
       name: 'KFTL',
@@ -2789,10 +2766,8 @@
     var lowerUser = username.toLowerCase();
     var lowerPass = password.toLowerCase();
 
-    // Check if client login
     for (var client in clientCredentials) {
       if (lowerUser === client && lowerPass === clientCredentials[client].password) {
-        // Client login - show client view
         clientViewUser = clientCredentials[client];
         clientViewData = CLIENTS_VIEW_DATA[client];
         
@@ -2802,14 +2777,11 @@
           loadingDiv.classList.remove('active');
           return;
         }
-        // After admin login, before hideLogin():
-document.getElementById('app').classList.remove('client-mode');
 
         hideLogin();
         document.getElementById('app').style.display = 'none';
         document.getElementById('client-view-container').style.display = 'block';
         
-        // Initialize client view
         initClientView(clientViewData, clientViewUser);
         
         toast('Welcome, ' + clientViewData.name + '!', 'success');
@@ -2818,7 +2790,6 @@ document.getElementById('app').classList.remove('client-mode');
       }
     }
 
-    // Admin login
     try {
       if (username === 'admin' && password === 'admin123') {
         currentUser = {
@@ -2845,7 +2816,7 @@ document.getElementById('app').classList.remove('client-mode');
         applyClientBranding(null);
         updateClientNavVisibility();
         toast('Welcome, Admin!', 'success');
-        loadMockData();
+        loadData();
         loadingDiv.classList.remove('active');
         return;
       }
@@ -2895,7 +2866,6 @@ document.getElementById('app').classList.remove('client-mode');
     clientViewData = null;
     document.getElementById('app').style.display = 'none';
     document.getElementById('client-view-container').style.display = 'none';
-      document.getElementById('app').classList.remove('client-mode');
     showLogin();
     toast('Logged out', 'info');
   }
@@ -2909,7 +2879,7 @@ document.getElementById('app').classList.remove('client-mode');
     if (urlParams.get('code')) {
       window.history.replaceState({}, document.title, window.location.pathname);
       showLogin();
-      setTimeout(loadMockData, 500);
+      setTimeout(loadData, 500);
       return;
     }
     token = localStorage.getItem('token');
@@ -2933,7 +2903,7 @@ document.getElementById('app').classList.remove('client-mode');
       loadData();
     } else {
       showLogin();
-      setTimeout(loadMockData, 500);
+      setTimeout(loadData, 500);
     }
   }
 
@@ -2944,7 +2914,6 @@ document.getElementById('app').classList.remove('client-mode');
   function initClientView(data, user) {
     if (!data) return;
     
-    // Apply client brand colors
     var primaryColor = data.color || '#e31b23';
     var secondaryColor = data.secondary || '#8b0000';
     document.documentElement.style.setProperty('--client-primary', primaryColor);
@@ -2952,30 +2921,26 @@ document.getElementById('app').classList.remove('client-mode');
     document.documentElement.style.setProperty('--client-gradient', 'linear-gradient(135deg, ' + primaryColor + ', ' + secondaryColor + ')');
     document.documentElement.style.setProperty('--client-glow', primaryColor + '44');
     
-    // Apply client mode class
     document.querySelector('.app').classList.add('client-mode');
     document.getElementById('client-view-container').classList.add('client-mode');
     
-    // Build client view HTML
     buildClientView(data, user);
   }
 
-function buildClientView(data, user) {
+  function buildClientView(data, user) {
     var container = document.getElementById('client-view-container');
     if (!container) return;
     
-    // Get greeting
     var hour = new Date().getHours();
     var greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
     
-    // Get health
     var allAssets = [];
     if (data.assets) {
-        Object.values(data.assets).forEach(function(arr) {
-            if (Array.isArray(arr)) {
-                arr.forEach(function(a) { allAssets.push(a); });
-            }
-        });
+      Object.values(data.assets).forEach(function(arr) {
+        if (Array.isArray(arr)) {
+          arr.forEach(function(a) { allAssets.push(a); });
+        }
+      });
     }
     var total = allAssets.length;
     var online = allAssets.filter(function(a) { return a.status === 'Online' || a.status === 'ONLINE'; }).length;
@@ -2991,10 +2956,8 @@ function buildClientView(data, user) {
     var primaryColor = data.color || '#e31b23';
     var secondaryColor = data.secondary || '#8b0000';
     
-    // Build the client view HTML with sidebar
     container.innerHTML = `
       <div style="display:flex;height:100vh;background:#f5f5f5;font-family:'Inter',sans-serif;">
-        <!-- Sidebar -->
         <div style="width:200px;background:#ffffff;border-right:1px solid rgba(0,0,0,0.08);display:flex;flex-direction:column;flex-shrink:0;height:100vh;overflow:hidden;">
           <div style="padding:16px 20px 14px;border-bottom:1px solid rgba(0,0,0,0.08);">
             <img src="${clientLogo}" alt="${clientName}" style="height:32px;width:auto;border-radius:4px;" onerror="this.src='logo.png'">
@@ -3045,23 +3008,18 @@ function buildClientView(data, user) {
           </div>
         </div>
         
-        <!-- Main Content -->
         <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;">
-          <!-- Top Bar -->
           <header style="background:#ffffff;border-bottom:1px solid rgba(0,0,0,0.08);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
             <span style="font-size:15px;font-weight:600;color:#1a1a2e;" id="client-page-title">Dashboard</span>
-<div style="display:flex;align-items:center;gap:12px;">
-  <img src="logo-light.png" alt="ETech" style="height:28px;width:auto;border-radius:4px;" onerror="this.src='logo.png'">
-  <span style="font-size:12px;color:#999;">${fullDateTime()}</span>
-  <button onclick="logout()" style="padding:4px 12px;border-radius:4px;border:1px solid rgba(0,0,0,0.08);background:transparent;color:#999;cursor:pointer;font-size:11px;font-family:'Inter',sans-serif;">Logout</button>
-</div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <img src="logo-light.png" alt="ETech" style="height:28px;width:auto;border-radius:4px;" onerror="this.src='logo.png'">
+              <span style="font-size:12px;color:#999;">${fullDateTime()}</span>
+              <button onclick="logout()" style="padding:4px 12px;border-radius:4px;border:1px solid rgba(0,0,0,0.08);background:transparent;color:#999;cursor:pointer;font-size:11px;font-family:'Inter',sans-serif;">Logout</button>
+            </div>
           </header>
           
-          <!-- Content -->
           <div style="flex:1;overflow-y:auto;padding:20px 24px;background:#f5f5f5;" id="client-main-content">
-            <!-- Dashboard Tab -->
             <div class="client-tab active" id="client-tab-dashboard">
-              <!-- Welcome Banner -->
               <div style="background:linear-gradient(135deg, ${primaryColor}, ${secondaryColor});border-radius:12px;padding:28px 32px;margin-bottom:24px;position:relative;overflow:hidden;box-shadow:0 8px 32px ${primaryColor}44;">
                 <div style="position:relative;z-index:1;">
                   <div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:500;margin-bottom:2px;letter-spacing:0.04em;">${greeting}</div>
@@ -3080,7 +3038,6 @@ function buildClientView(data, user) {
                 </div>
               </div>
               
-              <!-- Stats -->
               <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
                 <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:18px 22px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
                   <div style="font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;">Total Assets</div>
@@ -3104,7 +3061,6 @@ function buildClientView(data, user) {
                 </div>
               </div>
               
-              <!-- Activity -->
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
                 <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
                   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
@@ -3160,7 +3116,6 @@ function buildClientView(data, user) {
               </div>
             </div>
 
-            <!-- Cameras Tab -->
             <div class="client-tab" id="client-tab-cameras" style="display:none;">
               <h2 style="font-size:18px;font-weight:600;color:#1a1a2e;margin-bottom:16px;">Cameras</h2>
               <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
@@ -3187,7 +3142,6 @@ function buildClientView(data, user) {
               </div>
             </div>
 
-            <!-- Doors Tab -->
             <div class="client-tab" id="client-tab-doors" style="display:none;">
               <h2 style="font-size:18px;font-weight:600;color:#1a1a2e;margin-bottom:16px;">Access Control — Doors</h2>
               <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
@@ -3214,7 +3168,6 @@ function buildClientView(data, user) {
               </div>
             </div>
 
-            <!-- Servers Tab -->
             <div class="client-tab" id="client-tab-servers" style="display:none;">
               <h2 style="font-size:18px;font-weight:600;color:#1a1a2e;margin-bottom:16px;">Servers</h2>
               <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
@@ -3248,7 +3201,6 @@ function buildClientView(data, user) {
               </div>
             </div>
 
-            <!-- Switches Tab -->
             <div class="client-tab" id="client-tab-switches" style="display:none;">
               <h2 style="font-size:18px;font-weight:600;color:#1a1a2e;margin-bottom:16px;">Network Switches</h2>
               <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
@@ -3274,7 +3226,6 @@ function buildClientView(data, user) {
               </div>
             </div>
 
-            <!-- Software Tab -->
             <div class="client-tab" id="client-tab-software" style="display:none;">
               <h2 style="font-size:18px;font-weight:600;color:#1a1a2e;margin-bottom:16px;">Software & Licenses</h2>
               <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
@@ -3297,7 +3248,6 @@ function buildClientView(data, user) {
               </div>
             </div>
 
-            <!-- Client Assets Tab -->
             <div class="client-tab" id="client-tab-assets" style="display:none;">
               <h2 style="font-size:18px;font-weight:600;color:#1a1a2e;margin-bottom:16px;">Client Assets</h2>
               <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
@@ -3371,7 +3321,6 @@ function buildClientView(data, user) {
               </div>
             </div>
 
-            <!-- Service Requests Tab -->
             <div class="client-tab" id="client-tab-service-requests" style="display:none;">
               <h2 style="font-size:18px;font-weight:600;color:#1a1a2e;margin-bottom:16px;">Service Requests</h2>
               <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
@@ -3411,7 +3360,6 @@ function buildClientView(data, user) {
               </div>
             </div>
 
-            <!-- Create SR Tab -->
             <div class="client-tab" id="client-tab-create-sr" style="display:none;">
               <h2 style="font-size:18px;font-weight:600;color:#1a1a2e;margin-bottom:16px;">Create Service Request</h2>
               <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
@@ -3452,7 +3400,6 @@ function buildClientView(data, user) {
               </div>
             </div>
 
-            <!-- Contact Tab -->
             <div class="client-tab" id="client-tab-contact" style="display:none;">
               <h2 style="font-size:18px;font-weight:600;color:#1a1a2e;margin-bottom:16px;">Contact Support</h2>
               <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
@@ -3481,9 +3428,7 @@ function buildClientView(data, user) {
       </div>
     `;
     
-    // Set up client tab switching
     window.clientSwitchTab = function(tab) {
-      // Update nav items
       document.querySelectorAll('.client-nav-item').forEach(function(el) {
         el.style.borderLeftColor = 'transparent';
         el.style.background = 'transparent';
@@ -3493,14 +3438,12 @@ function buildClientView(data, user) {
         }
       });
       
-      // Update content tabs
       document.querySelectorAll('.client-tab').forEach(function(el) {
         el.style.display = 'none';
       });
       var target = document.getElementById('client-tab-' + tab);
       if (target) target.style.display = 'block';
       
-      // Update title
       var titles = {
         dashboard: 'Dashboard',
         cameras: 'Cameras',
@@ -3516,11 +3459,9 @@ function buildClientView(data, user) {
       var titleEl = document.getElementById('client-page-title');
       if (titleEl) titleEl.textContent = titles[tab] || tab;
       
-      // Refresh SR list if needed
       if (tab === 'service-requests') renderClientSRs();
     };
     
-    // Asset sub-tab switching
     window.clientAssetSubTab = function(tab) {
       document.querySelectorAll('.asset-sub-tab').forEach(function(el) {
         el.style.color = '#999';
@@ -3537,13 +3478,11 @@ function buildClientView(data, user) {
       if (target) target.style.display = 'block';
     };
     
-    // Set initial active states
     document.querySelector('.client-nav-item[data-tab="dashboard"]').style.borderLeftColor = primaryColor;
     document.querySelector('.client-nav-item[data-tab="dashboard"]').style.background = 'rgba(227,27,35,0.06)';
     document.querySelector('.asset-sub-tab[data-subtab="storage"]').style.color = primaryColor;
     document.querySelector('.asset-sub-tab[data-subtab="storage"]').style.borderBottomColor = primaryColor;
     
-    // SR functions
     window.renderClientSRs = function() {
       var search = document.getElementById('client-sr-search') ? document.getElementById('client-sr-search').value.toLowerCase() : '';
       var filter = document.getElementById('client-sr-filter') ? document.getElementById('client-sr-filter').value : 'all';
@@ -3608,12 +3547,10 @@ function buildClientView(data, user) {
       
       toast('Service Request ' + id + ' created!', 'success');
       
-      // Rebuild the entire client view
       buildClientView(data, user);
       clientSwitchTab('service-requests');
     };
     
-    // Keep the openClient* functions for detail modals
     window.openClientCameraDetail = function(name) {
       var camera = (data.assets && data.assets.cameras) ? data.assets.cameras.find(function(c) { return c.name === name; }) : null;
       if (!camera) return;
@@ -3714,18 +3651,32 @@ function buildClientView(data, user) {
       document.getElementById('switch-detail-modal').classList.add('open');
     };
     
-    // Update topbar date
     setInterval(function() {
       var el = document.querySelector('#client-view-container .topbar-date');
       if (el) el.textContent = fullDateTime();
     }, 30000);
   }
 
+  function getStatusBadgeHTML(status) {
+    var colors = {
+      'Online': 'color:#22c55e;background:#dcfce7;',
+      'ONLINE': 'color:#22c55e;background:#dcfce7;',
+      'Offline': 'color:#ef4444;background:#fee2e2;',
+      'OFFLINE': 'color:#ef4444;background:#fee2e2;',
+      'Defective': 'color:#ef4444;background:#fee2e2;',
+      'No Power': 'color:#f59e0b;background:#fef3c7;',
+      'No Camera': 'color:#f59e0b;background:#fef3c7;',
+      'Under Maintenance': 'color:#f59e0b;background:#fef3c7;'
+    };
+    var color = colors[status] || 'color:#666;background:#f0f0f0;';
+    return '<span style="display:inline-block;padding:2px 12px;border-radius:12px;font-size:10px;font-weight:600;' + color + '">' + status + '</span>';
+  }
+
   // ============================================================
   // ── DATA LOADING ─────────────────────────────────────────────
   // ============================================================
 
-  async function loadData() {
+  function loadData() {
     try {
       loadMockData();
     } catch (error) {
@@ -3818,6 +3769,369 @@ function buildClientView(data, user) {
     renderInbox();
     renderFileExplorer();
     updateClientNavVisibility();
+  }
+
+  // ============================================================
+  // ── EMBEDDED DATA ────────────────────────────────────────────
+  // ============================================================
+
+  function getEmbeddedCameras() {
+    return [
+      // GENETEC LISTING - Pelco cameras
+      {name: "N25 PTZ", zone: "NORTH", status: "Offline", comments: "Defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.102.216", mac_address: "00-04-7D-27-9F-BA"},
+      {name: "B8 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.66", mac_address: "00-04-7D-27-9F-BD"},
+      {name: "D12 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.105", mac_address: "00-04-7D-27-9F-BE"},
+      {name: "PPE Store Perim PTZ", zone: "NORTH TERMINAL PERIMETER", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.102.203", mac_address: "00-04-7D-27-9F-C1"},
+      {name: "B9 PTZ", zone: "SOUTH", status: "Offline", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.67", mac_address: "00-04-7D-27-9F-C2"},
+      {name: "Visitor Car Park Ptz 1", zone: "HIGH MAST", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 2", ip_address: "172.17.102.184", mac_address: "00-04-7D-27-9F-C3"},
+      {name: "A2 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 5", ip_address: "172.17.103.144", mac_address: "00-04-7D-27-9F-C4"},
+      {name: "A5 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.103.34", mac_address: "00-04-7D-27-9F-C6"},
+      {name: "HM10 PTZ", zone: "HIGH MAST", status: "Online", comments: "Camera is reconfigured, had default IP", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.102.224", mac_address: "00-04-7D-27-9F-C8"},
+      {name: "HM8 PTZ", zone: "HIGH MAST", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.102.221", mac_address: "00-04-7D-27-9F-C9"},
+      {name: "A7 PTZ", zone: "SOUTH", status: "Offline", comments: "Camera defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.103.36", mac_address: "00-04-7D-27-9F-CA"},
+      {name: "A1 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.30", mac_address: "00-04-7D-27-9F-CB"},
+      {name: "South Perim PTZ", zone: "SOUTH", status: "Offline", comments: "Camera defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.86", mac_address: "00-04-7D-27-9F-CC"},
+      {name: "HM3 PTZ", zone: "HIGH MAST", status: "Offline", comments: "POE added, camera shows signs of being defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 2", ip_address: "172.17.102.218", mac_address: "00-04-7D-27-9F-CF"},
+      {name: "C2 PTZ", zone: "SOUTH", status: "Online", comments: "Obstacles, unable to clean", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 5", ip_address: "172.17.103.82", mac_address: "00-04-7D-27-9F-D0"},
+      {name: "HM23 PTZ", zone: "HIGH MAST", status: "Offline", comments: "cables ends corroded, camera overheating, defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.102.200", mac_address: "00-04-7D-27-9F-D2"},
+      {name: "C9 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.143", mac_address: "00-04-7D-27-9F-D3"},
+      {name: "HM28 PTZ", zone: "HIGH MAST", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.102.202", mac_address: "00-04-7D-27-9F-D4"},
+      {name: "Visitor Car Park Ptz 2", zone: "HIGH MAST", status: "Offline", comments: "REPLACEMENT/AXIS Q6318-LE 60HZ to be installed", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 2", ip_address: "172.17.102.185", mac_address: "00-04-7D-27-9F-E2"},
+      {name: "B5 PTZ", zone: "SOUTH", status: "Offline", comments: "Only Pole mount present", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.63", mac_address: "00-04-7D-27-9F-EB"},
+      {name: "W6 PTZ", zone: "WEST", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 2", ip_address: "172.17.102.248", mac_address: "00-04-7D-27-9F-ED"},
+      {name: "N30 PTZ", zone: "HIGH MAST", status: "Online", comments: "Reset needs to be done", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.102.210", mac_address: "00-04-7D-27-9F-EF"},
+      {name: "HM11 PTZ", zone: "HIGH MAST", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.102.225", mac_address: "00-04-7D-27-9F-F0"},
+      {name: "C1 PTZ", zone: "SOUTH", status: "Offline", comments: "Camera is defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.103.81", mac_address: "00-04-7D-27-9F-F2"},
+      {name: "A10 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.39", mac_address: "00-04-7D-27-9F-F3"},
+      {name: "B12 PTZ", zone: "SOUTH", status: "Online", comments: "Camera was reset to default IP adjustments made.", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.70", mac_address: "00-04-7D-27-9F-F5"},
+      {name: "B1 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.60", mac_address: "00-04-7D-27-9F-F6"},
+      {name: "B2 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.61", mac_address: "00-04-7D-27-9F-F7"},
+      {name: "B6 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.64", mac_address: "00-04-7D-27-9F-F8"},
+      {name: "A8 PTZ", zone: "SOUTH", status: "Offline", comments: "Camera defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.103.37", mac_address: "00-04-7D-27-9F-F9"},
+      {name: "Wharfage Perim N Exit Gate PTZ", zone: "NORTH TERMINAL PERIMETER", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.102.183", mac_address: "00-04-7D-27-9F-FA"},
+      {name: "Toll Gate Entry PTZ", zone: "Port Entry Exit", status: "Online", comments: "Lift required", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.102.182", mac_address: "00-04-7D-27-9F-FB"},
+      {name: "A6 PTZ", zone: "SOUTH", status: "Online", comments: "Camera on default, reconfigured", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.103.35", mac_address: "00-04-7D-27-9F-FC"},
+      {name: "A12 PTZ", zone: "SOUTH", status: "Online", comments: "Body adjusted", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.41", mac_address: "00-04-7D-27-9F-FD"},
+      {name: "HM4 PTZ", zone: "HIGH MAST", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.102.219", mac_address: "00-04-7D-27-9F-FF"},
+      {name: "A4 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.33", mac_address: "00-04-7D-27-A0-00"},
+      {name: "B10 PTZ", zone: "SOUTH", status: "Online", comments: "POE replaced with SW perim PTZ POE", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.68", mac_address: "00-04-7D-27-A0-02"},
+      {name: "HM5 PTZ", zone: "HIGH MAST", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 5", ip_address: "172.17.102.223", mac_address: "00-04-7D-27-A0-03"},
+      {name: "SW Corner Perim PTZ", zone: "JIEIC Warehouse", status: "Online", comments: "To be replaced", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.102.155", mac_address: "00-04-7D-27-A0-04"},
+      {name: "D4 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 2", ip_address: "172.17.103.99", mac_address: "00-04-7D-27-A0-05"},
+      {name: "Manager Car Park PTZ", zone: "HIGH MAST", status: "Offline", comments: "Defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.102.186", mac_address: "00-04-7D-27-A0-06"},
+      {name: "A11 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.40", mac_address: "00-04-7D-27-A0-0A"},
+      {name: "D10 PTZ", zone: "SOUTH", status: "Online", comments: "Obstacles, unable to clean", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 5", ip_address: "172.17.103.104", mac_address: "00-04-7D-27-DD-C2"},
+      {name: "C11 PTZ", zone: "SOUTH", status: "Offline", comments: "Only Pole mount present", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.85", mac_address: "00-04-7D-27-F4-2A"},
+      {name: "D5 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 2", ip_address: "172.17.103.100", mac_address: "00-04-7D-27-F4-2F"},
+      {name: "B11 PTZ", zone: "SOUTH", status: "Online", comments: "Cable was replaced (6/24/2026)", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.69", mac_address: "00-04-7D-27-F4-30"},
+      {name: "W2 PTZ", zone: "WEST", status: "Offline", comments: "Switch needs power supply replacement", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.102.244", mac_address: "00-04-7D-27-F4-31"},
+      {name: "C4 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.83", mac_address: "00-04-7D-27-F4-32"},
+      
+      // Avigilon cameras from GENETEC LISTING
+      {name: "D6", zone: "SOUTH", status: "Online", comments: "Cable replacement done", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 4", ip_address: "172.17.103.106", mac_address: "00-18-85-2F-0B-93"},
+      {name: "W6", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.233", mac_address: "00-18-85-2F-0B-A6"},
+      {name: "A14", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 3", ip_address: "172.17.103.5", mac_address: "00-18-85-2F-E7-88"},
+      {name: "C12", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.79", mac_address: "00-18-85-2F-E7-89"},
+      {name: "C4", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.73", mac_address: "00-18-85-2F-E7-8E"},
+      {name: "E2", zone: "SOUTH", status: "Online", comments: "Replaced with B7 old removed camera", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 3", ip_address: "172.17.103.11", mac_address: "00-18-85-2F-E7-92"},
+      {name: "B8", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 4", ip_address: "172.17.103.54", mac_address: "00-18-85-2F-E7-93"},
+      {name: "B12", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.58", mac_address: "00-18-85-2F-E7-95"},
+      {name: "HM5", zone: "HIGH MAST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.222", mac_address: "00-18-85-2F-E7-97"},
+      {name: "B14", zone: "SOUTH", status: "Online", comments: "Obstacles, unable to clean", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.7", mac_address: "00-18-85-2F-E7-98"},
+      {name: "W3", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.230", mac_address: "00-18-85-2F-E7-9C"},
+      {name: "C5", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.74", mac_address: "00-18-85-2F-E7-A4"},
+      {name: "C5", zone: "SOUTH", status: "Offline", comments: "Camera Defective", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.75", mac_address: "00-18-85-2F-E7-B8"},
+      {name: "B9", zone: "SOUTH", status: "Online", comments: "Cable Replacement done", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 1", ip_address: "172.17.103.55", mac_address: "00-18-85-2F-E7-C2"},
+      {name: "B13", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.59", mac_address: "00-18-85-2F-E7-ED"},
+      {name: "D5", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.90", mac_address: "00-18-85-2F-E7-FF"},
+      {name: "W5", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.228", mac_address: "00-18-85-30-A2-0F"},
+      {name: "W1", zone: "WEST", status: "Offline", comments: "Cabinet box and lock damaged therefore no power or connectivity", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.155", mac_address: "00-18-85-30-A2-10"},
+      {name: "D8", zone: "SOUTH", status: "Online", comments: "No Fibre Cable Replacement done", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.93", mac_address: "00-18-85-30-A2-11"},
+      {name: "Data Center B Unit", zone: "ENGINEERING", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 1", ip_address: "172.17.103.108", mac_address: "00-18-85-30-A2-14"},
+      {name: "HM8", zone: "HIGH MAST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.102.220", mac_address: "00-18-85-30-A2-16"},
+      {name: "W8", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 4", ip_address: "172.17.102.235", mac_address: "00-18-85-30-A2-17"},
+      {name: "W4", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.232", mac_address: "00-18-85-30-A2-1A"},
+      {name: "D2", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.88", mac_address: "00-18-85-30-A2-1B"},
+      {name: "W10", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 4", ip_address: "172.17.102.231", mac_address: "00-18-85-30-A2-1D"},
+      {name: "W7", zone: "WEST", status: "Online", comments: "Ends recrimped. Cable is water logged, water seeping through.", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.234", mac_address: "00-18-85-30-A2-1F"},
+      {name: "C12", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.80", mac_address: "00-18-85-30-A2-21"},
+      {name: "HM14", zone: "HIGH MAST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.102.212", mac_address: "00-18-85-30-A2-22"},
+      {name: "D1", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.87", mac_address: "00-18-85-30-A2-24"},
+      {name: "D7", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.92", mac_address: "00-18-85-30-A2-26"},
+      {name: "C11", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.78", mac_address: "00-18-85-30-A2-28"},
+      {name: "W13", zone: "WEST", status: "Offline", comments: "Damaged by VTR, cable needs to be replaced", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.102.241", mac_address: "00-18-85-30-A2-29"},
+      {name: "D4", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.89", mac_address: "00-18-85-30-A2-2A"},
+      {name: "W9", zone: "WEST", status: "Online", comments: "Firmware Update Done POE injector added", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 4", ip_address: "172.17.102.236", mac_address: "00-18-85-30-A2-2C"},
+      {name: "C9", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.77", mac_address: "00-18-85-30-A2-2D"},
+      {name: "B5", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 1", ip_address: "172.17.103.49", mac_address: "00-18-85-30-A2-2E"},
+      {name: "B1", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.44", mac_address: "00-18-85-30-A2-2F"},
+      {name: "B7", zone: "SOUTH", status: "Online", comments: "REPLACED CAMERA on 5/6/2026 Old camera installed at E2", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 1", ip_address: "172.17.103.52", mac_address: "00-18-85-30-A2-32"},
+      {name: "B10", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.56", mac_address: "00-18-85-30-A2-34"},
+      {name: "B5", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 1", ip_address: "172.17.103.48", mac_address: "00-18-85-30-A2-35"},
+      {name: "B2", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.45", mac_address: "00-18-85-30-A2-37"},
+      {name: "B1", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.43", mac_address: "00-18-85-30-A2-3B"},
+      {name: "B3", zone: "SOUTH", status: "Online", comments: "Camera to be replaced, Arm needed", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 1", ip_address: "172.17.103.46", mac_address: "00-18-85-30-A2-3D"},
+      {name: "C9", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.76", mac_address: "00-18-85-30-A2-3E"},
+      {name: "C1", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.71", mac_address: "00-18-85-30-A2-40"},
+      {name: "B5", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.47", mac_address: "00-18-85-30-A2-41"},
+      {name: "B6", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 1", ip_address: "172.17.103.51", mac_address: "00-18-85-30-A2-42"},
+      {name: "B7", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 1", ip_address: "172.17.103.53", mac_address: "00-18-85-30-A2-48"},
+      {name: "W12", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.240", mac_address: "00-18-85-30-A2-4C"},
+      {name: "W16", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.242", mac_address: "00-18-85-30-A2-4F"},
+      {name: "C2", zone: "SOUTH", status: "Online", comments: "Obstacles, unable to clean", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.72", mac_address: "00-18-85-30-A2-51"},
+      {name: "W11", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.239", mac_address: "00-18-85-30-A2-52"},
+      {name: "B11", zone: "SOUTH", status: "Online", comments: "Cable was replaced (6/24/2026)", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.57", mac_address: "00-18-85-30-A2-56"},
+      {name: "B6", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 1", ip_address: "172.17.103.50", mac_address: "00-18-85-30-A2-5A"},
+      
+      // FLIR Systems cameras
+      {name: "N34 PTZ", zone: "NORTH TERMINAL PERIMETER", status: "Offline", comments: "No camera on Pole", model: "DX-624", manufacturer: "FLIR Systems", archiver: "Archiver 1", ip_address: "172.17.102.204", mac_address: "00-1B-D8-90-07-DC"},
+      {name: "A13 PTZ", zone: "SOUTH", status: "Offline", comments: "cable tested good, cable ends are good, no POE light present", model: "DX-612", manufacturer: "FLIR Systems", archiver: "Archiver 1", ip_address: "172.17.103.42", mac_address: "00-1B-D8-90-07-E3"},
+      {name: "A9 PTZ", zone: "SOUTH", status: "Offline", comments: "cable tested good, cable ends are good, no POE light present", model: "DX-612", manufacturer: "FLIR Systems", archiver: "Archiver 4", ip_address: "172.17.103.38", mac_address: "00-1B-D8-90-07-F2"},
+      {name: "N31 PTZ", zone: "NORTH TERMINAL PERIMETER", status: "Offline", comments: "POE injector changed, Camera needs reset", model: "DX-624", manufacturer: "FLIR Systems", archiver: "Archiver 4", ip_address: "172.17.102.207", mac_address: "00-1B-D8-90-07-FA"},
+      
+      // LPR cameras
+      {name: "Truck Entry 1 LPR", zone: "LPR System Units", status: "Online", comments: "Working", model: "AutoVu SharpOS", manufacturer: "AutoVu", archiver: "Archiver 1", ip_address: "172.17.103.186", mac_address: "0C-BF-15-01-A1-5F"},
+      {name: "Truck Entry 2 LPR", zone: "LPR System Units", status: "Online", comments: "Working", model: "AutoVu SharpOS", manufacturer: "AutoVu", archiver: "Archiver 1", ip_address: "172.17.103.167", mac_address: "0C-BF-15-01-A1-A6"},
+      {name: "Tollgate Exit LPR", zone: "LPR System Units", status: "Online", comments: "Working", model: "AutoVu SharpOS", manufacturer: "AutoVu", archiver: "Archiver 1", ip_address: "172.17.102.189", mac_address: "0C-BF-15-01-A1-A9"},
+      {name: "Tollgate Entry LPR", zone: "LPR System Units", status: "Online", comments: "Working", model: "AutoVu SharpOS", manufacturer: "AutoVu", archiver: "Archiver 1", ip_address: "172.17.102.188", mac_address: "0C-BF-15-01-A1-CB"},
+      {name: "Truck Exit LPR", zone: "LPR System Units", status: "Online", comments: "Working", model: "AutoVu SharpOS", manufacturer: "AutoVu", archiver: "Archiver 1", ip_address: "172.17.102.194", mac_address: "0C-BF-15-01-A1-E0"},
+      {name: "Truck entry LPR 4", zone: "LPR System Units", status: "Online", comments: "Working", model: "SharpV (Gen 3)", manufacturer: "Genetec", archiver: "Archiver 1", ip_address: "172.17.103.191", mac_address: "0C-BF-15-02-9D-2B"},
+      {name: "Truck entry LPR 3", zone: "LPR System Units", status: "Online", comments: "Working", model: "SharpV (Gen 3)", manufacturer: "Genetec", archiver: "Archiver 1", ip_address: "172.17.103.190", mac_address: "0C-BF-15-02-9F-30"},
+      
+      // Additional cameras from XLSX data - NORTH sheet
+      {name: "ATM Walkway", zone: "ADMIN/HR", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Board N Ceo Secretary", zone: "ADMIN/HR", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Executive 2nd Fl Exit Stair Lower Case", zone: "ADMIN/HR", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Executive 2nd Fl Exit Stair Top Case", zone: "ADMIN/HR", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "HR Meeting Rm Passage", zone: "ADMIN/HR", status: "Online", comments: "Camera refocused", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "HR Waiting Area", zone: "ADMIN/HR", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Lobby HR", zone: "ADMIN/HR", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Meeting RM Passage", zone: "ADMIN/HR", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Payroll Walkway", zone: "ADMIN/HR", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Planning Main Entry", zone: "ADMIN/HR", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Procurement Passage", zone: "ADMIN/HR", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Bathroom Passage 1", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Bathroom Passage 2", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Battery Shop", zone: "ENGINEERING", status: "Online", comments: "Lift Required", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Data Center A", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "F Changing Room Exit Passage", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Eng Workshop 3", zone: "ENGINEERING", status: "Online", comments: "Lift Required", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Eng Rear Passage", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Engineering East Stair", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Engineering West Stair", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "IT Entry", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "IT Exit", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "IT Stairwell", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Engineering Lunch Room", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Engineering Entry", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Engineering Gym", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Training Room East", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Training Room West", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Eng Lunch RM Kitchen", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Engineering Entry Passage", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Tyre Shop", zone: "ENGINEERING", status: "Online", comments: "Lift Required", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "HM5(11)", zone: "HIGH MAST", status: "Online", comments: "Camera had default IP reconfigured", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "HM5(134)", zone: "HIGH MAST", status: "Online", comments: "Camera lens damaged", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "HM23", zone: "HIGH MAST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "HM24A", zone: "HIGH MAST", status: "Offline", comments: "No Fibre link", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Manager Car Park Dome", zone: "HIGH MAST", status: "Online", comments: "Camera lens Damaged", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "N30", zone: "HIGH MAST", status: "Online", comments: "Pole", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "N31", zone: "HIGH MAST", status: "Online", comments: "Camera needs to be reset, POE replaced", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "N33", zone: "HIGH MAST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "N34", zone: "HIGH MAST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "HM14 PTZ 2", zone: "HIGH MAST", status: "Online", comments: "To be added to genetec", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Berth 9 PTZ", zone: "HIGH MAST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "N Terminal NW Corner PTZ", zone: "HIGH MAST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      
+      // JIEIC Warehouse (NORTH sheet) - still cameras
+      {name: "S Bay T", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "N Bay 2", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "N Bay 5", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "N Bay 7", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "N Bay 8", zone: "JIEIC Warehouse", status: "Online", comments: "Obstacle blocking area", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "N Bay 9", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "N Bay 10", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "N Bay 11", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "N Bay 12", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "N Platform 1 Stripping", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "N Platform 2 Stripping", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "NE Corner Stripping", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "NW Corner Stripping", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Rear Entry/ Exit", zone: "JIEIC Warehouse", status: "Online", comments: "Camera replaced", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "S Bay AB", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "S Bay CD", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "S Bay EF", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "S Bay G", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "S Bay HI", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "S Bay J", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "S Bay KL", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "S Bay M", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "S Bay NO", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "S Bay PQ", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "S Bay RS", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "S Bay U", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "SE Corner Stripping", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Security Station N Pedestrian Gate", zone: "JIEIC Warehouse", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "SW Corner Perimeter 1 Stripping", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "SW Corner Perimer 2 Stripping", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "SW Corner Stripping", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Warehouse Passage", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Warehouse Walkway N Parking", zone: "JIEIC Warehouse", status: "Online", comments: "Analytics applied", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Warehouse Central PTZ 2", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Warehouse Central PTZ", zone: "JIEIC Warehouse", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      
+      // Port Entry Exit
+      {name: "Car Park 3", zone: "Port Entry Exit", status: "Online", comments: "Lift required", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Exit Gate", zone: "Port Entry Exit", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Gate Office E Side Outside", zone: "Port Entry Exit", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "KFTL Port Main Entry Exit", zone: "Port Entry Exit", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "MainEntry/Exit Security Walkway", zone: "Port Entry Exit", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Main Entry/Exit Turn style", zone: "Port Entry Exit", status: "Offline", comments: "Camera no longer exists", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Toll Gate Entry", zone: "Port Entry Exit", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Toll Gate Exit", zone: "Port Entry Exit", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Tollgate Entry LPR - Context", zone: "Port Entry Exit", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Tollgate Exit LPR - Context", zone: "Port Entry Exit", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Truck Entry 1", zone: "Port Entry Exit", status: "Online", comments: "Analytics Applied", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Truck Entry 1 LPR Context", zone: "Port Entry Exit", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Truck Entry 2", zone: "Port Entry Exit", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Truck entry 2 LPR - Context", zone: "Port Entry Exit", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Truck Entry LPR 3 - Context", zone: "Port Entry Exit", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Truck Entry LPR 4 - Context", zone: "Port Entry Exit", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Truck Exit", zone: "Port Entry Exit", status: "Online", comments: "Analytics Applied", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Truck Exit LPR - Context", zone: "Port Entry Exit", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Truck Guard House Exit", zone: "Port Entry Exit", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Toll Booth Exit PTZ", zone: "Port Entry Exit", status: "Online", comments: "Lift required", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      
+      // Others
+      {name: "Broker Parking area", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Car Park 1", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Car Park 2", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Car Park 4", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Car Park 5", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Car Park 6", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Gate Office Eastern Side", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Monitoring Room 1", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Monitoring Room 2", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Productions Turn Style", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Radio Room", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Recreation Area Rest Bay", zone: "Others", status: "Online", comments: "Camera replaced", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Rest Bay Turn Style", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Security Dept West Side 1", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Security Dept West Side 2", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Crane K", zone: "Others", status: "Online", comments: "Crane is offline due to Maintenance", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Crane M", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Crane S", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Crane A", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Crane B", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Crane N", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Crane O", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Crane P", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Crane Q", zone: "Others", status: "Online", comments: "Crane is offline due to Maintenance", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Crane C Under", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Crane D Under", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Crane C Backreach", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Crane T", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Crane Y", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Crane U", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Crane R", zone: "Others", status: "Online", comments: "Switch replaced with Blind Spot switch", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Crane Z", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Crane L", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Crane V", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Vet Waiting Area", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Vet Office 2 Window", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Vet Office entry Walkway", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Scanning Area 1", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Scanning Area 2", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""},
+      {name: "Vet Office 1", zone: "Others", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: ""}
+    ];
+  }
+
+  function getEmbeddedDoors() {
+    return [
+      {name: "Batching room", site: "LML B Liquid Plant", client: "Lasco", status: "Online", comments: "No longer use equipment has been removed"},
+      {name: "Blow mold entrance 1", site: "LML B Liquid Plant", client: "Lasco", status: "Online", comments: "Door needs repair door drop"},
+      {name: "Blow mold entrance 2", site: "LML B Liquid Plant", client: "Lasco", status: "Online", comments: "Door needs repair door drop"},
+      {name: "Chemistry lab", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
+      {name: "Electrical room to utilites", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
+      {name: "Utilites to electrical room", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
+      {name: "Entrance to uppstairs offices - IN", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
+      {name: "Entrance to uppstairs offices - OUT", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
+      {name: "Filling room 1", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
+      {name: "Filling room 2", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
+      {name: "Filling room 3", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
+      {name: "Filling room 4", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
+      {name: "Guest access - IN", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
+      {name: "Guest access - OUT", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
+      {name: "Lobby", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
+      {name: "Microbiology lab", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
+      {name: "Prep Room", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
+      {name: "Processing room 1", site: "LML B Liquid Plant", client: "Lasco", status: "Online", comments: "No longer use equipment has been removed"},
+      {name: "Processing room 2", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
+      {name: "Product dev lab", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
+      {name: "Production floor - IN", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
+      {name: "Production floor - OUT", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
+      {name: "QA office", site: "LML B Liquid Plant", client: "Lasco", status: "Online"},
+      {name: "Shop and spare parts", site: "LML B Liquid Plant", client: "Lasco", status: "Online"}
+    ];
+  }
+
+  function getEmbeddedServers() {
+    return [
+      {location: "Kingport", serial: "J1013DDR", make: "Dell", model: "PowerEdge R740", capacity: "6.11TB", used: "1.4TB", health: "Good (23%)", apps: "Ocularis DM5, LPR", status: "ONLINE", comments: "", purchase_date: "2024-01-15", warranty_expiry: "2026-01-15"},
+      {location: "Kingport", serial: "J1013DDV", make: "HP", model: "ProLiant DL380", capacity: "6.11TB", used: "1.4TB", health: "Good, Failed drive", apps: "Ocularis DM6, Eyelock", status: "ONLINE", comments: "", purchase_date: "2023-06-01", warranty_expiry: "2025-06-01"},
+      {location: "Kingport", serial: "J1013DDX", make: "Lenovo", model: "ThinkSystem SR650", capacity: "45TB", used: "178GB", health: "Excellent", apps: "—", status: "ONLINE", comments: "", purchase_date: "2024-08-15", warranty_expiry: "2026-08-15"}
+    ];
+  }
+
+  function getEmbeddedSwitches() {
+    return [
+      {name: "Main Entrance", location: "Security Office", model: "AXIS T8508", ip_address: "10.19.1.21", firmware: "6.54.2739", mac: "AC:CC:8E:FA:4B:1B", comments: "", purchase_date: "2024-02-01", warranty_expiry: "2026-02-01"},
+      {name: "2nd entrance", location: "SAL Duty Office", model: "AXIS T8516", ip_address: "10.19.1.23", firmware: "6.54.2739", mac: "AC:CC:8E:B6:DF:99", comments: "", purchase_date: "2024-03-15", warranty_expiry: "2026-03-15"}
+    ];
+  }
+
+  function getEmbeddedSoftware() {
+    return [
+      {vendor: "Genetec", client: "KFTL", version: "14.0.2.27", sma_expiry: "2026-12-31", status: "Good"},
+      {vendor: "Axis", client: "KFTL", version: "Various", sma_expiry: "2026-12-31", status: "Good"},
+      {vendor: "Avigilon", client: "KFTL", version: "4.8.0.12", sma_expiry: "2026-12-31", status: "Good"},
+      {vendor: "Pelco", client: "KFTL", version: "Various", sma_expiry: "2026-12-31", status: "Good"},
+      {vendor: "FLIR Systems", client: "KFTL", version: "v1.6.0.31", sma_expiry: "2026-12-31", status: "Good"},
+      {vendor: "AutoVu", client: "KFTL", version: "12.8.465.0", sma_expiry: "2026-12-31", status: "Good"},
+      {vendor: "Opgal Optronic Industries Ltd", client: "KFTL", version: "V 4.2.111", sma_expiry: "2026-12-31", status: "Good"},
+      {vendor: "Lenel", client: "KWL", version: "7.3.1", sma_expiry: "2026-06-15", status: "Warning"},
+      {vendor: "AMAG", client: "KFTL", version: "9.0.0", sma_expiry: "2025-01-01", status: "Expired"}
+    ];
+  }
+
+  function getEmbeddedStorage() {
+    return [
+      {name: "NAS-01", client: "KFTL", total: "10TB", usable: "8.2TB", health: 85, make: "Dell", model: "PowerVault", warranty_expiry: "2027-01-15"},
+      {name: "SAN-02", client: "KWL", total: "20TB", usable: "15.6TB", health: 92, make: "NetApp", model: "FAS2750", warranty_expiry: "2026-08-01"}
+    ];
+  }
+
+  function getEmbeddedStations() {
+    return [
+      {name: "Client-PC-01", client: "KFTL", apps: "Ocularis, Office", storage: "512GB", health: 90, make: "Dell", model: "OptiPlex", warranty_expiry: "2027-03-15"},
+      {name: "Client-PC-02", client: "KWL", apps: "Eyelock, Office", storage: "256GB", health: 78, make: "HP", model: "EliteDesk", warranty_expiry: "2026-06-01"}
+    ];
+  }
+
+  function getEmbeddedMonitors() {
+    return [
+      {name: "Monitor-01", client: "KFTL", size: "27\"", health: 95, make: "Dell", model: "UltraSharp", warranty_expiry: "2027-02-01"},
+      {name: "Monitor-02", client: "KWL", size: "32\"", health: 88, make: "LG", model: "UltraWide", warranty_expiry: "2026-09-15"}
+    ];
+  }
+
+  function getEmbeddedSRs() {
+    return [
+      {id: "SR-1847", client: "KFTL", site: "NORTH", subject: "8 Cameras Defective in NORTH Zone", from: "David Chen", category: "Camera", priority: "High", status: "Open", assigned: "Shanice Vernon", received: "Jun 15, 2026", body: "Multiple cameras showing as defective in NORTH zone. Need immediate attention.", notes: "Awaiting parts", history: [{time: "14:22", msg: "Created"}, {time: "15:00", msg: "Assigned to Shanice"}], attachments: []},
+      {id: "SR-1848", client: "KWL", site: "Tinson Pen", subject: "5 Cameras Offline - Urgent", from: "Andrea Williams", category: "Camera", priority: "High", status: "In Progress", assigned: "Marvin Grant", received: "Jun 15, 2026", body: "5 cameras down simultaneously at Tinson Pen. Need eyes back up ASAP.", notes: "On-site investigation", history: [{time: "11:05", msg: "Created"}, {time: "12:30", msg: "Dispatched to site"}], attachments: []},
+      {id: "SR-1849", client: "KFTL", site: "SAL Duty Office", subject: "Door 2nd Entrance Offline", from: "Security Ops", category: "Access Control", priority: "Medium", status: "In Progress", assigned: "Marvin Grant", received: "Jun 16, 2026", body: "2nd Entrance door reader offline. Need immediate attention.", notes: "", history: [{time: "08:00", msg: "Created"}], attachments: []},
+      {id: "SR-1850", client: "Lasco", site: "LML B Liquid Plant", subject: "Camera LML-01 Offline", from: "Vincent Hoo", category: "Camera", priority: "Medium", status: "Open", assigned: "Marvin Grant", received: "Jun 17, 2026", body: "Camera LML-01 reported offline at Liquid Plant.", notes: "", history: [{time: "06:30", msg: "Created"}], attachments: []}
+    ];
   }
 
   // ============================================================
@@ -4062,7 +4376,7 @@ function buildClientView(data, user) {
       var q = camSearchQuery.toLowerCase();
       filtered = filtered.filter(function(c) {
         return c.name.toLowerCase().indexOf(q) !== -1 ||
-          (getCameraIP(c) || '').toLowerCase().indexOf(q) !== -1 ||
+          (c.ip_address || '').toLowerCase().indexOf(q) !== -1 ||
           (c.comments || '').toLowerCase().indexOf(q) !== -1;
       });
     }
@@ -4075,7 +4389,7 @@ function buildClientView(data, user) {
     var col = camSortColumn;
     sorted.sort(function(a, b) {
       var valA, valB;
-      if (col === 'ip') { valA = getCameraIP(a) || ''; valB = getCameraIP(b) || ''; } else if (col === 'name') { valA = a.name; valB = b.name; } else if (col === 'zone') { valA = a.zone; valB = b.zone; } else if (col === 'status') { valA = a.status; valB = b.status; } else if (col === 'comments') { valA = a.comments || ''; valB = b.comments || ''; } else if (col === 'model') { valA = a.model || ''; valB = b.model || ''; } else if (col === 'resolution') { valA = a.resolution || ''; valB = b.resolution || ''; } else if (col === 'warranty') { valA = a.warranty_expiry || ''; valB = b.warranty_expiry || ''; } else { valA = ''; valB = ''; }
+      if (col === 'ip') { valA = a.ip_address || ''; valB = b.ip_address || ''; } else if (col === 'name') { valA = a.name; valB = b.name; } else if (col === 'zone') { valA = a.zone; valB = b.zone; } else if (col === 'status') { valA = a.status; valB = b.status; } else if (col === 'comments') { valA = a.comments || ''; valB = b.comments || ''; } else if (col === 'model') { valA = a.model || ''; valB = b.model || ''; } else { valA = ''; valB = ''; }
       if (valA < valB) return camSortDirection === 'asc' ? -1 : 1;
       if (valA > valB) return camSortDirection === 'asc' ? 1 : -1;
       return 0;
@@ -4118,11 +4432,10 @@ function buildClientView(data, user) {
           var pageCameras = cameras.slice(start, end);
           html += '<div class="cam-zone-group"><div class="cam-zone-header" onclick="toggleZone(\'zone-' + zone + '\')"><div><span class="zone-name">' + zone + '</span><span class="zone-client">(' + client + ')</span></div><div><span class="zone-count">' + totalInZone + ' cameras</span> <i class="ti ti-chevron-down zone-toggle" id="zone-toggle-' + zone + '"></i></div></div><div class="cam-zone-body" id="zone-body-' + zone + '">';
           if (pageCameras.length > 0) {
-            html += '<table class="tbl"><thead><tr><th>Zone</th><th>Camera</th><th>IP</th><th>Status</th><th>Comments</th><th>Model</th><th>Resolution</th><th>Warranty</th></tr></thead><tbody>';
+            html += '<table class="tbl"><thead><tr><th>Zone</th><th>Camera</th><th>IP</th><th>Status</th><th>Comments</th><th>Model</th><th>Manufacturer</th><th>Archiver</th></tr></thead><tbody>';
             pageCameras.forEach(function(c) {
-              var ip = getCameraIP(c);
               var globalIndex = CAMERAS.indexOf(c);
-              html += '<tr class="clickable" onclick="openCameraDetail(' + globalIndex + ')"><td>' + c.zone + '</td><td>' + c.name + '</td><td>' + (ip || '—') + '</td><td>' + camBadge(c.status) + '</td><td><span class="comment-display ' + (!c.comments ? 'placeholder' : '') + '" data-cam-index="' + globalIndex + '" onclick="event.stopPropagation();editComment(' + globalIndex + ')">' + (c.comments || 'Click to add note') + '</span></td><td>' + (c.model || '—') + '</td><td>' + (c.resolution || '—') + '</td><td>' + getWarrantyDisplay(c.warranty_expiry) + '</td></tr>';
+              html += '<tr class="clickable" onclick="openCameraDetail(' + globalIndex + ')"><td>' + c.zone + '</td><td>' + c.name + '</td><td>' + (c.ip_address || '—') + '</td><td>' + camBadge(c.status) + '</td><td><span class="comment-display ' + (!c.comments ? 'placeholder' : '') + '" data-cam-index="' + globalIndex + '" onclick="event.stopPropagation();editComment(' + globalIndex + ')">' + (c.comments || 'Click to add note') + '</span></td><td>' + (c.model || '—') + '</td><td>' + (c.manufacturer || '—') + '</td><td>' + (c.archiver || '—') + '</td></tr>';
             });
             html += '</tbody></table>';
             if (totalPages > 1) {
@@ -4252,13 +4565,13 @@ function buildClientView(data, user) {
   function openCameraDetail(index) {
     var camera = CAMERAS[index];
     if (!camera) return;
-    var ip = getCameraIP(camera) || 'N/A';
+    var ip = camera.ip_address || 'N/A';
     var client = getClient(camera.zone);
     document.getElementById('camera-detail-title').textContent = camera.name;
     document.getElementById('camera-detail-sub').textContent = 'Zone: ' + camera.zone + ' (' + client + ') · Status: ' + camera.status;
     var preview = document.getElementById('cam-preview-large');
     
-    if (camera.status === 'Online' && ip !== 'N/A') {
+    if (camera.status === 'Online' && ip !== 'N/A' && ip !== '') {
       preview.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;min-height:280px;">' +
         '<img src="http://' + ip + '/snapshot.jpg" onerror="this.parentElement.innerHTML=\'<div class=&quot;offline-msg&quot; style=&quot;color:var(--text-muted);padding:20px;text-align:center;&quot;><i class=&quot;ti ti-video-off&quot; style=&quot;font-size:32px;display:block;margin-bottom:8px;&quot;></i>Preview unavailable<br><span style=&quot;font-size:11px;&quot;>Camera may be offline or snapshot URL not accessible</span></div>\'" style="max-width:100%;max-height:100%;min-height:280px;object-fit:contain;border-radius:4px;" />' +
         '<div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.6);color:#4ade80;padding:4px 10px;border-radius:4px;font-size:10px;display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#4ade80;animation:pulse 1.5s infinite;"></span> LIVE</div>' +
@@ -4273,10 +4586,9 @@ function buildClientView(data, user) {
       '<div class="modal-field"><label>Status</label>' + camBadge(camera.status) + '</div>' +
       '<div class="modal-field"><label>IP Address</label><span class="mono">' + ip + '</span></div>' +
       '<div class="modal-field"><label>Model</label><span>' + (camera.model || '—') + '</span></div>' +
-      '<div class="modal-field"><label>Resolution</label><span>' + (camera.resolution || '—') + '</span></div>' +
+      '<div class="modal-field"><label>Manufacturer</label><span>' + (camera.manufacturer || '—') + '</span></div>' +
       '<div class="modal-field"><label>Archiver</label><span>' + (camera.archiver || '—') + '</span></div>' +
-      '<div class="modal-field"><label>Purchase Date</label><input type="date" value="' + (camera.purchase_date || '') + '" onchange="camera.purchase_date=this.value;" /></div>' +
-      '<div class="modal-field"><label>Warranty Expiry</label><input type="date" value="' + (camera.warranty_expiry || '') + '" onchange="camera.warranty_expiry=this.value;" /></div>';
+      '<div class="modal-field"><label>MAC Address</label><span class="mono">' + (camera.mac_address || '—') + '</span></div>';
     var commentsSection = document.getElementById('cam-detail-comments-section');
     if (commentsSection) {
       commentsSection.innerHTML = '<div class="modal-section-title">Comments</div><textarea class="notes-area" id="cam-modal-comments">' + (camera.comments || '') + '</textarea><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;"><button class="btn btn-sm btn-success" onclick="saveCameraModalComment()"><i class="ti ti-device-floppy"></i> Save</button></div>';
@@ -4302,9 +4614,9 @@ function buildClientView(data, user) {
     var title = document.getElementById('camera-detail-title').textContent;
     var camera = CAMERAS.find(function(c) { return c.name === title; });
     if (!camera) return;
-    var ip = getCameraIP(camera) || 'N/A';
+    var ip = camera.ip_address || 'N/A';
     var resultDiv = document.getElementById('cam-ping-result');
-    if (ip === 'N/A') { resultDiv.innerHTML = '<span class="ping-result fail" style="color:var(--danger);">No IP</span>'; return; }
+    if (ip === 'N/A' || ip === '') { resultDiv.innerHTML = '<span class="ping-result fail" style="color:var(--danger);">No IP</span>'; return; }
     resultDiv.innerHTML = '<span class="ping-result pending" style="color:var(--warning);">Pinging ' + ip + '...</span>';
     setTimeout(function() {
       var online = Math.random() > 0.3;
@@ -4316,8 +4628,8 @@ function buildClientView(data, user) {
     var title = document.getElementById('camera-detail-title').textContent;
     var camera = CAMERAS.find(function(c) { return c.name === title; });
     if (!camera) return;
-    var ip = getCameraIP(camera) || 'N/A';
-    if (ip !== 'N/A') window.open('http://' + ip, '_blank');
+    var ip = camera.ip_address || 'N/A';
+    if (ip !== 'N/A' && ip !== '') window.open('http://' + ip, '_blank');
     else toast('No IP', 'error');
   }
 
@@ -4429,10 +4741,10 @@ function buildClientView(data, user) {
         siteKeys.forEach(function(site) {
           var doors = groups[site];
           var client = doors[0].client || getClient(site);
-          html += '<div class="door-zone-group"><div class="door-zone-header" onclick="toggleDoorZone(\'zone-' + site + '\')"><div><span class="zone-name">' + site + '</span><span class="zone-client">(' + client + ')</span></div><div><span class="zone-count">' + doors.length + ' doors</span> <i class="ti ti-chevron-down zone-toggle" id="door-zone-toggle-' + site + '"></i></div></div><div class="door-zone-body" id="door-zone-body-' + site + '"><table class="tbl"><thead><tr><th>Door</th><th>Site</th><th>Client</th><th>Reader</th><th>Lock</th><th>Powered</th><th>Status</th><th>Tech</th><th>Door Swing</th><th>Access Type</th><th>Anti-Passback</th><th>Controller Type</th><th>Warranty</th><th>Actions</th></tr></thead><tbody>';
+          html += '<div class="door-zone-group"><div class="door-zone-header" onclick="toggleDoorZone(\'zone-' + site + '\')"><div><span class="zone-name">' + site + '</span><span class="zone-client">(' + client + ')</span></div><div><span class="zone-count">' + doors.length + ' doors</span> <i class="ti ti-chevron-down zone-toggle" id="door-zone-toggle-' + site + '"></i></div></div><div class="door-zone-body" id="door-zone-body-' + site + '"><table class="tbl"><thead><tr><th>Door</th><th>Site</th><th>Client</th><th>Status</th><th>Comments</th></tr></thead><tbody>';
           doors.forEach(function(d) {
             var realIndex = DOORS.indexOf(d);
-            html += '<tr class="clickable" onclick="openDoorDetail(' + realIndex + ')"><td>' + d.name + '</td><td>' + d.site + '</td><td>' + d.client + '</td><td>' + (d.reader || '—') + '</td><td>' + (d.lock || '—') + '</td><td><span style="color:' + (d.powered === 'Not In Use' ? '#fbbf24' : '#4ade80') + ';">' + (d.powered || '—') + '</span></td><td>' + doorBadge(d.status) + '</td><td>' + (d.tech || '—') + '</td><td>' + (d.doorSwing || 'In') + '</td><td>' + (d.accessType || 'Read In + Read Out') + '</td><td>' + (d.antiPassback || 'No') + '</td><td>' + (d.controllerType || 'Standalone') + '</td><td>' + getWarrantyDisplay(d.warranty_expiry) + '</td><td><button class="btn btn-xs" onclick="event.stopPropagation();openDoorDetail(' + realIndex + ')"><i class="ti ti-eye"></i></button></td></tr>';
+            html += '<tr class="clickable" onclick="openDoorDetail(' + realIndex + ')"><td>' + d.name + '</td><td>' + d.site + '</td><td>' + d.client + '</td><td>' + doorBadge(d.status) + '</td><td><span class="comment-display ' + (!d.comments ? 'placeholder' : '') + '" data-door-index="' + realIndex + '" onclick="event.stopPropagation();editDoorComment(' + realIndex + ')">' + (d.comments || 'Click to add note') + '</span></td></tr>';
           });
           html += '</tbody></table></div></div>';
         });
@@ -4449,6 +4761,74 @@ function buildClientView(data, user) {
     if (!body || !toggle) return;
     body.classList.toggle('hidden');
     toggle.classList.toggle('collapsed');
+  }
+
+  function editDoorComment(index) {
+    var door = DOORS[index];
+    if (!door) return;
+    var commentCell = document.querySelector('.comment-display[data-door-index="' + index + '"]');
+    if (!commentCell) return;
+    var currentComment = door.comments || '';
+    var wrapper = document.createElement('div');
+    wrapper.style.display = 'flex';
+    wrapper.style.gap = '4px';
+    wrapper.style.alignItems = 'center';
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'edit-comment-input';
+    input.value = currentComment;
+    input.style.flex = '1';
+    var saveBtn = document.createElement('button');
+    saveBtn.className = 'btn btn-xs btn-success';
+    saveBtn.innerHTML = '<i class="ti ti-check"></i>';
+    var cancelBtn = document.createElement('button');
+    cancelBtn.className = 'btn btn-xs';
+    cancelBtn.innerHTML = '<i class="ti ti-x"></i>';
+    wrapper.appendChild(input);
+    wrapper.appendChild(saveBtn);
+    wrapper.appendChild(cancelBtn);
+    commentCell.replaceWith(wrapper);
+    input.focus();
+    input.select();
+    var resolved = false;
+    var restoreSpan = function(text) {
+      var span = document.createElement('span');
+      span.className = 'comment-display ' + (!text ? 'placeholder' : '');
+      span.setAttribute('data-door-index', index);
+      span.textContent = text || 'Click to add note';
+      span.onclick = function(e) { e.stopPropagation(); editDoorComment(index); };
+      wrapper.replaceWith(span);
+    };
+    var doSave = function() {
+      if (resolved) return;
+      resolved = true;
+      var newComment = input.value.trim();
+      if (newComment !== door.comments) {
+        door.comments = newComment;
+        addAuditLogEntry('System', 'updated', 'Door ' + door.name + ' comment');
+      }
+      restoreSpan(newComment);
+      renderDoorsEnhanced();
+    };
+    saveBtn.addEventListener('click', function(e) { e.stopPropagation(); doSave(); });
+    cancelBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (resolved) return;
+      resolved = true;
+      restoreSpan(currentComment);
+    });
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); doSave(); }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        if (resolved) return;
+        resolved = true;
+        restoreSpan(currentComment);
+      }
+    });
+    input.addEventListener('blur', function() {
+      setTimeout(function() { if (!resolved) doSave(); }, 120);
+    });
   }
 
   function updateDoorLastUpdated() {
@@ -4474,19 +4854,8 @@ function buildClientView(data, user) {
       '<div class="modal-field"><label>Door</label><span>' + door.name + '</span></div>' +
       '<div class="modal-field"><label>Site</label><span>' + door.site + '</span></div>' +
       '<div class="modal-field"><label>Client</label><span>' + door.client + '</span></div>' +
-      '<div class="modal-field"><label>Reader</label><span>' + (door.reader || '—') + '</span></div>' +
-      '<div class="modal-field"><label>Lock Type</label><span>' + (door.lock || '—') + '</span></div>' +
-      '<div class="modal-field"><label>Powered</label><span style="color:' + (door.powered === 'Not In Use' ? '#fbbf24' : '#4ade80') + ';">' + (door.powered || '—') + '</span></div>' +
       '<div class="modal-field"><label>Status</label><select class="status-select" id="modal-door-status" onchange="door.status=this.value;renderDoorsEnhanced();"><option value="Online" ' + (door.status === 'Online' ? 'selected' : '') + '>Online</option><option value="Offline" ' + (door.status === 'Offline' ? 'selected' : '') + '>Offline</option><option value="Under Maintenance" ' + (door.status === 'Under Maintenance' ? 'selected' : '') + '>Under Maintenance</option></select></div>' +
-      '<div class="modal-field"><label>Technician</label><select class="status-select" id="modal-door-tech" onchange="door.tech=this.value;renderDoorsEnhanced();"><option value="Shanice Vernon" ' + (door.tech === 'Shanice Vernon' ? 'selected' : '') + '>Shanice Vernon</option><option value="Shavine" ' + (door.tech === 'Shavine' ? 'selected' : '') + '>Shavine</option><option value="Marvin Grant" ' + (door.tech === 'Marvin Grant' ? 'selected' : '') + '>Marvin Grant</option><option value="Ackeem" ' + (door.tech === 'Ackeem' ? 'selected' : '') + '>Ackeem</option><option value="Unassigned" ' + (door.tech === 'Unassigned' ? 'selected' : '') + '>Unassigned</option></select></div>' +
-      '<div class="modal-field"><label>Door Swing</label><select class="status-select" id="modal-door-swing" onchange="door.doorSwing=this.value;"><option value="In" ' + (door.doorSwing === 'In' ? 'selected' : '') + '>In</option><option value="Out" ' + (door.doorSwing === 'Out' ? 'selected' : '') + '>Out</option></select></div>' +
-      '<div class="modal-field"><label>Access Type</label><select class="status-select" id="modal-door-access-type" onchange="door.accessType=this.value;"><option value="Read In + Read Out" ' + (door.accessType === 'Read In + Read Out' ? 'selected' : '') + '>Read In + Read Out</option><option value="Read In + Push Out" ' + (door.accessType === 'Read In + Push Out' ? 'selected' : '') + '>Read In + Push Out</option><option value="Read In Only" ' + (door.accessType === 'Read In Only' ? 'selected' : '') + '>Read In Only</option><option value="Push Out Only" ' + (door.accessType === 'Push Out Only' ? 'selected' : '') + '>Push Out Only</option><option value="RTE Only" ' + (door.accessType === 'RTE Only' ? 'selected' : '') + '>RTE Only</option><option value="Read In + RTE" ' + (door.accessType === 'Read In + RTE' ? 'selected' : '') + '>Read In + RTE</option></select></div>' +
-      '<div class="modal-field"><label>Anti-Passback</label><select class="status-select" id="modal-door-anti-passback" onchange="door.antiPassback=this.value;"><option value="Yes" ' + (door.antiPassback === 'Yes' ? 'selected' : '') + '>Yes</option><option value="No" ' + (door.antiPassback === 'No' ? 'selected' : '') + '>No</option></select></div>' +
-      '<div class="modal-field"><label>Controller Type</label><select class="status-select" id="modal-door-controller-type" onchange="door.controllerType=this.value;"><option value="Standalone" ' + (door.controllerType === 'Standalone' ? 'selected' : '') + '>Standalone Controllers</option><option value="Integrated" ' + (door.controllerType === 'Integrated' ? 'selected' : '') + '>Integrated Controllers</option><option value="Networked/IP" ' + (door.controllerType === 'Networked/IP' ? 'selected' : '') + '>Networked/IP Controllers</option><option value="Centralized/Panel-Based" ' + (door.controllerType === 'Centralized/Panel-Based' ? 'selected' : '') + '>Centralized/Panel-Based Controllers</option></select></div>' +
-      '<div class="modal-field"><label>IP</label><span class="mono">' + (door.ip || 'N/A') + '</span></div>' +
-      '<div class="modal-field"><label>Controller</label><span>' + (door.controller || 'N/A') + '</span></div>' +
-      '<div class="modal-field"><label>Purchase Date</label><input type="date" value="' + (door.purchase_date || '') + '" onchange="door.purchase_date=this.value;" /></div>' +
-      '<div class="modal-field"><label>Warranty Expiry</label><input type="date" value="' + (door.warranty_expiry || '') + '" onchange="door.warranty_expiry=this.value;" /></div>';
+      '<div class="modal-field"><label>Comments</label><textarea class="notes-area" id="door-modal-comments">' + (door.comments || '') + '</textarea></div>';
     var commentsSection = document.getElementById('door-detail-comments-section');
     if (commentsSection) {
       commentsSection.innerHTML = '<div class="modal-section-title">Comments</div><textarea class="notes-area" id="door-modal-comments">' + (door.comments || '') + '</textarea><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;"><button class="btn btn-sm btn-success" onclick="saveDoorModalComment()"><i class="ti ti-device-floppy"></i> Save</button></div>';
@@ -4595,14 +4964,14 @@ function buildClientView(data, user) {
         html = '<div class="empty-state"><span class="empty-icon">🖥</span><div class="empty-title">No servers found</div></div>';
       } else {
         locKeys.forEach(function(loc) {
-          html += '<div class="server-zone-group"><div class="server-zone-header" onclick="toggleSrvZone(\'srv-zone-' + loc + '\')"><div><span class="zone-name">' + loc + '</span></div><div><span class="zone-count">' + groups[loc].length + ' servers</span> <i class="ti ti-chevron-down zone-toggle" id="srv-zone-toggle-' + loc + '"></i></div></div><div class="server-zone-body" id="srv-zone-body-' + loc + '"><table class="tbl"><thead><tr><th>Location</th><th>Serial</th><th>Make</th><th>Model</th><th>Storage</th><th>Health</th><th>Apps</th><th>Status</th><th>Warranty</th><th>Actions</th></tr></thead><tbody>';
+          html += '<div class="server-zone-group"><div class="server-zone-header" onclick="toggleSrvZone(\'srv-zone-' + loc + '\')"><div><span class="zone-name">' + loc + '</span></div><div><span class="zone-count">' + groups[loc].length + ' servers</span> <i class="ti ti-chevron-down zone-toggle" id="srv-zone-toggle-' + loc + '"></i></div></div><div class="server-zone-body" id="srv-zone-body-' + loc + '"><table class="tbl"><thead><tr><th>Location</th><th>Serial</th><th>Make</th><th>Model</th><th>Storage</th><th>Health</th><th>Apps</th><th>Status</th></tr></thead><tbody>';
           groups[loc].forEach(function(s) {
             var realIndex = SERVERS.indexOf(s);
             var capacityNum = parseFloat(s.capacity);
             var usedNum = parseFloat(s.used);
             var pct = (!isNaN(capacityNum) && !isNaN(usedNum) && capacityNum > 0) ? Math.round((usedNum / capacityNum) * 100) : 0;
             var barColor = pct > 85 ? 'red' : pct > 70 ? 'yellow' : 'green';
-            html += '<tr class="clickable" onclick="openServerDetail(' + realIndex + ')"><td>' + s.location + '</td><td style="font-family:monospace;">' + s.serial + '</td><td>' + (s.make || '—') + '</td><td>' + (s.model || '—') + '</td><td><div style="display:flex;flex-direction:column;gap:2px;"><span>' + (s.used && s.capacity ? s.used + ' / ' + s.capacity : s.capacity || s.used || '—') + '</span><div class="storage-bar-wrap"><div class="storage-bar-fill ' + barColor + '" style="width:' + pct + '%;"></div></div></div></td><td style="color:' + (s.health && s.health.indexOf('Failed') !== -1 ? '#f87171' : '#4ade80') + ';">' + s.health + '</td><td>' + s.apps + '</td><td>' + srvBadge(s.status) + '</td><td>' + getWarrantyDisplay(s.warranty_expiry) + '</td><td><button class="btn btn-xs" onclick="event.stopPropagation();openServerDetail(' + realIndex + ')"><i class="ti ti-eye"></i></button></td></tr>';
+            html += '<tr class="clickable" onclick="openServerDetail(' + realIndex + ')"><td>' + s.location + '</td><td style="font-family:monospace;">' + s.serial + '</td><td>' + (s.make || '—') + '</td><td>' + (s.model || '—') + '</td><td><div style="display:flex;flex-direction:column;gap:2px;"><span>' + (s.used && s.capacity ? s.used + ' / ' + s.capacity : s.capacity || s.used || '—') + '</span><div class="storage-bar-wrap"><div class="storage-bar-fill ' + barColor + '" style="width:' + pct + '%;"></div></div></div></td><td style="color:' + (s.health && s.health.indexOf('Failed') !== -1 ? '#f87171' : '#4ade80') + ';">' + s.health + '</td><td>' + s.apps + '</td><td>' + srvBadge(s.status) + '</td></tr>';
           });
           html += '</tbody></table></div></div>';
         });
@@ -4649,9 +5018,7 @@ function buildClientView(data, user) {
       '<div class="modal-field"><label>In Use</label><span>' + server.used + '</span></div>' +
       '<div class="modal-field"><label>Health</label><span>' + server.health + '</span></div>' +
       '<div class="modal-field"><label>Apps</label><span>' + server.apps + '</span></div>' +
-      '<div class="modal-field"><label>Status</label>' + srvBadge(server.status) + '</div>' +
-      '<div class="modal-field"><label>Purchase Date</label><input type="date" value="' + (server.purchase_date || '') + '" onchange="server.purchase_date=this.value;" /></div>' +
-      '<div class="modal-field"><label>Warranty Expiry</label><input type="date" value="' + (server.warranty_expiry || '') + '" onchange="server.warranty_expiry=this.value;" /></div>';
+      '<div class="modal-field"><label>Status</label>' + srvBadge(server.status) + '</div>';
     var commentsSection = document.getElementById('server-detail-comments-section');
     if (commentsSection) {
       commentsSection.innerHTML = '<div class="modal-section-title">Comments</div><textarea class="notes-area" id="server-modal-comments">' + (server.comments || '') + '</textarea><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;"><button class="btn btn-sm btn-success" onclick="saveServerModalComment()"><i class="ti ti-device-floppy"></i> Save</button></div>';
@@ -4757,15 +5124,11 @@ function buildClientView(data, user) {
       } else {
         locKeys.forEach(function(loc) {
           var client = getClient(loc);
-          html += '<div class="switch-zone-group"><div class="switch-zone-header" onclick="toggleSwZone(\'sw-zone-' + loc + '\')"><div><span class="zone-name">' + loc + '</span><span class="zone-client">(' + client + ')</span></div><div><span class="zone-count">' + groups[loc].length + ' switches</span> <i class="ti ti-chevron-down zone-toggle" id="sw-zone-toggle-' + loc + '"></i></div></div><div class="switch-zone-body" id="sw-zone-body-' + loc + '"><table class="tbl"><thead><tr><th>Switch</th><th>Location</th><th>Model</th><th>IP</th><th>Ports</th><th>Uptime</th><th>Firmware</th><th>Warranty</th><th>Actions</th></tr></thead><tbody>';
+          html += '<div class="switch-zone-group"><div class="switch-zone-header" onclick="toggleSwZone(\'sw-zone-' + loc + '\')"><div><span class="zone-name">' + loc + '</span><span class="zone-client">(' + client + ')</span></div><div><span class="zone-count">' + groups[loc].length + ' switches</span> <i class="ti ti-chevron-down zone-toggle" id="sw-zone-toggle-' + loc + '"></i></div></div><div class="switch-zone-body" id="sw-zone-body-' + loc + '"><table class="tbl"><thead><tr><th>Switch</th><th>Location</th><th>Model</th><th>IP</th><th>Firmware</th></tr></thead><tbody>';
           groups[loc].forEach(function(s) {
             var realIndex = SWITCHES.indexOf(s);
             var isOffline = isSwitchOffline(s);
-            var portCount = Math.floor(Math.random() * 8) + 4;
-            var totalPorts = 8 + Math.floor(Math.random() * 3) * 8;
-            var pct = Math.round((portCount / totalPorts) * 100);
-            var barColor = pct > 85 ? 'red' : pct > 70 ? 'yellow' : 'green';
-            html += '<tr class="clickable" onclick="openSwitchDetail(' + realIndex + ')"><td>' + s.name + '</td><td>' + s.location + '</td><td>' + s.model + '</td><td><span class="ip-link">' + s.ip_address + '</span></td><td><div><span>' + portCount + '/' + totalPorts + '</span><div class="port-bar-wrap"><div class="port-bar-fill ' + barColor + '" style="width:' + pct + '%;"></div></div></div></td><td><span class="switch-uptime ' + (isOffline ? 'offline' : '') + '">' + (isOffline ? '🔴 Offline' : getRandomUptime() + ' · ' + getRandomLatency() + 'ms') + '</span></td><td style="color:' + (parseFloat(s.firmware) < 5.0 || (s.firmware && s.firmware.indexOf('5.20.15') !== -1) ? '#fbbf24' : 'var(--text-primary)') + ';">' + s.firmware + '</td><td>' + getWarrantyDisplay(s.warranty_expiry) + '</td><td><button class="btn btn-xs" onclick="event.stopPropagation();openSwitchDetail(' + realIndex + ')"><i class="ti ti-eye"></i></button></td></tr>';
+            html += '<tr class="clickable" onclick="openSwitchDetail(' + realIndex + ')"><td>' + s.name + '</td><td>' + s.location + '</td><td>' + s.model + '</td><td><span class="ip-link">' + s.ip_address + '</span></td><td style="color:' + (parseFloat(s.firmware) < 5.0 || (s.firmware && s.firmware.indexOf('5.20.15') !== -1) ? '#fbbf24' : 'var(--text-primary)') + ';">' + s.firmware + '</td></tr>';
           });
           html += '</tbody></table></div></div>';
         });
@@ -4811,9 +5174,7 @@ function buildClientView(data, user) {
       '<div class="modal-field"><label>IP</label><span class="mono">' + sw.ip_address + '</span></div>' +
       '<div class="modal-field"><label>MAC</label><span class="mono">' + (sw.mac || '—') + '</span></div>' +
       '<div class="modal-field"><label>Firmware</label><span>' + sw.firmware + '</span></div>' +
-      '<div class="modal-field"><label>Status</label>' + (isOffline ? '<span class="badge b-high">Offline</span>' : '<span class="badge b-done">Online</span>') + '</div>' +
-      '<div class="modal-field"><label>Purchase Date</label><input type="date" value="' + (sw.purchase_date || '') + '" onchange="sw.purchase_date=this.value;" /></div>' +
-      '<div class="modal-field"><label>Warranty Expiry</label><input type="date" value="' + (sw.warranty_expiry || '') + '" onchange="sw.warranty_expiry=this.value;" /></div>';
+      '<div class="modal-field"><label>Status</label>' + (isOffline ? '<span class="badge b-high">Offline</span>' : '<span class="badge b-done">Online</span>') + '</div>';
     var commentsSection = document.getElementById('switch-detail-comments-section');
     if (commentsSection) {
       commentsSection.innerHTML = '<div class="modal-section-title">Comments</div><textarea class="notes-area" id="switch-modal-comments">' + (sw.comments || '') + '</textarea><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;"><button class="btn btn-sm btn-success" onclick="saveSwitchModalComment()"><i class="ti ti-device-floppy"></i> Save</button></div>';
@@ -5555,52 +5916,39 @@ function buildClientView(data, user) {
   }
 
   function exportCamerasCSV() {
-    var headers = ['name', 'zone', 'ip_address', 'status', 'comments', 'model', 'resolution', 'archiver', 'purchase_date', 'warranty_expiry'];
+    var headers = ['name', 'zone', 'ip_address', 'status', 'comments', 'model', 'manufacturer', 'archiver', 'mac_address'];
     var data = CAMERAS.map(function(c) {
-      var ip = getCameraIP(c) || c.ip_address || '';
       return {
         name: c.name || '',
         zone: c.zone || '',
-        ip_address: ip,
+        ip_address: c.ip_address || '',
         status: c.status || '',
         comments: c.comments || '',
         model: c.model || '',
-        resolution: c.resolution || '',
+        manufacturer: c.manufacturer || '',
         archiver: c.archiver || '',
-        purchase_date: c.purchase_date || '',
-        warranty_expiry: c.warranty_expiry || ''
+        mac_address: c.mac_address || ''
       };
     });
     exportToCSV(data, headers, 'cameras');
   }
 
   function exportDoorsCSV() {
-    var headers = ['name', 'site', 'client', 'reader', 'lock', 'powered', 'status', 'tech', 'ip', 'controller', 'doorSwing', 'accessType', 'antiPassback', 'controllerType', 'purchase_date', 'warranty_expiry'];
+    var headers = ['name', 'site', 'client', 'status', 'comments'];
     var data = DOORS.map(function(d) {
       return {
         name: d.name || '',
         site: d.site || '',
         client: d.client || '',
-        reader: d.reader || '',
-        lock: d.lock || '',
-        powered: d.powered || '',
         status: d.status || '',
-        tech: d.tech || '',
-        ip: d.ip || '',
-        controller: d.controller || '',
-        doorSwing: d.doorSwing || '',
-        accessType: d.accessType || '',
-        antiPassback: d.antiPassback || '',
-        controllerType: d.controllerType || '',
-        purchase_date: d.purchase_date || '',
-        warranty_expiry: d.warranty_expiry || ''
+        comments: d.comments || ''
       };
     });
     exportToCSV(data, headers, 'doors');
   }
 
   function exportServersCSV() {
-    var headers = ['location', 'serial', 'make', 'model', 'capacity', 'used', 'health', 'apps', 'status', 'purchase_date', 'warranty_expiry'];
+    var headers = ['location', 'serial', 'make', 'model', 'capacity', 'used', 'health', 'apps', 'status'];
     var data = SERVERS.map(function(s) {
       return {
         location: s.location || '',
@@ -5611,16 +5959,14 @@ function buildClientView(data, user) {
         used: s.used || '',
         health: s.health || '',
         apps: s.apps || '',
-        status: s.status || '',
-        purchase_date: s.purchase_date || '',
-        warranty_expiry: s.warranty_expiry || ''
+        status: s.status || ''
       };
     });
     exportToCSV(data, headers, 'servers');
   }
 
   function exportSwitchesCSV() {
-    var headers = ['name', 'location', 'model', 'ip_address', 'firmware', 'mac', 'purchase_date', 'warranty_expiry'];
+    var headers = ['name', 'location', 'model', 'ip_address', 'firmware', 'mac'];
     var data = SWITCHES.map(function(s) {
       return {
         name: s.name || '',
@@ -5628,9 +5974,7 @@ function buildClientView(data, user) {
         model: s.model || '',
         ip_address: s.ip_address || '',
         firmware: s.firmware || '',
-        mac: s.mac || '',
-        purchase_date: s.purchase_date || '',
-        warranty_expiry: s.warranty_expiry || ''
+        mac: s.mac || ''
       };
     });
     exportToCSV(data, headers, 'switches');
@@ -5816,6 +6160,7 @@ function buildClientView(data, user) {
         '</div></div>';
     }).join('');
   }
+
   function openEmail(id) {
     activeEmailId = id;
     var e = getCurrentFolderEmails().find(function(x) { return x.id === id; }) || EMAILS.find(function(x) { return x.id === id; });
@@ -6418,7 +6763,6 @@ function buildClientView(data, user) {
   var savedTheme = localStorage.getItem('ccsm_theme') || 'dark';
   setTheme(savedTheme);
 
-  // Check if client already logged in from localStorage
   checkLogin();
   
   if (localStorage.getItem('ccsm_sidebar') === '1') toggleSidebar();
