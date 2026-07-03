@@ -4030,12 +4030,12 @@ function editDoorComponent(index, component) {
   var compFields = fields[component] || [];
   var compName = componentNames[component] || component;
   
-  var modalHtml = '<div class="modal" style="max-width:500px;">';
-  modalHtml += '<button class="modal-close" onclick="closeAddModal(\'door-component-modal\')"><i class="ti ti-x"></i></button>';
-  modalHtml += '<div class="modal-title">✏️ Edit ' + compName + '</div>';
-  modalHtml += '<div class="modal-sub">' + door.name + ' · ' + door.site + '</div>';
-  modalHtml += '<div class="modal-section">';
-  modalHtml += '<div class="modal-grid">';
+var modalHtml = '<div class="modal" style="max-width:500px;">';
+modalHtml += '<button class="modal-close" onclick="closeDoorComponentModal()"><i class="ti ti-x"></i></button>';
+modalHtml += '<div class="modal-title">✏️ Edit ' + compName + '</div>';
+modalHtml += '<div class="modal-sub">' + door.name + ' · ' + door.site + '</div>';
+modalHtml += '<div class="modal-section">';
+modalHtml += '<div class="modal-grid">';
   
   compFields.forEach(function(field) {
     modalHtml += '<div class="modal-field">';
@@ -4055,10 +4055,10 @@ function editDoorComponent(index, component) {
   });
   
   modalHtml += '</div></div>';
-  modalHtml += '<div class="modal-footer">';
-  modalHtml += '<button class="btn" onclick="closeAddModal(\'door-component-modal\')">Cancel</button>';
-  modalHtml += '<button class="btn btn-accent" onclick="saveDoorComponent(' + index + ', \'' + component + '\')"><i class="ti ti-device-floppy"></i> Save</button>';
-  modalHtml += '</div></div>';
+modalHtml += '<div class="modal-footer">';
+modalHtml += '<button class="btn" onclick="closeDoorComponentModal()">Cancel</button>';
+modalHtml += '<button class="btn btn-accent" onclick="saveDoorComponent(' + index + ', \'' + component + '\')"><i class="ti ti-device-floppy"></i> Save</button>';
+modalHtml += '</div></div>';
   
   var overlay = document.createElement('div');
   overlay.id = 'door-component-modal';
@@ -4066,11 +4066,24 @@ function editDoorComponent(index, component) {
   overlay.innerHTML = modalHtml;
   document.body.appendChild(overlay);
   
-  overlay.addEventListener('click', function(e) {
-    if (e.target === this) {
-      closeAddModal('door-component-modal');
-    }
-  });
+overlay.addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeDoorComponentModal();
+  }
+});
+}
+
+function closeDoorComponentModal() {
+  var modal = document.getElementById('door-component-modal');
+  if (modal) {
+    modal.classList.remove('open');
+    // Remove the modal from DOM after closing
+    setTimeout(function() {
+      if (modal.parentNode) {
+        modal.parentNode.removeChild(modal);
+      }
+    }, 300);
+  }
 }
 
 function saveDoorComponent(index, component) {
