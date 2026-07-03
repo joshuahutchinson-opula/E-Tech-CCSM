@@ -4171,17 +4171,16 @@ function renderDoorsEnhanced() {
         html += '</div>';
         html += '<div class="door-card-body" id="' + doorId + '-body" style="' + (isCollapsed ? 'display:none;' : '') + 'padding:16px 18px;">';
         
-        // Controller Section
-        html += '<div class="door-component-section" style="margin-bottom:14px;border-left:3px solid var(--accent);padding-left:12px;">';
+        // === DOOR SWING SECTION ===
+        html += '<div class="door-component-section" style="margin-bottom:14px;border-left:3px solid #f472b6;padding-left:12px;">';
         html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
-        html += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">🖥️ Controller</span>';
-        html += '<span class="status-badge ' + (controllerStatus === 'Online' ? 'good' : controllerStatus === 'Offline' ? 'critical' : 'warning') + '" style="font-size:9px;padding:1px 8px;">' + controllerStatus + '</span>';
+        html += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">🚪 Door Swing</span>';
         html += '</div>';
         html += '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:6px 12px;font-size:12px;">';
-        html += '<div><span style="color:var(--text-muted);">Controller Type:</span> <span style="color:var(--text-primary);">' + (d.controllerType || 'Standalone') + '</span></div>';
-        html += '<div><span style="color:var(--text-muted);">IP Address:</span> <span style="color:var(--text-primary);font-family:monospace;">' + (d.ip || 'N/A') + '</span></div>';
-        html += '<div><span style="color:var(--text-muted);">Model:</span> <span style="color:var(--text-primary);">' + (d.controller_model || '—') + '</span></div>';
-        html += '<div><span style="color:var(--text-muted);">Warranty:</span> <span style="color:var(--text-primary);">' + getWarrantyDisplay(d.controller_warranty) + '</span></div>';
+        html += '<div><span style="color:var(--text-muted);">Door Swing:</span> <span style="color:var(--text-primary);">' + (d.doorSwing || 'In') + '</span></div>';
+        html += '<div><span style="color:var(--text-muted);">Powered:</span> <span style="color:var(--text-primary);">' + (d.powered || 'Yes') + '</span></div>';
+        html += '<div><span style="color:var(--text-muted);">Access Type:</span> <span style="color:var(--text-primary);">' + (d.accessType || 'Read In + Read Out') + '</span></div>';
+        html += '<div><span style="color:var(--text-muted);">Anti-Passback:</span> <span style="color:var(--text-primary);">' + (d.antiPassback || 'No') + '</span></div>';
         html += '</div></div>';
         
         // Reader Section
