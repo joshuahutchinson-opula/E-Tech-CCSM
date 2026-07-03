@@ -2935,6 +2935,10 @@ function buildClientView(data, user) {
   
   var clientName = data.name || 'Client';
   
+  // Get current date for greeting message
+  var now = new Date();
+  var dateStr = now.toLocaleDateString('en-JM', { weekday: 'long', month: 'long', day: 'numeric' });
+  
   // Calculate client-specific stats
   var totalCameras = data.assets && data.assets.cameras ? data.assets.cameras.length : 0;
   var totalDoors = data.assets && data.assets.doors ? data.assets.doors.length : 0;
@@ -2953,21 +2957,20 @@ function buildClientView(data, user) {
   var openSRs = data.srs ? data.srs.filter(function(r) { return r.status !== 'Resolved'; }).length : 0;
   var totalSRs = data.srs ? data.srs.length : 0;
   
-  // Header with client branding
-  html += '<div style="background:linear-gradient(135deg, ' + primaryColor + ', ' + secondaryColor + ');padding:12px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0;min-height:60px;">';
+  // Header with client branding - WHITE background
+  html += '<div style="background:#ffffff;padding:8px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;min-height:50px;">';
   
-  // Left side - Client logo and name
-  html += '<div style="display:flex;align-items:center;gap:14px;">';
-  html += '<img src="' + (data.logo || 'logo.png') + '" style="height:32px;width:auto;" onerror="this.style.display=\'none\'" />';
-  html += '<span style="color:#fff;font-size:16px;font-weight:600;">' + clientName + ' Portal</span>';
+  // Left side - Client logo only (no text)
+  html += '<div style="display:flex;align-items:center;gap:12px;">';
+  html += '<img src="' + (data.logo || 'logo.png') + '" style="height:28px;width:auto;" onerror="this.style.display=\'none\'" />';
   html += '</div>';
   
   // Right side - ETECH logo and logout
-  html += '<div style="display:flex;align-items:center;gap:16px;">';
-  html += '<img src="logo-light.png" style="height:28px;width:auto;" onerror="this.style.display=\'none\'" />';
-  html += '<span style="color:rgba(255,255,255,0.2);font-size:18px;">|</span>';
-  html += '<span style="color:rgba(255,255,255,0.8);font-size:12px;">' + (user ? user.client : 'Client') + '</span>';
-  html += '<button onclick="logoutClientView()" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:4px 14px;border-radius:4px;cursor:pointer;font-size:11px;font-family:var(--font);transition:all 0.2s;" onmouseover="this.style.background=\'rgba(255,255,255,0.25)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.12)\'">Logout</button>';
+  html += '<div style="display:flex;align-items:center;gap:12px;">';
+  html += '<img src="logo-light.png" style="height:24px;width:auto;" onerror="this.style.display=\'none\'" />';
+  html += '<span style="color:rgba(0,0,0,0.2);font-size:16px;">|</span>';
+  html += '<span style="color:rgba(0,0,0,0.6);font-size:12px;">' + (user ? user.client : 'Client') + '</span>';
+  html += '<button onclick="logoutClientView()" style="background:rgba(0,0,0,0.06);border:1px solid rgba(0,0,0,0.1);color:#555;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:11px;font-family:var(--font);transition:all 0.2s;" onmouseover="this.style.background=\'rgba(0,0,0,0.12)\'" onmouseout="this.style.background=\'rgba(0,0,0,0.06)\'">Logout</button>';
   html += '</div>';
   html += '</div>';
   
@@ -3011,6 +3014,23 @@ function buildClientView(data, user) {
   // ===== DASHBOARD TAB =====
   html += '<div id="client-tab-dashboard" class="client-tab-content">';
   
+  // Custom Greeting Message with red background
+  html += '<div style="background:linear-gradient(135deg, ' + primaryColor + ', ' + secondaryColor + ');border-radius:12px;padding:28px 32px;margin-bottom:20px;position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(227,27,35,0.3);">';
+  html += '<div style="position:relative;z-index:1;">';
+  html += '<div style="font-size:14px;color:rgba(255,255,255,0.85);font-weight:500;margin-bottom:2px;letter-spacing:0.04em;">' + greeting + ', ' + clientName + '! 👋</div>';
+  html += '<h1 style="font-size:22px;font-weight:700;color:#ffffff;letter-spacing:-0.02em;margin-bottom:6px;">' + clientName + ' — ' + dateStr + '</h1>';
+  html += '<div style="font-size:14px;color:rgba(255,255,255,0.8);font-weight:400;">We\'re here to help 24/7. How can we support your security needs today?</div>';
+  html += '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:12px;">';
+  html += '<div style="display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,0.15);padding:4px 16px 4px 12px;border-radius:20px;backdrop-filter:blur(4px);">';
+  html += '<span style="font-size:18px;font-weight:700;color:#ffffff;">' + health + '%</span>';
+  html += '<span style="font-size:11px;color:rgba(255,255,255,0.7);font-weight:400;">System Health</span>';
+  html += '</div>';
+  html += '<div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.15);padding:4px 14px 4px 10px;border-radius:20px;backdrop-filter:blur(4px);">';
+  html += '<img src="' + (data.logo || 'logo.png') + '" style="height:20px;width:auto;border-radius:3px;" onerror="this.style.display=\'none\'">';
+  html += '<span style="color:rgba(255,255,255,0.9);font-weight:500;font-size:12px;">' + clientName + '</span>';
+  html += '</div>';
+  html += '</div></div></div>';
+  
   // Emergency banner (if there are alerts)
   var hasAlerts = defective > 0 || acOffline > 0 || swOffline > 0 || srvOffline > 0;
   if (hasAlerts) {
@@ -3027,79 +3047,74 @@ function buildClientView(data, user) {
     html += '</div>';
   }
   
-  // Stats cards - matching admin view
-  html += '<div class="stats-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;">';
+  // Stats cards - RED with white text
+  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">';
   
-  html += '<div class="stat-card" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden;">';
-  html += '<div class="stat-label" style="font-size:10px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;font-weight:700;">System Health <span class="trend-badge" style="font-size:10px;padding:1px 6px;border-radius:10px;background:rgba(52,211,153,0.15);color:#34d399;margin-left:4px;display:inline-block;"><i class="ti ti-trending-up"></i> +' + (health > 80 ? Math.floor(Math.random() * 5) + 1 : 0) + '%</span></div>';
-  html += '<div class="stat-val" style="font-size:26px;font-weight:600;color:' + (health >= 90 ? 'var(--success)' : health >= 70 ? 'var(--warning)' : 'var(--danger)') + ';line-height:1;">' + health + '%</div>';
-  html += '<div class="stat-note note-success" style="font-size:11px;margin-top:4px;color:var(--text-secondary);">' + (health >= 90 ? 'Excellent' : health >= 70 ? 'Good' : 'Needs attention') + '</div>';
+  html += '<div style="background:linear-gradient(135deg, ' + primaryColor + ', ' + secondaryColor + ');border-radius:10px;padding:16px 18px;box-shadow:0 2px 12px rgba(227,27,35,0.2);">';
+  html += '<div style="font-size:10px;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Total Assets</div>';
+  html += '<div style="font-size:28px;font-weight:700;color:#ffffff;line-height:1.2;margin-top:2px;">' + totalDevices + '</div>';
+  html += '<div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;">All systems</div>';
   html += '</div>';
   
-  html += '<div class="stat-card" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden;">';
-  html += '<div class="stat-label" style="font-size:10px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;font-weight:700;">Active Alerts <span class="trend-badge warn" style="font-size:10px;padding:1px 6px;border-radius:10px;background:rgba(255,179,71,0.15);color:#ffb347;margin-left:4px;display:inline-block;"><i class="ti ti-alert-circle"></i> ' + offlineDevices + '</span></div>';
-  html += '<div class="stat-val" style="font-size:26px;font-weight:600;color:var(--warning);line-height:1;">' + offlineDevices + '</div>';
-  html += '<div class="stat-note note-warn" style="font-size:11px;margin-top:4px;color:var(--text-secondary);">' + (offlineDevices > 0 ? 'Requires attention' : 'All systems nominal') + '</div>';
+  html += '<div style="background:linear-gradient(135deg, ' + primaryColor + ', ' + secondaryColor + ');border-radius:10px;padding:16px 18px;box-shadow:0 2px 12px rgba(227,27,35,0.2);">';
+  html += '<div style="font-size:10px;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Online</div>';
+  html += '<div style="font-size:28px;font-weight:700;color:#ffffff;line-height:1.2;margin-top:2px;">' + onlineDevices + '</div>';
+  html += '<div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;"><span style="color:#4ade80;">●</span> Operational</div>';
   html += '</div>';
   
-  html += '<div class="stat-card" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden;">';
-  html += '<div class="stat-label" style="font-size:10px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;font-weight:700;">Offline Devices <span class="trend-badge down" style="font-size:10px;padding:1px 6px;border-radius:10px;background:rgba(255,94,122,0.15);color:#ff5e7a;margin-left:4px;display:inline-block;"><i class="ti ti-trending-down"></i> ' + offlineDevices + '</span></div>';
-  html += '<div class="stat-val" style="font-size:26px;font-weight:600;color:var(--danger);line-height:1;">' + offlineDevices + '</div>';
-  html += '<div class="stat-note note-danger" style="font-size:11px;margin-top:4px;color:var(--text-secondary);">' + (offlineDevices === 0 ? 'All devices online' : offlineDevices + ' device(s) offline') + '</div>';
+  html += '<div style="background:linear-gradient(135deg, ' + primaryColor + ', ' + secondaryColor + ');border-radius:10px;padding:16px 18px;box-shadow:0 2px 12px rgba(227,27,35,0.2);">';
+  html += '<div style="font-size:10px;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Offline / Issues</div>';
+  html += '<div style="font-size:28px;font-weight:700;color:#ffffff;line-height:1.2;margin-top:2px;">' + (totalDevices - onlineDevices) + '</div>';
+  html += '<div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;"><span style="color:#fca5a5;">●</span> Needs attention</div>';
   html += '</div>';
   
-  html += '<div class="stat-card" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden;">';
-  html += '<div class="stat-label" style="font-size:10px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;font-weight:700;">Open SRs <span class="trend-badge" style="font-size:10px;padding:1px 6px;border-radius:10px;background:rgba(52,211,153,0.15);color:#34d399;margin-left:4px;display:inline-block;"><i class="ti ti-trending-up"></i> ' + openSRs + '</span></div>';
-  html += '<div class="stat-val" style="font-size:26px;font-weight:600;color:var(--info);line-height:1;">' + openSRs + '</div>';
-  html += '<div class="stat-note note-info" style="font-size:11px;margin-top:4px;color:var(--text-secondary);">' + (openSRs > 0 ? 'Pending resolution' : 'No open requests') + '</div>';
+  html += '<div style="background:linear-gradient(135deg, ' + primaryColor + ', ' + secondaryColor + ');border-radius:10px;padding:16px 18px;box-shadow:0 2px 12px rgba(227,27,35,0.2);">';
+  html += '<div style="font-size:10px;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Open Service Requests</div>';
+  html += '<div style="font-size:28px;font-weight:700;color:#ffffff;line-height:1.2;margin-top:2px;">' + openSRs + '</div>';
+  html += '<div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;"><span style="color:#fbbf24;">●</span> Pending resolution</div>';
   html += '</div>';
   
   html += '</div>';
   
   // Today's Activity
-  html += '<div class="panel" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px 20px;position:relative;">';
-  html += '<div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><span class="panel-title" style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;">Today\'s Activity</span></div>';
-  html += '<div class="timeline" style="display:flex;flex-direction:column;gap:6px;">';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">';
+  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px 20px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">';
+  html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">';
+  html += '<span style="font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;">Today\'s Activity</span>';
+  html += '</div>';
+  html += '<div style="display:flex;flex-direction:column;gap:6px;">';
   if (data.activity && data.activity.length) {
     data.activity.forEach(function(item) {
       var color = item.type === 'urgent' ? '#f87171' : item.type === 'warning' ? '#fbbf24' : item.type === 'success' ? '#4ade80' : 'var(--text-secondary)';
-      html += '<div class="tl-item" style="display:flex;gap:12px;font-size:12px;padding:6px 0;border-bottom:1px solid var(--card-border);"><span class="tl-time" style="color:var(--text-muted);flex-shrink:0;font-weight:500;min-width:40px;">' + item.time + '</span><span class="tl-msg" style="color:' + color + ';">' + item.msg + '</span></div>';
+      html += '<div style="display:flex;gap:12px;font-size:12px;padding:6px 0;border-bottom:1px solid var(--card-border);"><span style="color:var(--text-muted);flex-shrink:0;font-weight:500;min-width:40px;">' + item.time + '</span><span style="color:' + color + ';">' + item.msg + '</span></div>';
     });
   } else {
     html += '<div style="color:var(--text-muted);padding:8px 0;text-align:center;font-size:12px;">No activity today</div>';
   }
   html += '</div></div>';
   
-  // Urgent Service Requests
-  html += '<div class="panel" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px 20px;position:relative;margin-top:14px;">';
-  html += '<div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">';
-  html += '<span class="panel-title" style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;">Urgent Service Requests</span>';
+  // Open Service Requests
+  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px 20px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">';
+  html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">';
+  html += '<span style="font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;">Open Service Requests</span>';
   html += '<button class="link-btn" onclick="switchClientViewTab(\'srs\', document.querySelector(\'.nav-item[onclick*=\\\'srs\\\']\'))" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:11px;font-family:var(--font);">View all →</button>';
   html += '</div>';
-  
-  var urgentSRs = data.srs ? data.srs.filter(function(r) { return r.status !== 'Resolved' && r.priority === 'High'; }).slice(0, 7) : [];
-  if (urgentSRs.length > 0) {
-    html += '<table class="tbl" style="width:100%;border-collapse:collapse;font-size:12px;">';
-    html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">ID</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Client</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Site</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Subject</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Priority</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th></tr></thead>';
-    html += '<tbody>';
-    urgentSRs.forEach(function(sr) {
-      var priColor = sr.priority === 'High' ? 'pri-high' : sr.priority === 'Medium' ? 'pri-med' : 'pri-low';
-      var statusBadge = sr.status === 'Open' ? 'b-open' : sr.status === 'In Progress' ? 'b-in-progress' : sr.status === 'On-Site Review' ? 'b-info' : sr.status === 'Pending' ? 'b-pending' : 'b-done';
+  html += '<div style="overflow-x:auto;">';
+  html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+  html += '<thead><tr><th style="color:var(--text-muted);font-weight:600;letter-spacing:0.08em;padding:6px 4px;border-bottom:2px solid var(--card-border);text-align:left;font-size:10px;text-transform:uppercase;">ID</th><th style="color:var(--text-muted);font-weight:600;letter-spacing:0.08em;padding:6px 4px;border-bottom:2px solid var(--card-border);text-align:left;font-size:10px;text-transform:uppercase;">Subject</th><th style="color:var(--text-muted);font-weight:600;letter-spacing:0.08em;padding:6px 4px;border-bottom:2px solid var(--card-border);text-align:left;font-size:10px;text-transform:uppercase;">Priority</th><th style="color:var(--text-muted);font-weight:600;letter-spacing:0.08em;padding:6px 4px;border-bottom:2px solid var(--card-border);text-align:left;font-size:10px;text-transform:uppercase;">Status</th></tr></thead>';
+  html += '<tbody>';
+  var openSRsList = (data.srs || []).filter(function(s) { return s.status !== 'Resolved'; });
+  if (openSRsList.length > 0) {
+    openSRsList.forEach(function(sr) {
+      var priColor = sr.priority === 'High' ? '#ef4444' : sr.priority === 'Medium' ? '#f59e0b' : '#22c55e';
+      var statusBadge = sr.status === 'Open' ? 'b-open' : sr.status === 'In Progress' ? 'b-in-progress' : sr.status === 'On-Site Review' ? 'b-info' : 'b-pending';
       var statusText = sr.status || 'Open';
-      html += '<tr class="clickable" onclick="alert(\'View SR: ' + sr.id + '\')" style="cursor:pointer;">';
-      html += '<td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-size:11px;color:var(--text-muted);">' + sr.id + '</td>';
-      html += '<td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + clientName + '</td>';
-      html += '<td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (sr.site || '—') + '</td>';
-      html += '<td style="padding:8px 6px;border-bottom:1px solid var(--card-border);max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + sr.subject + '</td>';
-      html += '<td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="pri-dot ' + priColor + '" style="display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;"></span>' + sr.priority + '</td>';
-      html += '<td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="badge ' + statusBadge + '" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + statusText + '</span></td>';
-      html += '</tr>';
+      html += '<tr><td style="padding:6px 4px;border-bottom:1px solid var(--card-border);font-size:11px;color:var(--text-muted);">' + sr.id + '</td><td style="padding:6px 4px;border-bottom:1px solid var(--card-border);color:var(--text-primary);">' + sr.subject + '</td><td style="padding:6px 4px;border-bottom:1px solid var(--card-border);color:' + priColor + ';font-weight:600;">' + sr.priority + '</td><td style="padding:6px 4px;border-bottom:1px solid var(--card-border);"><span class="badge ' + statusBadge + '" style="display:inline-block;padding:2px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + statusText + '</span></td></tr>';
     });
-    html += '</tbody></table>';
   } else {
-    html += '<div style="color:var(--text-muted);padding:20px;text-align:center;font-size:12px;">No urgent service requests</div>';
+    html += '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:12px;">No open service requests</td></tr>';
   }
-  html += '</div>';
+  html += '</tbody></table></div></div></div>';
   
   html += '</div>';
   
@@ -3110,6 +3125,7 @@ function buildClientView(data, user) {
   html += '<span class="panel-title" style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;">Cameras</span>';
   html += '</div>';
   if (data.assets && data.assets.cameras && data.assets.cameras.length > 0) {
+    html += '<div style="overflow-x:auto;">';
     html += '<table class="tbl" style="width:100%;border-collapse:collapse;font-size:12px;">';
     html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Zone</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Camera</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">IP</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Comments</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Model</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Manufacturer</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Resolution</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Archiver</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">MAC Address</th></tr></thead>';
     html += '<tbody>';
@@ -3117,7 +3133,7 @@ function buildClientView(data, user) {
       var statusBadge = cam.status === 'Online' ? 'b-done' : cam.status === 'Defective' ? 'b-high' : cam.status === 'No Power' ? 'b-high' : cam.status === 'No Camera' ? 'b-open' : 'b-info';
       html += '<tr><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + cam.zone + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + cam.name + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-family:monospace;font-size:11px;">' + (cam.ip || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="badge ' + statusBadge + '" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + cam.status + '</span></td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.comments || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.model || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.manufacturer || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.resolution || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.archiver || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-family:monospace;font-size:10px;">' + (cam.mac_address || '—') + '</td></tr>';
     });
-    html += '</tbody></table>';
+    html += '</tbody></table></div>';
   } else {
     html += '<div style="color:var(--text-muted);padding:40px;text-align:center;font-size:12px;">No cameras found</div>';
   }
@@ -3126,8 +3142,9 @@ function buildClientView(data, user) {
   // ===== DOORS TAB =====
   html += '<div id="client-tab-doors" class="client-tab-content" style="display:none;">';
   
-  // Build door cards
+  // Build door cards with scrollable content
   if (data.assets && data.assets.doors && data.assets.doors.length > 0) {
+    html += '<div style="max-height:calc(100vh - 180px);overflow-y:auto;padding-right:4px;">';
     data.assets.doors.forEach(function(door, index) {
       var statusBadge = door.status === 'Online' ? 'b-done' : door.status === 'Offline' ? 'b-high' : 'b-under-maintenance';
       var readerStatus = door.reader_status || door.status || 'Online';
@@ -3137,7 +3154,7 @@ function buildClientView(data, user) {
       
       html += '<div class="panel" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px 20px;position:relative;margin-bottom:14px;">';
       html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">';
-      html += '<div style="display:flex;align-items:center;gap:12px;">';
+      html += '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">';
       html += '<span style="font-size:20px;">🚪</span>';
       html += '<div><span style="font-weight:600;color:var(--text-primary);font-size:15px;">' + door.name + '</span>';
       html += '<span style="margin-left:10px;font-size:12px;color:var(--text-muted);">' + (door.zone || '—') + ' · ' + (door.client || '—') + '</span></div>';
@@ -3227,6 +3244,7 @@ function buildClientView(data, user) {
       
       html += '</div>';
     });
+    html += '</div>';
   } else {
     html += '<div style="color:var(--text-muted);padding:40px;text-align:center;font-size:12px;">No doors found</div>';
   }
@@ -3240,6 +3258,7 @@ function buildClientView(data, user) {
   html += '<span class="panel-title" style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;">Servers</span>';
   html += '</div>';
   if (data.assets && data.assets.servers && data.assets.servers.length > 0) {
+    html += '<div style="overflow-x:auto;">';
     html += '<table class="tbl" style="width:100%;border-collapse:collapse;font-size:12px;">';
     html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Location</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Serial</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Make</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Model</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Storage</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Used</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Health</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Apps</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th></tr></thead>';
     html += '<tbody>';
@@ -3248,11 +3267,10 @@ function buildClientView(data, user) {
       var capacityNum = parseFloat(server.capacity);
       var usedNum = parseFloat(server.used);
       var pct = (!isNaN(capacityNum) && !isNaN(usedNum) && capacityNum > 0) ? Math.round((usedNum / capacityNum) * 100) : 0;
-      var barColor = pct > 85 ? 'red' : pct > 70 ? 'yellow' : 'green';
       var storageDisplay = server.used && server.capacity ? server.used + ' / ' + server.capacity : server.capacity || server.used || '—';
       html += '<tr><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + server.zone + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-family:monospace;font-size:11px;">' + server.serial + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (server.make || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (server.model || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><div style="display:flex;flex-direction:column;gap:2px;"><span>' + storageDisplay + '</span><div style="width:100%;height:4px;background:var(--card-border);border-radius:2px;overflow:hidden;"><div style="height:100%;border-radius:2px;width:' + pct + '%;background:' + (pct > 85 ? '#ef4444' : pct > 70 ? '#f59e0b' : '#22c55e') + ';"></div></div></div></td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (server.used || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);color:' + (server.health && server.health.indexOf('Failed') !== -1 ? '#ef4444' : '#22c55e') + ';">' + (server.health || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (server.apps || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="badge ' + statusBadge + '" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + server.status + '</span></td></tr>';
     });
-    html += '</tbody></table>';
+    html += '</tbody></table></div>';
   } else {
     html += '<div style="color:var(--text-muted);padding:40px;text-align:center;font-size:12px;">No servers found</div>';
   }
@@ -3265,6 +3283,7 @@ function buildClientView(data, user) {
   html += '<span class="panel-title" style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;">Network Switches</span>';
   html += '</div>';
   if (data.assets && data.assets.switches && data.assets.switches.length > 0) {
+    html += '<div style="overflow-x:auto;">';
     html += '<table class="tbl" style="width:100%;border-collapse:collapse;font-size:12px;">';
     html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Name</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Location</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Model</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">IP Address</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">MAC Address</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Firmware</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Ports</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Uptime</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th></tr></thead>';
     html += '<tbody>';
@@ -3273,10 +3292,9 @@ function buildClientView(data, user) {
       var portCount = Math.floor(Math.random() * 8) + 4;
       var totalPorts = 8 + Math.floor(Math.random() * 3) * 8;
       var pct = Math.round((portCount / totalPorts) * 100);
-      var barColor = pct > 85 ? 'red' : pct > 70 ? 'yellow' : 'green';
       html += '<tr><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + sw.name + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + sw.zone + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (sw.model || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-family:monospace;font-size:11px;">' + (sw.ip_address || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-family:monospace;font-size:10px;">' + (sw.mac || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);color:' + (parseFloat(sw.firmware) < 5.0 || (sw.firmware && sw.firmware.indexOf('5.20.15') !== -1) ? '#fbbf24' : 'var(--text-primary)') + ';">' + (sw.firmware || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><div><span>' + portCount + '/' + totalPorts + '</span><div style="width:100%;height:4px;background:var(--card-border);border-radius:2px;overflow:hidden;margin-top:2px;"><div style="height:100%;border-radius:2px;width:' + pct + '%;background:' + (pct > 85 ? '#ef4444' : pct > 70 ? '#f59e0b' : '#22c55e') + ';"></div></div></div></td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span style="font-size:11px;color:var(--text-secondary);">' + (sw.status === 'Online' ? getRandomUptime() + ' · ' + getRandomLatency() + 'ms' : '🔴 Offline') + '</span></td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="badge ' + statusBadge + '" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + sw.status + '</span></td></tr>';
     });
-    html += '</tbody></table>';
+    html += '</tbody></table></div>';
   } else {
     html += '<div style="color:var(--text-muted);padding:40px;text-align:center;font-size:12px;">No switches found</div>';
   }
@@ -3290,6 +3308,7 @@ function buildClientView(data, user) {
   html += '<button onclick="openClientSRModal()" class="btn btn-accent btn-sm" style="font-size:12px;padding:7px 14px;border-radius:6px;background:var(--client-button-gradient);border:none;color:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:var(--font);transition:all 0.15s;white-space:nowrap;box-shadow:0 4px 16px var(--accent-glow);"><i class="ti ti-plus"></i> New Request</button>';
   html += '</div>';
   if (data.srs && data.srs.length > 0) {
+    html += '<div style="overflow-x:auto;">';
     html += '<table class="tbl" style="width:100%;border-collapse:collapse;font-size:12px;">';
     html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">ID</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Subject</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Priority</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Date</th></tr></thead>';
     html += '<tbody>';
@@ -3299,7 +3318,7 @@ function buildClientView(data, user) {
       var statusText = sr.status || 'Open';
       html += '<tr><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-size:11px;color:var(--text-muted);">' + sr.id + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + sr.subject + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="pri-dot ' + priColor + '" style="display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;"></span>' + sr.priority + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="badge ' + statusBadge + '" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + statusText + '</span></td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + sr.date + '</td></tr>';
     });
-    html += '</tbody></table>';
+    html += '</tbody></table></div>';
   } else {
     html += '<div style="color:var(--text-muted);padding:40px;text-align:center;font-size:12px;">No service requests</div>';
   }
@@ -3337,38 +3356,6 @@ function buildClientView(data, user) {
     if (el) el.textContent = fullDateTime();
   }, 30000);
 }
-// ============================================================
-// ── CLIENT TAB SWITCHING ─────────────────────────────────────
-// ============================================================
-
-function switchClientViewTab(tab, el) {
-  var container = document.getElementById('client-view-container');
-  if (!container) return;
-  
-  // Update nav items
-  container.querySelectorAll('.nav-item').forEach(function(item) {
-    item.classList.remove('active');
-    item.style.background = 'transparent';
-    item.style.borderLeft = '2px solid transparent';
-    item.style.color = 'var(--text-secondary)';
-  });
-  
-  if (el) {
-    el.classList.add('active');
-    el.style.background = 'rgba(79,140,247,0.08)';
-    el.style.borderLeft = '2px solid var(--accent)';
-    el.style.color = 'var(--text-primary)';
-  }
-  
-  // Show/hide content
-  container.querySelectorAll('.client-tab-content').forEach(function(content) {
-    content.style.display = 'none';
-  });
-  
-  var target = document.getElementById('client-tab-' + tab);
-  if (target) target.style.display = 'block';
-}
-
 // ============================================================
 // ── CLIENT SR MODAL ──────────────────────────────────────────
 // ============================================================
