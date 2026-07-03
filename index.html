@@ -2912,6 +2912,10 @@ function buildClientView(data, user) {
   var primaryColor = data.color || '#e31b23';
   var secondaryColor = data.secondary || '#8b0000';
   
+  // Apply client colors to the container
+  container.style.setProperty('--client-primary', primaryColor);
+  container.style.setProperty('--client-secondary', secondaryColor);
+  
   var html = '';
   
   // Get time of day for greeting
@@ -2924,59 +2928,67 @@ function buildClientView(data, user) {
   
   var clientName = data.name || 'Client';
   
-  // Header with etech logo and client name
-  html += '<div style="background:linear-gradient(135deg, ' + primaryColor + ', ' + secondaryColor + ');padding:12px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0;">';
+  // Header with client branding - KFTL logo on left, ETECH logo on right
+  html += '<div style="background:linear-gradient(135deg, ' + primaryColor + ', ' + secondaryColor + ');padding:12px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0;min-height:60px;">';
+  
+  // Left side - Client logo and name
   html += '<div style="display:flex;align-items:center;gap:14px;">';
-  // etech logo (light version)
+  html += '<img src="' + (data.logo || 'logo.png') + '" style="height:32px;width:auto;" onerror="this.style.display=\'none\'" />';
+  html += '<span style="color:#fff;font-size:16px;font-weight:600;">' + clientName + ' Portal</span>';
+  html += '</div>';
+  
+  // Right side - ETECH logo (light mode) and logout
+  html += '<div style="display:flex;align-items:center;gap:16px;">';
   html += '<div style="display:flex;align-items:center;gap:6px;">';
-  html += '<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">';
-  html += '<rect width="32" height="32" rx="6" fill="white" opacity="0.2"/>';
+  html += '<svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">';
+  html += '<rect width="32" height="32" rx="6" fill="white" opacity="0.15"/>';
   html += '<path d="M8 22L16 8L24 22H8Z" fill="white" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>';
   html += '<circle cx="16" cy="18" r="4" fill="' + primaryColor + '" stroke="white" stroke-width="1.5"/>';
   html += '</svg>';
-  html += '<span style="color:rgba(255,255,255,0.9);font-size:14px;font-weight:600;letter-spacing:0.5px;">ETECH</span>';
+  html += '<span style="color:rgba(255,255,255,0.85);font-size:13px;font-weight:600;letter-spacing:0.5px;">ETECH</span>';
   html += '</div>';
-  html += '<span style="color:rgba(255,255,255,0.3);font-size:20px;">|</span>';
-  html += '<span style="color:#fff;font-size:16px;font-weight:500;">' + clientName + ' Portal</span>';
-  html += '</div>';
-  html += '<div style="display:flex;align-items:center;gap:12px;">';
+  html += '<span style="color:rgba(255,255,255,0.2);font-size:18px;">|</span>';
   html += '<span style="color:rgba(255,255,255,0.8);font-size:12px;">' + (user ? user.client : 'Client') + '</span>';
-  html += '<button onclick="logoutClientView()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:4px 14px;border-radius:4px;cursor:pointer;font-size:11px;font-family:var(--font);transition:all 0.2s;" onmouseover="this.style.background=\'rgba(255,255,255,0.25)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.15)\'">Logout</button>';
+  html += '<button onclick="logoutClientView()" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:4px 14px;border-radius:4px;cursor:pointer;font-size:11px;font-family:var(--font);transition:all 0.2s;" onmouseover="this.style.background=\'rgba(255,255,255,0.25)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.12)\'">Logout</button>';
   html += '</div>';
   html += '</div>';
   
   // Main layout with sidebar and content
-  html += '<div style="display:flex;flex:1;overflow:hidden;">';
+  html += '<div style="display:flex;flex:1;overflow:hidden;min-height:0;">';
   
-  // Sidebar
-  html += '<div style="width:200px;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);padding:12px 0;overflow-y:auto;flex-shrink:0;">';
-  html += '<div class="nav-section" style="padding:8px 16px 4px;">Menu</div>';
-  html += '<div class="nav-item active" onclick="switchClientViewTab(\'dashboard\', this)" style="padding:8px 16px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;"><i class="ti ti-layout-dashboard"></i> <span>Dashboard</span></div>';
+  // Sidebar - matching admin style
+  html += '<div style="width:200px;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);padding:12px 0;overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;">';
+  
+  // Navigation section
+  html += '<div class="nav-section" style="padding:8px 20px 4px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;">Main</div>';
+  html += '<div class="nav-item active" onclick="switchClientViewTab(\'dashboard\', this)" style="padding:9px 20px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;border-left:2px solid var(--accent);background:rgba(79,140,247,0.08);"><i class="ti ti-layout-dashboard" style="font-size:17px;width:20px;text-align:center;"></i> <span>Dashboard</span></div>';
   
   if (data.assets && data.assets.cameras && data.assets.cameras.length > 0) {
-    html += '<div class="nav-item" onclick="switchClientViewTab(\'cameras\', this)" style="padding:8px 16px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;"><i class="ti ti-video"></i> <span>Cameras</span></div>';
+    html += '<div class="nav-item" onclick="switchClientViewTab(\'cameras\', this)" style="padding:9px 20px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;border-left:2px solid transparent;"><i class="ti ti-video" style="font-size:17px;width:20px;text-align:center;"></i> <span>Cameras</span></div>';
   }
   if (data.assets && data.assets.doors && data.assets.doors.length > 0) {
-    html += '<div class="nav-item" onclick="switchClientViewTab(\'doors\', this)" style="padding:8px 16px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;"><i class="ti ti-door"></i> <span>Access Control</span></div>';
+    html += '<div class="nav-item" onclick="switchClientViewTab(\'doors\', this)" style="padding:9px 20px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;border-left:2px solid transparent;"><i class="ti ti-door" style="font-size:17px;width:20px;text-align:center;"></i> <span>Access Control</span></div>';
   }
   if (data.assets && data.assets.servers && data.assets.servers.length > 0) {
-    html += '<div class="nav-item" onclick="switchClientViewTab(\'servers\', this)" style="padding:8px 16px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;"><i class="ti ti-server"></i> <span>Servers</span></div>';
+    html += '<div class="nav-item" onclick="switchClientViewTab(\'servers\', this)" style="padding:9px 20px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;border-left:2px solid transparent;"><i class="ti ti-server" style="font-size:17px;width:20px;text-align:center;"></i> <span>Servers</span></div>';
   }
   if (data.assets && data.assets.switches && data.assets.switches.length > 0) {
-    html += '<div class="nav-item" onclick="switchClientViewTab(\'switches\', this)" style="padding:8px 16px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;"><i class="ti ti-router"></i> <span>Switches</span></div>';
-  }
-  if (data.srs && data.srs.length > 0) {
-    html += '<div class="nav-item" onclick="switchClientViewTab(\'srs\', this)" style="padding:8px 16px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;"><i class="ti ti-clipboard-list"></i> <span>Service Requests</span></div>';
+    html += '<div class="nav-item" onclick="switchClientViewTab(\'switches\', this)" style="padding:9px 20px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;border-left:2px solid transparent;"><i class="ti ti-router" style="font-size:17px;width:20px;text-align:center;"></i> <span>Switches</span></div>';
   }
   
-  html += '<div class="nav-section" style="padding:8px 16px 4px;margin-top:8px;">Support</div>';
-  html += '<div class="nav-item" onclick="switchClientViewTab(\'support\', this)" style="padding:8px 16px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;"><i class="ti ti-headset"></i> <span>Contact Support</span></div>';
+  html += '<div class="nav-section" style="padding:8px 20px 4px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-top:4px;">Support</div>';
+  html += '<div class="nav-item" onclick="switchClientViewTab(\'srs\', this)" style="padding:9px 20px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;border-left:2px solid transparent;"><i class="ti ti-clipboard-list" style="font-size:17px;width:20px;text-align:center;"></i> <span>Service Requests</span></div>';
+  html += '<div class="nav-item" onclick="switchClientViewTab(\'support\', this)" style="padding:9px 20px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;border-left:2px solid transparent;"><i class="ti ti-headset" style="font-size:17px;width:20px;text-align:center;"></i> <span>Contact Support</span></div>';
+  
+  // Spacer to push content up
+  html += '<div style="flex:1;"></div>';
+  
   html += '</div>';
   
   // Content area
-  html += '<div style="flex:1;overflow-y:auto;padding:20px 24px;background:var(--main-bg);" id="client-view-content">';
+  html += '<div style="flex:1;overflow-y:auto;padding:20px 24px;background:var(--main-bg);min-height:0;" id="client-view-content">';
   
-  // Dashboard tab (default)
+  // ===== DASHBOARD TAB =====
   html += '<div id="client-tab-dashboard" class="client-tab-content">';
   
   // Warm greeting
@@ -2986,17 +2998,18 @@ function buildClientView(data, user) {
   html += '</div>';
   
   // Stats cards
-  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">';
-  
   var camCount = data.assets && data.assets.cameras ? data.assets.cameras.length : 0;
   var doorCount = data.assets && data.assets.doors ? data.assets.doors.length : 0;
   var serverCount = data.assets && data.assets.servers ? data.assets.servers.length : 0;
+  var swCount = data.assets && data.assets.switches ? data.assets.switches.length : 0;
   var srCount = data.srs ? data.srs.length : 0;
   
-  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:14px 16px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">Cameras</div><div style="font-size:24px;font-weight:600;color:var(--text-primary);">' + camCount + '</div></div>';
-  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:14px 16px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">Doors</div><div style="font-size:24px;font-weight:600;color:var(--text-primary);">' + doorCount + '</div></div>';
-  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:14px 16px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">Servers</div><div style="font-size:24px;font-weight:600;color:var(--text-primary);">' + serverCount + '</div></div>';
-  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:14px 16px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">Service Requests</div><div style="font-size:24px;font-weight:600;color:var(--text-primary);">' + srCount + '</div></div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;">';
+  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:12px 14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">Cameras</div><div style="font-size:22px;font-weight:600;color:var(--text-primary);">' + camCount + '</div></div>';
+  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:12px 14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">Doors</div><div style="font-size:22px;font-weight:600;color:var(--text-primary);">' + doorCount + '</div></div>';
+  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:12px 14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">Servers</div><div style="font-size:22px;font-weight:600;color:var(--text-primary);">' + serverCount + '</div></div>';
+  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:12px 14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">Switches</div><div style="font-size:22px;font-weight:600;color:var(--text-primary);">' + swCount + '</div></div>';
+  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:12px 14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">Service Requests</div><div style="font-size:22px;font-weight:600;color:var(--text-primary);">' + srCount + '</div></div>';
   html += '</div>';
   
   // Activity
@@ -3016,7 +3029,7 @@ function buildClientView(data, user) {
   
   html += '</div>';
   
-  // Cameras tab
+  // ===== CAMERAS TAB =====
   html += '<div id="client-tab-cameras" class="client-tab-content" style="display:none;">';
   html += '<h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">📷 Cameras</h2>';
   if (data.assets && data.assets.cameras && data.assets.cameras.length > 0) {
@@ -3032,7 +3045,7 @@ function buildClientView(data, user) {
   }
   html += '</div>';
   
-  // Doors tab
+  // ===== DOORS TAB =====
   html += '<div id="client-tab-doors" class="client-tab-content" style="display:none;">';
   html += '<h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">🚪 Access Control</h2>';
   if (data.assets && data.assets.doors && data.assets.doors.length > 0) {
@@ -3048,7 +3061,7 @@ function buildClientView(data, user) {
   }
   html += '</div>';
   
-  // Servers tab
+  // ===== SERVERS TAB =====
   html += '<div id="client-tab-servers" class="client-tab-content" style="display:none;">';
   html += '<h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">🖥 Servers</h2>';
   if (data.assets && data.assets.servers && data.assets.servers.length > 0) {
@@ -3064,7 +3077,7 @@ function buildClientView(data, user) {
   }
   html += '</div>';
   
-  // Switches tab
+  // ===== SWITCHES TAB =====
   html += '<div id="client-tab-switches" class="client-tab-content" style="display:none;">';
   html += '<h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">🔌 Switches</h2>';
   if (data.assets && data.assets.switches && data.assets.switches.length > 0) {
@@ -3080,9 +3093,13 @@ function buildClientView(data, user) {
   }
   html += '</div>';
   
-  // Service Requests tab
+  // ===== SERVICE REQUESTS TAB =====
   html += '<div id="client-tab-srs" class="client-tab-content" style="display:none;">';
-  html += '<h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">📋 Service Requests</h2>';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">';
+  html += '<h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin:0;">📋 Service Requests</h2>';
+  html += '<button onclick="openClientSRModal()" style="padding:6px 16px;border-radius:6px;border:none;background:var(--client-button-gradient);color:#fff;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:6px;"><i class="ti ti-plus"></i> New Request</button>';
+  html += '</div>';
+  
   if (data.srs && data.srs.length > 0) {
     html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;overflow:hidden;">';
     html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
@@ -3093,11 +3110,15 @@ function buildClientView(data, user) {
     });
     html += '</tbody></table></div>';
   } else {
-    html += '<div style="color:var(--text-muted);padding:20px;text-align:center;">No service requests</div>';
+    html += '<div style="color:var(--text-muted);padding:40px;text-align:center;background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;">';
+    html += '<div style="font-size:36px;margin-bottom:8px;">📋</div>';
+    html += '<div style="font-size:14px;font-weight:500;color:var(--text-primary);">No service requests</div>';
+    html += '<div style="font-size:12px;">Click "New Request" to submit a support ticket</div>';
+    html += '</div>';
   }
   html += '</div>';
   
-  // Contact Support tab
+  // ===== CONTACT SUPPORT TAB =====
   html += '<div id="client-tab-support" class="client-tab-content" style="display:none;">';
   html += '<div style="max-width:600px;">';
   html += '<h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">📞 Contact Support</h2>';
@@ -3107,18 +3128,172 @@ function buildClientView(data, user) {
   html += '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><i class="ti ti-mail" style="font-size:20px;color:var(--accent);"></i><div><div style="font-weight:500;color:var(--text-primary);">Email</div><div style="color:var(--text-secondary);font-size:13px;">support@etechsystems.com</div></div></div>';
   html += '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;"><i class="ti ti-clock" style="font-size:20px;color:var(--accent);"></i><div><div style="font-weight:500;color:var(--text-primary);">Hours</div><div style="color:var(--text-secondary);font-size:13px;">24/7 — Always available</div></div></div>';
   html += '</div>';
-  html += '<div style="margin-top:16px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:16px 20px;">';
-  html += '<div style="font-weight:500;color:var(--text-primary);margin-bottom:8px;">📩 Quick Support Request</div>';
-  html += '<textarea style="width:100%;background:var(--select-bg);border:1px solid var(--select-border);border-radius:6px;color:var(--select-color);padding:10px 12px;font-size:12px;font-family:var(--font);resize:vertical;min-height:80px;" placeholder="Describe your issue..."></textarea>';
-  html += '<button style="margin-top:8px;padding:8px 20px;border-radius:6px;border:none;background:var(--client-button-gradient);color:#fff;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);">Send Message</button>';
-  html += '</div>';
   html += '</div></div>';
   
   html += '</div></div>';
   
   container.innerHTML = html;
+  
+  // Set initial active state styles
+  var activeItem = container.querySelector('.nav-item.active');
+  if (activeItem) {
+    activeItem.style.background = 'rgba(79,140,247,0.08)';
+    activeItem.style.borderLeft = '2px solid var(--accent)';
+    activeItem.style.color = 'var(--text-primary)';
+  }
 }
 
+// ============================================================
+// ── CLIENT TAB SWITCHING ─────────────────────────────────────
+// ============================================================
+
+function switchClientViewTab(tab, el) {
+  var container = document.getElementById('client-view-container');
+  if (!container) return;
+  
+  // Update nav items
+  container.querySelectorAll('.nav-item').forEach(function(item) {
+    item.classList.remove('active');
+    item.style.background = 'transparent';
+    item.style.borderLeft = '2px solid transparent';
+    item.style.color = 'var(--text-secondary)';
+  });
+  
+  if (el) {
+    el.classList.add('active');
+    el.style.background = 'rgba(79,140,247,0.08)';
+    el.style.borderLeft = '2px solid var(--accent)';
+    el.style.color = 'var(--text-primary)';
+  }
+  
+  // Show/hide content
+  container.querySelectorAll('.client-tab-content').forEach(function(content) {
+    content.style.display = 'none';
+  });
+  
+  var target = document.getElementById('client-tab-' + tab);
+  if (target) target.style.display = 'block';
+}
+
+// ============================================================
+// ── CLIENT SR MODAL ──────────────────────────────────────────
+// ============================================================
+
+function openClientSRModal() {
+  // Create modal overlay
+  var overlay = document.createElement('div');
+  overlay.id = 'client-sr-modal';
+  overlay.className = 'modal-overlay open';
+  overlay.innerHTML = `
+    <div class="modal">
+      <button class="modal-close" onclick="closeClientSRModal()"><i class="ti ti-x"></i></button>
+      <div class="modal-title">📋 New Service Request</div>
+      <div class="modal-sub">Submit a support request for your client</div>
+      <div class="modal-section">
+        <div class="modal-grid">
+          <div class="modal-field"><label>Subject *</label><input type="text" id="client-sr-subject" placeholder="Brief description of the issue" /></div>
+          <div class="modal-field"><label>Category</label><select id="client-sr-category"><option value="Camera">Camera</option><option value="Access Control">Access Control</option><option value="Server">Server</option><option value="Network">Network</option><option value="Power">Power</option><option value="Other">Other</option></select></div>
+          <div class="modal-field"><label>Priority</label><select id="client-sr-priority"><option value="High">🔴 High</option><option value="Medium" selected>🟡 Medium</option><option value="Low">🟢 Low</option></select></div>
+          <div class="modal-field"><label>Site</label><input type="text" id="client-sr-site" placeholder="Site location" /></div>
+        </div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Description</div>
+        <textarea id="client-sr-description" placeholder="Detailed description of the issue…" style="width:100%;background:var(--select-bg);border:1px solid var(--select-border);border-radius:6px;color:var(--select-color);font-size:12px;padding:10px 12px;min-height:100px;font-family:var(--font);resize:vertical;"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeClientSRModal()">Cancel</button>
+        <button class="btn btn-accent" onclick="submitClientSR()"><i class="ti ti-device-floppy"></i> Submit Request</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function closeClientSRModal() {
+  var modal = document.getElementById('client-sr-modal');
+  if (modal) modal.remove();
+}
+
+function submitClientSR() {
+  var subject = document.getElementById('client-sr-subject').value.trim();
+  var category = document.getElementById('client-sr-category').value;
+  var priority = document.getElementById('client-sr-priority').value;
+  var site = document.getElementById('client-sr-site').value.trim() || 'Unknown';
+  var description = document.getElementById('client-sr-description').value.trim();
+  
+  if (!subject) {
+    toast('Please enter a subject', 'warning');
+    return;
+  }
+  
+  var clientName = clientViewData ? clientViewData.name : 'Client';
+  
+  var id = 'SR-' + String(Math.floor(Math.random() * 9000) + 1000);
+  var newSR = {
+    id: id,
+    client: clientName,
+    site: site,
+    subject: subject,
+    from: clientViewUser ? clientViewUser.client : 'Client User',
+    category: category,
+    priority: priority,
+    status: 'Open',
+    assigned: getDefaultAssignee(),
+    received: new Date().toLocaleDateString('en-JM'),
+    body: description || '',
+    notes: '',
+    hardware: [],
+    history: [{ time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }), msg: 'Created by client' }],
+    attachments: []
+  };
+  
+  SERVICE_REQUESTS.unshift(newSR);
+  localStorage.setItem('ccsm_sr', JSON.stringify(SERVICE_REQUESTS));
+  
+  // Add to client's own SR list
+  if (clientViewData && clientViewData.srs) {
+    clientViewData.srs.unshift({
+      id: id,
+      subject: subject,
+      priority: priority,
+      status: 'Open',
+      date: new Date().toLocaleDateString('en-JM')
+    });
+  }
+  
+  closeClientSRModal();
+  toast('Service Request ' + id + ' submitted!', 'success');
+  
+  // Rebuild client view to show new SR
+  buildClientView(clientViewData, clientViewUser);
+  // Switch to SRS tab
+  var container = document.getElementById('client-view-container');
+  if (container) {
+    var srsTab = container.querySelector('.nav-item[onclick*="srs"]');
+    if (srsTab) switchClientViewTab('srs', srsTab);
+  }
+}
+
+// ============================================================
+// ── CLIENT VIEW LOGOUT ──────────────────────────────────────
+// ============================================================
+
+function logoutClientView() {
+  clientViewUser = null;
+  clientViewData = null;
+  var container = document.getElementById('client-view-container');
+  if (container) {
+    container.style.display = 'none';
+    container.innerHTML = '';
+  }
+  document.querySelector('.app').classList.remove('client-mode');
+  document.documentElement.style.setProperty('--client-primary', '#4f8cf7');
+  document.documentElement.style.setProperty('--client-secondary', '#00d4ff');
+  document.documentElement.style.setProperty('--client-gradient', 'linear-gradient(135deg, #4f8cf7, #00d4ff)');
+  showLogin();
+  toast('Logged out from client view', 'info');
+}
 // ============================================================
 // ── CLIENT VIEW TAB SWITCHING ──────────────────────────────
 // ============================================================
