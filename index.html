@@ -3111,11 +3111,11 @@ function buildClientView(data, user) {
   html += '</div>';
   if (data.assets && data.assets.cameras && data.assets.cameras.length > 0) {
     html += '<table class="tbl" style="width:100%;border-collapse:collapse;font-size:12px;">';
-    html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Zone</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Camera</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">IP</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Model</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Resolution</th></tr></thead>';
+    html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Zone</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Camera</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">IP</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Comments</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Model</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Manufacturer</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Resolution</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Archiver</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">MAC Address</th></tr></thead>';
     html += '<tbody>';
     data.assets.cameras.forEach(function(cam) {
       var statusBadge = cam.status === 'Online' ? 'b-done' : cam.status === 'Defective' ? 'b-high' : cam.status === 'No Power' ? 'b-high' : cam.status === 'No Camera' ? 'b-open' : 'b-info';
-      html += '<tr><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + cam.zone + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + cam.name + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-family:monospace;font-size:11px;">' + (cam.ip || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="badge ' + statusBadge + '" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + cam.status + '</span></td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.model || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.resolution || '—') + '</td></tr>';
+      html += '<tr><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + cam.zone + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + cam.name + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-family:monospace;font-size:11px;">' + (cam.ip || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="badge ' + statusBadge + '" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + cam.status + '</span></td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.comments || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.model || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.manufacturer || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.resolution || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.archiver || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-family:monospace;font-size:10px;">' + (cam.mac_address || '—') + '</td></tr>';
     });
     html += '</tbody></table>';
   } else {
@@ -3125,23 +3125,113 @@ function buildClientView(data, user) {
   
   // ===== DOORS TAB =====
   html += '<div id="client-tab-doors" class="client-tab-content" style="display:none;">';
-  html += '<div class="panel" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px 20px;position:relative;">';
-  html += '<div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">';
-  html += '<span class="panel-title" style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;">Access Control — Doors</span>';
-  html += '</div>';
+  
+  // Build door cards
   if (data.assets && data.assets.doors && data.assets.doors.length > 0) {
-    html += '<table class="tbl" style="width:100%;border-collapse:collapse;font-size:12px;">';
-    html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Name</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Site</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Door Swing</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Technician</th></tr></thead>';
-    html += '<tbody>';
-    data.assets.doors.forEach(function(door) {
+    data.assets.doors.forEach(function(door, index) {
       var statusBadge = door.status === 'Online' ? 'b-done' : door.status === 'Offline' ? 'b-high' : 'b-under-maintenance';
-      html += '<tr><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + door.name + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + door.zone + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="badge ' + statusBadge + '" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + door.status + '</span></td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (door.doorSwing || 'In') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (door.tech || 'Unassigned') + '</td></tr>';
+      var readerStatus = door.reader_status || door.status || 'Online';
+      var lockStatus = door.lock_status || door.status || 'Online';
+      var sensorStatus = door.sensor_status || 'Online';
+      var closerStatus = door.closer_status || 'Online';
+      
+      html += '<div class="panel" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px 20px;position:relative;margin-bottom:14px;">';
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">';
+      html += '<div style="display:flex;align-items:center;gap:12px;">';
+      html += '<span style="font-size:20px;">🚪</span>';
+      html += '<div><span style="font-weight:600;color:var(--text-primary);font-size:15px;">' + door.name + '</span>';
+      html += '<span style="margin-left:10px;font-size:12px;color:var(--text-muted);">' + (door.zone || '—') + ' · ' + (door.client || '—') + '</span></div>';
+      html += '<span class="badge ' + statusBadge + '" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + door.status + '</span>';
+      html += '<span style="font-size:10px;background:var(--select-bg);padding:2px 8px;border-radius:10px;border:1px solid var(--card-border);color:var(--text-secondary);">Swing: ' + (door.doorSwing || 'In') + '</span>';
+      html += '</div>';
+      html += '<span style="font-size:11px;color:var(--text-muted);">' + (door.tech || 'Unassigned') + '</span>';
+      html += '</div>';
+      
+      // Reader Section
+      html += '<div class="door-component-section" style="margin-bottom:12px;border-left:3px solid #3b82f6;padding-left:12px;">';
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
+      html += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">📡 Reader</span>';
+      html += '<span class="status-badge ' + (readerStatus === 'Online' ? 'good' : readerStatus === 'Offline' ? 'critical' : 'warning') + '" style="font-size:9px;padding:1px 8px;">' + readerStatus + '</span>';
+      html += '</div>';
+      html += '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:4px 12px;font-size:12px;">';
+      html += '<div><span style="color:var(--text-muted);">Reader Type:</span> <span style="color:var(--text-primary);">' + (door.reader || 'HID Prox') + '</span></div>';
+      html += '<div><span style="color:var(--text-muted);">Controller Port:</span> <span style="color:var(--text-primary);">' + (door.reader_port || 'Port 1') + '</span></div>';
+      html += '<div><span style="color:var(--text-muted);">Model:</span> <span style="color:var(--text-primary);">' + (door.reader_model || '—') + '</span></div>';
+      html += '<div><span style="color:var(--text-muted);">Warranty:</span> <span style="color:var(--text-primary);">' + getWarrantyDisplay(door.reader_warranty) + '</span></div>';
+      html += '</div></div>';
+      
+      // Access Type Section
+      html += '<div class="door-component-section" style="margin-bottom:12px;border-left:3px solid #8b5cf6;padding-left:12px;">';
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
+      html += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">🔑 Access Type</span>';
+      html += '</div>';
+      html += '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:4px 12px;font-size:12px;">';
+      html += '<div><span style="color:var(--text-muted);">Access Type:</span> <span style="color:var(--text-primary);">' + (door.accessType || 'Read In + Read Out') + '</span></div>';
+      html += '<div><span style="color:var(--text-muted);">Door Swing:</span> <span style="color:var(--text-primary);">' + (door.doorSwing || 'In') + '</span></div>';
+      html += '<div><span style="color:var(--text-muted);">Anti-Passback:</span> <span style="color:var(--text-primary);">' + (door.antiPassback || 'No') + '</span></div>';
+      html += '</div></div>';
+      
+      // Lock Section
+      html += '<div class="door-component-section" style="margin-bottom:12px;border-left:3px solid #f59e0b;padding-left:12px;">';
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
+      html += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">🔒 Lock</span>';
+      html += '<span class="status-badge ' + (lockStatus === 'Online' ? 'good' : lockStatus === 'Offline' ? 'critical' : 'warning') + '" style="font-size:9px;padding:1px 8px;">' + lockStatus + '</span>';
+      html += '</div>';
+      html += '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:4px 12px;font-size:12px;">';
+      html += '<div><span style="color:var(--text-muted);">Lock Size:</span> <span style="color:var(--text-primary);">' + (door.lock_type || '600lb') + '</span></div>';
+      html += '<div><span style="color:var(--text-muted);">Model:</span> <span style="color:var(--text-primary);">' + (door.lock_model || '—') + '</span></div>';
+      html += '<div><span style="color:var(--text-muted);">Warranty:</span> <span style="color:var(--text-primary);">' + getWarrantyDisplay(door.lock_warranty) + '</span></div>';
+      html += '</div></div>';
+      
+      // Sensor Section
+      html += '<div class="door-component-section" style="margin-bottom:12px;border-left:3px solid #22c55e;padding-left:12px;">';
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
+      html += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">🚪 Door Sensor</span>';
+      html += '<span class="status-badge ' + (sensorStatus === 'Online' ? 'good' : sensorStatus === 'Offline' ? 'critical' : 'warning') + '" style="font-size:9px;padding:1px 8px;">' + sensorStatus + '</span>';
+      html += '</div>';
+      html += '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:4px 12px;font-size:12px;">';
+      html += '<div><span style="color:var(--text-muted);">Sensor Type:</span> <span style="color:var(--text-primary);">' + (door.sensor_type || 'Magnetic') + '</span></div>';
+      html += '<div><span style="color:var(--text-muted);">Model:</span> <span style="color:var(--text-primary);">' + (door.sensor_model || '—') + '</span></div>';
+      html += '<div><span style="color:var(--text-muted);">Warranty:</span> <span style="color:var(--text-primary);">' + getWarrantyDisplay(door.sensor_warranty) + '</span></div>';
+      html += '</div></div>';
+      
+      // Closer Section
+      html += '<div class="door-component-section" style="margin-bottom:4px;border-left:3px solid #ec4899;padding-left:12px;">';
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
+      html += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">🚪 Door Closer</span>';
+      html += '<span class="status-badge ' + (closerStatus === 'Online' ? 'good' : closerStatus === 'Offline' ? 'critical' : 'warning') + '" style="font-size:9px;padding:1px 8px;">' + closerStatus + '</span>';
+      html += '</div>';
+      html += '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:4px 12px;font-size:12px;">';
+      html += '<div><span style="color:var(--text-muted);">Closer Type:</span> <span style="color:var(--text-primary);">' + (door.closer_type || 'Hydraulic') + '</span></div>';
+      html += '<div><span style="color:var(--text-muted);">Model:</span> <span style="color:var(--text-primary);">' + (door.closer_model || '—') + '</span></div>';
+      html += '<div><span style="color:var(--text-muted);">Warranty:</span> <span style="color:var(--text-primary);">' + getWarrantyDisplay(door.closer_warranty) + '</span></div>';
+      html += '</div></div>';
+      
+      if (door.comments) {
+        html += '<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--card-border);font-size:12px;color:var(--text-secondary);">';
+        html += '<span style="color:var(--text-muted);">📝 Notes:</span> ' + door.comments;
+        html += '</div>';
+      }
+      
+      html += '<div style="display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--card-border);flex-wrap:wrap;">';
+      html += '<button class="btn btn-sm" onclick="editDoorComponent(' + index + ', \'controller\')"><i class="ti ti-edit"></i> Edit Controller</button>';
+      html += '<button class="btn btn-sm" onclick="editDoorComponent(' + index + ', \'reader\')"><i class="ti ti-edit"></i> Edit Reader</button>';
+      html += '<button class="btn btn-sm" onclick="editDoorComponent(' + index + ', \'accessType\')"><i class="ti ti-edit"></i> Edit Access Type</button>';
+      html += '<button class="btn btn-sm" onclick="editDoorComponent(' + index + ', \'lock\')"><i class="ti ti-edit"></i> Edit Lock</button>';
+      html += '<button class="btn btn-sm" onclick="editDoorComponent(' + index + ', \'sensor\')"><i class="ti ti-edit"></i> Edit Sensor</button>';
+      html += '<button class="btn btn-sm" onclick="editDoorComponent(' + index + ', \'closer\')"><i class="ti ti-edit"></i> Edit Closer</button>';
+      if (door.ip) {
+        html += '<button class="btn btn-sm" onclick="pingDoorIP(\'' + door.ip + '\')"><i class="ti ti-network"></i> Ping</button>';
+      }
+      html += '</div>';
+      
+      html += '</div>';
     });
-    html += '</tbody></table>';
   } else {
     html += '<div style="color:var(--text-muted);padding:40px;text-align:center;font-size:12px;">No doors found</div>';
   }
-  html += '</div></div>';
+  
+  html += '</div>';
   
   // ===== SERVERS TAB =====
   html += '<div id="client-tab-servers" class="client-tab-content" style="display:none;">';
@@ -3151,11 +3241,16 @@ function buildClientView(data, user) {
   html += '</div>';
   if (data.assets && data.assets.servers && data.assets.servers.length > 0) {
     html += '<table class="tbl" style="width:100%;border-collapse:collapse;font-size:12px;">';
-    html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Serial</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Location</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Model</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Storage</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Health</th></tr></thead>';
+    html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Location</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Serial</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Make</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Model</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Storage</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Used</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Health</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Apps</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th></tr></thead>';
     html += '<tbody>';
     data.assets.servers.forEach(function(server) {
       var statusBadge = server.status === 'ONLINE' ? 'b-done' : 'b-high';
-      html += '<tr><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-family:monospace;font-size:11px;">' + server.serial + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + server.zone + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="badge ' + statusBadge + '" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + server.status + '</span></td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (server.model || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (server.capacity || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (server.health || '—') + '</td></tr>';
+      var capacityNum = parseFloat(server.capacity);
+      var usedNum = parseFloat(server.used);
+      var pct = (!isNaN(capacityNum) && !isNaN(usedNum) && capacityNum > 0) ? Math.round((usedNum / capacityNum) * 100) : 0;
+      var barColor = pct > 85 ? 'red' : pct > 70 ? 'yellow' : 'green';
+      var storageDisplay = server.used && server.capacity ? server.used + ' / ' + server.capacity : server.capacity || server.used || '—';
+      html += '<tr><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + server.zone + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-family:monospace;font-size:11px;">' + server.serial + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (server.make || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (server.model || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><div style="display:flex;flex-direction:column;gap:2px;"><span>' + storageDisplay + '</span><div style="width:100%;height:4px;background:var(--card-border);border-radius:2px;overflow:hidden;"><div style="height:100%;border-radius:2px;width:' + pct + '%;background:' + (pct > 85 ? '#ef4444' : pct > 70 ? '#f59e0b' : '#22c55e') + ';"></div></div></div></td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (server.used || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);color:' + (server.health && server.health.indexOf('Failed') !== -1 ? '#ef4444' : '#22c55e') + ';">' + (server.health || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (server.apps || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="badge ' + statusBadge + '" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + server.status + '</span></td></tr>';
     });
     html += '</tbody></table>';
   } else {
@@ -3171,11 +3266,15 @@ function buildClientView(data, user) {
   html += '</div>';
   if (data.assets && data.assets.switches && data.assets.switches.length > 0) {
     html += '<table class="tbl" style="width:100%;border-collapse:collapse;font-size:12px;">';
-    html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Name</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Location</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Model</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">IP</th></tr></thead>';
+    html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Name</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Location</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Model</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">IP Address</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">MAC Address</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Firmware</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Ports</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Uptime</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th></tr></thead>';
     html += '<tbody>';
     data.assets.switches.forEach(function(sw) {
       var statusBadge = sw.status === 'Online' ? 'b-done' : 'b-high';
-      html += '<tr><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + sw.name + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + sw.zone + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="badge ' + statusBadge + '" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + sw.status + '</span></td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (sw.model || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-family:monospace;font-size:11px;">' + (sw.ip_address || '—') + '</td></tr>';
+      var portCount = Math.floor(Math.random() * 8) + 4;
+      var totalPorts = 8 + Math.floor(Math.random() * 3) * 8;
+      var pct = Math.round((portCount / totalPorts) * 100);
+      var barColor = pct > 85 ? 'red' : pct > 70 ? 'yellow' : 'green';
+      html += '<tr><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + sw.name + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + sw.zone + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (sw.model || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-family:monospace;font-size:11px;">' + (sw.ip_address || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-family:monospace;font-size:10px;">' + (sw.mac || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);color:' + (parseFloat(sw.firmware) < 5.0 || (sw.firmware && sw.firmware.indexOf('5.20.15') !== -1) ? '#fbbf24' : 'var(--text-primary)') + ';">' + (sw.firmware || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><div><span>' + portCount + '/' + totalPorts + '</span><div style="width:100%;height:4px;background:var(--card-border);border-radius:2px;overflow:hidden;margin-top:2px;"><div style="height:100%;border-radius:2px;width:' + pct + '%;background:' + (pct > 85 ? '#ef4444' : pct > 70 ? '#f59e0b' : '#22c55e') + ';"></div></div></div></td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span style="font-size:11px;color:var(--text-secondary);">' + (sw.status === 'Online' ? getRandomUptime() + ' · ' + getRandomLatency() + 'ms' : '🔴 Offline') + '</span></td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="badge ' + statusBadge + '" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + sw.status + '</span></td></tr>';
     });
     html += '</tbody></table>';
   } else {
@@ -3238,7 +3337,6 @@ function buildClientView(data, user) {
     if (el) el.textContent = fullDateTime();
   }, 30000);
 }
-
 // ============================================================
 // ── CLIENT TAB SWITCHING ─────────────────────────────────────
 // ============================================================
