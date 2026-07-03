@@ -2915,7 +2915,7 @@ function buildClientView(data, user) {
   var html = '';
   
   // Header with client branding
-  html += '<div style="background:linear-gradient(135deg, ' + primaryColor + ', ' + secondaryColor + ');padding:16px 24px;display:flex;align-items:center;justify-content:space-between;">';
+  html += '<div style="background:linear-gradient(135deg, ' + primaryColor + ', ' + secondaryColor + ');padding:16px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.1);">';
   html += '<div style="display:flex;align-items:center;gap:12px;">';
   html += '<img src="' + (data.logo || 'logo.png') + '" style="height:36px;width:auto;" onerror="this.style.display=\'none\'" />';
   html += '<span style="color:#fff;font-size:18px;font-weight:600;">' + data.name + '</span>';
@@ -2926,17 +2926,17 @@ function buildClientView(data, user) {
   html += '</div>';
   html += '</div>';
   
-  // Stats
+  // Stats row
   var totalCameras = data.assets && data.assets.cameras ? data.assets.cameras.length : 0;
   var totalDoors = data.assets && data.assets.doors ? data.assets.doors.length : 0;
   var totalServers = data.assets && data.assets.servers ? data.assets.servers.length : 0;
   var totalSwitches = data.assets && data.assets.switches ? data.assets.switches.length : 0;
   
-  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:16px 24px;background:var(--card-bg);border-bottom:1px solid var(--card-border);">';
-  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:6px;padding:10px 14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Cameras</div><div style="font-size:22px;font-weight:600;color:var(--text-primary);">' + totalCameras + '</div></div>';
-  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:6px;padding:10px 14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Doors</div><div style="font-size:22px;font-weight:600;color:var(--text-primary);">' + totalDoors + '</div></div>';
-  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:6px;padding:10px 14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Servers</div><div style="font-size:22px;font-weight:600;color:var(--text-primary);">' + totalServers + '</div></div>';
-  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:6px;padding:10px 14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Switches</div><div style="font-size:22px;font-weight:600;color:var(--text-primary);">' + totalSwitches + '</div></div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px 24px;background:var(--card-bg);border-bottom:1px solid var(--card-border);">';
+  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:6px;padding:10px 14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Cameras</div><div style="font-size:20px;font-weight:600;color:var(--text-primary);">' + totalCameras + '</div></div>';
+  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:6px;padding:10px 14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Doors</div><div style="font-size:20px;font-weight:600;color:var(--text-primary);">' + totalDoors + '</div></div>';
+  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:6px;padding:10px 14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Servers</div><div style="font-size:20px;font-weight:600;color:var(--text-primary);">' + totalServers + '</div></div>';
+  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:6px;padding:10px 14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Switches</div><div style="font-size:20px;font-weight:600;color:var(--text-primary);">' + totalSwitches + '</div></div>';
   html += '</div>';
   
   // Content
@@ -2994,6 +2994,20 @@ function buildClientView(data, user) {
   html += '</div>';
   
   container.innerHTML = html;
+}
+
+// ============================================================
+// ── CLIENT VIEW LOGOUT ──────────────────────────────────────
+// ============================================================
+
+function logoutClientView() {
+  clientViewUser = null;
+  clientViewData = null;
+  document.getElementById('client-view-container').style.display = 'none';
+  document.getElementById('client-view-container').innerHTML = '';
+  document.querySelector('.app').classList.remove('client-mode');
+  showLogin();
+  toast('Logged out from client view', 'info');
 }
 
 // ============================================================
