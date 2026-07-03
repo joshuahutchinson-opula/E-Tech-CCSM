@@ -2963,20 +2963,7 @@ function buildClientView(data, user) {
   html += '</div>';
   
   // Right side - ETECH logo and logout
-  html += '<div style="display:flex;align-items:center;gap:16px;">';
-  html += '<div style="display:flex;align-items:center;gap:6px;">';
-  html += '<svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">';
-  html += '<rect width="32" height="32" rx="6" fill="white" opacity="0.15"/>';
-  html += '<path d="M8 22L16 8L24 22H8Z" fill="white" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>';
-  html += '<circle cx="16" cy="18" r="4" fill="' + primaryColor + '" stroke="white" stroke-width="1.5"/>';
-  html += '</svg>';
-  html += '<span style="color:rgba(255,255,255,0.85);font-size:13px;font-weight:600;letter-spacing:0.5px;">ETECH</span>';
-  html += '</div>';
-  html += '<span style="color:rgba(255,255,255,0.2);font-size:18px;">|</span>';
-  html += '<span style="color:rgba(255,255,255,0.8);font-size:12px;">' + (user ? user.client : 'Client') + '</span>';
-  html += '<button onclick="logoutClientView()" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:4px 14px;border-radius:4px;cursor:pointer;font-size:11px;font-family:var(--font);transition:all 0.2s;" onmouseover="this.style.background=\'rgba(255,255,255,0.25)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.12)\'">Logout</button>';
-  html += '</div>';
-  html += '</div>';
+html += '<img src="logo-light.png" style="height:28px;width:auto;" onerror="this.style.display=\'none\'" />';
   
   // Main layout with sidebar and content
   html += '<div style="display:flex;flex:1;overflow:hidden;min-height:0;">';
