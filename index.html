@@ -3343,6 +3343,34 @@ function buildClientView(data, user) {
     activeItem.style.color = 'var(--text-primary)';
   }
 }
+// Add this function - paste it anywhere after the buildClientView() function
+
+function switchClientViewTab(tab, element) {
+  // Update active state
+  document.querySelectorAll('#client-view-container .nav-item').forEach(function(el) {
+    el.classList.remove('active');
+    el.style.background = '';
+    el.style.borderLeft = '2px solid transparent';
+    el.style.color = 'var(--text-secondary)';
+  });
+  
+  if (element) {
+    element.classList.add('active');
+    element.style.background = 'rgba(79,140,247,0.08)';
+    element.style.borderLeft = '2px solid var(--accent)';
+    element.style.color = 'var(--text-primary)';
+  }
+  
+  // Show the right tab content
+  document.querySelectorAll('#client-view-container .client-tab-content').forEach(function(el) {
+    el.style.display = 'none';
+  });
+  
+  var target = document.getElementById('client-tab-' + tab);
+  if (target) {
+    target.style.display = 'block';
+  }
+}
 // ============================================================
 // ── CLIENT SR MODAL ──────────────────────────────────────────
 // ============================================================
