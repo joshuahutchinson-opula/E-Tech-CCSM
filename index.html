@@ -2914,33 +2914,90 @@ function buildClientView(data, user) {
   
   var html = '';
   
-  // Header with client branding
-  html += '<div style="background:linear-gradient(135deg, ' + primaryColor + ', ' + secondaryColor + ');padding:16px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.1);">';
-  html += '<div style="display:flex;align-items:center;gap:12px;">';
-  html += '<img src="' + (data.logo || 'logo.png') + '" style="height:36px;width:auto;" onerror="this.style.display=\'none\'" />';
-  html += '<span style="color:#fff;font-size:18px;font-weight:600;">' + data.name + '</span>';
+  // Get time of day for greeting
+  var hour = new Date().getHours();
+  var greeting = 'Good ';
+  if (hour < 12) greeting += 'Morning';
+  else if (hour < 17) greeting += 'Afternoon';
+  else if (hour < 20) greeting += 'Evening';
+  else greeting += 'Night';
+  
+  var clientName = data.name || 'Client';
+  
+  // Header with etech logo and client name
+  html += '<div style="background:linear-gradient(135deg, ' + primaryColor + ', ' + secondaryColor + ');padding:12px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0;">';
+  html += '<div style="display:flex;align-items:center;gap:14px;">';
+  // etech logo (light version)
+  html += '<div style="display:flex;align-items:center;gap:6px;">';
+  html += '<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">';
+  html += '<rect width="32" height="32" rx="6" fill="white" opacity="0.2"/>';
+  html += '<path d="M8 22L16 8L24 22H8Z" fill="white" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>';
+  html += '<circle cx="16" cy="18" r="4" fill="' + primaryColor + '" stroke="white" stroke-width="1.5"/>';
+  html += '</svg>';
+  html += '<span style="color:rgba(255,255,255,0.9);font-size:14px;font-weight:600;letter-spacing:0.5px;">ETECH</span>';
+  html += '</div>';
+  html += '<span style="color:rgba(255,255,255,0.3);font-size:20px;">|</span>';
+  html += '<span style="color:#fff;font-size:16px;font-weight:500;">' + clientName + ' Portal</span>';
   html += '</div>';
   html += '<div style="display:flex;align-items:center;gap:12px;">';
   html += '<span style="color:rgba(255,255,255,0.8);font-size:12px;">' + (user ? user.client : 'Client') + '</span>';
-  html += '<button onclick="logoutClientView()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-family:var(--font);">Logout</button>';
+  html += '<button onclick="logoutClientView()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:4px 14px;border-radius:4px;cursor:pointer;font-size:11px;font-family:var(--font);transition:all 0.2s;" onmouseover="this.style.background=\'rgba(255,255,255,0.25)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.15)\'">Logout</button>';
   html += '</div>';
   html += '</div>';
   
-  // Stats row
-  var totalCameras = data.assets && data.assets.cameras ? data.assets.cameras.length : 0;
-  var totalDoors = data.assets && data.assets.doors ? data.assets.doors.length : 0;
-  var totalServers = data.assets && data.assets.servers ? data.assets.servers.length : 0;
-  var totalSwitches = data.assets && data.assets.switches ? data.assets.switches.length : 0;
+  // Main layout with sidebar and content
+  html += '<div style="display:flex;flex:1;overflow:hidden;">';
   
-  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px 24px;background:var(--card-bg);border-bottom:1px solid var(--card-border);">';
-  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:6px;padding:10px 14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Cameras</div><div style="font-size:20px;font-weight:600;color:var(--text-primary);">' + totalCameras + '</div></div>';
-  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:6px;padding:10px 14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Doors</div><div style="font-size:20px;font-weight:600;color:var(--text-primary);">' + totalDoors + '</div></div>';
-  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:6px;padding:10px 14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Servers</div><div style="font-size:20px;font-weight:600;color:var(--text-primary);">' + totalServers + '</div></div>';
-  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:6px;padding:10px 14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Switches</div><div style="font-size:20px;font-weight:600;color:var(--text-primary);">' + totalSwitches + '</div></div>';
+  // Sidebar
+  html += '<div style="width:200px;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);padding:12px 0;overflow-y:auto;flex-shrink:0;">';
+  html += '<div class="nav-section" style="padding:8px 16px 4px;">Menu</div>';
+  html += '<div class="nav-item active" onclick="switchClientViewTab(\'dashboard\', this)" style="padding:8px 16px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;"><i class="ti ti-layout-dashboard"></i> <span>Dashboard</span></div>';
+  
+  if (data.assets && data.assets.cameras && data.assets.cameras.length > 0) {
+    html += '<div class="nav-item" onclick="switchClientViewTab(\'cameras\', this)" style="padding:8px 16px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;"><i class="ti ti-video"></i> <span>Cameras</span></div>';
+  }
+  if (data.assets && data.assets.doors && data.assets.doors.length > 0) {
+    html += '<div class="nav-item" onclick="switchClientViewTab(\'doors\', this)" style="padding:8px 16px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;"><i class="ti ti-door"></i> <span>Access Control</span></div>';
+  }
+  if (data.assets && data.assets.servers && data.assets.servers.length > 0) {
+    html += '<div class="nav-item" onclick="switchClientViewTab(\'servers\', this)" style="padding:8px 16px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;"><i class="ti ti-server"></i> <span>Servers</span></div>';
+  }
+  if (data.assets && data.assets.switches && data.assets.switches.length > 0) {
+    html += '<div class="nav-item" onclick="switchClientViewTab(\'switches\', this)" style="padding:8px 16px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;"><i class="ti ti-router"></i> <span>Switches</span></div>';
+  }
+  if (data.srs && data.srs.length > 0) {
+    html += '<div class="nav-item" onclick="switchClientViewTab(\'srs\', this)" style="padding:8px 16px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;"><i class="ti ti-clipboard-list"></i> <span>Service Requests</span></div>';
+  }
+  
+  html += '<div class="nav-section" style="padding:8px 16px 4px;margin-top:8px;">Support</div>';
+  html += '<div class="nav-item" onclick="switchClientViewTab(\'support\', this)" style="padding:8px 16px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;"><i class="ti ti-headset"></i> <span>Contact Support</span></div>';
   html += '</div>';
   
-  // Content
-  html += '<div style="padding:20px 24px;overflow-y:auto;flex:1;background:var(--main-bg);">';
+  // Content area
+  html += '<div style="flex:1;overflow-y:auto;padding:20px 24px;background:var(--main-bg);" id="client-view-content">';
+  
+  // Dashboard tab (default)
+  html += '<div id="client-tab-dashboard" class="client-tab-content">';
+  
+  // Warm greeting
+  html += '<div style="margin-bottom:20px;">';
+  html += '<h1 style="font-size:24px;font-weight:700;color:var(--text-primary);margin-bottom:4px;">' + greeting + ', ' + clientName + '! 👋</h1>';
+  html += '<p style="font-size:14px;color:var(--text-secondary);">24/7 support available. How can we help you today?</p>';
+  html += '</div>';
+  
+  // Stats cards
+  html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">';
+  
+  var camCount = data.assets && data.assets.cameras ? data.assets.cameras.length : 0;
+  var doorCount = data.assets && data.assets.doors ? data.assets.doors.length : 0;
+  var serverCount = data.assets && data.assets.servers ? data.assets.servers.length : 0;
+  var srCount = data.srs ? data.srs.length : 0;
+  
+  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:14px 16px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">Cameras</div><div style="font-size:24px;font-weight:600;color:var(--text-primary);">' + camCount + '</div></div>';
+  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:14px 16px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">Doors</div><div style="font-size:24px;font-weight:600;color:var(--text-primary);">' + doorCount + '</div></div>';
+  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:14px 16px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">Servers</div><div style="font-size:24px;font-weight:600;color:var(--text-primary);">' + serverCount + '</div></div>';
+  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:14px 16px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">Service Requests</div><div style="font-size:24px;font-weight:600;color:var(--text-primary);">' + srCount + '</div></div>';
+  html += '</div>';
   
   // Activity
   html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:16px 18px;margin-bottom:14px;">';
@@ -2957,43 +3014,161 @@ function buildClientView(data, user) {
   }
   html += '</div>';
   
-  // Service Requests
-  if (data.srs && data.srs.length) {
-    html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:16px 18px;margin-bottom:14px;">';
-    html += '<div style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;">Service Requests</div>';
+  html += '</div>';
+  
+  // Cameras tab
+  html += '<div id="client-tab-cameras" class="client-tab-content" style="display:none;">';
+  html += '<h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">📷 Cameras</h2>';
+  if (data.assets && data.assets.cameras && data.assets.cameras.length > 0) {
+    html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;overflow:hidden;">';
     html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
-    html += '<thead><tr><th style="color:var(--text-secondary);padding:6px 8px;border-bottom:1px solid var(--card-border);text-align:left;">ID</th><th style="color:var(--text-secondary);padding:6px 8px;border-bottom:1px solid var(--card-border);text-align:left;">Subject</th><th style="color:var(--text-secondary);padding:6px 8px;border-bottom:1px solid var(--card-border);text-align:left;">Priority</th><th style="color:var(--text-secondary);padding:6px 8px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th></tr></thead><tbody>';
+    html += '<thead><tr><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Name</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Zone</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Model</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">IP</th></tr></thead><tbody>';
+    data.assets.cameras.forEach(function(cam) {
+      html += '<tr><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + cam.name + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + cam.zone + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + camBadge(cam.status) + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + (cam.model || '—') + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);font-family:monospace;">' + (cam.ip || '—') + '</td></tr>';
+    });
+    html += '</tbody></table></div>';
+  } else {
+    html += '<div style="color:var(--text-muted);padding:20px;text-align:center;">No cameras found</div>';
+  }
+  html += '</div>';
+  
+  // Doors tab
+  html += '<div id="client-tab-doors" class="client-tab-content" style="display:none;">';
+  html += '<h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">🚪 Access Control</h2>';
+  if (data.assets && data.assets.doors && data.assets.doors.length > 0) {
+    html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;overflow:hidden;">';
+    html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+    html += '<thead><tr><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Name</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Zone</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Door Swing</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Technician</th></tr></thead><tbody>';
+    data.assets.doors.forEach(function(door) {
+      html += '<tr><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + door.name + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + door.zone + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + doorBadge(door.status) + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + (door.doorSwing || 'In') + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + (door.tech || 'Unassigned') + '</td></tr>';
+    });
+    html += '</tbody></table></div>';
+  } else {
+    html += '<div style="color:var(--text-muted);padding:20px;text-align:center;">No doors found</div>';
+  }
+  html += '</div>';
+  
+  // Servers tab
+  html += '<div id="client-tab-servers" class="client-tab-content" style="display:none;">';
+  html += '<h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">🖥 Servers</h2>';
+  if (data.assets && data.assets.servers && data.assets.servers.length > 0) {
+    html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;overflow:hidden;">';
+    html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+    html += '<thead><tr><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Name</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Zone</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Model</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Storage</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Health</th></tr></thead><tbody>';
+    data.assets.servers.forEach(function(server) {
+      html += '<tr><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + server.serial + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + server.zone + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + srvBadge(server.status) + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + (server.model || '—') + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + (server.capacity || '—') + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + (server.health || '—') + '</td></tr>';
+    });
+    html += '</tbody></table></div>';
+  } else {
+    html += '<div style="color:var(--text-muted);padding:20px;text-align:center;">No servers found</div>';
+  }
+  html += '</div>';
+  
+  // Switches tab
+  html += '<div id="client-tab-switches" class="client-tab-content" style="display:none;">';
+  html += '<h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">🔌 Switches</h2>';
+  if (data.assets && data.assets.switches && data.assets.switches.length > 0) {
+    html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;overflow:hidden;">';
+    html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+    html += '<thead><tr><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Name</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Zone</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Model</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">IP</th></tr></thead><tbody>';
+    data.assets.switches.forEach(function(sw) {
+      html += '<tr><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + sw.name + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + sw.zone + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + (sw.status === 'Online' ? '<span class="badge b-done">Online</span>' : '<span class="badge b-high">Offline</span>') + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + (sw.model || '—') + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);font-family:monospace;">' + (sw.ip_address || '—') + '</td></tr>';
+    });
+    html += '</tbody></table></div>';
+  } else {
+    html += '<div style="color:var(--text-muted);padding:20px;text-align:center;">No switches found</div>';
+  }
+  html += '</div>';
+  
+  // Service Requests tab
+  html += '<div id="client-tab-srs" class="client-tab-content" style="display:none;">';
+  html += '<h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">📋 Service Requests</h2>';
+  if (data.srs && data.srs.length > 0) {
+    html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;overflow:hidden;">';
+    html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+    html += '<thead><tr><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">ID</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Subject</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Priority</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Date</th></tr></thead><tbody>';
     data.srs.forEach(function(sr) {
       var priColor = sr.priority === 'High' ? '#ef4444' : sr.priority === 'Medium' ? '#f59e0b' : '#22c55e';
-      html += '<tr><td style="padding:6px 8px;border-bottom:1px solid var(--card-border);">' + sr.id + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--card-border);">' + sr.subject + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--card-border);"><span style="color:' + priColor + ';">●</span> ' + sr.priority + '</td><td style="padding:6px 8px;border-bottom:1px solid var(--card-border);">' + srStatusBadge(sr.status) + '</td></tr>';
+      html += '<tr><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + sr.id + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + sr.subject + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);"><span style="color:' + priColor + ';">●</span> ' + sr.priority + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + srStatusBadge(sr.status) + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + sr.date + '</td></tr>';
     });
-    html += '</tbody></table>';
-    html += '</div>';
-  }
-  
-  // Assets summary
-  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:16px 18px;">';
-  html += '<div style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;">Assets Summary</div>';
-  
-  if (data.assets) {
-    if (data.assets.cameras && data.assets.cameras.length) {
-      html += '<div style="margin-bottom:8px;"><span style="font-weight:500;color:var(--text-primary);">📷 Cameras:</span> <span style="color:var(--text-secondary);">' + data.assets.cameras.length + ' devices</span></div>';
-    }
-    if (data.assets.doors && data.assets.doors.length) {
-      html += '<div style="margin-bottom:8px;"><span style="font-weight:500;color:var(--text-primary);">🚪 Doors:</span> <span style="color:var(--text-secondary);">' + data.assets.doors.length + ' devices</span></div>';
-    }
-    if (data.assets.servers && data.assets.servers.length) {
-      html += '<div style="margin-bottom:8px;"><span style="font-weight:500;color:var(--text-primary);">🖥 Servers:</span> <span style="color:var(--text-secondary);">' + data.assets.servers.length + ' devices</span></div>';
-    }
-    if (data.assets.switches && data.assets.switches.length) {
-      html += '<div style="margin-bottom:8px;"><span style="font-weight:500;color:var(--text-primary);">🔌 Switches:</span> <span style="color:var(--text-secondary);">' + data.assets.switches.length + ' devices</span></div>';
-    }
+    html += '</tbody></table></div>';
+  } else {
+    html += '<div style="color:var(--text-muted);padding:20px;text-align:center;">No service requests</div>';
   }
   html += '</div>';
   
+  // Contact Support tab
+  html += '<div id="client-tab-support" class="client-tab-content" style="display:none;">';
+  html += '<div style="max-width:600px;">';
+  html += '<h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">📞 Contact Support</h2>';
+  html += '<p style="color:var(--text-secondary);font-size:13px;margin-bottom:20px;">Our support team is available 24/7 to assist you with any issues.</p>';
+  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:20px;">';
+  html += '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><i class="ti ti-phone" style="font-size:20px;color:var(--accent);"></i><div><div style="font-weight:500;color:var(--text-primary);">Phone</div><div style="color:var(--text-secondary);font-size:13px;">+1 (876) 555-0123</div></div></div>';
+  html += '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><i class="ti ti-mail" style="font-size:20px;color:var(--accent);"></i><div><div style="font-weight:500;color:var(--text-primary);">Email</div><div style="color:var(--text-secondary);font-size:13px;">support@etechsystems.com</div></div></div>';
+  html += '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;"><i class="ti ti-clock" style="font-size:20px;color:var(--accent);"></i><div><div style="font-weight:500;color:var(--text-primary);">Hours</div><div style="color:var(--text-secondary);font-size:13px;">24/7 — Always available</div></div></div>';
   html += '</div>';
+  html += '<div style="margin-top:16px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:16px 20px;">';
+  html += '<div style="font-weight:500;color:var(--text-primary);margin-bottom:8px;">📩 Quick Support Request</div>';
+  html += '<textarea style="width:100%;background:var(--select-bg);border:1px solid var(--select-border);border-radius:6px;color:var(--select-color);padding:10px 12px;font-size:12px;font-family:var(--font);resize:vertical;min-height:80px;" placeholder="Describe your issue..."></textarea>';
+  html += '<button style="margin-top:8px;padding:8px 20px;border-radius:6px;border:none;background:var(--client-button-gradient);color:#fff;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);">Send Message</button>';
+  html += '</div>';
+  html += '</div></div>';
+  
+  html += '</div></div>';
   
   container.innerHTML = html;
+}
+
+// ============================================================
+// ── CLIENT VIEW TAB SWITCHING ──────────────────────────────
+// ============================================================
+
+function switchClientViewTab(tab, el) {
+  // Update nav items
+  document.querySelectorAll('#client-view-container .nav-item').forEach(function(item) {
+    item.classList.remove('active');
+  });
+  if (el) {
+    el.classList.add('active');
+    // Style the active nav item
+    el.style.background = 'rgba(79,140,247,0.15)';
+    el.style.borderLeft = '2px solid var(--accent)';
+    el.style.color = 'var(--text-primary)';
+  }
+  
+  // Reset all nav items to default style
+  document.querySelectorAll('#client-view-container .nav-item').forEach(function(item) {
+    if (!item.classList.contains('active')) {
+      item.style.background = 'transparent';
+      item.style.borderLeft = '2px solid transparent';
+      item.style.color = 'var(--text-secondary)';
+    }
+  });
+  
+  // Show/hide content
+  document.querySelectorAll('#client-view-container .client-tab-content').forEach(function(content) {
+    content.style.display = 'none';
+  });
+  
+  var target = document.getElementById('client-tab-' + tab);
+  if (target) target.style.display = 'block';
+}
+
+// ============================================================
+// ── CLIENT VIEW LOGOUT ──────────────────────────────────────
+// ============================================================
+
+function logoutClientView() {
+  clientViewUser = null;
+  clientViewData = null;
+  document.getElementById('client-view-container').style.display = 'none';
+  document.getElementById('client-view-container').innerHTML = '';
+  document.querySelector('.app').classList.remove('client-mode');
+  document.documentElement.style.setProperty('--client-primary', '#4f8cf7');
+  document.documentElement.style.setProperty('--client-secondary', '#00d4ff');
+  document.documentElement.style.setProperty('--client-gradient', 'linear-gradient(135deg, #4f8cf7, #00d4ff)');
+  showLogin();
+  toast('Logged out from client view', 'info');
 }
 
 // ============================================================
