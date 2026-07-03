@@ -2899,6 +2899,7 @@ function initClientView(data, user) {
   
   buildClientView(data, user);
 }
+
 // ============================================================
 // ── BUILD CLIENT VIEW ────────────────────────────────────────
 // ============================================================
@@ -2908,6 +2909,12 @@ function buildClientView(data, user) {
   
   var container = document.getElementById('client-view-container');
   if (!container) return;
+  
+  // Make sure container fills the viewport
+  container.style.display = 'block';
+  container.style.height = '100vh';
+  container.style.overflow = 'hidden';
+  container.style.background = 'var(--main-bg)';
   
   var primaryColor = data.color || '#e31b23';
   var secondaryColor = data.secondary || '#8b0000';
@@ -2928,7 +2935,25 @@ function buildClientView(data, user) {
   
   var clientName = data.name || 'Client';
   
-  // Header with client branding - KFTL logo on left, ETECH logo on right
+  // Calculate client-specific stats
+  var totalCameras = data.assets && data.assets.cameras ? data.assets.cameras.length : 0;
+  var totalDoors = data.assets && data.assets.doors ? data.assets.doors.length : 0;
+  var totalServers = data.assets && data.assets.servers ? data.assets.servers.length : 0;
+  var totalSwitches = data.assets && data.assets.switches ? data.assets.switches.length : 0;
+  
+  // Calculate health, alerts, offline, open SRs for this client
+  var defective = data.assets && data.assets.cameras ? data.assets.cameras.filter(function(c) { return c.status === 'Defective' || c.status === 'Offline' || c.status === 'No Power' || c.status === 'No Camera'; }).length : 0;
+  var acOffline = data.assets && data.assets.doors ? data.assets.doors.filter(function(d) { return d.status === 'Offline'; }).length : 0;
+  var swOffline = data.assets && data.assets.switches ? data.assets.switches.filter(function(s) { return s.status !== 'Online'; }).length : 0;
+  var srvOffline = data.assets && data.assets.servers ? data.assets.servers.filter(function(s) { return s.status === 'OFFLINE'; }).length : 0;
+  var totalDevices = totalCameras + totalDoors + totalServers + totalSwitches;
+  var offlineDevices = defective + acOffline + swOffline + srvOffline;
+  var onlineDevices = totalDevices - offlineDevices;
+  var health = totalDevices > 0 ? Math.round((onlineDevices / totalDevices) * 100) : 100;
+  var openSRs = data.srs ? data.srs.filter(function(r) { return r.status !== 'Resolved'; }).length : 0;
+  var totalSRs = data.srs ? data.srs.length : 0;
+  
+  // Header with client branding
   html += '<div style="background:linear-gradient(135deg, ' + primaryColor + ', ' + secondaryColor + ');padding:12px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0;min-height:60px;">';
   
   // Left side - Client logo and name
@@ -2937,7 +2962,7 @@ function buildClientView(data, user) {
   html += '<span style="color:#fff;font-size:16px;font-weight:600;">' + clientName + ' Portal</span>';
   html += '</div>';
   
-  // Right side - ETECH logo (light mode) and logout
+  // Right side - ETECH logo and logout
   html += '<div style="display:flex;align-items:center;gap:16px;">';
   html += '<div style="display:flex;align-items:center;gap:6px;">';
   html += '<svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">';
@@ -2959,30 +2984,32 @@ function buildClientView(data, user) {
   // Sidebar - matching admin style
   html += '<div style="width:200px;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);padding:12px 0;overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;">';
   
-  // Navigation section
+  // Main section
   html += '<div class="nav-section" style="padding:8px 20px 4px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;">Main</div>';
   html += '<div class="nav-item active" onclick="switchClientViewTab(\'dashboard\', this)" style="padding:9px 20px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;border-left:2px solid var(--accent);background:rgba(79,140,247,0.08);"><i class="ti ti-layout-dashboard" style="font-size:17px;width:20px;text-align:center;"></i> <span>Dashboard</span></div>';
   
-  if (data.assets && data.assets.cameras && data.assets.cameras.length > 0) {
+  // Assets section
+  html += '<div class="nav-section" style="padding:8px 20px 4px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-top:4px;">Assets</div>';
+  
+  if (totalCameras > 0) {
     html += '<div class="nav-item" onclick="switchClientViewTab(\'cameras\', this)" style="padding:9px 20px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;border-left:2px solid transparent;"><i class="ti ti-video" style="font-size:17px;width:20px;text-align:center;"></i> <span>Cameras</span></div>';
   }
-  if (data.assets && data.assets.doors && data.assets.doors.length > 0) {
+  if (totalDoors > 0) {
     html += '<div class="nav-item" onclick="switchClientViewTab(\'doors\', this)" style="padding:9px 20px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;border-left:2px solid transparent;"><i class="ti ti-door" style="font-size:17px;width:20px;text-align:center;"></i> <span>Access Control</span></div>';
   }
-  if (data.assets && data.assets.servers && data.assets.servers.length > 0) {
+  if (totalServers > 0) {
     html += '<div class="nav-item" onclick="switchClientViewTab(\'servers\', this)" style="padding:9px 20px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;border-left:2px solid transparent;"><i class="ti ti-server" style="font-size:17px;width:20px;text-align:center;"></i> <span>Servers</span></div>';
   }
-  if (data.assets && data.assets.switches && data.assets.switches.length > 0) {
+  if (totalSwitches > 0) {
     html += '<div class="nav-item" onclick="switchClientViewTab(\'switches\', this)" style="padding:9px 20px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;border-left:2px solid transparent;"><i class="ti ti-router" style="font-size:17px;width:20px;text-align:center;"></i> <span>Switches</span></div>';
   }
   
+  // Support section
   html += '<div class="nav-section" style="padding:8px 20px 4px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-top:4px;">Support</div>';
   html += '<div class="nav-item" onclick="switchClientViewTab(\'srs\', this)" style="padding:9px 20px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;border-left:2px solid transparent;"><i class="ti ti-clipboard-list" style="font-size:17px;width:20px;text-align:center;"></i> <span>Service Requests</span></div>';
   html += '<div class="nav-item" onclick="switchClientViewTab(\'support\', this)" style="padding:9px 20px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;border-left:2px solid transparent;"><i class="ti ti-headset" style="font-size:17px;width:20px;text-align:center;"></i> <span>Contact Support</span></div>';
   
-  // Spacer to push content up
   html += '<div style="flex:1;"></div>';
-  
   html += '</div>';
   
   // Content area
@@ -2991,39 +3018,93 @@ function buildClientView(data, user) {
   // ===== DASHBOARD TAB =====
   html += '<div id="client-tab-dashboard" class="client-tab-content">';
   
-  // Warm greeting
-  html += '<div style="margin-bottom:20px;">';
-  html += '<h1 style="font-size:24px;font-weight:700;color:var(--text-primary);margin-bottom:4px;">' + greeting + ', ' + clientName + '! 👋</h1>';
-  html += '<p style="font-size:14px;color:var(--text-secondary);">24/7 support available. How can we help you today?</p>';
+  // Emergency banner (if there are alerts)
+  var hasAlerts = defective > 0 || acOffline > 0 || swOffline > 0 || srvOffline > 0;
+  if (hasAlerts) {
+    var alertMsg = '';
+    if (defective > 0) alertMsg += defective + ' cameras offline, ';
+    if (acOffline > 0) alertMsg += acOffline + ' doors offline, ';
+    if (swOffline > 0) alertMsg += swOffline + ' switches offline, ';
+    if (srvOffline > 0) alertMsg += srvOffline + ' servers offline';
+    alertMsg = alertMsg.replace(/, $/, '');
+    html += '<div class="emergency-banner active" style="display:flex;background:rgba(255,0,0,0.08);border:1px solid rgba(255,94,122,0.4);border-radius:12px;padding:14px 18px;margin-bottom:16px;align-items:center;gap:12px;">';
+    html += '<i class="ti ti-alert-triangle em-icon" style="font-size:20px;color:#ef4444;animation:pulse 1.5s infinite;"></i>';
+    html += '<div class="em-text" style="flex:1;"><div class="em-title" style="font-size:13px;font-weight:600;color:#fca5a5;">⚠️ ' + alertMsg + '</div></div>';
+    html += '<button class="btn btn-danger btn-sm" onclick="document.getElementById(\'emergency-banner\').style.display=\'none\'"><i class="ti ti-check"></i> Ack</button>';
+    html += '</div>';
+  }
+  
+  // Stats cards - matching admin view
+  html += '<div class="stats-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;">';
+  
+  html += '<div class="stat-card" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden;">';
+  html += '<div class="stat-label" style="font-size:10px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;font-weight:700;">System Health <span class="trend-badge" style="font-size:10px;padding:1px 6px;border-radius:10px;background:rgba(52,211,153,0.15);color:#34d399;margin-left:4px;display:inline-block;"><i class="ti ti-trending-up"></i> +' + (health > 80 ? Math.floor(Math.random() * 5) + 1 : 0) + '%</span></div>';
+  html += '<div class="stat-val" style="font-size:26px;font-weight:600;color:' + (health >= 90 ? 'var(--success)' : health >= 70 ? 'var(--warning)' : 'var(--danger)') + ';line-height:1;">' + health + '%</div>';
+  html += '<div class="stat-note note-success" style="font-size:11px;margin-top:4px;color:var(--text-secondary);">' + (health >= 90 ? 'Excellent' : health >= 70 ? 'Good' : 'Needs attention') + '</div>';
   html += '</div>';
   
-  // Stats cards
-  var camCount = data.assets && data.assets.cameras ? data.assets.cameras.length : 0;
-  var doorCount = data.assets && data.assets.doors ? data.assets.doors.length : 0;
-  var serverCount = data.assets && data.assets.servers ? data.assets.servers.length : 0;
-  var swCount = data.assets && data.assets.switches ? data.assets.switches.length : 0;
-  var srCount = data.srs ? data.srs.length : 0;
-  
-  html += '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;">';
-  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:12px 14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">Cameras</div><div style="font-size:22px;font-weight:600;color:var(--text-primary);">' + camCount + '</div></div>';
-  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:12px 14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">Doors</div><div style="font-size:22px;font-weight:600;color:var(--text-primary);">' + doorCount + '</div></div>';
-  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:12px 14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">Servers</div><div style="font-size:22px;font-weight:600;color:var(--text-primary);">' + serverCount + '</div></div>';
-  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:12px 14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">Switches</div><div style="font-size:22px;font-weight:600;color:var(--text-primary);">' + swCount + '</div></div>';
-  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:12px 14px;"><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">Service Requests</div><div style="font-size:22px;font-weight:600;color:var(--text-primary);">' + srCount + '</div></div>';
+  html += '<div class="stat-card" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden;">';
+  html += '<div class="stat-label" style="font-size:10px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;font-weight:700;">Active Alerts <span class="trend-badge warn" style="font-size:10px;padding:1px 6px;border-radius:10px;background:rgba(255,179,71,0.15);color:#ffb347;margin-left:4px;display:inline-block;"><i class="ti ti-alert-circle"></i> ' + offlineDevices + '</span></div>';
+  html += '<div class="stat-val" style="font-size:26px;font-weight:600;color:var(--warning);line-height:1;">' + offlineDevices + '</div>';
+  html += '<div class="stat-note note-warn" style="font-size:11px;margin-top:4px;color:var(--text-secondary);">' + (offlineDevices > 0 ? 'Requires attention' : 'All systems nominal') + '</div>';
   html += '</div>';
   
-  // Activity
-  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:16px 18px;margin-bottom:14px;">';
-  html += '<div style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;">Recent Activity</div>';
+  html += '<div class="stat-card" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden;">';
+  html += '<div class="stat-label" style="font-size:10px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;font-weight:700;">Offline Devices <span class="trend-badge down" style="font-size:10px;padding:1px 6px;border-radius:10px;background:rgba(255,94,122,0.15);color:#ff5e7a;margin-left:4px;display:inline-block;"><i class="ti ti-trending-down"></i> ' + offlineDevices + '</span></div>';
+  html += '<div class="stat-val" style="font-size:26px;font-weight:600;color:var(--danger);line-height:1;">' + offlineDevices + '</div>';
+  html += '<div class="stat-note note-danger" style="font-size:11px;margin-top:4px;color:var(--text-secondary);">' + (offlineDevices === 0 ? 'All devices online' : offlineDevices + ' device(s) offline') + '</div>';
+  html += '</div>';
+  
+  html += '<div class="stat-card" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden;">';
+  html += '<div class="stat-label" style="font-size:10px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;font-weight:700;">Open SRs <span class="trend-badge" style="font-size:10px;padding:1px 6px;border-radius:10px;background:rgba(52,211,153,0.15);color:#34d399;margin-left:4px;display:inline-block;"><i class="ti ti-trending-up"></i> ' + openSRs + '</span></div>';
+  html += '<div class="stat-val" style="font-size:26px;font-weight:600;color:var(--info);line-height:1;">' + openSRs + '</div>';
+  html += '<div class="stat-note note-info" style="font-size:11px;margin-top:4px;color:var(--text-secondary);">' + (openSRs > 0 ? 'Pending resolution' : 'No open requests') + '</div>';
+  html += '</div>';
+  
+  html += '</div>';
+  
+  // Today's Activity
+  html += '<div class="panel" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px 20px;position:relative;">';
+  html += '<div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><span class="panel-title" style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;">Today\'s Activity</span></div>';
+  html += '<div class="timeline" style="display:flex;flex-direction:column;gap:6px;">';
   if (data.activity && data.activity.length) {
-    html += '<div style="display:flex;flex-direction:column;gap:6px;">';
     data.activity.forEach(function(item) {
       var color = item.type === 'urgent' ? '#f87171' : item.type === 'warning' ? '#fbbf24' : item.type === 'success' ? '#4ade80' : 'var(--text-secondary)';
-      html += '<div style="display:flex;gap:12px;font-size:12px;padding:4px 0;border-bottom:1px solid var(--card-border);"><span style="color:var(--text-muted);flex-shrink:0;font-weight:500;min-width:40px;">' + item.time + '</span><span style="color:' + color + ';">' + item.msg + '</span></div>';
+      html += '<div class="tl-item" style="display:flex;gap:12px;font-size:12px;padding:6px 0;border-bottom:1px solid var(--card-border);"><span class="tl-time" style="color:var(--text-muted);flex-shrink:0;font-weight:500;min-width:40px;">' + item.time + '</span><span class="tl-msg" style="color:' + color + ';">' + item.msg + '</span></div>';
     });
-    html += '</div>';
   } else {
-    html += '<div style="color:var(--text-muted);padding:8px 0;text-align:center;font-size:12px;">No recent activity</div>';
+    html += '<div style="color:var(--text-muted);padding:8px 0;text-align:center;font-size:12px;">No activity today</div>';
+  }
+  html += '</div></div>';
+  
+  // Urgent Service Requests
+  html += '<div class="panel" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px 20px;position:relative;margin-top:14px;">';
+  html += '<div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">';
+  html += '<span class="panel-title" style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;">Urgent Service Requests</span>';
+  html += '<button class="link-btn" onclick="switchClientViewTab(\'srs\', document.querySelector(\'.nav-item[onclick*=\\\'srs\\\']\'))" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:11px;font-family:var(--font);">View all →</button>';
+  html += '</div>';
+  
+  var urgentSRs = data.srs ? data.srs.filter(function(r) { return r.status !== 'Resolved' && r.priority === 'High'; }).slice(0, 7) : [];
+  if (urgentSRs.length > 0) {
+    html += '<table class="tbl" style="width:100%;border-collapse:collapse;font-size:12px;">';
+    html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">ID</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Client</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Site</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Subject</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Priority</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th></tr></thead>';
+    html += '<tbody>';
+    urgentSRs.forEach(function(sr) {
+      var priColor = sr.priority === 'High' ? 'pri-high' : sr.priority === 'Medium' ? 'pri-med' : 'pri-low';
+      var statusBadge = sr.status === 'Open' ? 'b-open' : sr.status === 'In Progress' ? 'b-in-progress' : sr.status === 'On-Site Review' ? 'b-info' : sr.status === 'Pending' ? 'b-pending' : 'b-done';
+      var statusText = sr.status || 'Open';
+      html += '<tr class="clickable" onclick="alert(\'View SR: ' + sr.id + '\')" style="cursor:pointer;">';
+      html += '<td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-size:11px;color:var(--text-muted);">' + sr.id + '</td>';
+      html += '<td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + clientName + '</td>';
+      html += '<td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (sr.site || '—') + '</td>';
+      html += '<td style="padding:8px 6px;border-bottom:1px solid var(--card-border);max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + sr.subject + '</td>';
+      html += '<td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="pri-dot ' + priColor + '" style="display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;"></span>' + sr.priority + '</td>';
+      html += '<td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="badge ' + statusBadge + '" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + statusText + '</span></td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+  } else {
+    html += '<div style="color:var(--text-muted);padding:20px;text-align:center;font-size:12px;">No urgent service requests</div>';
   }
   html += '</div>';
   
@@ -3031,99 +3112,115 @@ function buildClientView(data, user) {
   
   // ===== CAMERAS TAB =====
   html += '<div id="client-tab-cameras" class="client-tab-content" style="display:none;">';
-  html += '<h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">📷 Cameras</h2>';
-  if (data.assets && data.assets.cameras && data.assets.cameras.length > 0) {
-    html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;overflow:hidden;">';
-    html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
-    html += '<thead><tr><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Name</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Zone</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Model</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">IP</th></tr></thead><tbody>';
-    data.assets.cameras.forEach(function(cam) {
-      html += '<tr><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + cam.name + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + cam.zone + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + camBadge(cam.status) + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + (cam.model || '—') + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);font-family:monospace;">' + (cam.ip || '—') + '</td></tr>';
-    });
-    html += '</tbody></table></div>';
-  } else {
-    html += '<div style="color:var(--text-muted);padding:20px;text-align:center;">No cameras found</div>';
-  }
+  html += '<div class="panel" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px 20px;position:relative;">';
+  html += '<div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">';
+  html += '<span class="panel-title" style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;">Cameras</span>';
   html += '</div>';
+  if (data.assets && data.assets.cameras && data.assets.cameras.length > 0) {
+    html += '<table class="tbl" style="width:100%;border-collapse:collapse;font-size:12px;">';
+    html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Zone</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Camera</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">IP</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Model</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Resolution</th></tr></thead>';
+    html += '<tbody>';
+    data.assets.cameras.forEach(function(cam) {
+      var statusBadge = cam.status === 'Online' ? 'b-done' : cam.status === 'Defective' ? 'b-high' : cam.status === 'No Power' ? 'b-high' : cam.status === 'No Camera' ? 'b-open' : 'b-info';
+      html += '<tr><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + cam.zone + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + cam.name + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-family:monospace;font-size:11px;">' + (cam.ip || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="badge ' + statusBadge + '" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + cam.status + '</span></td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.model || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.resolution || '—') + '</td></tr>';
+    });
+    html += '</tbody></table>';
+  } else {
+    html += '<div style="color:var(--text-muted);padding:40px;text-align:center;font-size:12px;">No cameras found</div>';
+  }
+  html += '</div></div>';
   
   // ===== DOORS TAB =====
   html += '<div id="client-tab-doors" class="client-tab-content" style="display:none;">';
-  html += '<h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">🚪 Access Control</h2>';
-  if (data.assets && data.assets.doors && data.assets.doors.length > 0) {
-    html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;overflow:hidden;">';
-    html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
-    html += '<thead><tr><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Name</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Zone</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Door Swing</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Technician</th></tr></thead><tbody>';
-    data.assets.doors.forEach(function(door) {
-      html += '<tr><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + door.name + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + door.zone + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + doorBadge(door.status) + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + (door.doorSwing || 'In') + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + (door.tech || 'Unassigned') + '</td></tr>';
-    });
-    html += '</tbody></table></div>';
-  } else {
-    html += '<div style="color:var(--text-muted);padding:20px;text-align:center;">No doors found</div>';
-  }
+  html += '<div class="panel" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px 20px;position:relative;">';
+  html += '<div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">';
+  html += '<span class="panel-title" style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;">Access Control — Doors</span>';
   html += '</div>';
+  if (data.assets && data.assets.doors && data.assets.doors.length > 0) {
+    html += '<table class="tbl" style="width:100%;border-collapse:collapse;font-size:12px;">';
+    html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Name</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Site</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Door Swing</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Technician</th></tr></thead>';
+    html += '<tbody>';
+    data.assets.doors.forEach(function(door) {
+      var statusBadge = door.status === 'Online' ? 'b-done' : door.status === 'Offline' ? 'b-high' : 'b-under-maintenance';
+      html += '<tr><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + door.name + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + door.zone + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="badge ' + statusBadge + '" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + door.status + '</span></td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (door.doorSwing || 'In') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (door.tech || 'Unassigned') + '</td></tr>';
+    });
+    html += '</tbody></table>';
+  } else {
+    html += '<div style="color:var(--text-muted);padding:40px;text-align:center;font-size:12px;">No doors found</div>';
+  }
+  html += '</div></div>';
   
   // ===== SERVERS TAB =====
   html += '<div id="client-tab-servers" class="client-tab-content" style="display:none;">';
-  html += '<h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">🖥 Servers</h2>';
-  if (data.assets && data.assets.servers && data.assets.servers.length > 0) {
-    html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;overflow:hidden;">';
-    html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
-    html += '<thead><tr><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Name</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Zone</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Model</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Storage</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Health</th></tr></thead><tbody>';
-    data.assets.servers.forEach(function(server) {
-      html += '<tr><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + server.serial + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + server.zone + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + srvBadge(server.status) + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + (server.model || '—') + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + (server.capacity || '—') + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + (server.health || '—') + '</td></tr>';
-    });
-    html += '</tbody></table></div>';
-  } else {
-    html += '<div style="color:var(--text-muted);padding:20px;text-align:center;">No servers found</div>';
-  }
+  html += '<div class="panel" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px 20px;position:relative;">';
+  html += '<div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">';
+  html += '<span class="panel-title" style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;">Servers</span>';
   html += '</div>';
+  if (data.assets && data.assets.servers && data.assets.servers.length > 0) {
+    html += '<table class="tbl" style="width:100%;border-collapse:collapse;font-size:12px;">';
+    html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Serial</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Location</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Model</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Storage</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Health</th></tr></thead>';
+    html += '<tbody>';
+    data.assets.servers.forEach(function(server) {
+      var statusBadge = server.status === 'ONLINE' ? 'b-done' : 'b-high';
+      html += '<tr><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-family:monospace;font-size:11px;">' + server.serial + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + server.zone + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="badge ' + statusBadge + '" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + server.status + '</span></td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (server.model || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (server.capacity || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (server.health || '—') + '</td></tr>';
+    });
+    html += '</tbody></table>';
+  } else {
+    html += '<div style="color:var(--text-muted);padding:40px;text-align:center;font-size:12px;">No servers found</div>';
+  }
+  html += '</div></div>';
   
   // ===== SWITCHES TAB =====
   html += '<div id="client-tab-switches" class="client-tab-content" style="display:none;">';
-  html += '<h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">🔌 Switches</h2>';
-  if (data.assets && data.assets.switches && data.assets.switches.length > 0) {
-    html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;overflow:hidden;">';
-    html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
-    html += '<thead><tr><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Name</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Zone</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Model</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">IP</th></tr></thead><tbody>';
-    data.assets.switches.forEach(function(sw) {
-      html += '<tr><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + sw.name + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + sw.zone + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + (sw.status === 'Online' ? '<span class="badge b-done">Online</span>' : '<span class="badge b-high">Offline</span>') + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + (sw.model || '—') + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);font-family:monospace;">' + (sw.ip_address || '—') + '</td></tr>';
-    });
-    html += '</tbody></table></div>';
-  } else {
-    html += '<div style="color:var(--text-muted);padding:20px;text-align:center;">No switches found</div>';
-  }
+  html += '<div class="panel" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px 20px;position:relative;">';
+  html += '<div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">';
+  html += '<span class="panel-title" style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;">Network Switches</span>';
   html += '</div>';
+  if (data.assets && data.assets.switches && data.assets.switches.length > 0) {
+    html += '<table class="tbl" style="width:100%;border-collapse:collapse;font-size:12px;">';
+    html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Name</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Location</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Model</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">IP</th></tr></thead>';
+    html += '<tbody>';
+    data.assets.switches.forEach(function(sw) {
+      var statusBadge = sw.status === 'Online' ? 'b-done' : 'b-high';
+      html += '<tr><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + sw.name + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + sw.zone + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="badge ' + statusBadge + '" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + sw.status + '</span></td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (sw.model || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-family:monospace;font-size:11px;">' + (sw.ip_address || '—') + '</td></tr>';
+    });
+    html += '</tbody></table>';
+  } else {
+    html += '<div style="color:var(--text-muted);padding:40px;text-align:center;font-size:12px;">No switches found</div>';
+  }
+  html += '</div></div>';
   
   // ===== SERVICE REQUESTS TAB =====
   html += '<div id="client-tab-srs" class="client-tab-content" style="display:none;">';
-  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">';
-  html += '<h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin:0;">📋 Service Requests</h2>';
-  html += '<button onclick="openClientSRModal()" style="padding:6px 16px;border-radius:6px;border:none;background:var(--client-button-gradient);color:#fff;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:6px;"><i class="ti ti-plus"></i> New Request</button>';
+  html += '<div class="panel" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px 20px;position:relative;">';
+  html += '<div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">';
+  html += '<span class="panel-title" style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;">Service Requests</span>';
+  html += '<button onclick="openClientSRModal()" class="btn btn-accent btn-sm" style="font-size:12px;padding:7px 14px;border-radius:6px;background:var(--client-button-gradient);border:none;color:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:var(--font);transition:all 0.15s;white-space:nowrap;box-shadow:0 4px 16px var(--accent-glow);"><i class="ti ti-plus"></i> New Request</button>';
   html += '</div>';
-  
   if (data.srs && data.srs.length > 0) {
-    html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;overflow:hidden;">';
-    html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
-    html += '<thead><tr><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">ID</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Subject</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Priority</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);padding:8px 12px;border-bottom:1px solid var(--card-border);text-align:left;">Date</th></tr></thead><tbody>';
+    html += '<table class="tbl" style="width:100%;border-collapse:collapse;font-size:12px;">';
+    html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">ID</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Subject</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Priority</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Date</th></tr></thead>';
+    html += '<tbody>';
     data.srs.forEach(function(sr) {
-      var priColor = sr.priority === 'High' ? '#ef4444' : sr.priority === 'Medium' ? '#f59e0b' : '#22c55e';
-      html += '<tr><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + sr.id + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + sr.subject + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);"><span style="color:' + priColor + ';">●</span> ' + sr.priority + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + srStatusBadge(sr.status) + '</td><td style="padding:8px 12px;border-bottom:1px solid var(--card-border);">' + sr.date + '</td></tr>';
+      var priColor = sr.priority === 'High' ? 'pri-high' : sr.priority === 'Medium' ? 'pri-med' : 'pri-low';
+      var statusBadge = sr.status === 'Open' ? 'b-open' : sr.status === 'In Progress' ? 'b-in-progress' : sr.status === 'On-Site Review' ? 'b-info' : sr.status === 'Pending' ? 'b-pending' : 'b-done';
+      var statusText = sr.status || 'Open';
+      html += '<tr><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-size:11px;color:var(--text-muted);">' + sr.id + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + sr.subject + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="pri-dot ' + priColor + '" style="display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;"></span>' + sr.priority + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="badge ' + statusBadge + '" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + statusText + '</span></td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + sr.date + '</td></tr>';
     });
-    html += '</tbody></table></div>';
+    html += '</tbody></table>';
   } else {
-    html += '<div style="color:var(--text-muted);padding:40px;text-align:center;background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;">';
-    html += '<div style="font-size:36px;margin-bottom:8px;">📋</div>';
-    html += '<div style="font-size:14px;font-weight:500;color:var(--text-primary);">No service requests</div>';
-    html += '<div style="font-size:12px;">Click "New Request" to submit a support ticket</div>';
-    html += '</div>';
+    html += '<div style="color:var(--text-muted);padding:40px;text-align:center;font-size:12px;">No service requests</div>';
   }
-  html += '</div>';
+  html += '</div></div>';
   
   // ===== CONTACT SUPPORT TAB =====
   html += '<div id="client-tab-support" class="client-tab-content" style="display:none;">';
-  html += '<div style="max-width:600px;">';
-  html += '<h2 style="font-size:18px;font-weight:600;color:var(--text-primary);margin-bottom:12px;">📞 Contact Support</h2>';
-  html += '<p style="color:var(--text-secondary);font-size:13px;margin-bottom:20px;">Our support team is available 24/7 to assist you with any issues.</p>';
-  html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;padding:20px;">';
+  html += '<div class="panel" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px 20px;position:relative;max-width:600px;">';
+  html += '<div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">';
+  html += '<span class="panel-title" style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;">📞 Contact Support</span>';
+  html += '</div>';
+  html += '<p style="color:var(--text-secondary);font-size:13px;margin-bottom:16px;">Our support team is available 24/7 to assist you with any issues.</p>';
+  html += '<div style="display:flex;flex-direction:column;gap:4px;">';
   html += '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><i class="ti ti-phone" style="font-size:20px;color:var(--accent);"></i><div><div style="font-weight:500;color:var(--text-primary);">Phone</div><div style="color:var(--text-secondary);font-size:13px;">+1 (876) 555-0123</div></div></div>';
   html += '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--card-border);"><i class="ti ti-mail" style="font-size:20px;color:var(--accent);"></i><div><div style="font-weight:500;color:var(--text-primary);">Email</div><div style="color:var(--text-secondary);font-size:13px;">support@etechsystems.com</div></div></div>';
   html += '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;"><i class="ti ti-clock" style="font-size:20px;color:var(--accent);"></i><div><div style="font-weight:500;color:var(--text-primary);">Hours</div><div style="color:var(--text-secondary);font-size:13px;">24/7 — Always available</div></div></div>';
@@ -3142,7 +3239,6 @@ function buildClientView(data, user) {
     activeItem.style.color = 'var(--text-primary)';
   }
 }
-
 // ============================================================
 // ── CLIENT TAB SWITCHING ─────────────────────────────────────
 // ============================================================
