@@ -355,7 +355,7 @@
     }
     .quick-btn:active { transform: scale(0.95); background: var(--accent-glow); border-color: var(--accent); }
 
-    /* Stats Cards - Overview */
+    /* Stats Cards */
     .stats-row {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -461,7 +461,7 @@
     .b-med { background: rgba(255,179,71,0.15); color: #ffb347; }
     .b-low { background: rgba(52,211,153,0.15); color: #34d399; }
 
-    /* Device List - Clean & Simple */
+    /* Device List */
     .device-grid {
       display: flex;
       flex-direction: column;
@@ -535,7 +535,7 @@
       flex-shrink: 0;
     }
 
-    /* Filter pills - clean & simple */
+    /* Filter pills */
     .filter-section {
       margin-bottom: 12px;
     }
@@ -704,7 +704,6 @@
     .modal-sheet .modal-actions .btn:active { background: var(--accent-glow); border-color: var(--accent); }
     .modal-sheet .modal-actions .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
     .modal-sheet .modal-actions .btn.success { background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.3); color: var(--success); }
-    .modal-sheet .modal-actions .btn.danger { background: rgba(255,94,122,0.15); border-color: rgba(255,94,122,0.3); color: var(--danger); }
 
     /* Scanner Overlay */
     #scanner-overlay {
@@ -811,7 +810,7 @@
   <header class="field-header">
     <div class="logo-area">
       <img src="logo.png" alt="CAMS" id="field-logo" onerror="this.src='logo.png'">
-      <span class="tech-name" id="header-tech-name">Technician</span>
+      <span class="tech-name" id="header-tech-name">Name</span>
     </div>
     <div class="header-actions">
       <button class="theme-btn" onclick="toggleTheme()" id="theme-toggle-btn"><i class="ti ti-sun"></i></button>
@@ -895,7 +894,7 @@
       <div id="ticket-list"></div>
     </div>
 
-    <!-- Devices Tab - Clean & Simple -->
+    <!-- Devices Tab -->
     <div class="tab-page" id="tab-devices">
       <div class="search-wrap">
         <input type="text" id="device-search" placeholder="Search devices..." oninput="renderDevices()">
@@ -1156,6 +1155,13 @@ function loadData() {
     if (SERVICE_REQUESTS.length === 0) SERVICE_REQUESTS = getEmbeddedSRs();
     if (CLIENTS.length === 0) CLIENTS = ['KFTL', 'KWL', 'Lasco'];
 
+    // Fix camera client assignments based on zone
+    CAMERAS.forEach(function(c) {
+      if (!c.client) {
+        c.client = getClientFromZone(c.zone);
+      }
+    });
+
     // Load today's alarms from audit log
     var now = new Date().toDateString();
     todaysAlarms = AUDIT_LOG.filter(function(a) {
@@ -1166,36 +1172,75 @@ function loadData() {
   }
 }
 
+// Helper to determine client from zone
+function getClientFromZone(zone) {
+  if (!zone) return 'Unknown';
+  var zoneLower = zone.toLowerCase();
+  if (zoneLower.indexOf('north') !== -1 || zoneLower.indexOf('south') !== -1 || 
+      zoneLower.indexOf('east') !== -1 || zoneLower.indexOf('west') !== -1 ||
+      zoneLower.indexOf('high mast') !== -1 || zoneLower.indexOf('terminal') !== -1 ||
+      zoneLower.indexOf('security') !== -1 || zoneLower.indexOf('sal') !== -1 ||
+      zoneLower.indexOf('gate') !== -1 || zoneLower.indexOf('car park') !== -1 ||
+      zoneLower.indexOf('berth') !== -1 || zoneLower.indexOf('wharfage') !== -1 ||
+      zoneLower.indexOf('toll') !== -1 || zoneLower.indexOf('kingport') !== -1) {
+    return 'KFTL';
+  }
+  if (zoneLower.indexOf('tinson') !== -1 || zoneLower.indexOf('warehouse') !== -1 ||
+      zoneLower.indexOf('kwl') !== -1) {
+    return 'KWL';
+  }
+  if (zoneLower.indexOf('liquid') !== -1 || zoneLower.indexOf('lml') !== -1 ||
+      zoneLower.indexOf('ldl') !== -1 || zoneLower.indexOf('lasco') !== -1) {
+    return 'Lasco';
+  }
+  if (zoneLower.indexOf('nestle') !== -1) return 'Nestle';
+  if (zoneLower.indexOf('nids') !== -1) return 'NIDS';
+  if (zoneLower.indexOf('nutrien') !== -1) return 'Nutrien';
+  if (zoneLower.indexOf('fidelity') !== -1 || zoneLower.indexOf('showroom') !== -1 ||
+      zoneLower.indexOf('service center') !== -1) {
+    return 'Fidelity Motors';
+  }
+  return 'Unknown';
+}
+
 // ============================================================
 // ── EMBEDDED DATA ────────────────────────────────────────────
 // ============================================================
 function getEmbeddedCameras() {
   return [
-    {name: "HM3 PTZ", zone: "NORTH", status: "Online", ip_address: "10.19.1.150", model: "AXIS P5635", manufacturer: "Axis", client: "KFTL"},
-    {name: "HM11 PTZ", zone: "NORTH", status: "Defective", ip_address: "10.19.1.159", model: "AXIS Q6075", manufacturer: "Axis", client: "KFTL"},
-    {name: "N25 PTZ", zone: "NORTH", status: "Online", ip_address: "10.19.1.175", model: "AXIS P5635", manufacturer: "Axis", client: "KFTL"},
-    {name: "C1 PTZ", zone: "SOUTH", status: "Online", ip_address: "10.19.1.140", model: "AXIS Q6075", manufacturer: "Axis", client: "KFTL"},
-    {name: "TP-01", zone: "Tinson Pen", status: "Online", ip_address: "172.16.19.91", model: "AXIS P5635", manufacturer: "Axis", client: "KWL"},
-    {name: "WH-01", zone: "Warehouse 1", status: "Online", ip_address: "172.16.20.10", model: "AXIS P5635", manufacturer: "Axis", client: "KWL"},
+    {name: "HM3 PTZ", zone: "NORTH", status: "Online", ip_address: "10.19.1.150", model: "AXIS P5635", manufacturer: "Axis"},
+    {name: "HM11 PTZ", zone: "NORTH", status: "Defective", ip_address: "10.19.1.159", model: "AXIS Q6075", manufacturer: "Axis"},
+    {name: "N25 PTZ", zone: "NORTH", status: "Online", ip_address: "10.19.1.175", model: "AXIS P5635", manufacturer: "Axis"},
+    {name: "C1 PTZ", zone: "SOUTH", status: "Online", ip_address: "10.19.1.140", model: "AXIS Q6075", manufacturer: "Axis"},
+    {name: "TP-01", zone: "Tinson Pen", status: "Online", ip_address: "172.16.19.91", model: "AXIS P5635", manufacturer: "Axis"},
+    {name: "WH-01", zone: "Warehouse 1", status: "Online", ip_address: "172.16.20.10", model: "AXIS P5635", manufacturer: "Axis"},
+    {name: "A7 PTZ", zone: "EAST", status: "Online", ip_address: "10.19.1.130", model: "AXIS P5635", manufacturer: "Axis"},
+    {name: "W1", zone: "WEST", status: "No Power", ip_address: "10.19.1.180", model: "AXIS P5635", manufacturer: "Axis"},
+    {name: "LDL-01", zone: "LDL Warehouse", status: "Online", ip_address: "10.20.2.20", model: "AXIS P5635", manufacturer: "Axis"},
+    {name: "LML-01", zone: "LML B Liquid Plant", status: "Offline", ip_address: "10.20.3.30", model: "AXIS P5635", manufacturer: "Axis"},
   ];
 }
 function getEmbeddedDoors() {
   return [
-    {name: "Main Entrance", site: "Security Office", client: "KFTL", status: "Online", tech: "Shanice Vernon", reader: "HID Prox", lock_type: "600lb", ip: "10.19.1.100"},
-    {name: "2nd Entrance", site: "SAL Duty Office", client: "KFTL", status: "Offline", tech: "Marvin Grant", reader: "HID Prox", lock_type: "1200lb", ip: "10.19.1.101"},
-    {name: "Warehouse Main", site: "Warehouse 1", client: "KWL", status: "Online", tech: "Ackeem", reader: "HID Prox", lock_type: "600lb", ip: "172.16.20.10"},
+    {name: "Main Entrance", site: "Security Office", status: "Online", tech: "Shanice Vernon", reader: "HID Prox", lock_type: "600lb", ip: "10.19.1.100"},
+    {name: "2nd Entrance", site: "SAL Duty Office", status: "Offline", tech: "Marvin Grant", reader: "HID Prox", lock_type: "1200lb", ip: "10.19.1.101"},
+    {name: "Warehouse Main", site: "Warehouse 1", status: "Online", tech: "Ackeem", reader: "HID Prox", lock_type: "600lb", ip: "172.16.20.10"},
+    {name: "Batching room", site: "LML B Liquid Plant", status: "Online", tech: "Unassigned", reader: "HID Prox", lock_type: "600lb", ip: ""},
+    {name: "Lobby", site: "LML B Liquid Plant", status: "Online", tech: "Unassigned", reader: "HID Prox", lock_type: "600lb", ip: ""},
   ];
 }
 function getEmbeddedServers() {
   return [
-    {location: "Kingport", serial: "J1013DDR", client: "KFTL", make: "Dell", model: "PowerEdge R740", capacity: "6.11TB", used: "1.4TB", health: "Good (23%)", apps: "Ocularis DM5", status: "ONLINE"},
-    {location: "Kingport", serial: "J1013DDV", client: "KFTL", make: "HP", model: "ProLiant DL380", capacity: "6.11TB", used: "1.4TB", health: "Good, Failed drive", apps: "Ocularis DM6", status: "ONLINE"},
+    {location: "Kingport", serial: "J1013DDR", make: "Dell", model: "PowerEdge R740", capacity: "6.11TB", used: "1.4TB", health: "Good (23%)", apps: "Ocularis DM5", status: "ONLINE"},
+    {location: "Kingport", serial: "J1013DDV", make: "HP", model: "ProLiant DL380", capacity: "6.11TB", used: "1.4TB", health: "Good, Failed drive", apps: "Ocularis DM6", status: "ONLINE"},
+    {location: "Tinson Pen", serial: "KWL-SRV-01", make: "Dell", model: "PowerEdge R740", capacity: "6.11TB", used: "1.4TB", health: "Good (23%)", apps: "Ocularis DM5", status: "ONLINE"},
   ];
 }
 function getEmbeddedSwitches() {
   return [
-    {name: "Main Entrance", location: "Security Office", client: "KFTL", model: "AXIS T8508", ip_address: "10.19.1.21", firmware: "6.54.2739", mac: "AC:CC:8E:FA:4B:1B"},
-    {name: "2nd entrance", location: "SAL Duty Office", client: "KFTL", model: "AXIS T8516", ip_address: "10.19.1.23", firmware: "6.54.2739", mac: "AC:CC:8E:B6:DF:99"},
+    {name: "Main Entrance", location: "Security Office", model: "AXIS T8508", ip_address: "10.19.1.21", firmware: "6.54.2739", mac: "AC:CC:8E:FA:4B:1B"},
+    {name: "2nd entrance", location: "SAL Duty Office", model: "AXIS T8516", ip_address: "10.19.1.23", firmware: "6.54.2739", mac: "AC:CC:8E:B6:DF:99"},
+    {name: "TP Switch 1", location: "Tinson Pen", model: "AXIS T8508", ip_address: "10.19.1.21", firmware: "6.54.2739", mac: "AC:CC:8E:FA:4B:1C"},
   ];
 }
 function getEmbeddedSRs() {
@@ -1319,7 +1364,6 @@ function renderActivity() {
     return new Date(a.time).toDateString() === today;
   }).slice(0, 5);
 
-  // If no audit log activity, use sample or show empty
   if (!activities.length) {
     container.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px 0;">No activity today</div>';
     return;
@@ -1448,13 +1492,14 @@ function setTicketFilter(f) {
 }
 
 // ============================================================
-// ── DEVICES ── Clean & Simple ──────────────────────────────
+// ── DEVICES ──────────────────────────────────────────────────
 // ============================================================
 function renderDevices() {
   var q = document.getElementById('device-search') ? document.getElementById('device-search').value.toLowerCase() : '';
   var allDevices = [];
 
   CAMERAS.forEach(function(c) {
+    var client = c.client || getClientFromZone(c.zone);
     allDevices.push({
       type: 'camera',
       name: c.name,
@@ -1463,12 +1508,13 @@ function renderDevices() {
       ip: c.ip_address || '',
       model: c.model || '',
       manufacturer: c.manufacturer || '',
-      client: c.client || 'Unknown',
+      client: client,
       id: c.name,
       raw: c
     });
   });
   DOORS.forEach(function(d) {
+    var client = d.client || getClientFromZone(d.site);
     allDevices.push({
       type: 'door',
       name: d.name,
@@ -1477,12 +1523,13 @@ function renderDevices() {
       ip: d.ip || '',
       model: d.reader || '',
       manufacturer: d.lock_type || '',
-      client: d.client || 'Unknown',
+      client: client,
       id: d.name,
       raw: d
     });
   });
   SERVERS.forEach(function(s) {
+    var client = s.client || getClientFromZone(s.location);
     allDevices.push({
       type: 'server',
       name: s.serial,
@@ -1491,12 +1538,13 @@ function renderDevices() {
       ip: '',
       model: s.make + ' ' + s.model,
       manufacturer: s.health || '',
-      client: s.client || 'Unknown',
+      client: client,
       id: s.serial,
       raw: s
     });
   });
   SWITCHES.forEach(function(s) {
+    var client = s.client || getClientFromZone(s.location);
     allDevices.push({
       type: 'switch',
       name: s.name,
@@ -1505,7 +1553,7 @@ function renderDevices() {
       ip: s.ip_address || '',
       model: s.model || '',
       manufacturer: s.firmware || '',
-      client: s.client || 'Unknown',
+      client: client,
       id: s.name,
       raw: s
     });
@@ -1564,13 +1612,26 @@ function renderClientFilters() {
   var container = document.getElementById('client-filter-pills');
   if (!container) return;
 
-  var allDevices = [];
-  CAMERAS.forEach(function(c) { allDevices.push(c.client || 'Unknown'); });
-  DOORS.forEach(function(d) { allDevices.push(d.client || 'Unknown'); });
-  SERVERS.forEach(function(s) { allDevices.push(s.client || 'Unknown'); });
-  SWITCHES.forEach(function(s) { allDevices.push(s.client || 'Unknown'); });
+  // Get unique clients from all devices
+  var allClients = [];
+  CAMERAS.forEach(function(c) { 
+    var client = c.client || getClientFromZone(c.zone);
+    if (client && client !== 'Unknown') allClients.push(client);
+  });
+  DOORS.forEach(function(d) { 
+    var client = d.client || getClientFromZone(d.site);
+    if (client && client !== 'Unknown') allClients.push(client);
+  });
+  SERVERS.forEach(function(s) { 
+    var client = s.client || getClientFromZone(s.location);
+    if (client && client !== 'Unknown') allClients.push(client);
+  });
+  SWITCHES.forEach(function(s) { 
+    var client = s.client || getClientFromZone(s.location);
+    if (client && client !== 'Unknown') allClients.push(client);
+  });
 
-  var uniqueClients = Array.from(new Set(allDevices)).filter(function(c) { return c && c !== 'Unknown'; }).sort();
+  var uniqueClients = Array.from(new Set(allClients)).sort();
 
   var html = '<button class="filter-pill client-pill active" data-client="all" onclick="setClientFilter(\'all\')">All</button>';
   uniqueClients.forEach(function(client) {
@@ -1624,14 +1685,15 @@ function openDeviceDetail(id, type) {
 
   var d = device.data;
   var typeLabel = device.type.charAt(0).toUpperCase() + device.type.slice(1);
+  var client = d.client || getClientFromZone(d.zone || d.location || d.site);
 
   document.getElementById('modal-title').textContent = d.name || d.serial || 'Unknown';
-  document.getElementById('modal-sub').textContent = typeLabel + ' · ' + (d.client || 'Unknown');
+  document.getElementById('modal-sub').textContent = typeLabel + ' · ' + client;
 
   var body = '';
   body += '<div class="detail-row"><span class="label">Name</span><span class="value">' + (d.name || d.serial || '—') + '</span></div>';
   body += '<div class="detail-row"><span class="label">Status</span><span class="value">' + (d.status || '—') + '</span></div>';
-  body += '<div class="detail-row"><span class="label">Client</span><span class="value">' + (d.client || '—') + '</span></div>';
+  body += '<div class="detail-row"><span class="label">Client</span><span class="value">' + client + '</span></div>';
   body += '<div class="detail-row"><span class="label">Location</span><span class="value">' + (d.zone || d.location || d.site || '—') + '</span></div>';
   if (d.ip || d.ip_address) body += '<div class="detail-row"><span class="label">IP Address</span><span class="value">' + (d.ip || d.ip_address || '—') + '</span></div>';
   if (d.model) body += '<div class="detail-row"><span class="label">Model</span><span class="value">' + d.model + '</span></div>';
@@ -1872,10 +1934,10 @@ function lookupManual() {
 
 function lookupDevice(query) {
   var all = [];
-  CAMERAS.forEach(function(c) { all.push({ type: 'camera', data: c }); });
-  DOORS.forEach(function(d) { all.push({ type: 'door', data: d }); });
-  SERVERS.forEach(function(s) { all.push({ type: 'server', data: s }); });
-  SWITCHES.forEach(function(s) { all.push({ type: 'switch', data: s }); });
+  CAMERAS.forEach(function(c) { all.push({ type: 'camera', data: c, client: c.client || getClientFromZone(c.zone) }); });
+  DOORS.forEach(function(d) { all.push({ type: 'door', data: d, client: d.client || getClientFromZone(d.site) }); });
+  SERVERS.forEach(function(s) { all.push({ type: 'server', data: s, client: s.client || getClientFromZone(s.location) }); });
+  SWITCHES.forEach(function(s) { all.push({ type: 'switch', data: s, client: s.client || getClientFromZone(s.location) }); });
 
   var q = query.toLowerCase();
   var found = null;
@@ -1896,6 +1958,7 @@ function lookupDevice(query) {
   }
 
   var d = found.data;
+  var client = found.client || 'Unknown';
   var statusDot = d.status === 'Online' ? 'online' : d.status === 'Offline' ? 'offline' : 'warning';
   var ip = d.ip_address || d.ip || 'N/A';
 
@@ -1905,7 +1968,7 @@ function lookupDevice(query) {
     '<span class="status-dot ' + statusDot + '"></span> ' + d.status +
     ' · ' + (d.zone || d.location || d.site || '') +
     '</div>' +
-    '<div style="font-size:12px;color:var(--text3);">Client: ' + (d.client || 'Unknown') + (ip !== 'N/A' ? ' · IP: ' + ip : '') + '</div>' +
+    '<div style="font-size:12px;color:var(--text3);">Client: ' + client + (ip !== 'N/A' ? ' · IP: ' + ip : '') + '</div>' +
     '<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">' +
     (ip !== 'N/A' ? '<button class="btn" onclick="event.stopPropagation();pingDevice(\'' + ip + '\', \'' + (d.name || d.serial) + '\')">Ping</button>' : '') +
     (ip !== 'N/A' ? '<button class="btn" onclick="event.stopPropagation();openController(\'' + ip + '\')">Open</button>' : '') +
