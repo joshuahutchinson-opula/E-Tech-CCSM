@@ -1,21 +1,16 @@
 {
-  "name": "cams-server",
+  "name": "cams-app",
   "version": "1.0.0",
-  "description": "Client Assessment Management System - Backend Server",
+  "description": "CAMS - Client Assessment Management System",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "jsonwebtoken": "^9.0.0",
-    "bcryptjs": "^2.4.3",
-    "nodemailer": "^6.9.1",
-    "dotenv": "^16.0.3"
+    "cors": "^2.8.5"
   },
-  "devDependencies": {
-    "nodemon": "^2.0.22"
+  "engines": {
+    "node": ">=16.0.0"
   }
 }
