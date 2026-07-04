@@ -535,7 +535,7 @@
       flex-shrink: 0;
     }
 
-    /* Filter pills */
+    /* Filter elements */
     .filter-section {
       margin-bottom: 12px;
     }
@@ -570,10 +570,39 @@
       color: #fff;
       border-color: var(--accent);
     }
-    .filter-pill.client-pill.active {
-      background: var(--border);
+
+    /* Dropdown */
+    .dropdown-wrap {
+      position: relative;
+      width: 100%;
+      margin-bottom: 8px;
+    }
+    .dropdown-wrap select {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card);
       color: var(--text);
-      border-color: var(--border);
+      font-size: 14px;
+      font-family: var(--font);
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+      cursor: pointer;
+      min-height: 44px;
+    }
+    .dropdown-wrap select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-glow);
+    }
+    .dropdown-wrap select option {
+      background: var(--bg);
+      color: var(--text);
     }
 
     /* Toast */
@@ -677,6 +706,14 @@
     }
     .modal-sheet .modal-body .detail-row .label { color: var(--text3); }
     .modal-sheet .modal-body .detail-row .value { color: var(--text); font-weight: 500; }
+    .modal-sheet .modal-body .section-divider {
+      margin: 10px 0 6px 0;
+      font-weight: 600;
+      color: var(--text2);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
     .modal-sheet .modal-actions {
       display: flex;
       gap: 8px;
@@ -900,17 +937,16 @@
         <input type="text" id="device-search" placeholder="Search devices..." oninput="renderDevices()">
       </div>
 
-      <!-- Client Filter -->
-      <div class="filter-section">
-        <div class="filter-label">Client</div>
-        <div class="filter-pills" id="client-filter-pills">
-          <button class="filter-pill client-pill active" data-client="all" onclick="setClientFilter('all')">All</button>
-        </div>
+      <!-- Client Dropdown -->
+      <div class="dropdown-wrap">
+        <select id="client-dropdown" onchange="setClientFilter(this.value)">
+          <option value="all">All Clients</option>
+        </select>
       </div>
 
       <!-- Type Filter -->
       <div class="filter-section">
-        <div class="filter-label">Type</div>
+        <div class="filter-label">Asset Type</div>
         <div class="filter-pills">
           <button class="filter-pill active" onclick="setDeviceFilter('all')">All</button>
           <button class="filter-pill" onclick="setDeviceFilter('cameras')">Cameras</button>
@@ -1013,6 +1049,7 @@ var CAMERAS = [];
 var DOORS = [];
 var SERVERS = [];
 var SWITCHES = [];
+var SOFTWARE = [];
 var SERVICE_REQUESTS = [];
 var AUDIT_LOG = [];
 var CLIENTS = [];
@@ -1144,6 +1181,7 @@ function loadData() {
     DOORS = JSON.parse(localStorage.getItem('ccsm_doors') || '[]');
     SERVERS = JSON.parse(localStorage.getItem('ccsm_servers') || '[]');
     SWITCHES = JSON.parse(localStorage.getItem('ccsm_switches') || '[]');
+    SOFTWARE = JSON.parse(localStorage.getItem('ccsm_software') || '[]');
     SERVICE_REQUESTS = JSON.parse(localStorage.getItem('ccsm_sr') || '[]');
     AUDIT_LOG = JSON.parse(localStorage.getItem('ccsm_audit_log') || '[]');
     CLIENTS = JSON.parse(localStorage.getItem('ccsm_clients') || '[]');
@@ -1152,13 +1190,29 @@ function loadData() {
     if (DOORS.length === 0) DOORS = getEmbeddedDoors();
     if (SERVERS.length === 0) SERVERS = getEmbeddedServers();
     if (SWITCHES.length === 0) SWITCHES = getEmbeddedSwitches();
+    if (SOFTWARE.length === 0) SOFTWARE = getEmbeddedSoftware();
     if (SERVICE_REQUESTS.length === 0) SERVICE_REQUESTS = getEmbeddedSRs();
-    if (CLIENTS.length === 0) CLIENTS = ['KFTL', 'KWL', 'Lasco'];
+    if (CLIENTS.length === 0) CLIENTS = ['KFTL', 'KWL', 'Lasco', 'Nestle', 'NIDS', 'Nutrien', 'Fidelity Motors'];
 
-    // Fix camera client assignments based on zone
+    // Fix device client assignments based on zone
     CAMERAS.forEach(function(c) {
-      if (!c.client) {
+      if (!c.client || c.client === 'Unknown') {
         c.client = getClientFromZone(c.zone);
+      }
+    });
+    DOORS.forEach(function(d) {
+      if (!d.client || d.client === 'Unknown') {
+        d.client = getClientFromZone(d.site);
+      }
+    });
+    SERVERS.forEach(function(s) {
+      if (!s.client || s.client === 'Unknown') {
+        s.client = getClientFromZone(s.location);
+      }
+    });
+    SWITCHES.forEach(function(s) {
+      if (!s.client || s.client === 'Unknown') {
+        s.client = getClientFromZone(s.location);
       }
     });
 
@@ -1167,6 +1221,10 @@ function loadData() {
     todaysAlarms = AUDIT_LOG.filter(function(a) {
       return a.action === 'alarm' && new Date(a.time).toDateString() === now;
     }).length;
+
+    // Populate client dropdown
+    populateClientDropdown();
+
   } catch (e) {
     console.warn('Data load error', e);
   }
@@ -1203,51 +1261,78 @@ function getClientFromZone(zone) {
   return 'Unknown';
 }
 
+function populateClientDropdown() {
+  var dropdown = document.getElementById('client-dropdown');
+  if (!dropdown) return;
+
+  var allClients = [];
+  CAMERAS.forEach(function(c) { if (c.client && c.client !== 'Unknown') allClients.push(c.client); });
+  DOORS.forEach(function(d) { if (d.client && d.client !== 'Unknown') allClients.push(d.client); });
+  SERVERS.forEach(function(s) { if (s.client && s.client !== 'Unknown') allClients.push(s.client); });
+  SWITCHES.forEach(function(s) { if (s.client && s.client !== 'Unknown') allClients.push(s.client); });
+
+  var uniqueClients = Array.from(new Set(allClients)).sort();
+
+  var html = '<option value="all">All Clients</option>';
+  uniqueClients.forEach(function(client) {
+    html += '<option value="' + client + '">' + client + '</option>';
+  });
+  dropdown.innerHTML = html;
+}
+
 // ============================================================
 // ── EMBEDDED DATA ────────────────────────────────────────────
 // ============================================================
 function getEmbeddedCameras() {
   return [
-    {name: "HM3 PTZ", zone: "NORTH", status: "Online", ip_address: "10.19.1.150", model: "AXIS P5635", manufacturer: "Axis"},
-    {name: "HM11 PTZ", zone: "NORTH", status: "Defective", ip_address: "10.19.1.159", model: "AXIS Q6075", manufacturer: "Axis"},
-    {name: "N25 PTZ", zone: "NORTH", status: "Online", ip_address: "10.19.1.175", model: "AXIS P5635", manufacturer: "Axis"},
-    {name: "C1 PTZ", zone: "SOUTH", status: "Online", ip_address: "10.19.1.140", model: "AXIS Q6075", manufacturer: "Axis"},
-    {name: "TP-01", zone: "Tinson Pen", status: "Online", ip_address: "172.16.19.91", model: "AXIS P5635", manufacturer: "Axis"},
-    {name: "WH-01", zone: "Warehouse 1", status: "Online", ip_address: "172.16.20.10", model: "AXIS P5635", manufacturer: "Axis"},
-    {name: "A7 PTZ", zone: "EAST", status: "Online", ip_address: "10.19.1.130", model: "AXIS P5635", manufacturer: "Axis"},
-    {name: "W1", zone: "WEST", status: "No Power", ip_address: "10.19.1.180", model: "AXIS P5635", manufacturer: "Axis"},
-    {name: "LDL-01", zone: "LDL Warehouse", status: "Online", ip_address: "10.20.2.20", model: "AXIS P5635", manufacturer: "Axis"},
-    {name: "LML-01", zone: "LML B Liquid Plant", status: "Offline", ip_address: "10.20.3.30", model: "AXIS P5635", manufacturer: "Axis"},
+    {name: "HM3 PTZ", zone: "NORTH", status: "Online", ip_address: "10.19.1.150", model: "AXIS P5635", manufacturer: "Axis", archiver: "DM5", resolution: "1080p", mac_address: "00-04-7D-27-9F-CF", purchase_date: "2024-01-15", warranty_expiry: "2026-01-15", comments: "POE added, camera shows signs of being defective"},
+    {name: "HM11 PTZ", zone: "NORTH", status: "Online", ip_address: "10.19.1.159", model: "AXIS Q6075", manufacturer: "Axis", archiver: "DM3", resolution: "4K", mac_address: "00-04-7D-27-9F-F0", purchase_date: "2023-06-01", warranty_expiry: "2025-06-01", comments: "Working"},
+    {name: "N25 PTZ", zone: "NORTH", status: "Online", ip_address: "10.19.1.175", model: "AXIS P5635", manufacturer: "Axis", archiver: "DM6", resolution: "1080p", mac_address: "00-04-7D-27-9F-BA", purchase_date: "2024-08-15", warranty_expiry: "2026-08-15", comments: "Working"},
+    {name: "C1 PTZ", zone: "SOUTH", status: "Online", ip_address: "10.19.1.140", model: "AXIS Q6075", manufacturer: "Axis", archiver: "DM4", resolution: "4K", mac_address: "00-04-7D-27-9F-F2", purchase_date: "2023-11-01", warranty_expiry: "2025-11-01", comments: "Camera is defective"},
+    {name: "TP-01", zone: "Tinson Pen", status: "Online", ip_address: "172.16.19.91", model: "AXIS P5635", manufacturer: "Axis", archiver: "DM5", resolution: "1080p", mac_address: "00-04-7D-27-9F-C1", purchase_date: "2024-04-01", warranty_expiry: "2026-04-01", comments: "Camera recalibrated"},
+    {name: "WH-01", zone: "Warehouse 1", status: "Online", ip_address: "172.16.20.10", model: "AXIS P5635", manufacturer: "Axis", archiver: "DM5", resolution: "1080p", mac_address: "00-04-7D-27-9F-C3", purchase_date: "2024-03-01", warranty_expiry: "2026-03-01", comments: "Lens cleaned"},
+    {name: "A7 PTZ", zone: "EAST", status: "Defective", ip_address: "10.19.1.130", model: "AXIS P5635", manufacturer: "Axis", archiver: "DM4", resolution: "1080p", mac_address: "00-04-7D-27-9F-CA", purchase_date: "2024-05-20", warranty_expiry: "2026-05-20", comments: "Camera defective"},
+    {name: "W1", zone: "WEST", status: "No Power", ip_address: "10.19.1.180", model: "AXIS P5635", manufacturer: "Axis", archiver: "DM2", resolution: "1080p", mac_address: "00-18-85-30-A2-10", purchase_date: "2024-03-15", warranty_expiry: "2026-03-15", comments: "Cabinet box and lock damaged"},
+    {name: "LDL-01", zone: "LDL Warehouse", status: "Online", ip_address: "10.20.2.20", model: "AXIS P5635", manufacturer: "Axis", archiver: "DM5", resolution: "1080p", mac_address: "00-18-85-30-A2-11", purchase_date: "2024-01-15", warranty_expiry: "2026-01-15", comments: "Working"},
+    {name: "LML-01", zone: "LML B Liquid Plant", status: "Offline", ip_address: "10.20.3.30", model: "AXIS P5635", manufacturer: "Axis", archiver: "DM5", resolution: "1080p", mac_address: "00-18-85-30-A2-12", purchase_date: "2023-12-01", warranty_expiry: "2025-12-01", comments: "Power outage reported"},
   ];
 }
 function getEmbeddedDoors() {
   return [
-    {name: "Main Entrance", site: "Security Office", status: "Online", tech: "Shanice Vernon", reader: "HID Prox", lock_type: "600lb", ip: "10.19.1.100"},
-    {name: "2nd Entrance", site: "SAL Duty Office", status: "Offline", tech: "Marvin Grant", reader: "HID Prox", lock_type: "1200lb", ip: "10.19.1.101"},
-    {name: "Warehouse Main", site: "Warehouse 1", status: "Online", tech: "Ackeem", reader: "HID Prox", lock_type: "600lb", ip: "172.16.20.10"},
-    {name: "Batching room", site: "LML B Liquid Plant", status: "Online", tech: "Unassigned", reader: "HID Prox", lock_type: "600lb", ip: ""},
-    {name: "Lobby", site: "LML B Liquid Plant", status: "Online", tech: "Unassigned", reader: "HID Prox", lock_type: "600lb", ip: ""},
+    {name: "Main Entrance", site: "Security Office", status: "Online", tech: "Shanice Vernon", reader: "HID Prox", lock_type: "600lb", ip: "10.19.1.100", controllerType: "Standalone", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "Yes", powered: "Yes", purchase_date: "2024-01-01", warranty_expiry: "2026-01-01", comments: "High traffic door", history: [{date: "2024-06-10", event: "Routine maintenance"}]},
+    {name: "2nd Entrance", site: "SAL Duty Office", status: "Offline", tech: "Marvin Grant", reader: "HID Prox", lock_type: "1200lb", ip: "10.19.1.101", controllerType: "Integrated", doorSwing: "Out", accessType: "Read In + Push Out", antiPassback: "No", powered: "Yes", purchase_date: "2024-02-15", warranty_expiry: "2026-02-15", comments: "Offline - needs attention", history: [{date: "2024-05-30", event: "Offline alert"}]},
+    {name: "Warehouse Main", site: "Warehouse 1", status: "Online", tech: "Ackeem", reader: "HID Prox", lock_type: "600lb", ip: "172.16.20.10", controllerType: "Standalone", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "Yes", powered: "Yes", purchase_date: "2024-02-01", warranty_expiry: "2026-02-01", comments: "", history: [{date: "2024-05-15", event: "Battery replaced"}]},
+    {name: "Batching room", site: "LML B Liquid Plant", status: "Online", tech: "Unassigned", reader: "HID Prox", lock_type: "600lb", ip: "", controllerType: "Standalone", doorSwing: "In", accessType: "Read In Only", antiPassback: "No", powered: "Yes", purchase_date: "2024-03-01", warranty_expiry: "2026-03-01", comments: "No longer use equipment has been removed", history: []},
+    {name: "Lobby", site: "LML B Liquid Plant", status: "Online", tech: "Unassigned", reader: "HID Prox", lock_type: "600lb", ip: "", controllerType: "Standalone", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", powered: "Yes", purchase_date: "2024-03-01", warranty_expiry: "2026-03-01", comments: "", history: []},
   ];
 }
 function getEmbeddedServers() {
   return [
-    {location: "Kingport", serial: "J1013DDR", make: "Dell", model: "PowerEdge R740", capacity: "6.11TB", used: "1.4TB", health: "Good (23%)", apps: "Ocularis DM5", status: "ONLINE"},
-    {location: "Kingport", serial: "J1013DDV", make: "HP", model: "ProLiant DL380", capacity: "6.11TB", used: "1.4TB", health: "Good, Failed drive", apps: "Ocularis DM6", status: "ONLINE"},
-    {location: "Tinson Pen", serial: "KWL-SRV-01", make: "Dell", model: "PowerEdge R740", capacity: "6.11TB", used: "1.4TB", health: "Good (23%)", apps: "Ocularis DM5", status: "ONLINE"},
+    {location: "Kingport", serial: "J1013DDR", make: "Dell", model: "PowerEdge R740", capacity: "6.11TB", used: "1.4TB", health: "Good (23%)", apps: "Ocularis DM5, LPR", status: "ONLINE", purchase_date: "2024-01-15", warranty_expiry: "2026-01-15", comments: ""},
+    {location: "Kingport", serial: "J1013DDV", make: "HP", model: "ProLiant DL380", capacity: "6.11TB", used: "1.4TB", health: "Good, Failed drive", apps: "Ocularis DM6, Eyelock", status: "ONLINE", purchase_date: "2023-06-01", warranty_expiry: "2025-06-01", comments: "Drive replacement advised"},
+    {location: "Tinson Pen", serial: "KWL-SRV-01", make: "Dell", model: "PowerEdge R740", capacity: "6.11TB", used: "1.4TB", health: "Good (23%)", apps: "Ocularis DM5", status: "ONLINE", purchase_date: "2024-01-01", warranty_expiry: "2026-01-01", comments: ""},
   ];
 }
 function getEmbeddedSwitches() {
   return [
-    {name: "Main Entrance", location: "Security Office", model: "AXIS T8508", ip_address: "10.19.1.21", firmware: "6.54.2739", mac: "AC:CC:8E:FA:4B:1B"},
-    {name: "2nd entrance", location: "SAL Duty Office", model: "AXIS T8516", ip_address: "10.19.1.23", firmware: "6.54.2739", mac: "AC:CC:8E:B6:DF:99"},
-    {name: "TP Switch 1", location: "Tinson Pen", model: "AXIS T8508", ip_address: "10.19.1.21", firmware: "6.54.2739", mac: "AC:CC:8E:FA:4B:1C"},
+    {name: "Main Entrance", location: "Security Office", model: "AXIS T8508", ip_address: "10.19.1.21", firmware: "6.54.2739", mac: "AC:CC:8E:FA:4B:1B", purchase_date: "2024-02-01", warranty_expiry: "2026-02-01", comments: ""},
+    {name: "2nd entrance", location: "SAL Duty Office", model: "AXIS T8516", ip_address: "10.19.1.23", firmware: "6.54.2739", mac: "AC:CC:8E:B6:DF:99", purchase_date: "2024-03-15", warranty_expiry: "2026-03-15", comments: ""},
+    {name: "TP Switch 1", location: "Tinson Pen", model: "AXIS T8508", ip_address: "10.19.1.21", firmware: "6.54.2739", mac: "AC:CC:8E:FA:4B:1C", purchase_date: "2024-02-15", warranty_expiry: "2026-02-15", comments: "Port configuration updated"},
+  ];
+}
+function getEmbeddedSoftware() {
+  return [
+    {vendor: "Genetec", client: "KFTL", version: "14.0.2.27", license_type: "Regular license (1)", sma_expiry: "2026-12-31", status: "Good"},
+    {vendor: "Axis", client: "KFTL", version: "Various", license_type: "Regular license (1)", sma_expiry: "2026-12-31", status: "Good"},
+    {vendor: "Avigilon", client: "KFTL", version: "4.8.0.12", license_type: "Regular license (1)", sma_expiry: "2026-12-31", status: "Good"},
+    {vendor: "Lenel", client: "KWL", version: "7.3.1", license_type: "Enterprise", sma_expiry: "2026-06-15", status: "Warning"},
   ];
 }
 function getEmbeddedSRs() {
   return [
-    {id: "SR-1847", client: "KFTL", site: "NORTH", subject: "8 Cameras Defective in NORTH Zone", priority: "High", status: "Open", assigned: "tech", received: "Jun 15, 2026", body: "Multiple cameras showing as defective in NORTH zone.", notes: "", history: [{time: "14:22", msg: "Created"}]},
-    {id: "SR-1848", client: "KWL", site: "Tinson Pen", subject: "5 Cameras Offline - Urgent", priority: "High", status: "In Progress", assigned: "tech", received: "Jun 15, 2026", body: "5 cameras down simultaneously at Tinson Pen.", notes: "", history: [{time: "11:05", msg: "Created"}]},
-    {id: "SR-1849", client: "KFTL", site: "SAL Duty Office", subject: "Door 2nd Entrance Offline", priority: "Medium", status: "Open", assigned: "Shanice Vernon", received: "Jun 16, 2026", body: "2nd Entrance door reader offline.", notes: "", history: [{time: "08:00", msg: "Created"}]},
+    {id: "SR-1847", client: "KFTL", site: "NORTH", subject: "8 Cameras Defective in NORTH Zone", priority: "High", status: "Open", assigned: "tech", received: "Jun 15, 2026", body: "Multiple cameras showing as defective in NORTH zone. Need immediate attention.", notes: "Awaiting parts", history: [{time: "14:22", msg: "Created"}, {time: "15:00", msg: "Assigned to Shanice"}]},
+    {id: "SR-1848", client: "KWL", site: "Tinson Pen", subject: "5 Cameras Offline - Urgent", priority: "High", status: "In Progress", assigned: "tech", received: "Jun 15, 2026", body: "5 cameras down simultaneously at Tinson Pen. Need eyes back up ASAP.", notes: "On-site investigation", history: [{time: "11:05", msg: "Created"}, {time: "12:30", msg: "Dispatched to site"}]},
+    {id: "SR-1849", client: "KFTL", site: "SAL Duty Office", subject: "Door 2nd Entrance Offline", priority: "Medium", status: "Open", assigned: "Shanice Vernon", received: "Jun 16, 2026", body: "2nd Entrance door reader offline. Need immediate attention.", notes: "", history: [{time: "08:00", msg: "Created"}]},
   ];
 }
 
@@ -1359,7 +1444,6 @@ function renderActivity() {
   var container = document.getElementById('today-activity');
   var today = new Date().toDateString();
 
-  // Get today's activity from audit log
   var activities = AUDIT_LOG.filter(function(a) {
     return new Date(a.time).toDateString() === today;
   }).slice(0, 5);
@@ -1508,6 +1592,12 @@ function renderDevices() {
       ip: c.ip_address || '',
       model: c.model || '',
       manufacturer: c.manufacturer || '',
+      archiver: c.archiver || '',
+      resolution: c.resolution || '',
+      mac_address: c.mac_address || '',
+      purchase_date: c.purchase_date || '',
+      warranty_expiry: c.warranty_expiry || '',
+      comments: c.comments || '',
       client: client,
       id: c.name,
       raw: c
@@ -1523,6 +1613,16 @@ function renderDevices() {
       ip: d.ip || '',
       model: d.reader || '',
       manufacturer: d.lock_type || '',
+      controllerType: d.controllerType || '',
+      doorSwing: d.doorSwing || '',
+      accessType: d.accessType || '',
+      antiPassback: d.antiPassback || '',
+      powered: d.powered || '',
+      tech: d.tech || '',
+      purchase_date: d.purchase_date || '',
+      warranty_expiry: d.warranty_expiry || '',
+      comments: d.comments || '',
+      history: d.history || [],
       client: client,
       id: d.name,
       raw: d
@@ -1537,7 +1637,14 @@ function renderDevices() {
       status: s.status,
       ip: '',
       model: s.make + ' ' + s.model,
-      manufacturer: s.health || '',
+      manufacturer: s.make || '',
+      capacity: s.capacity || '',
+      used: s.used || '',
+      health: s.health || '',
+      apps: s.apps || '',
+      purchase_date: s.purchase_date || '',
+      warranty_expiry: s.warranty_expiry || '',
+      comments: s.comments || '',
       client: client,
       id: s.serial,
       raw: s
@@ -1552,7 +1659,12 @@ function renderDevices() {
       status: 'Online',
       ip: s.ip_address || '',
       model: s.model || '',
-      manufacturer: s.firmware || '',
+      manufacturer: s.model || '',
+      firmware: s.firmware || '',
+      mac: s.mac || '',
+      purchase_date: s.purchase_date || '',
+      warranty_expiry: s.warranty_expiry || '',
+      comments: s.comments || '',
       client: client,
       id: s.name,
       raw: s
@@ -1576,12 +1688,9 @@ function renderDevices() {
     return a.name.localeCompare(b.name);
   });
 
-  // Update client filters
-  renderClientFilters();
-
   var container = document.getElementById('device-list');
   if (!filtered.length) {
-    container.innerHTML = '<div class="empty-state"><i class="ti ti-devices"></i><div class="empty-title">No devices found</div></div>';
+    container.innerHTML = '<div class="empty-state"><i class="ti ti-devices"></i><div class="empty-title">No devices found for this client</div></div>';
     return;
   }
 
@@ -1589,11 +1698,12 @@ function renderDevices() {
     var statusDot = d.status === 'Online' ? 'online' : d.status === 'Offline' ? 'offline' : 'warning';
     var statusDisplay = d.status === 'Online' ? 'Online' : d.status === 'Offline' ? 'Offline' : d.status;
     var typeLabel = d.type.charAt(0).toUpperCase() + d.type.slice(1);
+    var typeIcon = d.type === 'camera' ? '📷' : d.type === 'door' ? '🚪' : d.type === 'server' ? '🖥' : '🔌';
 
     return '<div class="device-card" onclick="openDeviceDetail(\'' + d.id + '\', \'' + d.type + '\')">' +
       '<div class="dev-left">' +
       '<div class="dev-name">' +
-      d.name +
+      typeIcon + ' ' + d.name +
       '<span class="dev-type">' + typeLabel + '</span>' +
       '</div>' +
       '<div class="dev-detail">' +
@@ -1608,50 +1718,16 @@ function renderDevices() {
   }).join('') + '</div>';
 }
 
-function renderClientFilters() {
-  var container = document.getElementById('client-filter-pills');
-  if (!container) return;
-
-  // Get unique clients from all devices
-  var allClients = [];
-  CAMERAS.forEach(function(c) { 
-    var client = c.client || getClientFromZone(c.zone);
-    if (client && client !== 'Unknown') allClients.push(client);
-  });
-  DOORS.forEach(function(d) { 
-    var client = d.client || getClientFromZone(d.site);
-    if (client && client !== 'Unknown') allClients.push(client);
-  });
-  SERVERS.forEach(function(s) { 
-    var client = s.client || getClientFromZone(s.location);
-    if (client && client !== 'Unknown') allClients.push(client);
-  });
-  SWITCHES.forEach(function(s) { 
-    var client = s.client || getClientFromZone(s.location);
-    if (client && client !== 'Unknown') allClients.push(client);
-  });
-
-  var uniqueClients = Array.from(new Set(allClients)).sort();
-
-  var html = '<button class="filter-pill client-pill active" data-client="all" onclick="setClientFilter(\'all\')">All</button>';
-  uniqueClients.forEach(function(client) {
-    html += '<button class="filter-pill client-pill" data-client="' + client + '" onclick="setClientFilter(\'' + client + '\')">' + client + '</button>';
-  });
-  container.innerHTML = html;
-}
-
 function setClientFilter(client) {
   clientFilter = client;
-  document.querySelectorAll('#client-filter-pills .filter-pill').forEach(function(el) {
-    el.classList.remove('active');
-    if (el.dataset.client === client) el.classList.add('active');
-  });
+  var dropdown = document.getElementById('client-dropdown');
+  if (dropdown) dropdown.value = client;
   renderDevices();
 }
 
 function setDeviceFilter(f) {
   deviceFilter = f;
-  document.querySelectorAll('#tab-devices .filter-pill:not(.client-pill)').forEach(function(el) {
+  document.querySelectorAll('#tab-devices .filter-pill').forEach(function(el) {
     el.classList.remove('active');
     var txt = el.textContent.trim().toLowerCase();
     if (txt === 'all' && f === 'all') el.classList.add('active');
@@ -1686,26 +1762,72 @@ function openDeviceDetail(id, type) {
   var d = device.data;
   var typeLabel = device.type.charAt(0).toUpperCase() + device.type.slice(1);
   var client = d.client || getClientFromZone(d.zone || d.location || d.site);
+  var typeIcon = device.type === 'camera' ? '📷' : device.type === 'door' ? '🚪' : device.type === 'server' ? '🖥' : '🔌';
 
-  document.getElementById('modal-title').textContent = d.name || d.serial || 'Unknown';
-  document.getElementById('modal-sub').textContent = typeLabel + ' · ' + client;
+  document.getElementById('modal-title').textContent = typeIcon + ' ' + (d.name || d.serial || 'Unknown');
+  document.getElementById('modal-sub').textContent = typeLabel + ' · ' + client + ' · ' + (d.status || '—');
 
   var body = '';
+
+  // Common details
   body += '<div class="detail-row"><span class="label">Name</span><span class="value">' + (d.name || d.serial || '—') + '</span></div>';
   body += '<div class="detail-row"><span class="label">Status</span><span class="value">' + (d.status || '—') + '</span></div>';
   body += '<div class="detail-row"><span class="label">Client</span><span class="value">' + client + '</span></div>';
   body += '<div class="detail-row"><span class="label">Location</span><span class="value">' + (d.zone || d.location || d.site || '—') + '</span></div>';
-  if (d.ip || d.ip_address) body += '<div class="detail-row"><span class="label">IP Address</span><span class="value">' + (d.ip || d.ip_address || '—') + '</span></div>';
-  if (d.model) body += '<div class="detail-row"><span class="label">Model</span><span class="value">' + d.model + '</span></div>';
-  if (d.manufacturer) body += '<div class="detail-row"><span class="label">Manufacturer</span><span class="value">' + d.manufacturer + '</span></div>';
-  if (d.serial) body += '<div class="detail-row"><span class="label">Serial</span><span class="value">' + d.serial + '</span></div>';
-  if (d.capacity) body += '<div class="detail-row"><span class="label">Capacity</span><span class="value">' + d.capacity + '</span></div>';
-  if (d.used) body += '<div class="detail-row"><span class="label">Used</span><span class="value">' + d.used + '</span></div>';
-  if (d.health) body += '<div class="detail-row"><span class="label">Health</span><span class="value">' + d.health + '</span></div>';
-  if (d.firmware) body += '<div class="detail-row"><span class="label">Firmware</span><span class="value">' + d.firmware + '</span></div>';
-  if (d.mac || d.mac_address) body += '<div class="detail-row"><span class="label">MAC</span><span class="value">' + (d.mac || d.mac_address || '—') + '</span></div>';
-  if (d.purchase_date) body += '<div class="detail-row"><span class="label">Purchase Date</span><span class="value">' + d.purchase_date + '</span></div>';
-  if (d.warranty_expiry) body += '<div class="detail-row"><span class="label">Warranty</span><span class="value">' + getWarrantyDisplay(d.warranty_expiry) + '</span></div>';
+
+  // Type-specific details
+  if (device.type === 'camera') {
+    body += '<div class="section-divider">Camera Details</div>';
+    body += '<div class="detail-row"><span class="label">IP Address</span><span class="value">' + (d.ip_address || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Model</span><span class="value">' + (d.model || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Manufacturer</span><span class="value">' + (d.manufacturer || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Resolution</span><span class="value">' + (d.resolution || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Archiver</span><span class="value">' + (d.archiver || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">MAC Address</span><span class="value">' + (d.mac_address || '—') + '</span></div>';
+  } else if (device.type === 'door') {
+    body += '<div class="section-divider">Access Control Details</div>';
+    body += '<div class="detail-row"><span class="label">IP Address</span><span class="value">' + (d.ip || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Reader</span><span class="value">' + (d.reader || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Lock Type</span><span class="value">' + (d.lock_type || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Controller Type</span><span class="value">' + (d.controllerType || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Door Swing</span><span class="value">' + (d.doorSwing || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Access Type</span><span class="value">' + (d.accessType || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Anti-Passback</span><span class="value">' + (d.antiPassback || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Powered</span><span class="value">' + (d.powered || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Technician</span><span class="value">' + (d.tech || 'Unassigned') + '</span></div>';
+    // Door history
+    if (d.history && d.history.length) {
+      body += '<div class="section-divider">History</div>';
+      d.history.forEach(function(h) {
+        body += '<div class="detail-row" style="font-size:12px;"><span class="label">' + h.date + '</span><span class="value">' + h.event + '</span></div>';
+      });
+    }
+  } else if (device.type === 'server') {
+    body += '<div class="section-divider">Server Details</div>';
+    body += '<div class="detail-row"><span class="label">Serial Number</span><span class="value">' + (d.serial || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Make</span><span class="value">' + (d.make || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Model</span><span class="value">' + (d.model || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Capacity</span><span class="value">' + (d.capacity || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Used</span><span class="value">' + (d.used || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Health</span><span class="value">' + (d.health || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Applications</span><span class="value">' + (d.apps || '—') + '</span></div>';
+  } else if (device.type === 'switch') {
+    body += '<div class="section-divider">Switch Details</div>';
+    body += '<div class="detail-row"><span class="label">IP Address</span><span class="value">' + (d.ip_address || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Model</span><span class="value">' + (d.model || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Firmware</span><span class="value">' + (d.firmware || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">MAC Address</span><span class="value">' + (d.mac || '—') + '</span></div>';
+  }
+
+  // Common fields
+  body += '<div class="section-divider">Purchase & Warranty</div>';
+  body += '<div class="detail-row"><span class="label">Purchase Date</span><span class="value">' + (d.purchase_date || '—') + '</span></div>';
+  body += '<div class="detail-row"><span class="label">Warranty</span><span class="value">' + getWarrantyDisplay(d.warranty_expiry) + '</span></div>';
+
+  if (d.comments) {
+    body += '<div class="section-divider">Comments</div>';
+    body += '<div style="padding:6px 0;font-size:12px;color:var(--text2);">' + d.comments + '</div>';
+  }
 
   document.getElementById('modal-body').innerHTML = body;
 
@@ -1961,9 +2083,10 @@ function lookupDevice(query) {
   var client = found.client || 'Unknown';
   var statusDot = d.status === 'Online' ? 'online' : d.status === 'Offline' ? 'offline' : 'warning';
   var ip = d.ip_address || d.ip || 'N/A';
+  var typeIcon = found.type === 'camera' ? '📷' : found.type === 'door' ? '🚪' : found.type === 'server' ? '🖥' : '🔌';
 
   container.innerHTML = '<div class="card" style="border-color:var(--accent);cursor:pointer;" onclick="openDeviceDetail(\'' + (d.name || d.serial) + '\', \'' + found.type + '\')">' +
-    '<div style="font-size:16px;font-weight:600;">' + (d.name || d.serial || 'Unknown') + '</div>' +
+    '<div style="font-size:16px;font-weight:600;">' + typeIcon + ' ' + (d.name || d.serial || 'Unknown') + '</div>' +
     '<div style="font-size:12px;color:var(--text2);">' +
     '<span class="status-dot ' + statusDot + '"></span> ' + d.status +
     ' · ' + (d.zone || d.location || d.site || '') +
@@ -2050,7 +2173,7 @@ setTimeout(function() {
   checkAlerts();
 }, 1000);
 
-console.log('📱 CAMS Field App v3 - Clean & Simple');
+console.log('📱 CAMS Field App v4 - Dropdown + Full Asset Info');
 </script>
 </body>
 </html>
