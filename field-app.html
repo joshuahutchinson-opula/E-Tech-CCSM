@@ -385,7 +385,6 @@
     .stat-card .stat-number.accent { color: var(--accent); }
     .stat-card .stat-number.success { color: var(--success); }
     .stat-card .stat-number.danger { color: var(--danger); }
-    .stat-card .stat-number.warning { color: var(--warning); }
 
     /* Alert Banner */
     .alert-banner {
@@ -462,27 +461,35 @@
     .b-med { background: rgba(255,179,71,0.15); color: #ffb347; }
     .b-low { background: rgba(52,211,153,0.15); color: #34d399; }
 
-    /* Device List - Professional */
-    .device-item {
+    /* Device List - Clean & Simple */
+    .device-grid {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 14px;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .device-card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      margin-bottom: 8px;
+      border-radius: var(--radius);
+      padding: 12px 14px;
       cursor: pointer;
       transition: all 0.15s;
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
     }
-    .device-item:active {
+    .device-card:active {
       transform: scale(0.98);
       border-color: var(--accent);
     }
-    .device-item .dev-info { flex: 1; min-width: 0; }
-    .device-item .dev-info .dev-name {
+    .device-card .dev-left {
+      flex: 1;
+      min-width: 0;
+    }
+    .device-card .dev-left .dev-name {
       font-size: 14px;
       font-weight: 500;
       color: var(--text);
@@ -490,7 +497,7 @@
       align-items: center;
       gap: 6px;
     }
-    .device-item .dev-info .dev-name .dev-type {
+    .device-card .dev-left .dev-name .dev-type {
       font-size: 10px;
       color: var(--text3);
       font-weight: 400;
@@ -498,23 +505,22 @@
       padding: 0 8px;
       border-radius: 10px;
     }
-    .device-item .dev-info .dev-detail {
-      font-size: 11px;
+    .device-card .dev-left .dev-detail {
+      font-size: 12px;
       color: var(--text3);
       margin-top: 2px;
     }
-    .device-item .dev-info .dev-detail .status-dot {
+    .device-card .dev-left .dev-detail .status-dot {
       display: inline-block;
       width: 8px;
       height: 8px;
       border-radius: 50%;
       margin-right: 4px;
     }
-    .device-item .dev-info .dev-detail .status-dot.online { background: var(--success); }
-    .device-item .dev-info .dev-detail .status-dot.offline { background: var(--danger); }
-    .device-item .dev-info .dev-detail .status-dot.warning { background: var(--warning); }
-
-    .device-item .dev-client {
+    .device-card .dev-left .dev-detail .status-dot.online { background: var(--success); }
+    .device-card .dev-left .dev-detail .status-dot.offline { background: var(--danger); }
+    .device-card .dev-left .dev-detail .status-dot.warning { background: var(--warning); }
+    .device-card .dev-client {
       font-size: 10px;
       color: var(--text3);
       background: var(--border);
@@ -522,39 +528,49 @@
       border-radius: 10px;
       white-space: nowrap;
       flex-shrink: 0;
-      margin-left: 8px;
+    }
+    .device-card .dev-arrow {
+      color: var(--text3);
+      font-size: 16px;
+      flex-shrink: 0;
     }
 
-    /* Filter buttons */
-    .filter-row {
+    /* Filter pills - clean & simple */
+    .filter-section {
+      margin-bottom: 12px;
+    }
+    .filter-section .filter-label {
+      font-size: 10px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+    }
+    .filter-pills {
       display: flex;
       gap: 6px;
       flex-wrap: wrap;
-      margin-bottom: 10px;
     }
-    .filter-btn {
+    .filter-pill {
       padding: 6px 14px;
       border-radius: 16px;
       border: 1px solid var(--border);
       background: var(--card);
       color: var(--text2);
-      font-size: 11px;
+      font-size: 12px;
       font-family: var(--font);
       cursor: pointer;
       transition: all 0.15s;
       touch-action: manipulation;
       white-space: nowrap;
     }
-    .filter-btn:active { transform: scale(0.95); }
-    .filter-btn.active {
+    .filter-pill:active { transform: scale(0.95); }
+    .filter-pill.active {
       background: var(--accent);
       color: #fff;
       border-color: var(--accent);
     }
-    .filter-btn.client-filter {
-      border-color: var(--border);
-    }
-    .filter-btn.client-filter.active {
+    .filter-pill.client-pill.active {
       background: var(--border);
       color: var(--text);
       border-color: var(--border);
@@ -687,8 +703,8 @@
     }
     .modal-sheet .modal-actions .btn:active { background: var(--accent-glow); border-color: var(--accent); }
     .modal-sheet .modal-actions .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-    .modal-sheet .modal-actions .btn.danger { background: rgba(255,94,122,0.15); border-color: rgba(255,94,122,0.3); color: var(--danger); }
     .modal-sheet .modal-actions .btn.success { background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.3); color: var(--success); }
+    .modal-sheet .modal-actions .btn.danger { background: rgba(255,94,122,0.15); border-color: rgba(255,94,122,0.3); color: var(--danger); }
 
     /* Scanner Overlay */
     #scanner-overlay {
@@ -728,7 +744,26 @@
       text-align: center;
     }
 
-    /* Responsive */
+    /* Activity Timeline */
+    .activity-item {
+      display: flex;
+      gap: 10px;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-item .act-time {
+      color: var(--text3);
+      font-weight: 500;
+      min-width: 40px;
+      flex-shrink: 0;
+    }
+    .activity-item .act-msg {
+      color: var(--text2);
+    }
+    .activity-item .act-msg .highlight { color: var(--text); font-weight: 500; }
+
     @media (max-width: 420px) {
       .quick-grid { grid-template-columns: repeat(4, 1fr); gap: 4px; }
       .quick-btn { padding: 8px 2px; font-size: 9px; min-height: 56px; }
@@ -806,7 +841,7 @@
         </div>
         <div class="stat-card">
           <div class="stat-number danger" id="stat-alarms">0</div>
-          <div class="stat-label">Alarms Today</div>
+          <div class="stat-label">Alerts</div>
         </div>
       </div>
 
@@ -817,16 +852,23 @@
         <button class="quick-btn" onclick="switchTab('profile')"><i class="ti ti-user"></i> Profile</button>
       </div>
 
+      <!-- Urgent Service Requests -->
       <div class="card">
-        <div class="card-title">⏰ SLA Deadlines</div>
-        <div id="sla-deadlines"></div>
+        <div class="card-title">Urgent Service Requests</div>
+        <div id="urgent-tickets"></div>
+      </div>
+
+      <!-- Today's Activity -->
+      <div class="card">
+        <div class="card-title">Today's Activity</div>
+        <div id="today-activity"></div>
       </div>
     </div>
 
     <!-- Scanner Tab -->
     <div class="tab-page" id="tab-scanner">
       <div class="card">
-        <div class="card-title">📸 Scan QR Code</div>
+        <div class="card-title">Scan QR Code</div>
         <button class="quick-btn" style="width:100%;padding:16px;min-height:80px;font-size:14px;" onclick="openScanner()">
           <i class="ti ti-qrcode" style="font-size:32px;"></i> Tap to Scan
         </button>
@@ -844,34 +886,41 @@
       <div class="search-wrap">
         <input type="text" id="ticket-search" placeholder="Search tickets..." oninput="renderTickets()">
       </div>
-      <div class="filter-row">
-        <button class="filter-btn active" onclick="setTicketFilter('all')">All</button>
-        <button class="filter-btn" onclick="setTicketFilter('Open')">Open</button>
-        <button class="filter-btn" onclick="setTicketFilter('In Progress')">In Progress</button>
-        <button class="filter-btn" onclick="setTicketFilter('Resolved')">Resolved</button>
+      <div class="filter-pills" style="margin-bottom:12px;">
+        <button class="filter-pill active" onclick="setTicketFilter('all')">All</button>
+        <button class="filter-pill" onclick="setTicketFilter('Open')">Open</button>
+        <button class="filter-pill" onclick="setTicketFilter('In Progress')">In Progress</button>
+        <button class="filter-pill" onclick="setTicketFilter('Resolved')">Resolved</button>
       </div>
       <div id="ticket-list"></div>
     </div>
 
-    <!-- Devices Tab -->
+    <!-- Devices Tab - Clean & Simple -->
     <div class="tab-page" id="tab-devices">
       <div class="search-wrap">
         <input type="text" id="device-search" placeholder="Search devices..." oninput="renderDevices()">
       </div>
 
       <!-- Client Filter -->
-      <div class="filter-row" id="client-filter-row">
-        <button class="filter-btn client-filter active" data-client="all" onclick="setClientFilter('all')">All Clients</button>
+      <div class="filter-section">
+        <div class="filter-label">Client</div>
+        <div class="filter-pills" id="client-filter-pills">
+          <button class="filter-pill client-pill active" data-client="all" onclick="setClientFilter('all')">All</button>
+        </div>
       </div>
 
       <!-- Type Filter -->
-      <div class="filter-row">
-        <button class="filter-btn active" onclick="setDeviceFilter('all')">All</button>
-        <button class="filter-btn" onclick="setDeviceFilter('cameras')">📷 Cameras</button>
-        <button class="filter-btn" onclick="setDeviceFilter('doors')">🚪 Doors</button>
-        <button class="filter-btn" onclick="setDeviceFilter('servers')">🖥 Servers</button>
-        <button class="filter-btn" onclick="setDeviceFilter('switches')">🔌 Switches</button>
+      <div class="filter-section">
+        <div class="filter-label">Type</div>
+        <div class="filter-pills">
+          <button class="filter-pill active" onclick="setDeviceFilter('all')">All</button>
+          <button class="filter-pill" onclick="setDeviceFilter('cameras')">Cameras</button>
+          <button class="filter-pill" onclick="setDeviceFilter('doors')">Doors</button>
+          <button class="filter-pill" onclick="setDeviceFilter('servers')">Servers</button>
+          <button class="filter-pill" onclick="setDeviceFilter('switches')">Switches</button>
+        </div>
       </div>
+
       <div id="device-list"></div>
     </div>
 
@@ -885,7 +934,7 @@
         </div>
       </div>
       <div class="card">
-        <div class="card-title">⚙️ Settings</div>
+        <div class="card-title">Settings</div>
         <button class="quick-btn" style="width:100%;flex-direction:row;justify-content:flex-start;gap:12px;min-height:44px;padding:8px 12px;" onclick="toggleTheme()">
           <i class="ti ti-palette"></i> <span>Toggle Theme</span>
         </button>
@@ -894,7 +943,7 @@
         </button>
       </div>
       <div class="card">
-        <div class="card-title">📱 About</div>
+        <div class="card-title">About</div>
         <div style="font-size:12px;color:var(--text3);">CAMS Field v1.0<br>Connected to CAMS database</div>
       </div>
     </div>
@@ -966,6 +1015,7 @@ var DOORS = [];
 var SERVERS = [];
 var SWITCHES = [];
 var SERVICE_REQUESTS = [];
+var AUDIT_LOG = [];
 var CLIENTS = [];
 
 var currentTab = 'dashboard';
@@ -1096,6 +1146,7 @@ function loadData() {
     SERVERS = JSON.parse(localStorage.getItem('ccsm_servers') || '[]');
     SWITCHES = JSON.parse(localStorage.getItem('ccsm_switches') || '[]');
     SERVICE_REQUESTS = JSON.parse(localStorage.getItem('ccsm_sr') || '[]');
+    AUDIT_LOG = JSON.parse(localStorage.getItem('ccsm_audit_log') || '[]');
     CLIENTS = JSON.parse(localStorage.getItem('ccsm_clients') || '[]');
 
     if (CAMERAS.length === 0) CAMERAS = getEmbeddedCameras();
@@ -1104,6 +1155,12 @@ function loadData() {
     if (SWITCHES.length === 0) SWITCHES = getEmbeddedSwitches();
     if (SERVICE_REQUESTS.length === 0) SERVICE_REQUESTS = getEmbeddedSRs();
     if (CLIENTS.length === 0) CLIENTS = ['KFTL', 'KWL', 'Lasco'];
+
+    // Load today's alarms from audit log
+    var now = new Date().toDateString();
+    todaysAlarms = AUDIT_LOG.filter(function(a) {
+      return a.action === 'alarm' && new Date(a.time).toDateString() === now;
+    }).length;
   } catch (e) {
     console.warn('Data load error', e);
   }
@@ -1161,10 +1218,8 @@ function toggleTheme() {
     root.classList.remove('light-theme');
     root.classList.add('jet-black-theme');
     if (btn) btn.innerHTML = '<i class="ti ti-moon"></i>';
-    // Logo will reload via the onerror or we set it directly
     if (logo) {
       logo.src = 'logo-black.png';
-      // Force reload if it fails
       logo.onerror = function() { this.src = 'logo.png'; };
     }
   } else if (root.classList.contains('jet-black-theme')) {
@@ -1229,27 +1284,49 @@ function switchTab(tab) {
 // ── DASHBOARD ────────────────────────────────────────────────
 // ============================================================
 function renderDashboard() {
-  renderSLADeadlines();
+  renderUrgentTickets();
+  renderActivity();
   updateStats();
   checkAlerts();
 }
 
-function renderSLADeadlines() {
-  var container = document.getElementById('sla-deadlines');
-  var assignedToTech = SERVICE_REQUESTS.filter(function(r) {
-    return r.assigned === (currentUser ? currentUser.username : '') && r.status !== 'Resolved';
-  });
-  var urgent = assignedToTech.filter(function(r) { return r.priority === 'High'; }).slice(0, 5);
+function renderUrgentTickets() {
+  var container = document.getElementById('urgent-tickets');
+  var techName = currentUser ? currentUser.username : '';
+  var urgent = SERVICE_REQUESTS.filter(function(r) {
+    return r.assigned === techName && r.status !== 'Resolved' && r.priority === 'High';
+  }).slice(0, 5);
+
   if (!urgent.length) {
-    container.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px 0;">No urgent SLA deadlines</div>';
+    container.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px 0;">No urgent tickets assigned</div>';
     return;
   }
   container.innerHTML = urgent.map(function(r) {
     return '<div class="ticket-item" onclick="openTicketDetail(\'' + r.id + '\')">' +
       '<div class="ticket-top"><span class="ticket-id">' + r.id + '</span><span class="badge b-high">' + r.priority + '</span></div>' +
       '<div class="ticket-subject">' + r.subject + '</div>' +
-      '<div class="ticket-meta"><span class="sla ' + getSLAClass(r) + '">⏱ ' + getSLAText(r) + '</span></div>' +
+      '<div class="ticket-meta"><span>' + r.client + ' · ' + r.site + '</span><span class="sla ' + getSLAClass(r) + '">⏱ ' + getSLAText(r) + '</span></div>' +
       '</div>';
+  }).join('');
+}
+
+function renderActivity() {
+  var container = document.getElementById('today-activity');
+  var today = new Date().toDateString();
+
+  // Get today's activity from audit log
+  var activities = AUDIT_LOG.filter(function(a) {
+    return new Date(a.time).toDateString() === today;
+  }).slice(0, 5);
+
+  // If no audit log activity, use sample or show empty
+  if (!activities.length) {
+    container.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px 0;">No activity today</div>';
+    return;
+  }
+
+  container.innerHTML = activities.map(function(a) {
+    return '<div class="activity-item"><span class="act-time">' + a.time + '</span><span class="act-msg"><span class="highlight">' + a.user + '</span> ' + a.action + ' ' + a.target + '</span></div>';
   }).join('');
 }
 
@@ -1269,40 +1346,33 @@ function getSLAText(r) {
 }
 
 function updateStats() {
-  // Assigned to this technician
+  var techName = currentUser ? currentUser.username : '';
   var assigned = SERVICE_REQUESTS.filter(function(r) {
-    return r.assigned === (currentUser ? currentUser.username : '') && r.status !== 'Resolved';
+    return r.assigned === techName && r.status !== 'Resolved';
   });
   document.getElementById('stat-assigned').textContent = assigned.length;
 
-  // Resolved by this technician
   var resolved = SERVICE_REQUESTS.filter(function(r) {
-    return r.assigned === (currentUser ? currentUser.username : '') && r.status === 'Resolved';
+    return r.assigned === techName && r.status === 'Resolved';
   });
   document.getElementById('stat-resolved').textContent = resolved.length;
 
-  // Alarms today - count from audit log or simulate
-  var now = new Date().toDateString();
-  var alarms = AUDIT_LOG ? AUDIT_LOG.filter(function(a) {
-    return a.action === 'alarm' && new Date(a.time).toDateString() === now;
-  }) : [];
-  document.getElementById('stat-alarms').textContent = alarms.length || todaysAlarms || 0;
+  document.getElementById('stat-alarms').textContent = todaysAlarms || 0;
 }
 
 function checkAlerts() {
   var container = document.getElementById('alert-container');
+  var techName = currentUser ? currentUser.username : '';
   var urgent = SERVICE_REQUESTS.filter(function(r) {
-    return r.status !== 'Resolved' && r.priority === 'High' &&
-      r.assigned === (currentUser ? currentUser.username : '');
+    return r.assigned === techName && r.status !== 'Resolved' && r.priority === 'High';
   });
-  var alarms = todaysAlarms || 0;
 
   var alerts = [];
   if (urgent.length) {
     alerts.push({ icon: 'ti ti-alert-triangle', text: '<strong>' + urgent.length + '</strong> urgent tickets need attention', type: 'urgent' });
   }
-  if (alarms > 0) {
-    alerts.push({ icon: 'ti ti-bell', text: '<strong>' + alarms + '</strong> alarm' + (alarms > 1 ? 's' : '') + ' triggered today', type: 'warning' });
+  if (todaysAlarms > 0) {
+    alerts.push({ icon: 'ti ti-bell', text: '<strong>' + todaysAlarms + '</strong> alarm' + (todaysAlarms > 1 ? 's' : '') + ' triggered today', type: 'warning' });
   }
 
   if (!alerts.length) {
@@ -1329,7 +1399,6 @@ function renderTickets() {
   var q = document.getElementById('ticket-search') ? document.getElementById('ticket-search').value.toLowerCase() : '';
   var techName = currentUser ? currentUser.username : '';
 
-  // Only show tickets assigned to this technician
   var filtered = SERVICE_REQUESTS.filter(function(r) {
     return r.assigned === techName || r.assigned === 'Unassigned';
   }).filter(function(r) {
@@ -1369,7 +1438,7 @@ function renderTickets() {
 
 function setTicketFilter(f) {
   ticketFilter = f;
-  document.querySelectorAll('#tab-tickets .filter-btn').forEach(function(el) {
+  document.querySelectorAll('#tab-tickets .filter-pill').forEach(function(el) {
     el.classList.remove('active');
     if (el.textContent.toLowerCase() === f.toLowerCase() || (f === 'all' && el.textContent === 'All')) {
       el.classList.add('active');
@@ -1379,7 +1448,7 @@ function setTicketFilter(f) {
 }
 
 // ============================================================
-// ── DEVICES ──────────────────────────────────────────────────
+// ── DEVICES ── Clean & Simple ──────────────────────────────
 // ============================================================
 function renderDevices() {
   var q = document.getElementById('device-search') ? document.getElementById('device-search').value.toLowerCase() : '';
@@ -1454,7 +1523,12 @@ function renderDevices() {
     return match && typeMatch && clientMatch;
   });
 
-  // Render client filter buttons
+  // Sort by name
+  filtered.sort(function(a, b) {
+    return a.name.localeCompare(b.name);
+  });
+
+  // Update client filters
   renderClientFilters();
 
   var container = document.getElementById('device-list');
@@ -1463,34 +1537,33 @@ function renderDevices() {
     return;
   }
 
-  container.innerHTML = filtered.map(function(d) {
+  container.innerHTML = '<div class="device-grid">' + filtered.map(function(d) {
     var statusDot = d.status === 'Online' ? 'online' : d.status === 'Offline' ? 'offline' : 'warning';
-    var statusDisplay = d.status === 'Online' ? '🟢' : d.status === 'Offline' ? '🔴' : '🟡';
-    var typeIcon = d.type === 'camera' ? '📷' : d.type === 'door' ? '🚪' : d.type === 'server' ? '🖥' : '🔌';
+    var statusDisplay = d.status === 'Online' ? 'Online' : d.status === 'Offline' ? 'Offline' : d.status;
     var typeLabel = d.type.charAt(0).toUpperCase() + d.type.slice(1);
 
-    return '<div class="device-item" onclick="openDeviceDetail(\'' + d.id + '\', \'' + d.type + '\')">' +
-      '<div class="dev-info">' +
+    return '<div class="device-card" onclick="openDeviceDetail(\'' + d.id + '\', \'' + d.type + '\')">' +
+      '<div class="dev-left">' +
       '<div class="dev-name">' +
-      typeIcon + ' ' + d.name +
+      d.name +
       '<span class="dev-type">' + typeLabel + '</span>' +
       '</div>' +
       '<div class="dev-detail">' +
-      '<span class="status-dot ' + statusDot + '"></span>' + statusDisplay + ' ' + d.status +
+      '<span class="status-dot ' + statusDot + '"></span> ' + statusDisplay +
       ' · ' + d.zone +
       (d.ip ? ' · ' + d.ip : '') +
       '</div>' +
       '</div>' +
       '<span class="dev-client">' + d.client + '</span>' +
+      '<span class="dev-arrow"><i class="ti ti-chevron-right"></i></span>' +
       '</div>';
-  }).join('');
+  }).join('') + '</div>';
 }
 
 function renderClientFilters() {
-  var container = document.getElementById('client-filter-row');
+  var container = document.getElementById('client-filter-pills');
   if (!container) return;
 
-  // Get unique clients from all devices
   var allDevices = [];
   CAMERAS.forEach(function(c) { allDevices.push(c.client || 'Unknown'); });
   DOORS.forEach(function(d) { allDevices.push(d.client || 'Unknown'); });
@@ -1499,16 +1572,16 @@ function renderClientFilters() {
 
   var uniqueClients = Array.from(new Set(allDevices)).filter(function(c) { return c && c !== 'Unknown'; }).sort();
 
-  var html = '<button class="filter-btn client-filter active" data-client="all" onclick="setClientFilter(\'all\')">All Clients</button>';
+  var html = '<button class="filter-pill client-pill active" data-client="all" onclick="setClientFilter(\'all\')">All</button>';
   uniqueClients.forEach(function(client) {
-    html += '<button class="filter-btn client-filter" data-client="' + client + '" onclick="setClientFilter(\'' + client + '\')">' + client + '</button>';
+    html += '<button class="filter-pill client-pill" data-client="' + client + '" onclick="setClientFilter(\'' + client + '\')">' + client + '</button>';
   });
   container.innerHTML = html;
 }
 
 function setClientFilter(client) {
   clientFilter = client;
-  document.querySelectorAll('#client-filter-row .filter-btn').forEach(function(el) {
+  document.querySelectorAll('#client-filter-pills .filter-pill').forEach(function(el) {
     el.classList.remove('active');
     if (el.dataset.client === client) el.classList.add('active');
   });
@@ -1517,7 +1590,7 @@ function setClientFilter(client) {
 
 function setDeviceFilter(f) {
   deviceFilter = f;
-  document.querySelectorAll('#tab-devices .filter-btn:not(.client-filter)').forEach(function(el) {
+  document.querySelectorAll('#tab-devices .filter-pill:not(.client-pill)').forEach(function(el) {
     el.classList.remove('active');
     var txt = el.textContent.trim().toLowerCase();
     if (txt === 'all' && f === 'all') el.classList.add('active');
@@ -1550,10 +1623,10 @@ function openDeviceDetail(id, type) {
   }
 
   var d = device.data;
-  var typeIcon = device.type === 'camera' ? '📷' : device.type === 'door' ? '🚪' : device.type === 'server' ? '🖥' : '🔌';
+  var typeLabel = device.type.charAt(0).toUpperCase() + device.type.slice(1);
 
-  document.getElementById('modal-title').textContent = typeIcon + ' ' + (d.name || d.serial || 'Unknown');
-  document.getElementById('modal-sub').textContent = device.type.charAt(0).toUpperCase() + device.type.slice(1) + ' · ' + (d.client || 'Unknown');
+  document.getElementById('modal-title').textContent = d.name || d.serial || 'Unknown';
+  document.getElementById('modal-sub').textContent = typeLabel + ' · ' + (d.client || 'Unknown');
 
   var body = '';
   body += '<div class="detail-row"><span class="label">Name</span><span class="value">' + (d.name || d.serial || '—') + '</span></div>';
@@ -1579,10 +1652,10 @@ function openDeviceDetail(id, type) {
   var ip = d.ip || d.ip_address || '';
   var btns = [];
   if (ip) {
-    btns.push({ label: '📶 Ping', onclick: 'pingDevice(\'' + ip + '\', \'' + (d.name || d.serial) + '\')' });
-    btns.push({ label: '🌐 Open', onclick: 'openController(\'' + ip + '\')' });
+    btns.push({ label: 'Ping', onclick: 'pingDevice(\'' + ip + '\', \'' + (d.name || d.serial) + '\')' });
+    btns.push({ label: 'Open', onclick: 'openController(\'' + ip + '\')' });
   }
-  btns.push({ label: '📋 History', onclick: 'viewDeviceHistory(\'' + (d.name || d.serial) + '\', \'' + device.type + '\')' });
+  btns.push({ label: 'History', onclick: 'viewDeviceHistory(\'' + (d.name || d.serial) + '\', \'' + device.type + '\')' });
   btns.push({ label: 'Close', onclick: 'closeModal()', cls: '' });
 
   btns.forEach(function(b) {
@@ -1633,9 +1706,9 @@ function openTicketDetail(id) {
   var actions = document.getElementById('modal-actions');
   actions.innerHTML = '';
   var btns = [
-    { label: '📷 Add Photo', onclick: 'addTicketPhoto(\'' + id + '\')' },
-    { label: '✅ Resolve', onclick: 'resolveTicket(\'' + id + '\')', cls: 'success' },
-    { label: '📶 Ping Device', onclick: 'pingTicketDevice(\'' + id + '\')' },
+    { label: 'Add Photo', onclick: 'addTicketPhoto(\'' + id + '\')' },
+    { label: 'Resolve', onclick: 'resolveTicket(\'' + id + '\')', cls: 'success' },
+    { label: 'Ping Device', onclick: 'pingTicketDevice(\'' + id + '\')' },
     { label: 'Close', onclick: 'closeModal()' },
   ];
   btns.forEach(function(b) {
@@ -1663,7 +1736,7 @@ function resolveTicket(id) {
   closeModal();
   renderTickets();
   renderDashboard();
-  toast('Ticket ' + id + ' resolved!', 'success');
+  toast('Ticket ' + id + ' resolved', 'success');
 }
 
 function addTicketPhoto(id) {
@@ -1680,7 +1753,7 @@ function addTicketPhoto(id) {
           if (!r.attachments) r.attachments = [];
           r.attachments.push({ name: 'photo-' + Date.now() + '.jpg', data: ev.target.result, type: 'image/jpeg' });
           localStorage.setItem('ccsm_sr', JSON.stringify(SERVICE_REQUESTS));
-          toast('Photo attached!', 'success');
+          toast('Photo attached', 'success');
           closeModal();
           openTicketDetail(id);
         }
@@ -1694,9 +1767,9 @@ function addTicketPhoto(id) {
 function pingTicketDevice(id) {
   var r = SERVICE_REQUESTS.find(function(x) { return x.id === id; });
   if (!r) { toast('No device to ping', 'warning'); return; }
-  toast('Pinging devices for ' + r.id + '...', 'info');
+  toast('Pinging devices...', 'info');
   setTimeout(function() {
-    toast('All devices online ✅', 'success');
+    toast('All devices online', 'success');
   }, 1500);
 }
 
@@ -1708,7 +1781,7 @@ function pingDevice(ip, name) {
   toast('Pinging ' + ip + '...', 'info');
   setTimeout(function() {
     var online = Math.random() > 0.2;
-    toast(ip + ' is ' + (online ? '✅ online' : '❌ unreachable'), online ? 'success' : 'error');
+    toast(ip + ' is ' + (online ? 'online' : 'unreachable'), online ? 'success' : 'error');
   }, 1200);
 }
 
@@ -1727,7 +1800,7 @@ function viewDeviceHistory(name, type) {
     toast('No history for ' + name, 'warning');
     return;
   }
-  document.getElementById('modal-title').textContent = '📋 ' + name + ' — History';
+  document.getElementById('modal-title').textContent = name + ' — History';
   document.getElementById('modal-sub').textContent = type + ' · ' + related.length + ' related tickets';
   document.getElementById('modal-body').innerHTML = related.map(function(r) {
     return '<div style="padding:4px 0;border-bottom:1px solid var(--border);font-size:12px;"><strong>' + r.id + '</strong> ' + r.subject + ' <span class="badge ' + (r.status === 'Open' ? 'b-open' : r.status === 'In Progress' ? 'b-progress' : 'b-resolved') + '">' + r.status + '</span></div>';
@@ -1817,27 +1890,26 @@ function lookupDevice(query) {
 
   var container = document.getElementById('scanner-device-result');
   if (!found) {
-    container.innerHTML = '<div class="card" style="border-color:var(--danger);"><div style="color:var(--danger);">❌ No device found for "' + query + '"</div></div>';
+    container.innerHTML = '<div class="card" style="border-color:var(--danger);"><div style="color:var(--danger);">No device found for "' + query + '"</div></div>';
     toast('Device not found', 'error');
     return;
   }
 
   var d = found.data;
-  var typeIcon = found.type === 'camera' ? '📷' : found.type === 'door' ? '🚪' : found.type === 'server' ? '🖥' : '🔌';
-  var ip = d.ip_address || d.ip || 'N/A';
   var statusDot = d.status === 'Online' ? 'online' : d.status === 'Offline' ? 'offline' : 'warning';
+  var ip = d.ip_address || d.ip || 'N/A';
 
   container.innerHTML = '<div class="card" style="border-color:var(--accent);cursor:pointer;" onclick="openDeviceDetail(\'' + (d.name || d.serial) + '\', \'' + found.type + '\')">' +
-    '<div style="font-size:16px;font-weight:600;">' + typeIcon + ' ' + (d.name || d.serial || 'Unknown') + '</div>' +
+    '<div style="font-size:16px;font-weight:600;">' + (d.name || d.serial || 'Unknown') + '</div>' +
     '<div style="font-size:12px;color:var(--text2);">' +
     '<span class="status-dot ' + statusDot + '"></span> ' + d.status +
     ' · ' + (d.zone || d.location || d.site || '') +
     '</div>' +
     '<div style="font-size:12px;color:var(--text3);">Client: ' + (d.client || 'Unknown') + (ip !== 'N/A' ? ' · IP: ' + ip : '') + '</div>' +
     '<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">' +
-    (ip !== 'N/A' ? '<button class="btn" onclick="event.stopPropagation();pingDevice(\'' + ip + '\', \'' + (d.name || d.serial) + '\')"><i class="ti ti-wifi"></i> Ping</button>' : '') +
-    (ip !== 'N/A' ? '<button class="btn" onclick="event.stopPropagation();openController(\'' + ip + '\')"><i class="ti ti-external-link"></i> Open</button>' : '') +
-    '<button class="btn primary" onclick="event.stopPropagation();openDeviceDetail(\'' + (d.name || d.serial) + '\', \'' + found.type + '\')"><i class="ti ti-eye"></i> View</button>' +
+    (ip !== 'N/A' ? '<button class="btn" onclick="event.stopPropagation();pingDevice(\'' + ip + '\', \'' + (d.name || d.serial) + '\')">Ping</button>' : '') +
+    (ip !== 'N/A' ? '<button class="btn" onclick="event.stopPropagation();openController(\'' + ip + '\')">Open</button>' : '') +
+    '<button class="btn primary" onclick="event.stopPropagation();openDeviceDetail(\'' + (d.name || d.serial) + '\', \'' + found.type + '\')">View</button>' +
     '</div></div>';
   toast('Device found: ' + (d.name || d.serial), 'success');
 }
@@ -1900,7 +1972,6 @@ var savedTheme = localStorage.getItem('ccsm_theme') || 'dark';
 if (savedTheme === 'light') document.documentElement.classList.add('light-theme');
 if (savedTheme === 'jet-black') document.documentElement.classList.add('jet-black-theme');
 
-// Fix logo for jet-black theme on load
 if (savedTheme === 'jet-black') {
   var logo = document.getElementById('field-logo');
   if (logo) {
@@ -1911,13 +1982,12 @@ if (savedTheme === 'jet-black') {
 
 checkLogin();
 
-// Simulate an alarm for demo
 setTimeout(function() {
   todaysAlarms = 1;
   checkAlerts();
 }, 1000);
 
-console.log('📱 CAMS Field App v2 - Professional Mobile View');
+console.log('📱 CAMS Field App v3 - Clean & Simple');
 </script>
 </body>
 </html>
