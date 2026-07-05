@@ -1219,13 +1219,11 @@ function loadData() {
     AUDIT_LOG = JSON.parse(localStorage.getItem('ccsm_audit_log') || '[]');
     CLIENTS = JSON.parse(localStorage.getItem('ccsm_clients') || '[]');
 
-    if (CAMERAS.length === 0) CAMERAS = getEmbeddedCameras();
-    if (DOORS.length === 0) DOORS = getEmbeddedDoors();
-    if (SERVERS.length === 0) SERVERS = getEmbeddedServers();
-    if (SWITCHES.length === 0) SWITCHES = getEmbeddedSwitches();
-    if (SOFTWARE.length === 0) SOFTWARE = getEmbeddedSoftware();
-    if (SERVICE_REQUESTS.length === 0) SERVICE_REQUESTS = getEmbeddedSRs();
-    if (CLIENTS.length === 0) CLIENTS = ['KFTL', 'KWL', 'Lasco', 'Nestle', 'NIDS', 'Nutrien', 'Fidelity Motors'];
+    // If no data exists, load embedded data
+    if (CAMERAS.length === 0 || DOORS.length === 0 || SERVERS.length === 0 || 
+        SWITCHES.length === 0 || SERVICE_REQUESTS.length === 0) {
+      loadEmbeddedData();
+    }
 
     // Fix device client assignments based on zone
     CAMERAS.forEach(function(c) {
@@ -1258,14 +1256,56 @@ function loadData() {
     // Populate client dropdown
     populateClientDropdown();
 
-    // Add mock audit log data if empty
-    if (AUDIT_LOG.length === 0) {
-      AUDIT_LOG = getMockAuditLog();
-    }
-
   } catch (e) {
-    console.warn('Data load error', e);
+    console.warn('Data load error, loading embedded data', e);
+    loadEmbeddedData();
   }
+}
+
+function loadEmbeddedData() {
+  CAMERAS = getEmbeddedCameras();
+  DOORS = getEmbeddedDoors();
+  SERVERS = getEmbeddedServers();
+  SWITCHES = getEmbeddedSwitches();
+  SOFTWARE = getEmbeddedSoftware();
+  SERVICE_REQUESTS = getEmbeddedSRs();
+  CLIENTS = ['KFTL', 'KWL', 'Lasco', 'Nestle', 'NIDS', 'Nutrien', 'Fidelity Motors'];
+  
+  // Set mock audit log
+  AUDIT_LOG = getMockAuditLog();
+  
+  // Save to localStorage
+  localStorage.setItem('ccsm_cameras', JSON.stringify(CAMERAS));
+  localStorage.setItem('ccsm_doors', JSON.stringify(DOORS));
+  localStorage.setItem('ccsm_servers', JSON.stringify(SERVERS));
+  localStorage.setItem('ccsm_switches', JSON.stringify(SWITCHES));
+  localStorage.setItem('ccsm_software', JSON.stringify(SOFTWARE));
+  localStorage.setItem('ccsm_sr', JSON.stringify(SERVICE_REQUESTS));
+  localStorage.setItem('ccsm_clients', JSON.stringify(CLIENTS));
+  localStorage.setItem('ccsm_audit_log', JSON.stringify(AUDIT_LOG));
+}
+
+function getMockAuditLog() {
+  var now = new Date();
+  var h = now.getHours();
+  var m = now.getMinutes();
+  
+  // Create times throughout the day
+  var times = [
+    (h-4).toString().padStart(2,'0') + ':' + (m-10).toString().padStart(2,'0'),
+    (h-3).toString().padStart(2,'0') + ':' + (m-5).toString().padStart(2,'0'),
+    (h-2).toString().padStart(2,'0') + ':' + (m-20).toString().padStart(2,'0'),
+    (h-1).toString().padStart(2,'0') + ':' + (m-15).toString().padStart(2,'0'),
+    (h-1).toString().padStart(2,'0') + ':' + (m-3).toString().padStart(2,'0'),
+  ];
+  
+  return [
+    { time: times[0], user: 'Shanice Vernon', action: 'updated', target: 'Camera HM3 PTZ' },
+    { time: times[1], user: 'Marvin Grant', action: 'assigned', target: 'SR-1847 to Ackeem' },
+    { time: times[2], user: 'System', action: 'sync', target: 'Database sync completed' },
+    { time: times[3], user: 'Ackeem', action: 'saved', target: 'Door configuration updated' },
+    { time: times[4], user: 'System', action: 'alarm', target: 'Tinson Pen Cam 282 motion detected' },
+  ];
 }
 
 // Helper to determine client from zone
@@ -1316,20 +1356,6 @@ function populateClientDropdown() {
     html += '<option value="' + client + '">' + client + '</option>';
   });
   dropdown.innerHTML = html;
-}
-
-function getMockAuditLog() {
-  var now = new Date();
-  var hours = now.getHours();
-  var minutes = now.getMinutes();
-  
-  return [
-    { time: (hours-2).toString().padStart(2,'0') + ':' + minutes.toString().padStart(2,'0'), user: 'Shanice Vernon', action: 'updated', target: 'Camera HM3 PTZ' },
-    { time: (hours-1).toString().padStart(2,'0') + ':' + (minutes-15).toString().padStart(2,'0'), user: 'Marvin Grant', action: 'assigned', target: 'SR-1847 to Ackeem' },
-    { time: (hours-1).toString().padStart(2,'0') + ':' + (minutes-5).toString().padStart(2,'0'), user: 'System', action: 'sync', target: 'Database sync completed' },
-    { time: (hours-2).toString().padStart(2,'0') + ':' + (minutes-20).toString().padStart(2,'0'), user: 'Ackeem', action: 'saved', target: 'Door configuration updated' },
-    { time: (hours-3).toString().padStart(2,'0') + ':' + (minutes-10).toString().padStart(2,'0'), user: 'System', action: 'alarm', target: 'Tinson Pen Cam 282 motion detected' },
-  ];
 }
 
 // ============================================================
@@ -1478,20 +1504,21 @@ function renderUrgentTickets() {
   var container = document.getElementById('urgent-tickets');
   var techName = currentUser ? currentUser.username : '';
   
-  // Get high priority tickets assigned to this technician, cap at 5
+  // Get ALL high priority tickets (not just assigned to tech) and cap at 5
   var urgent = SERVICE_REQUESTS.filter(function(r) {
-    return r.assigned === techName && r.status !== 'Resolved' && r.priority === 'High';
+    return r.priority === 'High' && r.status !== 'Resolved';
   }).slice(0, 5);
 
   if (!urgent.length) {
-    container.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px 0;">No urgent tickets assigned</div>';
+    container.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px 0;">No urgent tickets</div>';
     return;
   }
   container.innerHTML = urgent.map(function(r) {
+    var assignedTo = r.assigned || 'Unassigned';
     return '<div class="ticket-item" onclick="openTicketDetail(\'' + r.id + '\')">' +
       '<div class="ticket-top"><span class="ticket-id">' + r.id + '</span><span class="badge b-high">' + r.priority + '</span></div>' +
       '<div class="ticket-subject">' + r.subject + '</div>' +
-      '<div class="ticket-meta"><span>' + r.client + ' · ' + r.site + '</span><span class="sla ' + getSLAClass(r) + '">⏱ ' + getSLAText(r) + '</span></div>' +
+      '<div class="ticket-meta"><span>' + r.client + ' · ' + r.site + '</span><span>👤 ' + assignedTo + '</span><span class="sla ' + getSLAClass(r) + '">⏱ ' + getSLAText(r) + '</span></div>' +
       '</div>';
   }).join('');
 }
@@ -1500,7 +1527,7 @@ function renderActivity() {
   var container = document.getElementById('today-activity');
   var today = new Date().toDateString();
 
-  // Get today's activity from audit log
+  // Get today's activity from audit log (same mock data as admin view)
   var activities = AUDIT_LOG.filter(function(a) {
     return new Date(a.time).toDateString() === today;
   }).slice(0, 5);
@@ -1549,7 +1576,7 @@ function checkAlerts() {
   var container = document.getElementById('alert-container');
   var techName = currentUser ? currentUser.username : '';
   var urgent = SERVICE_REQUESTS.filter(function(r) {
-    return r.assigned === techName && r.status !== 'Resolved' && r.priority === 'High';
+    return r.priority === 'High' && r.status !== 'Resolved';
   });
 
   var alerts = [];
@@ -1747,7 +1774,7 @@ function renderDevices() {
 
   var container = document.getElementById('device-list');
   if (!filtered.length) {
-    container.innerHTML = '<div class="empty-state"><i class="ti ti-devices"></i><div class="empty-title">No devices found for this client</div></div>';
+    container.innerHTML = '<div class="empty-state"><i class="ti ti-devices"></i><div class="empty-title">No devices found</div></div>';
     return;
   }
 
@@ -2286,7 +2313,7 @@ setTimeout(function() {
   checkAlerts();
 }, 1000);
 
-console.log('📱 CAMS Field App v5 - Mock Activity & Urgent Tickets');
+console.log('📱 CAMS Field App v5 - Fixed Filters & Home Cards');
 </script>
 </body>
 </html>
