@@ -921,7 +921,7 @@
         <button class="quick-btn" onclick="switchTab('profile')"><i class="ti ti-user"></i> Profile</button>
       </div>
 
-      <!-- Urgent Service Requests -->
+      <!-- Urgent Service Requests - Cap at 3 -->
       <div class="card">
         <div class="card-title">Urgent Service Requests</div>
         <div id="urgent-tickets"></div>
@@ -1271,8 +1271,14 @@ function loadEmbeddedData() {
   SERVICE_REQUESTS = getEmbeddedSRs();
   CLIENTS = ['KFTL', 'KWL', 'Lasco', 'Nestle', 'NIDS', 'Nutrien', 'Fidelity Motors'];
   
-  // Set mock audit log
-  AUDIT_LOG = getMockAuditLog();
+  // Set mock audit log with specific activity items
+  AUDIT_LOG = [
+    { time: '06:30', user: 'System', action: 'alarm', target: 'SR-1847 SLA warning — 8 cameras defective >4h in NORTH zone' },
+    { time: '08:15', user: 'Marvin Grant', action: 'assigned', target: 'SR-1849 assigned — Marvin dispatched to Second Entrance' },
+    { time: '10:00', user: 'System', action: 'check', target: 'Server J1013DDX — Health check passed, 178GB in use' },
+    { time: '11:45', user: 'System', action: 'warning', target: 'Tinson Pen switches — 5 switches on firmware 5.20.15, update recommended' },
+    { time: '14:30', user: 'System', action: 'alarm', target: 'ALARM triggered — Tinson Pen Cam 282 motion detection' },
+  ];
   
   // Save to localStorage
   localStorage.setItem('ccsm_cameras', JSON.stringify(CAMERAS));
@@ -1283,29 +1289,6 @@ function loadEmbeddedData() {
   localStorage.setItem('ccsm_sr', JSON.stringify(SERVICE_REQUESTS));
   localStorage.setItem('ccsm_clients', JSON.stringify(CLIENTS));
   localStorage.setItem('ccsm_audit_log', JSON.stringify(AUDIT_LOG));
-}
-
-function getMockAuditLog() {
-  var now = new Date();
-  var h = now.getHours();
-  var m = now.getMinutes();
-  
-  // Create times throughout the day
-  var times = [
-    (h-4).toString().padStart(2,'0') + ':' + (m-10).toString().padStart(2,'0'),
-    (h-3).toString().padStart(2,'0') + ':' + (m-5).toString().padStart(2,'0'),
-    (h-2).toString().padStart(2,'0') + ':' + (m-20).toString().padStart(2,'0'),
-    (h-1).toString().padStart(2,'0') + ':' + (m-15).toString().padStart(2,'0'),
-    (h-1).toString().padStart(2,'0') + ':' + (m-3).toString().padStart(2,'0'),
-  ];
-  
-  return [
-    { time: times[0], user: 'Shanice Vernon', action: 'updated', target: 'Camera HM3 PTZ' },
-    { time: times[1], user: 'Marvin Grant', action: 'assigned', target: 'SR-1847 to Ackeem' },
-    { time: times[2], user: 'System', action: 'sync', target: 'Database sync completed' },
-    { time: times[3], user: 'Ackeem', action: 'saved', target: 'Door configuration updated' },
-    { time: times[4], user: 'System', action: 'alarm', target: 'Tinson Pen Cam 282 motion detected' },
-  ];
 }
 
 // Helper to determine client from zone
@@ -1504,10 +1487,10 @@ function renderUrgentTickets() {
   var container = document.getElementById('urgent-tickets');
   var techName = currentUser ? currentUser.username : '';
   
-  // Get ALL high priority tickets (not just assigned to tech) and cap at 5
+  // Get high priority tickets, cap at 3
   var urgent = SERVICE_REQUESTS.filter(function(r) {
     return r.priority === 'High' && r.status !== 'Resolved';
-  }).slice(0, 5);
+  }).slice(0, 3);
 
   if (!urgent.length) {
     container.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px 0;">No urgent tickets</div>';
@@ -1525,12 +1508,9 @@ function renderUrgentTickets() {
 
 function renderActivity() {
   var container = document.getElementById('today-activity');
-  var today = new Date().toDateString();
 
-  // Get today's activity from audit log (same mock data as admin view)
-  var activities = AUDIT_LOG.filter(function(a) {
-    return new Date(a.time).toDateString() === today;
-  }).slice(0, 5);
+  // Use the mock activity data
+  var activities = AUDIT_LOG.slice(0, 5);
 
   if (!activities.length) {
     container.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px 0;">No activity today</div>';
@@ -1538,7 +1518,8 @@ function renderActivity() {
   }
 
   container.innerHTML = activities.map(function(a) {
-    return '<div class="activity-item"><span class="act-time">' + a.time + '</span><span class="act-msg"><span class="highlight">' + a.user + '</span> ' + a.action + ' ' + a.target + '</span></div>';
+    var highlight = a.user === 'System' ? 'System' : a.user;
+    return '<div class="activity-item"><span class="act-time">' + a.time + '</span><span class="act-msg"><span class="highlight">' + highlight + '</span> ' + a.target + '</span></div>';
   }).join('');
 }
 
@@ -1660,7 +1641,7 @@ function setTicketFilter(f) {
 }
 
 // ============================================================
-// ── DEVICES ──────────────────────────────────────────────────
+// ── DEVICES ── FIXED FILTER FUNCTION ──────────────────────
 // ============================================================
 function renderDevices() {
   var q = document.getElementById('device-search') ? document.getElementById('device-search').value.toLowerCase() : '';
@@ -1811,9 +1792,10 @@ function setClientFilter(client) {
 
 function setDeviceFilter(f) {
   deviceFilter = f;
+  // Update pill active states
   document.querySelectorAll('#device-filter-pills .filter-pill').forEach(function(el) {
     el.classList.remove('active');
-    if (el.dataset.filter === f) {
+    if (el.getAttribute('data-filter') === f) {
       el.classList.add('active');
     }
   });
@@ -2313,7 +2295,7 @@ setTimeout(function() {
   checkAlerts();
 }, 1000);
 
-console.log('📱 CAMS Field App v5 - Fixed Filters & Home Cards');
+console.log('📱 CAMS Field App v6 - Fixed Filters, 3 Urgent Tickets, Activity Log');
 </script>
 </body>
 </html>
