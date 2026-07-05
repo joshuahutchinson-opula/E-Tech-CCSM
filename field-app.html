@@ -800,6 +800,39 @@
     }
     .activity-item .act-msg .highlight { color: var(--text); font-weight: 500; }
 
+    /* Comment Input */
+    .comment-input-wrap {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .comment-input-wrap input {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 10px 14px;
+      font-size: 13px;
+      font-family: var(--font);
+      min-height: 44px;
+    }
+    .comment-input-wrap input:focus { outline: none; border-color: var(--accent); }
+    .comment-input-wrap input::placeholder { color: var(--text3); }
+    .comment-input-wrap .btn {
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-size: 13px;
+      font-family: var(--font);
+      cursor: pointer;
+      min-height: 44px;
+      white-space: nowrap;
+    }
+    .comment-input-wrap .btn:active { opacity: 0.8; }
+
     @media (max-width: 420px) {
       .quick-grid { grid-template-columns: repeat(4, 1fr); gap: 4px; }
       .quick-btn { padding: 8px 2px; font-size: 9px; min-height: 56px; }
@@ -947,12 +980,12 @@
       <!-- Type Filter -->
       <div class="filter-section">
         <div class="filter-label">Asset Type</div>
-        <div class="filter-pills">
-          <button class="filter-pill active" onclick="setDeviceFilter('all')">All</button>
-          <button class="filter-pill" onclick="setDeviceFilter('cameras')">Cameras</button>
-          <button class="filter-pill" onclick="setDeviceFilter('doors')">Doors</button>
-          <button class="filter-pill" onclick="setDeviceFilter('servers')">Servers</button>
-          <button class="filter-pill" onclick="setDeviceFilter('switches')">Switches</button>
+        <div class="filter-pills" id="device-filter-pills">
+          <button class="filter-pill active" data-filter="all" onclick="setDeviceFilter('all')">All</button>
+          <button class="filter-pill" data-filter="cameras" onclick="setDeviceFilter('cameras')">Cameras</button>
+          <button class="filter-pill" data-filter="doors" onclick="setDeviceFilter('doors')">Doors</button>
+          <button class="filter-pill" data-filter="servers" onclick="setDeviceFilter('servers')">Servers</button>
+          <button class="filter-pill" data-filter="switches" onclick="setDeviceFilter('switches')">Switches</button>
         </div>
       </div>
 
@@ -1225,6 +1258,11 @@ function loadData() {
     // Populate client dropdown
     populateClientDropdown();
 
+    // Add mock audit log data if empty
+    if (AUDIT_LOG.length === 0) {
+      AUDIT_LOG = getMockAuditLog();
+    }
+
   } catch (e) {
     console.warn('Data load error', e);
   }
@@ -1280,6 +1318,20 @@ function populateClientDropdown() {
   dropdown.innerHTML = html;
 }
 
+function getMockAuditLog() {
+  var now = new Date();
+  var hours = now.getHours();
+  var minutes = now.getMinutes();
+  
+  return [
+    { time: (hours-2).toString().padStart(2,'0') + ':' + minutes.toString().padStart(2,'0'), user: 'Shanice Vernon', action: 'updated', target: 'Camera HM3 PTZ' },
+    { time: (hours-1).toString().padStart(2,'0') + ':' + (minutes-15).toString().padStart(2,'0'), user: 'Marvin Grant', action: 'assigned', target: 'SR-1847 to Ackeem' },
+    { time: (hours-1).toString().padStart(2,'0') + ':' + (minutes-5).toString().padStart(2,'0'), user: 'System', action: 'sync', target: 'Database sync completed' },
+    { time: (hours-2).toString().padStart(2,'0') + ':' + (minutes-20).toString().padStart(2,'0'), user: 'Ackeem', action: 'saved', target: 'Door configuration updated' },
+    { time: (hours-3).toString().padStart(2,'0') + ':' + (minutes-10).toString().padStart(2,'0'), user: 'System', action: 'alarm', target: 'Tinson Pen Cam 282 motion detected' },
+  ];
+}
+
 // ============================================================
 // ── EMBEDDED DATA ────────────────────────────────────────────
 // ============================================================
@@ -1333,6 +1385,8 @@ function getEmbeddedSRs() {
     {id: "SR-1847", client: "KFTL", site: "NORTH", subject: "8 Cameras Defective in NORTH Zone", priority: "High", status: "Open", assigned: "tech", received: "Jun 15, 2026", body: "Multiple cameras showing as defective in NORTH zone. Need immediate attention.", notes: "Awaiting parts", history: [{time: "14:22", msg: "Created"}, {time: "15:00", msg: "Assigned to Shanice"}]},
     {id: "SR-1848", client: "KWL", site: "Tinson Pen", subject: "5 Cameras Offline - Urgent", priority: "High", status: "In Progress", assigned: "tech", received: "Jun 15, 2026", body: "5 cameras down simultaneously at Tinson Pen. Need eyes back up ASAP.", notes: "On-site investigation", history: [{time: "11:05", msg: "Created"}, {time: "12:30", msg: "Dispatched to site"}]},
     {id: "SR-1849", client: "KFTL", site: "SAL Duty Office", subject: "Door 2nd Entrance Offline", priority: "Medium", status: "Open", assigned: "Shanice Vernon", received: "Jun 16, 2026", body: "2nd Entrance door reader offline. Need immediate attention.", notes: "", history: [{time: "08:00", msg: "Created"}]},
+    {id: "SR-1850", client: "Lasco", site: "LML B Liquid Plant", subject: "Camera LML-01 Offline", priority: "High", status: "Open", assigned: "tech", received: "Jun 17, 2026", body: "Camera LML-01 reported offline at Liquid Plant.", notes: "", history: [{time: "06:30", msg: "Created"}]},
+    {id: "SR-1851", client: "KFTL", site: "Security Office", subject: "Door Main Entrance Offline", priority: "High", status: "Open", assigned: "tech", received: "Jun 17, 2026", body: "Main entrance door not responding to card swipes.", notes: "", history: [{time: "09:15", msg: "Created"}]},
   ];
 }
 
@@ -1423,6 +1477,8 @@ function renderDashboard() {
 function renderUrgentTickets() {
   var container = document.getElementById('urgent-tickets');
   var techName = currentUser ? currentUser.username : '';
+  
+  // Get high priority tickets assigned to this technician, cap at 5
   var urgent = SERVICE_REQUESTS.filter(function(r) {
     return r.assigned === techName && r.status !== 'Resolved' && r.priority === 'High';
   }).slice(0, 5);
@@ -1444,6 +1500,7 @@ function renderActivity() {
   var container = document.getElementById('today-activity');
   var today = new Date().toDateString();
 
+  // Get today's activity from audit log
   var activities = AUDIT_LOG.filter(function(a) {
     return new Date(a.time).toDateString() === today;
   }).slice(0, 5);
@@ -1727,11 +1784,11 @@ function setClientFilter(client) {
 
 function setDeviceFilter(f) {
   deviceFilter = f;
-  document.querySelectorAll('#tab-devices .filter-pill').forEach(function(el) {
+  document.querySelectorAll('#device-filter-pills .filter-pill').forEach(function(el) {
     el.classList.remove('active');
-    var txt = el.textContent.trim().toLowerCase();
-    if (txt === 'all' && f === 'all') el.classList.add('active');
-    if (txt.indexOf(f) !== -1 && f !== 'all') el.classList.add('active');
+    if (el.dataset.filter === f) {
+      el.classList.add('active');
+    }
   });
   renderDevices();
 }
@@ -1824,10 +1881,13 @@ function openDeviceDetail(id, type) {
   body += '<div class="detail-row"><span class="label">Purchase Date</span><span class="value">' + (d.purchase_date || '—') + '</span></div>';
   body += '<div class="detail-row"><span class="label">Warranty</span><span class="value">' + getWarrantyDisplay(d.warranty_expiry) + '</span></div>';
 
-  if (d.comments) {
-    body += '<div class="section-divider">Comments</div>';
-    body += '<div style="padding:6px 0;font-size:12px;color:var(--text2);">' + d.comments + '</div>';
-  }
+  // Comments section with edit capability
+  body += '<div class="section-divider">Comments</div>';
+  body += '<div id="device-comment-display" style="padding:6px 0;font-size:12px;color:var(--text2);">' + (d.comments || 'No comments') + '</div>';
+  body += '<div class="comment-input-wrap">';
+  body += '<input type="text" id="device-comment-input" placeholder="Add a comment..." value="' + (d.comments || '') + '">';
+  body += '<button class="btn" onclick="saveDeviceComment(\'' + d.id + '\', \'' + device.type + '\')">Save</button>';
+  body += '</div>';
 
   document.getElementById('modal-body').innerHTML = body;
 
@@ -1851,6 +1911,58 @@ function openDeviceDetail(id, type) {
   });
 
   document.getElementById('modal-sheet').classList.add('open');
+}
+
+function saveDeviceComment(id, type) {
+  var input = document.getElementById('device-comment-input');
+  if (!input) return;
+  
+  var newComment = input.value.trim();
+  var device = null;
+  
+  if (type === 'camera') {
+    device = CAMERAS.find(function(c) { return c.name === id; });
+  } else if (type === 'door') {
+    device = DOORS.find(function(d) { return d.name === id; });
+  } else if (type === 'server') {
+    device = SERVERS.find(function(s) { return s.serial === id; });
+  } else if (type === 'switch') {
+    device = SWITCHES.find(function(s) { return s.name === id; });
+  }
+  
+  if (!device) {
+    toast('Device not found', 'error');
+    return;
+  }
+  
+  device.comments = newComment;
+  
+  // Save to localStorage
+  if (type === 'camera') localStorage.setItem('ccsm_cameras', JSON.stringify(CAMERAS));
+  else if (type === 'door') localStorage.setItem('ccsm_doors', JSON.stringify(DOORS));
+  else if (type === 'server') localStorage.setItem('ccsm_servers', JSON.stringify(SERVERS));
+  else if (type === 'switch') localStorage.setItem('ccsm_switches', JSON.stringify(SWITCHES));
+  
+  // Update display
+  var display = document.getElementById('device-comment-display');
+  if (display) {
+    display.textContent = newComment || 'No comments';
+    display.style.color = 'var(--text2)';
+  }
+  
+  // Add to audit log
+  var now = new Date();
+  var timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  AUDIT_LOG.unshift({ 
+    time: timeStr, 
+    user: currentUser ? currentUser.username : 'Technician', 
+    action: 'commented', 
+    target: device.name || device.serial || id 
+  });
+  localStorage.setItem('ccsm_audit_log', JSON.stringify(AUDIT_LOG));
+  
+  toast('Comment saved!', 'success');
+  renderDevices();
 }
 
 function getWarrantyDisplay(expiryDate) {
@@ -2150,6 +2262,7 @@ window.pingDevice = pingDevice;
 window.openController = openController;
 window.viewDeviceHistory = viewDeviceHistory;
 window.viewAlerts = viewAlerts;
+window.saveDeviceComment = saveDeviceComment;
 
 // ============================================================
 // ── INIT ──────────────────────────────────────────────────────
@@ -2173,7 +2286,7 @@ setTimeout(function() {
   checkAlerts();
 }, 1000);
 
-console.log('📱 CAMS Field App v4 - Dropdown + Full Asset Info');
+console.log('📱 CAMS Field App v5 - Mock Activity & Urgent Tickets');
 </script>
 </body>
 </html>
