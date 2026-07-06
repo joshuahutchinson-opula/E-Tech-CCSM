@@ -921,7 +921,7 @@
         <button class="quick-btn" onclick="switchTab('profile')"><i class="ti ti-user"></i> Profile</button>
       </div>
 
-      <!-- Urgent Service Requests - Cap at 3 -->
+      <!-- Urgent Service Requests -->
       <div class="card">
         <div class="card-title">Urgent Service Requests</div>
         <div id="urgent-tickets"></div>
@@ -1509,17 +1509,17 @@ function renderUrgentTickets() {
 function renderActivity() {
   var container = document.getElementById('today-activity');
 
-  // Use the mock activity data
-  var activities = AUDIT_LOG.slice(0, 5);
-
-  if (!activities.length) {
-    container.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px 0;">No activity today</div>';
-    return;
-  }
+  // Use the mock activity data from the admin view
+  var activities = [
+    { time: '06:30', msg: 'SR-1847 SLA warning — 8 cameras defective >4h in NORTH zone' },
+    { time: '08:15', msg: 'SR-1849 assigned — Marvin dispatched to Second Entrance' },
+    { time: '10:00', msg: 'Server J1013DDX — Health check passed, 178GB in use' },
+    { time: '11:45', msg: 'Tinson Pen switches — 5 switches on firmware 5.20.15, update recommended' },
+    { time: '14:30', msg: 'ALARM triggered — Tinson Pen Cam 282 motion detection' },
+  ];
 
   container.innerHTML = activities.map(function(a) {
-    var highlight = a.user === 'System' ? 'System' : a.user;
-    return '<div class="activity-item"><span class="act-time">' + a.time + '</span><span class="act-msg"><span class="highlight">' + highlight + '</span> ' + a.target + '</span></div>';
+    return '<div class="activity-item"><span class="act-time">' + a.time + '</span><span class="act-msg">' + a.msg + '</span></div>';
   }).join('');
 }
 
@@ -2295,7 +2295,7 @@ setTimeout(function() {
   checkAlerts();
 }, 1000);
 
-console.log('📱 CAMS Field App v6 - Fixed Filters, 3 Urgent Tickets, Activity Log');
+console.log('📱 CAMS Field App v6 - Fixed Filters, Activity Log');
 </script>
 </body>
 </html>
