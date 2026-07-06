@@ -192,6 +192,9 @@ input, select, textarea, button { font-family: var(--font); }
 .b-warning { background: rgba(255,179,71,0.15); color: #ffb347; }
 .b-expired { background: rgba(255,94,122,0.15); color: #ff5e7a; }
 .b-good { background: rgba(52,211,153,0.15); color: #34d399; }
+.b-intrusion-online { background: rgba(52,211,153,0.15); color: #34d399; }
+.b-intrusion-offline { background: rgba(255,94,122,0.15); color: #ff5e7a; }
+.b-intrusion-warning { background: rgba(255,179,71,0.15); color: #ffb347; }
 
 .status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 500; }
 .status-badge.good { background: rgba(52,211,153,0.15); color: #34d399; }
@@ -374,11 +377,11 @@ input::placeholder, textarea::placeholder {
 .tl-time { color: var(--text-muted); flex-shrink: 0; font-weight: 500; min-width: 40px; }
 .tl-msg { color: var(--text-secondary); }
 
-.cam-zone-group, .door-zone-group, .server-zone-group, .switch-zone-group, .software-zone-group, .assets-zone-group { margin-bottom: 12px; }
-.cam-zone-header, .door-zone-header, .server-zone-header, .switch-zone-header, .software-zone-header, .assets-zone-header { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px; padding: 10px 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
-.cam-zone-header:hover, .door-zone-header:hover, .server-zone-header:hover, .switch-zone-header:hover, .software-zone-header:hover, .assets-zone-header:hover { border-color: var(--accent); background: rgba(255,255,255,0.02); }
-.cam-zone-body, .door-zone-body, .server-zone-body, .switch-zone-body, .software-zone-body, .assets-zone-body { padding: 8px 0; }
-.cam-zone-body.hidden, .door-zone-body.hidden, .server-zone-body.hidden, .switch-zone-body.hidden, .software-zone-body.hidden, .assets-zone-body.hidden { display: none; }
+.cam-zone-group, .door-zone-group, .server-zone-group, .switch-zone-group, .software-zone-group, .assets-zone-group, .intrusion-zone-group { margin-bottom: 12px; }
+.cam-zone-header, .door-zone-header, .server-zone-header, .switch-zone-header, .software-zone-header, .assets-zone-header, .intrusion-zone-header { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px; padding: 10px 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
+.cam-zone-header:hover, .door-zone-header:hover, .server-zone-header:hover, .switch-zone-header:hover, .software-zone-header:hover, .assets-zone-header:hover, .intrusion-zone-header:hover { border-color: var(--accent); background: rgba(255,255,255,0.02); }
+.cam-zone-body, .door-zone-body, .server-zone-body, .switch-zone-body, .software-zone-body, .assets-zone-body, .intrusion-zone-body { padding: 8px 0; }
+.cam-zone-body.hidden, .door-zone-body.hidden, .server-zone-body.hidden, .switch-zone-body.hidden, .software-zone-body.hidden, .assets-zone-body.hidden, .intrusion-zone-body.hidden { display: none; }
 .zone-name { font-weight: 500; color: var(--text-primary); }
 .zone-client { font-size: 11px; color: var(--text-muted); margin-left: 8px; }
 .zone-count { font-size: 11px; color: var(--text-muted); }
@@ -491,10 +494,10 @@ input::placeholder, textarea::placeholder {
 .bulk-bar select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
 .bulk-bar select option { background: var(--option-bg); color: var(--option-color); }
 
-.door-stats, .server-stats-grid, .switch-stats-grid, .assets-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
-.door-stat-card, .server-stat-card, .switch-stat-card, .assets-stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px; padding: 10px 14px; }
-.ds-label, .ss-label, .as-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
-.ds-value, .ss-value, .as-value { font-size: 20px; font-weight: 600; color: var(--text-primary); margin: 4px 0; }
+.door-stats, .server-stats-grid, .switch-stats-grid, .assets-stats-grid, .intrusion-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
+.door-stat-card, .server-stat-card, .switch-stat-card, .assets-stat-card, .intrusion-stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px; padding: 10px 14px; }
+.ds-label, .ss-label, .as-label, .is-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.ds-value, .ss-value, .as-value, .is-value { font-size: 20px; font-weight: 600; color: var(--text-primary); margin: 4px 0; }
 .ds-value.online { color: var(--success); }
 .ds-value.offline { color: var(--danger); }
 .ds-value.under-maintenance { color: var(--warning); }
@@ -585,12 +588,12 @@ input::placeholder, textarea::placeholder {
 .audit-user { font-weight: 500; color: var(--text-primary); min-width: 80px; }
 .audit-action .highlight { color: var(--text-primary); }
 
-.asset-sub-tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 2px solid var(--card-border); }
-.asset-sub-tab { padding: 8px 20px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; background: none; border-top: none; border-left: none; border-right: none; font-family: var(--font); }
-.asset-sub-tab:hover { color: var(--text-primary); }
-.asset-sub-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-.asset-sub-content { display: none; }
-.asset-sub-content.active { display: block; }
+.asset-sub-tabs, .compute-sub-tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 2px solid var(--card-border); }
+.asset-sub-tab, .compute-sub-tab { padding: 8px 20px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; background: none; border-top: none; border-left: none; border-right: none; font-family: var(--font); }
+.asset-sub-tab:hover, .compute-sub-tab:hover { color: var(--text-primary); }
+.asset-sub-tab.active, .compute-sub-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.asset-sub-content, .compute-sub-content { display: none; }
+.asset-sub-content.active, .compute-sub-content.active { display: block; }
 
 .app { display: flex; height: 100vh; width: 100%; max-width: 100%; background: var(--main-bg); overflow: hidden; display: none; }
 .app.client-mode { background: #f5f5f5; }
@@ -802,7 +805,7 @@ input::placeholder, textarea::placeholder {
   .btn { font-size: 10px; padding: 5px 10px; }
   .outlook-folder-pane { width: 120px; }
   .outlook-list-pane { width: 35%; }
-  .door-stats, .server-stats-grid, .switch-stats-grid, .assets-stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .door-stats, .server-stats-grid, .switch-stats-grid, .assets-stats-grid, .intrusion-stats-grid { grid-template-columns: repeat(2, 1fr); }
   .file-item { grid-template-columns: 30px 1fr 60px 60px; }
   .file-item .file-modified { display: none; }
 }
@@ -819,7 +822,7 @@ input::placeholder, textarea::placeholder {
   .outlook-folder-pane { width: 100%; border-right: none; border-bottom: 1px solid var(--card-border); max-height: 120px; }
   .outlook-content { flex-direction: column; }
   .outlook-list-pane { width: 100%; border-right: none; border-bottom: 1px solid var(--card-border); max-height: 200px; }
-  .door-stats, .server-stats-grid, .switch-stats-grid, .assets-stats-grid { grid-template-columns: 1fr 1fr; }
+  .door-stats, .server-stats-grid, .switch-stats-grid, .assets-stats-grid, .intrusion-stats-grid { grid-template-columns: 1fr 1fr; }
   .file-item { grid-template-columns: 30px 1fr; gap: 4px; }
   .file-item .file-type, .file-item .file-size, .file-item .file-modified { display: none; }
   .ore-actions { flex-wrap: wrap; }
@@ -918,14 +921,6 @@ input::placeholder, textarea::placeholder {
         <button class="add-btn" onclick="toggleAddDropdown()" id="add-btn"><i class="ti ti-plus"></i></button>
         <div class="add-dropdown" id="add-dropdown">
           <button class="dd-item" onclick="openAddSRModal();closeAddDropdown();"><span class="dd-icon">📋</span> Add Service Request</button>
-          <button class="dd-item" onclick="openAddCameraModal();closeAddDropdown();"><span class="dd-icon">📷</span> Add Camera</button>
-          <button class="dd-item" onclick="openAddDoorModal();closeAddDropdown();"><span class="dd-icon">🚪</span> Add Door</button>
-          <button class="dd-item" onclick="openAddServerModal();closeAddDropdown();"><span class="dd-icon">🖥</span> Add Server</button>
-          <button class="dd-item" onclick="openAddSwitchModal();closeAddDropdown();"><span class="dd-icon">🔌</span> Add Switch</button>
-          <button class="dd-item" onclick="openAddSoftwareModal();closeAddDropdown();"><span class="dd-icon">💻</span> Add Software</button>
-          <button class="dd-item" onclick="openAddStorageModal();closeAddDropdown();"><span class="dd-icon">💾</span> Add Storage</button>
-          <button class="dd-item" onclick="openAddStationModal();closeAddDropdown();"><span class="dd-icon">🖥️</span> Add Station</button>
-          <button class="dd-item" onclick="openAddMonitorModal();closeAddDropdown();"><span class="dd-icon">🖥️</span> Add Monitor</button>
           <div class="dd-sep"></div>
           <button class="dd-item" onclick="openAddClientModal();closeAddDropdown();"><span class="dd-icon">👤</span> Add Client</button>
         </div>
@@ -1167,28 +1162,95 @@ input::placeholder, textarea::placeholder {
         </div>
       </div>
 
-      <!-- Servers -->
-      <div class="tab" id="tab-servers">
+      <!-- Compute & Storage -->
+      <div class="tab" id="tab-compute">
         <div class="panel">
           <div class="panel-header">
-            <span class="panel-title">Servers</span>
+            <span class="panel-title">Compute & Storage</span>
             <div style="display:flex;align-items:center;gap:8px;">
               <button class="btn btn-sm" onclick="exportServersCSV()"><i class="ti ti-download"></i> Export CSV</button>
               <span class="last-updated" style="color:var(--text-secondary);" id="srv-last-updated">Last updated: Today</span>
               <button class="btn btn-sm" onclick="refreshServers()" title="Refresh"><i class="ti ti-refresh"></i></button>
             </div>
           </div>
-          <div class="server-stats-grid" id="server-stats-grid">
-            <div class="server-stat-card"><div class="ss-label">Total Servers</div><div class="ss-value" id="srv-total">0</div><div class="ss-sub">All locations</div></div>
-            <div class="server-stat-card"><div class="ss-label">Total Storage</div><div class="ss-value" id="srv-total-storage">0 TB</div><div class="ss-sub">Across all servers</div></div>
-            <div class="server-stat-card"><div class="ss-label">Health Score</div><div class="ss-value green" id="srv-health-score">0%</div><div class="ss-sub">Average</div></div>
-            <div class="server-stat-card"><div class="ss-label">Critical Alerts</div><div class="ss-value red" id="srv-critical-alerts">0</div><div class="ss-sub">No issues</div></div>
+          <div class="compute-sub-tabs">
+            <button class="compute-sub-tab active" data-subtab="servers" onclick="switchComputeTab('servers')">Servers</button>
+            <button class="compute-sub-tab" data-subtab="storage" onclick="switchComputeTab('storage')">Storage</button>
           </div>
-          <div class="search-bar">
-            <input type="text" id="srv-search" placeholder="Search servers by location, serial, or app…" oninput="debounceRenderServers()" />
+
+          <!-- Servers Sub-tab -->
+          <div class="compute-sub-content active" id="subtab-servers">
+            <div class="server-stats-grid" id="server-stats-grid">
+              <div class="server-stat-card"><div class="ss-label">Total Servers</div><div class="ss-value" id="srv-total">0</div><div class="ss-sub">All locations</div></div>
+              <div class="server-stat-card"><div class="ss-label">Total Storage</div><div class="ss-value" id="srv-total-storage">0 TB</div><div class="ss-sub">Across all servers</div></div>
+              <div class="server-stat-card"><div class="ss-label">Health Score</div><div class="ss-value green" id="srv-health-score">0%</div><div class="ss-sub">Average</div></div>
+              <div class="server-stat-card"><div class="ss-label">Critical Alerts</div><div class="ss-value red" id="srv-critical-alerts">0</div><div class="ss-sub">No issues</div></div>
+            </div>
+            <div class="search-bar">
+              <input type="text" id="srv-search" placeholder="Search servers by location, serial, or app…" oninput="debounceRenderServers()" />
+            </div>
+            <div class="loading-overlay" id="srv-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading servers...</span></div></div>
+            <div id="srv-groups-container"></div>
           </div>
-          <div class="loading-overlay" id="srv-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading servers...</span></div></div>
-          <div id="srv-groups-container"></div>
+
+          <!-- Storage Sub-tab -->
+          <div class="compute-sub-content" id="subtab-storage">
+            <div class="assets-stats-grid">
+              <div class="assets-stat-card"><div class="as-label">Total Storage</div><div class="as-value" id="compute-storage-total">0</div><div class="ss-sub">Items</div></div>
+              <div class="assets-stat-card"><div class="as-label">Total Capacity</div><div class="as-value" id="compute-storage-capacity">0 TB</div><div class="ss-sub">All storage</div></div>
+              <div class="assets-stat-card"><div class="as-label">Avg Health</div><div class="as-value green" id="compute-storage-health">0%</div><div class="ss-sub">Average</div></div>
+            </div>
+            <div class="search-bar">
+              <input type="text" id="compute-storage-search" placeholder="Search storage by name or make…" oninput="debounceRenderComputeStorage()" />
+            </div>
+            <div class="loading-overlay" id="compute-storage-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading storage...</span></div></div>
+            <div id="compute-storage-groups-container"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Control Center -->
+      <div class="tab" id="tab-controlcenter">
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Control Center</span>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <button class="btn btn-sm" onclick="exportAssetsCSV()"><i class="ti ti-download"></i> Export CSV</button>
+              <button class="btn btn-sm" onclick="refreshAssets()" title="Refresh"><i class="ti ti-refresh"></i></button>
+            </div>
+          </div>
+          <div class="asset-sub-tabs">
+            <button class="asset-sub-tab active" data-subtab="stations" onclick="switchAssetSubTab('stations')">Stations</button>
+            <button class="asset-sub-tab" data-subtab="monitors" onclick="switchAssetSubTab('monitors')">Monitors</button>
+          </div>
+
+          <!-- Stations Sub-tab -->
+          <div class="asset-sub-content active" id="subtab-stations">
+            <div class="assets-stats-grid">
+              <div class="assets-stat-card"><div class="as-label">Total Stations</div><div class="as-value" id="stations-total">0</div><div class="ss-sub">Items</div></div>
+              <div class="assets-stat-card"><div class="as-label">Avg Health</div><div class="as-value green" id="stations-health">0%</div><div class="ss-sub">Average</div></div>
+              <div class="assets-stat-card"><div class="as-label">Total Storage</div><div class="as-value" id="stations-storage">0 TB</div><div class="ss-sub">All stations</div></div>
+            </div>
+            <div class="search-bar">
+              <input type="text" id="stations-search" placeholder="Search stations by name or apps…" oninput="debounceRenderStations()" />
+            </div>
+            <div class="loading-overlay" id="stations-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading stations...</span></div></div>
+            <div id="stations-groups-container"></div>
+          </div>
+
+          <!-- Monitors Sub-tab -->
+          <div class="asset-sub-content" id="subtab-monitors">
+            <div class="assets-stats-grid">
+              <div class="assets-stat-card"><div class="as-label">Total Monitors</div><div class="as-value" id="monitors-total">0</div><div class="ss-sub">Items</div></div>
+              <div class="assets-stat-card"><div class="as-label">Avg Health</div><div class="as-value green" id="monitors-health">0%</div><div class="ss-sub">Average</div></div>
+              <div class="assets-stat-card"><div class="as-label">Avg Size</div><div class="as-value" id="monitors-size">0"</div><div class="ss-sub">Average</div></div>
+            </div>
+            <div class="search-bar">
+              <input type="text" id="monitors-search" placeholder="Search monitors by make or model…" oninput="debounceRenderMonitors()" />
+            </div>
+            <div class="loading-overlay" id="monitors-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading monitors...</span></div></div>
+            <div id="monitors-groups-container"></div>
+          </div>
         </div>
       </div>
 
@@ -1259,64 +1321,27 @@ input::placeholder, textarea::placeholder {
         </div>
       </div>
 
-      <!-- Client Assets Tab -->
-      <div class="tab" id="tab-assets">
+      <!-- Intrusion Detection Tab -->
+      <div class="tab" id="tab-intrusion">
         <div class="panel">
           <div class="panel-header">
-            <span class="panel-title">Client Assets</span>
+            <span class="panel-title">Intrusion Detection</span>
             <div style="display:flex;align-items:center;gap:8px;">
-              <button class="btn btn-sm" onclick="exportAssetsCSV()"><i class="ti ti-download"></i> Export CSV</button>
-              <button class="btn btn-sm" onclick="refreshAssets()" title="Refresh"><i class="ti ti-refresh"></i></button>
+              <button class="btn btn-sm" onclick="exportIntrusionCSV()"><i class="ti ti-download"></i> Export CSV</button>
+              <button class="btn btn-sm" onclick="refreshIntrusion()" title="Refresh"><i class="ti ti-refresh"></i></button>
             </div>
           </div>
-          <!-- Sub-tabs -->
-          <div class="asset-sub-tabs">
-            <button class="asset-sub-tab active" data-subtab="storage" onclick="switchAssetSubTab('storage')">Storage</button>
-            <button class="asset-sub-tab" data-subtab="stations" onclick="switchAssetSubTab('stations')">Stations</button>
-            <button class="asset-sub-tab" data-subtab="monitors" onclick="switchAssetSubTab('monitors')">Monitors</button>
+          <div class="intrusion-stats-grid" id="intrusion-stats-grid">
+            <div class="intrusion-stat-card"><div class="is-label">Total Points</div><div class="is-value" id="intrusion-total">0</div><div class="ss-sub">All locations</div></div>
+            <div class="intrusion-stat-card"><div class="is-label">Online</div><div class="is-value green" id="intrusion-online">0</div><div class="ss-sub">Operational</div></div>
+            <div class="intrusion-stat-card"><div class="is-label">Offline</div><div class="is-value red" id="intrusion-offline">0</div><div class="ss-sub">Need attention</div></div>
+            <div class="intrusion-stat-card"><div class="is-label">Warning</div><div class="is-value yellow" id="intrusion-warning">0</div><div class="ss-sub">Check required</div></div>
           </div>
-
-          <!-- Storage Sub-tab -->
-          <div class="asset-sub-content active" id="subtab-storage">
-            <div class="assets-stats-grid">
-              <div class="assets-stat-card"><div class="as-label">Total Storage</div><div class="as-value" id="storage-total">0</div><div class="ss-sub">Items</div></div>
-              <div class="assets-stat-card"><div class="as-label">Total Capacity</div><div class="as-value" id="storage-capacity">0 TB</div><div class="ss-sub">All storage</div></div>
-              <div class="assets-stat-card"><div class="as-label">Avg Health</div><div class="as-value green" id="storage-health">0%</div><div class="ss-sub">Average</div></div>
-            </div>
-            <div class="search-bar">
-              <input type="text" id="storage-search" placeholder="Search storage by name or make…" oninput="debounceRenderStorage()" />
-            </div>
-            <div class="loading-overlay" id="storage-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading storage...</span></div></div>
-            <div id="storage-groups-container"></div>
+          <div class="search-bar">
+            <input type="text" id="intrusion-search" placeholder="Search by monitor point, module, or sensor…" oninput="debounceRenderIntrusion()" />
           </div>
-
-          <!-- Stations Sub-tab -->
-          <div class="asset-sub-content" id="subtab-stations">
-            <div class="assets-stats-grid">
-              <div class="assets-stat-card"><div class="as-label">Total Stations</div><div class="as-value" id="stations-total">0</div><div class="ss-sub">Items</div></div>
-              <div class="assets-stat-card"><div class="as-label">Avg Health</div><div class="as-value green" id="stations-health">0%</div><div class="ss-sub">Average</div></div>
-              <div class="assets-stat-card"><div class="as-label">Total Storage</div><div class="as-value" id="stations-storage">0 TB</div><div class="ss-sub">All stations</div></div>
-            </div>
-            <div class="search-bar">
-              <input type="text" id="stations-search" placeholder="Search stations by name or apps…" oninput="debounceRenderStations()" />
-            </div>
-            <div class="loading-overlay" id="stations-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading stations...</span></div></div>
-            <div id="stations-groups-container"></div>
-          </div>
-
-          <!-- Monitors Sub-tab -->
-          <div class="asset-sub-content" id="subtab-monitors">
-            <div class="assets-stats-grid">
-              <div class="assets-stat-card"><div class="as-label">Total Monitors</div><div class="as-value" id="monitors-total">0</div><div class="ss-sub">Items</div></div>
-              <div class="assets-stat-card"><div class="as-label">Avg Health</div><div class="as-value green" id="monitors-health">0%</div><div class="ss-sub">Average</div></div>
-              <div class="assets-stat-card"><div class="as-label">Avg Size</div><div class="as-value" id="monitors-size">0"</div><div class="ss-sub">Average</div></div>
-            </div>
-            <div class="search-bar">
-              <input type="text" id="monitors-search" placeholder="Search monitors by make or model…" oninput="debounceRenderMonitors()" />
-            </div>
-            <div class="loading-overlay" id="monitors-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading monitors...</span></div></div>
-            <div id="monitors-groups-container"></div>
-          </div>
+          <div class="loading-overlay" id="intrusion-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading intrusion points...</span></div></div>
+          <div id="intrusion-groups-container"></div>
         </div>
       </div>
 
@@ -1421,6 +1446,7 @@ input::placeholder, textarea::placeholder {
       <textarea class="notes-area" id="cam-modal-comments"></textarea>
       <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;">
         <button class="btn btn-sm btn-success" onclick="saveCameraModalComment()"><i class="ti ti-device-floppy"></i> Save</button>
+        <button class="btn btn-sm btn-accent" onclick="createSRFromAsset('camera', currentCameraIndex)"><i class="ti ti-clipboard-list"></i> Create Support Request</button>
       </div>
     </div>
     <div class="modal-footer">
@@ -1428,6 +1454,7 @@ input::placeholder, textarea::placeholder {
     </div>
   </div>
 </div>
+
 <!-- Door Detail Modal -->
 <div class="modal-overlay" id="door-detail-modal">
   <div class="modal xwide">
@@ -1447,6 +1474,7 @@ input::placeholder, textarea::placeholder {
       <textarea class="notes-area" id="door-modal-comments"></textarea>
       <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;">
         <button class="btn btn-sm btn-success" onclick="saveDoorModalComment()"><i class="ti ti-device-floppy"></i> Save</button>
+        <button class="btn btn-sm btn-accent" onclick="createSRFromAsset('door', currentDoorIndex)"><i class="ti ti-clipboard-list"></i> Create Support Request</button>
       </div>
     </div>
     <div class="modal-footer">
@@ -1477,6 +1505,7 @@ input::placeholder, textarea::placeholder {
       <textarea class="notes-area" id="server-modal-comments"></textarea>
       <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;">
         <button class="btn btn-sm btn-success" onclick="saveServerModalComment()"><i class="ti ti-device-floppy"></i> Save</button>
+        <button class="btn btn-sm btn-accent" onclick="createSRFromAsset('server', currentServerIndex)"><i class="ti ti-clipboard-list"></i> Create Support Request</button>
       </div>
     </div>
     <div class="modal-footer">
@@ -1507,6 +1536,7 @@ input::placeholder, textarea::placeholder {
       <textarea class="notes-area" id="switch-modal-comments"></textarea>
       <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;">
         <button class="btn btn-sm btn-success" onclick="saveSwitchModalComment()"><i class="ti ti-device-floppy"></i> Save</button>
+        <button class="btn btn-sm btn-accent" onclick="createSRFromAsset('switch', currentSwitchIndex)"><i class="ti ti-clipboard-list"></i> Create Support Request</button>
       </div>
     </div>
     <div class="modal-footer">
@@ -1514,6 +1544,32 @@ input::placeholder, textarea::placeholder {
       <button class="btn" onclick="openSwitchAdmin()"><i class="ti ti-external-link"></i> Admin</button>
       <span id="switch-ping-result" style="font-size:11px;margin-left:8px;"></span>
       <button class="btn" onclick="closeSwitchDetailModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Intrusion Detail Modal -->
+<div class="modal-overlay" id="intrusion-detail-modal">
+  <div class="modal wide">
+    <button class="modal-close" onclick="closeIntrusionDetailModal()"><i class="ti ti-x"></i></button>
+    <div class="modal-title" id="intrusion-detail-title">Monitor Point</div>
+    <div class="modal-sub" id="intrusion-detail-sub">Module · Status</div>
+    <div class="modal-section">
+      <div class="modal-section-title">Details</div>
+      <div class="modal-grid" id="intrusion-detail-grid"></div>
+    </div>
+    <div class="modal-section" id="intrusion-detail-comments-section">
+      <div class="modal-section-title">Comments</div>
+      <textarea class="notes-area" id="intrusion-modal-comments"></textarea>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;">
+        <button class="btn btn-sm btn-success" onclick="saveIntrusionModalComment()"><i class="ti ti-device-floppy"></i> Save</button>
+        <button class="btn btn-sm btn-accent" onclick="createSRFromAsset('intrusion', currentIntrusionIndex)"><i class="ti ti-clipboard-list"></i> Create Support Request</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="pingIntrusion()"><i class="ti ti-network"></i> Ping</button>
+      <span id="intrusion-ping-result" style="font-size:11px;margin-left:8px;"></span>
+      <button class="btn" onclick="closeIntrusionDetailModal()">Close</button>
     </div>
   </div>
 </div>
@@ -1616,249 +1672,6 @@ input::placeholder, textarea::placeholder {
   </div>
 </div>
 
-<!-- Add Camera Modal -->
-<div class="modal-overlay" id="add-camera-modal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeAddModal('add-camera-modal')"><i class="ti ti-x"></i></button>
-    <div class="modal-title">📷 Add Camera</div>
-    <div class="modal-sub">Add a new camera to the system</div>
-    <div class="modal-section">
-      <div class="modal-grid">
-        <div class="modal-field"><label>Camera Name *</label><input type="text" id="cam-name" placeholder="e.g., HM3 PTZ" /></div>
-        <div class="modal-field"><label>Client *</label><select id="cam-client"><option value="">Select Client</option></select></div>
-        <div class="modal-field"><label>Zone</label><input type="text" id="cam-zone" placeholder="e.g., NORTH" /></div>
-        <div class="modal-field"><label>IP Address</label><input type="text" id="cam-ip" placeholder="e.g., 10.19.1.150" /></div>
-        <div class="modal-field"><label>Model</label><input type="text" id="cam-model" placeholder="Camera model" /></div>
-        <div class="modal-field"><label>Resolution</label><input type="text" id="cam-resolution" placeholder="e.g., 1080p" /></div>
-        <div class="modal-field"><label>Archiver</label><input type="text" id="cam-archiver" placeholder="e.g., DM5" /></div>
-        <div class="modal-field"><label>Status</label><select id="cam-status"><option value="Online">Online</option><option value="Defective">Defective</option><option value="No Power">No Power</option><option value="No Camera">No Camera</option><option value="Needs Check">Needs Check</option></select></div>
-      </div>
-    </div>
-    <div class="modal-section">
-      <div class="modal-section-title">Additional Info</div>
-      <div class="modal-grid">
-        <div class="modal-field"><label>Purchase Date</label><input type="date" id="cam-purchase-date" /></div>
-        <div class="modal-field"><label>Warranty Expiry</label><input type="date" id="cam-warranty-expiry" /></div>
-      </div>
-    </div>
-    <div class="modal-section">
-      <div class="modal-section-title">Comments</div>
-      <textarea id="cam-comments" placeholder="Any additional notes…" style="width:100%;background:var(--select-bg);border:1px solid var(--select-border);border-radius:6px;color:var(--select-color);font-size:12px;padding:10px 12px;min-height:60px;font-family:var(--font);resize:vertical;"></textarea>
-    </div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeAddModal('add-camera-modal')">Cancel</button>
-      <button class="btn btn-accent" onclick="saveNewCamera()"><i class="ti ti-device-floppy"></i> Add Camera</button>
-    </div>
-  </div>
-</div>
-
-<!-- Add Door Modal -->
-<div class="modal-overlay" id="add-door-modal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeAddModal('add-door-modal')"><i class="ti ti-x"></i></button>
-    <div class="modal-title">🚪 Add Door</div>
-    <div class="modal-sub">Add a new access control door</div>
-    <div class="modal-section">
-      <div class="modal-grid">
-        <div class="modal-field"><label>Door Name *</label><input type="text" id="door-name" placeholder="e.g., Main Entrance" /></div>
-        <div class="modal-field"><label>Client *</label><select id="door-client"><option value="">Select Client</option></select></div>
-        <div class="modal-field"><label>Site</label><input type="text" id="door-site" placeholder="e.g., Security Office" /></div>
-        <div class="modal-field"><label>Reader</label><input type="text" id="door-reader" placeholder="e.g., HID Prox" /></div>
-        <div class="modal-field"><label>Lock Type</label><input type="text" id="door-lock" placeholder="e.g., 600lb, 1200lb, Z" /></div>
-        <div class="modal-field"><label>Powered</label><select id="door-powered"><option value="Yes">Yes</option><option value="No">No</option><option value="Not In Use">Not In Use</option></select></div>
-        <div class="modal-field"><label>Door Swing</label><select id="door-swing"><option value="In">In</option><option value="Out">Out</option></select></div>
-        <div class="modal-field"><label>Access Type</label><input type="text" id="door-access-type" placeholder="e.g., Read In + Read Out" /></div>
-        <div class="modal-field"><label>Anti-Passback</label><select id="door-anti-passback"><option value="Yes">Yes</option><option value="No">No</option></select></div>
-        <div class="modal-field"><label>Controller Type</label><select id="door-controller-type"><option value="Standalone">Standalone Controllers</option><option value="Integrated">Integrated Controllers</option><option value="Networked/IP">Networked/IP Controllers</option><option value="Centralized/Panel-Based">Centralized/Panel-Based Controllers</option></select></div>
-        <div class="modal-field"><label>Status</label><select id="door-status"><option value="Online">Online</option><option value="Offline">Offline</option><option value="Under Maintenance">Under Maintenance</option></select></div>
-        <div class="modal-field"><label>Technician</label><select id="door-tech"><option value="Shanice Vernon">Shanice Vernon</option><option value="Shavine">Shavine</option><option value="Marvin Grant">Marvin Grant</option><option value="Ackeem">Ackeem</option><option value="Unassigned">Unassigned</option></select></div>
-      </div>
-    </div>
-    <div class="modal-section">
-      <div class="modal-section-title">Additional Info</div>
-      <div class="modal-grid">
-        <div class="modal-field"><label>IP Address</label><input type="text" id="door-ip" placeholder="e.g., 10.19.1.100" /></div>
-        <div class="modal-field"><label>Controller</label><input type="text" id="door-controller" placeholder="e.g., Controller A" /></div>
-        <div class="modal-field"><label>Purchase Date</label><input type="date" id="door-purchase-date" /></div>
-        <div class="modal-field"><label>Warranty Expiry</label><input type="date" id="door-warranty-expiry" /></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeAddModal('add-door-modal')">Cancel</button>
-      <button class="btn btn-accent" onclick="saveNewDoor()"><i class="ti ti-device-floppy"></i> Add Door</button>
-    </div>
-  </div>
-</div>
-
-<!-- Add Server Modal -->
-<div class="modal-overlay" id="add-server-modal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeAddModal('add-server-modal')"><i class="ti ti-x"></i></button>
-    <div class="modal-title">🖥 Add Server</div>
-    <div class="modal-sub">Add a new server to the system</div>
-    <div class="modal-section">
-      <div class="modal-grid">
-        <div class="modal-field"><label>Serial Number *</label><input type="text" id="server-serial" placeholder="e.g., J1013DDR" /></div>
-        <div class="modal-field"><label>Location *</label><input type="text" id="server-location" placeholder="e.g., Kingport" /></div>
-        <div class="modal-field"><label>Client *</label><select id="server-client"><option value="">Select Client</option></select></div>
-        <div class="modal-field"><label>Make</label><input type="text" id="server-make" placeholder="e.g., Dell" /></div>
-        <div class="modal-field"><label>Model</label><input type="text" id="server-model" placeholder="e.g., PowerEdge R740" /></div>
-        <div class="modal-field"><label>Capacity</label><input type="text" id="server-capacity" placeholder="e.g., 6.11TB" /></div>
-        <div class="modal-field"><label>In Use</label><input type="text" id="server-used" placeholder="e.g., 1.4TB" /></div>
-        <div class="modal-field"><label>Health</label><input type="text" id="server-health" placeholder="e.g., Good (23%)" /></div>
-        <div class="modal-field"><label>Applications</label><input type="text" id="server-apps" placeholder="e.g., Ocularis DM5" /></div>
-        <div class="modal-field"><label>Status</label><select id="server-status"><option value="ONLINE">Online</option><option value="OFFLINE">Offline</option></select></div>
-        <div class="modal-field"><label>Purchase Date</label><input type="date" id="server-purchase-date" /></div>
-        <div class="modal-field"><label>Warranty Expiry</label><input type="date" id="server-warranty-expiry" /></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeAddModal('add-server-modal')">Cancel</button>
-      <button class="btn btn-accent" onclick="saveNewServer()"><i class="ti ti-device-floppy"></i> Add Server</button>
-    </div>
-  </div>
-</div>
-
-<!-- Add Switch Modal -->
-<div class="modal-overlay" id="add-switch-modal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeAddModal('add-switch-modal')"><i class="ti ti-x"></i></button>
-    <div class="modal-title">🔌 Add Switch</div>
-    <div class="modal-sub">Add a new network switch</div>
-    <div class="modal-section">
-      <div class="modal-grid">
-        <div class="modal-field"><label>Switch Name *</label><input type="text" id="switch-name" placeholder="e.g., Main Entrance" /></div>
-        <div class="modal-field"><label>Client *</label><select id="switch-client"><option value="">Select Client</option></select></div>
-        <div class="modal-field"><label>Location</label><input type="text" id="switch-location" placeholder="e.g., Security Office" /></div>
-        <div class="modal-field"><label>Model</label><select id="switch-model"><option value="AXIS T8508">AXIS T8508</option><option value="AXIS T8516">AXIS T8516</option><option value="AXIS T8504-R">AXIS T8504-R</option><option value="TL-SG2210P">TL-SG2210P</option><option value="NS3552-16P-2T-2S">NS3552-16P-2T-2S</option><option value="XS728T">XS728T</option><option value="XS716T">XS716T</option><option value="US-16-XG">US-16-XG</option><option value="M4300-24X">M4300-24X</option></select></div>
-        <div class="modal-field"><label>IP Address</label><input type="text" id="switch-ip" placeholder="e.g., 10.19.1.21" /></div>
-        <div class="modal-field"><label>Firmware</label><input type="text" id="switch-firmware" placeholder="e.g., 6.54.2739" /></div>
-        <div class="modal-field"><label>MAC Address</label><input type="text" id="switch-mac" placeholder="e.g., AC:CC:8E:FA:4B:1B" /></div>
-        <div class="modal-field"><label>Purchase Date</label><input type="date" id="switch-purchase-date" /></div>
-        <div class="modal-field"><label>Warranty Expiry</label><input type="date" id="switch-warranty-expiry" /></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeAddModal('add-switch-modal')">Cancel</button>
-      <button class="btn btn-accent" onclick="saveNewSwitch()"><i class="ti ti-device-floppy"></i> Add Switch</button>
-    </div>
-  </div>
-</div>
-<!-- Add Software Modal -->
-<div class="modal-overlay" id="add-software-modal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeAddModal('add-software-modal')"><i class="ti ti-x"></i></button>
-    <div class="modal-title">💻 Add Software</div>
-    <div class="modal-sub">Add new software to the system</div>
-    <div class="modal-section">
-      <div class="modal-grid">
-        <div class="modal-field"><label>Vendor *</label><select id="software-vendor">
-          <option value="">Select Vendor</option>
-          <option value="Octave">Octave</option>
-          <option value="AMAG">AMAG</option>
-          <option value="Axis">Axis</option>
-          <option value="Inex Tech">Inex Tech</option>
-          <option value="Salto">Salto</option>
-          <option value="Eyelock">Eyelock</option>
-          <option value="Commend">Commend</option>
-          <option value="Southwest Microwave">Southwest Microwave</option>
-          <option value="Trackable">Trackable</option>
-          <option value="Corsight">Corsight</option>
-          <option value="Telaeris">Telaeris</option>
-          <option value="Ipsotek">Ipsotek</option>
-          <option value="IQGEO">IQGEO</option>
-          <option value="NTEST">NTEST</option>
-          <option value="Galaxy">Galaxy</option>
-          <option value="Lenel">Lenel</option>
-          <option value="Maxxess">Maxxess</option>
-        </select></div>
-        <div class="modal-field"><label>Client *</label><select id="software-client"><option value="">Select Client</option></select></div>
-        <div class="modal-field"><label>Version</label><input type="text" id="software-version" placeholder="e.g., 8.5.2" /></div>
-        <div class="modal-field"><label>SMA Expiration</label><input type="date" id="software-sma" /></div>
-        <div class="modal-field"><label>Status</label><select id="software-status"><option value="Good">Good</option><option value="Warning">Warning</option><option value="Expired">Expired</option></select></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeAddModal('add-software-modal')">Cancel</button>
-      <button class="btn btn-accent" onclick="saveNewSoftware()"><i class="ti ti-device-floppy"></i> Add Software</button>
-    </div>
-  </div>
-</div>
-
-<!-- Add Storage Modal -->
-<div class="modal-overlay" id="add-storage-modal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeAddModal('add-storage-modal')"><i class="ti ti-x"></i></button>
-    <div class="modal-title">💾 Add Storage</div>
-    <div class="modal-sub">Add new storage to the system</div>
-    <div class="modal-section">
-      <div class="modal-grid">
-        <div class="modal-field"><label>Name *</label><input type="text" id="storage-name" placeholder="e.g., NAS-01" /></div>
-        <div class="modal-field"><label>Client *</label><select id="storage-client"><option value="">Select Client</option></select></div>
-        <div class="modal-field"><label>Total Storage</label><input type="text" id="storage-total" placeholder="e.g., 10TB" /></div>
-        <div class="modal-field"><label>Usable Storage</label><input type="text" id="storage-usable" placeholder="e.g., 8.2TB" /></div>
-        <div class="modal-field"><label>Health %</label><input type="number" id="storage-health" placeholder="e.g., 85" /></div>
-        <div class="modal-field"><label>Make</label><input type="text" id="storage-make" placeholder="e.g., Dell" /></div>
-        <div class="modal-field"><label>Model</label><input type="text" id="storage-model" placeholder="e.g., PowerVault" /></div>
-        <div class="modal-field"><label>Warranty Expiry</label><input type="date" id="storage-warranty" /></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeAddModal('add-storage-modal')">Cancel</button>
-      <button class="btn btn-accent" onclick="saveNewStorage()"><i class="ti ti-device-floppy"></i> Add Storage</button>
-    </div>
-  </div>
-</div>
-
-<!-- Add Station Modal -->
-<div class="modal-overlay" id="add-station-modal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeAddModal('add-station-modal')"><i class="ti ti-x"></i></button>
-    <div class="modal-title">🖥️ Add Station</div>
-    <div class="modal-sub">Add a new client station</div>
-    <div class="modal-section">
-      <div class="modal-grid">
-        <div class="modal-field"><label>Name *</label><input type="text" id="station-name" placeholder="e.g., Client-PC-01" /></div>
-        <div class="modal-field"><label>Client *</label><select id="station-client"><option value="">Select Client</option></select></div>
-        <div class="modal-field"><label>APPs</label><input type="text" id="station-apps" placeholder="e.g., Ocularis, Office" /></div>
-        <div class="modal-field"><label>Storage</label><input type="text" id="station-storage" placeholder="e.g., 512GB" /></div>
-        <div class="modal-field"><label>Health %</label><input type="number" id="station-health" placeholder="e.g., 90" /></div>
-        <div class="modal-field"><label>Make</label><input type="text" id="station-make" placeholder="e.g., Dell" /></div>
-        <div class="modal-field"><label>Model</label><input type="text" id="station-model" placeholder="e.g., OptiPlex" /></div>
-        <div class="modal-field"><label>Warranty Expiry</label><input type="date" id="station-warranty" /></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeAddModal('add-station-modal')">Cancel</button>
-      <button class="btn btn-accent" onclick="saveNewStation()"><i class="ti ti-device-floppy"></i> Add Station</button>
-    </div>
-  </div>
-</div>
-
-<!-- Add Monitor Modal -->
-<div class="modal-overlay" id="add-monitor-modal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeAddModal('add-monitor-modal')"><i class="ti ti-x"></i></button>
-    <div class="modal-title">🖥️ Add Monitor</div>
-    <div class="modal-sub">Add a new monitor</div>
-    <div class="modal-section">
-      <div class="modal-grid">
-        <div class="modal-field"><label>Name *</label><input type="text" id="monitor-name" placeholder="e.g., Monitor-01" /></div>
-        <div class="modal-field"><label>Client *</label><select id="monitor-client"><option value="">Select Client</option></select></div>
-        <div class="modal-field"><label>Size</label><input type="text" id="monitor-size" placeholder="e.g., 27\"" /></div>
-        <div class="modal-field"><label>Health %</label><input type="number" id="monitor-health" placeholder="e.g., 95" /></div>
-        <div class="modal-field"><label>Make</label><input type="text" id="monitor-make" placeholder="e.g., Dell" /></div>
-        <div class="modal-field"><label>Model</label><input type="text" id="monitor-model" placeholder="e.g., UltraSharp" /></div>
-        <div class="modal-field"><label>Warranty Expiry</label><input type="date" id="monitor-warranty" /></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeAddModal('add-monitor-modal')">Cancel</button>
-      <button class="btn btn-accent" onclick="saveNewMonitor()"><i class="ti ti-device-floppy"></i> Add Monitor</button>
-    </div>
-  </div>
-</div>
-
 <!-- Add Client Modal -->
 <div class="modal-overlay" id="add-client-modal">
   <div class="modal">
@@ -1943,6 +1756,7 @@ var SOFTWARE = [];
 var STORAGE = [];
 var STATIONS = [];
 var MONITORS = [];
+var INTRUSION = [];
 var SERVICE_REQUESTS = [];
 var AUDIT_LOG = [];
 var EMAILS = [];
@@ -1968,9 +1782,13 @@ var currentTab = 'dashboard';
 var currentDoorIndex = null;
 var currentServerIndex = null;
 var currentSwitchIndex = null;
+var currentIntrusionIndex = null;
+var currentCameraIndex = null;
 var activeEmailId = null;
 var previewFileData = null;
 var currentPath = ['CAMS Internal Database'];
+var currentComputeSubTab = 'servers';
+var currentAssetSubTab = 'stations';
 
 // Pagination state
 var camCurrentPage = {};
@@ -2214,6 +2032,13 @@ function getStatusBadge(health) {
   return '<span class="status-badge critical">Critical</span>';
 }
 
+function intrusionBadge(status) {
+  if (status === 'Online') return '<span class="badge b-intrusion-online">Online</span>';
+  if (status === 'Offline') return '<span class="badge b-intrusion-offline">Offline</span>';
+  if (status === 'Warning') return '<span class="badge b-intrusion-warning">Warning</span>';
+  return '<span class="badge b-info">Unknown</span>';
+}
+
 function timeAgo(d) {
   try {
     var dt = new Date(d);
@@ -2347,10 +2172,11 @@ var titles = {
   service: 'Service Requests',
   cameras: 'Cameras',
   doors: 'Access Control',
-  servers: 'Servers',
+  compute: 'Compute & Storage',
+  controlcenter: 'Control Center',
   switches: 'Switches',
   software: 'Software & Licenses',
-  assets: 'Assets',
+  intrusion: 'Intrusion Detection',
   files: 'Files & Logs'
 };
 
@@ -2375,10 +2201,11 @@ function switchTab(id) {
   if (id === 'files') { renderAuditLog(); renderFileExplorer(); }
   if (id === 'cameras') { renderStatusFilters(); renderCamerasOptimized(); }
   if (id === 'doors') { renderDoorsEnhanced(); }
-  if (id === 'servers') { renderServersEnhanced(); }
+  if (id === 'compute') { renderServersEnhanced(); renderComputeStorage(); }
+  if (id === 'controlcenter') { renderStations(); renderMonitors(); }
   if (id === 'switches') { renderSwitchesEnhanced(); }
   if (id === 'software') { renderSoftware(); }
-  if (id === 'assets') { renderStorage(); renderStations(); renderMonitors(); }
+  if (id === 'intrusion') { renderIntrusion(); }
 }
 
 document.getElementById('nav').addEventListener('click', function(e) {
@@ -2418,10 +2245,11 @@ document.addEventListener('keydown', function(e) {
     closeServerDetailModal();
     closeSwitchDetailModal();
     closeCameraDetailModal();
+    closeIntrusionDetailModal();
     closeComposeModal();
     hideContextMenu();
   }
-  var tabs = ['dashboard', 'inbox', 'service', 'cameras', 'doors', 'servers', 'switches', 'software', 'assets', 'files'];
+  var tabs = ['dashboard', 'inbox', 'service', 'cameras', 'doors', 'compute', 'controlcenter', 'switches', 'software', 'intrusion', 'files'];
   var num = parseInt(e.key);
   if (num >= 1 && num <= tabs.length) switchTab(tabs[num - 1]);
   if (e.key === 'n' || e.key === 'N') switchTab('service');
@@ -2456,14 +2284,6 @@ function openAddModal(modalId) {
 }
 
 function openAddSRModal() { openAddModal('add-sr-modal'); }
-function openAddCameraModal() { openAddModal('add-camera-modal'); }
-function openAddDoorModal() { openAddModal('add-door-modal'); }
-function openAddServerModal() { openAddModal('add-server-modal'); }
-function openAddSwitchModal() { openAddModal('add-switch-modal'); }
-function openAddSoftwareModal() { openAddModal('add-software-modal'); }
-function openAddStorageModal() { openAddModal('add-storage-modal'); }
-function openAddStationModal() { openAddModal('add-station-modal'); }
-function openAddMonitorModal() { openAddModal('add-monitor-modal'); }
 function openAddClientModal() { openAddModal('add-client-modal'); }
 
 function closeAddModal(modalId) {
@@ -2472,7 +2292,7 @@ function closeAddModal(modalId) {
 }
 
 function populateClientDropdowns() {
-  var selects = document.querySelectorAll('#sr-client, #cam-client, #door-client, #server-client, #switch-client, #software-client, #storage-client, #station-client, #monitor-client');
+  var selects = document.querySelectorAll('#sr-client');
   selects.forEach(function(select) {
     var currentVal = select.value;
     select.innerHTML = '<option value="">Select Client</option>';
@@ -2487,6 +2307,7 @@ function populateClientDropdowns() {
     }
   });
 }
+
 // ============================================================
 // ── AUTHENTICATION ──────────────────────────────────────────
 // ============================================================
@@ -3343,7 +3164,6 @@ function buildClientView(data, user) {
     activeItem.style.color = 'var(--text-primary)';
   }
 }
-// Add this function - paste it anywhere after the buildClientView() function
 
 function switchClientViewTab(tab, element) {
   // Update active state
@@ -3371,6 +3191,7 @@ function switchClientViewTab(tab, element) {
     target.style.display = 'block';
   }
 }
+
 // ============================================================
 // ── CLIENT SR MODAL ──────────────────────────────────────────
 // ============================================================
@@ -3513,6 +3334,7 @@ function loadMockData() {
   STORAGE = JSON.parse(localStorage.getItem('ccsm_storage') || 'null');
   STATIONS = JSON.parse(localStorage.getItem('ccsm_stations') || 'null');
   MONITORS = JSON.parse(localStorage.getItem('ccsm_monitors') || 'null');
+  INTRUSION = JSON.parse(localStorage.getItem('ccsm_intrusion') || 'null');
   SERVICE_REQUESTS = JSON.parse(localStorage.getItem('ccsm_sr') || 'null');
   AUDIT_LOG = JSON.parse(localStorage.getItem('ccsm_audit_log') || 'null');
   CLIENTS = JSON.parse(localStorage.getItem('ccsm_clients') || 'null');
@@ -3525,6 +3347,7 @@ function loadMockData() {
   STORAGE = STORAGE || [];
   STATIONS = STATIONS || [];
   MONITORS = MONITORS || [];
+  INTRUSION = INTRUSION || [];
   SERVICE_REQUESTS = SERVICE_REQUESTS || [];
   AUDIT_LOG = AUDIT_LOG || [];
   CLIENTS = CLIENTS || [];
@@ -3561,6 +3384,10 @@ function loadMockData() {
     MONITORS = getEmbeddedMonitors();
     localStorage.setItem('ccsm_monitors', JSON.stringify(MONITORS));
   }
+  if (INTRUSION.length === 0) {
+    INTRUSION = getEmbeddedIntrusion();
+    localStorage.setItem('ccsm_intrusion', JSON.stringify(INTRUSION));
+  }
   if (SERVICE_REQUESTS.length === 0) {
     SERVICE_REQUESTS = getEmbeddedSRs();
     localStorage.setItem('ccsm_sr', JSON.stringify(SERVICE_REQUESTS));
@@ -3570,6 +3397,20 @@ function loadMockData() {
     localStorage.setItem('ccsm_clients', JSON.stringify(CLIENTS));
   }
 
+  // Set client for each asset based on zone
+  CAMERAS.forEach(function(c) {
+    if (!c.client) c.client = getClient(c.zone);
+  });
+  DOORS.forEach(function(d) {
+    if (!d.client) d.client = getClient(d.site);
+  });
+  SERVERS.forEach(function(s) {
+    if (!s.client) s.client = getClient(s.location);
+  });
+  SWITCHES.forEach(function(s) {
+    if (!s.client) s.client = getClient(s.location);
+  });
+
   renderDashboard();
   renderSR();
   renderAuditLog();
@@ -3577,11 +3418,12 @@ function loadMockData() {
   renderCamerasOptimized();
   renderDoorsEnhanced();
   renderServersEnhanced();
+  renderComputeStorage();
   renderSwitchesEnhanced();
   renderSoftware();
-  renderStorage();
   renderStations();
   renderMonitors();
+  renderIntrusion();
   renderInbox();
   renderFileExplorer();
   updateClientNavVisibility();
@@ -3593,7 +3435,6 @@ function loadMockData() {
 
 function getEmbeddedCameras() {
   return [
-    // ===== GENETEC LISTING - PELCO CAMERAS =====
     {name: "N25 PTZ", zone: "NORTH", status: "Offline", comments: "Defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.102.216", mac_address: "00-04-7D-27-9F-BA", resolution: "", warranty_expiry: ""},
     {name: "B8 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.66", mac_address: "00-04-7D-27-9F-BD", resolution: "", warranty_expiry: ""},
     {name: "D12 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.105", mac_address: "00-04-7D-27-9F-BE", resolution: "", warranty_expiry: ""},
@@ -3642,8 +3483,6 @@ function getEmbeddedCameras() {
     {name: "B11 PTZ", zone: "SOUTH", status: "Online", comments: "Cable was replaced (6/24/2026)", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.69", mac_address: "00-04-7D-27-F4-30", resolution: "", warranty_expiry: ""},
     {name: "W2 PTZ", zone: "WEST", status: "Offline", comments: "Switch needs power supply replacement", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.102.244", mac_address: "00-04-7D-27-F4-31", resolution: "", warranty_expiry: ""},
     {name: "C4 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.83", mac_address: "00-04-7D-27-F4-32", resolution: "", warranty_expiry: ""},
-    
-    // ===== AVIGILON CAMERAS =====
     {name: "D6", zone: "SOUTH", status: "Online", comments: "Cable replacement done", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 4", ip_address: "172.17.103.106", mac_address: "00-18-85-2F-0B-93", resolution: "", warranty_expiry: ""},
     {name: "W6", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.233", mac_address: "00-18-85-2F-0B-A6", resolution: "", warranty_expiry: ""},
     {name: "A14", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 3", ip_address: "172.17.103.5", mac_address: "00-18-85-2F-E7-88", resolution: "", warranty_expiry: ""},
@@ -3698,14 +3537,10 @@ function getEmbeddedCameras() {
     {name: "W11", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.239", mac_address: "00-18-85-30-A2-52", resolution: "", warranty_expiry: ""},
     {name: "B11", zone: "SOUTH", status: "Online", comments: "Cable was replaced (6/24/2026)", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.57", mac_address: "00-18-85-30-A2-56", resolution: "", warranty_expiry: ""},
     {name: "B6", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 1", ip_address: "172.17.103.50", mac_address: "00-18-85-30-A2-5A", resolution: "", warranty_expiry: ""},
-    
-    // ===== FLIR SYSTEMS CAMERAS =====
     {name: "N34 PTZ", zone: "NORTH TERMINAL PERIMETER", status: "Offline", comments: "No camera on Pole", model: "DX-624", manufacturer: "FLIR Systems", archiver: "Archiver 1", ip_address: "172.17.102.204", mac_address: "00-1B-D8-90-07-DC", resolution: "", warranty_expiry: ""},
     {name: "A13 PTZ", zone: "SOUTH", status: "Offline", comments: "cable tested good, cable ends are good, no POE light present", model: "DX-612", manufacturer: "FLIR Systems", archiver: "Archiver 1", ip_address: "172.17.103.42", mac_address: "00-1B-D8-90-07-E3", resolution: "", warranty_expiry: ""},
     {name: "A9 PTZ", zone: "SOUTH", status: "Offline", comments: "cable tested good, cable ends are good, no POE light present", model: "DX-612", manufacturer: "FLIR Systems", archiver: "Archiver 4", ip_address: "172.17.103.38", mac_address: "00-1B-D8-90-07-F2", resolution: "", warranty_expiry: ""},
     {name: "N31 PTZ", zone: "NORTH TERMINAL PERIMETER", status: "Offline", comments: "POE injector changed, Camera needs reset", model: "DX-624", manufacturer: "FLIR Systems", archiver: "Archiver 4", ip_address: "172.17.102.207", mac_address: "00-1B-D8-90-07-FA", resolution: "", warranty_expiry: ""},
-    
-    // ===== LPR CAMERAS =====
     {name: "Truck Entry 1 LPR", zone: "LPR System Units", status: "Online", comments: "Working", model: "AutoVu SharpOS", manufacturer: "AutoVu", archiver: "Archiver 1", ip_address: "172.17.103.186", mac_address: "0C-BF-15-01-A1-5F", resolution: "", warranty_expiry: ""},
     {name: "Truck Entry 2 LPR", zone: "LPR System Units", status: "Online", comments: "Working", model: "AutoVu SharpOS", manufacturer: "AutoVu", archiver: "Archiver 1", ip_address: "172.17.103.167", mac_address: "0C-BF-15-01-A1-A6", resolution: "", warranty_expiry: ""},
     {name: "Tollgate Exit LPR", zone: "LPR System Units", status: "Online", comments: "Working", model: "AutoVu SharpOS", manufacturer: "AutoVu", archiver: "Archiver 1", ip_address: "172.17.102.189", mac_address: "0C-BF-15-01-A1-A9", resolution: "", warranty_expiry: ""},
@@ -3718,7 +3553,6 @@ function getEmbeddedCameras() {
 
 function getEmbeddedDoors() {
   return [
-    // Lasco Doors from Access Control CSV
     {name: "Batching room", site: "LML B Liquid Plant", client: "Lasco", status: "Online", tech: "Unassigned",
      controllerType: "Standalone", ip: "", controller_model: "SALTO XS4", controller_warranty: "", controller_status: "Online",
      reader: "HID Prox", reader_port: "Port 1", reader_model: "HID R40", reader_warranty: "", reader_status: "Online",
@@ -3908,7 +3742,6 @@ function getEmbeddedDoors() {
      closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "", closer_status: "Online",
      doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", powered: "Yes",
      comments: "", history: []},
-    // KFTL Doors
     {name: "Main Entrance", site: "Security Office", client: "KFTL", status: "Online", tech: "Shanice Vernon",
      controllerType: "Standalone", ip: "10.19.1.100", controller_model: "SALTO XS4", controller_warranty: "2027-01-15", controller_status: "Online",
      reader: "HID Prox", reader_port: "Port 1", reader_model: "HID R40", reader_warranty: "2027-01-15", reader_status: "Online",
@@ -3982,6 +3815,16 @@ function getEmbeddedMonitors() {
   ];
 }
 
+function getEmbeddedIntrusion() {
+  return [
+    {monitor_point: "Front Gate", modules: "Module A-1", communication: "Ethernet", sensor: "Motion Sensor", status: "Online", warranty_expiry: "2027-01-15", comments: "Operational - no issues"},
+    {monitor_point: "Back Gate", modules: "Module B-2", communication: "Wireless", sensor: "PIR Sensor", status: "Online", warranty_expiry: "2026-06-01", comments: "Battery replaced 2026-05-15"},
+    {monitor_point: "East Perimeter", modules: "Module C-3", communication: "Fiber", sensor: "Fiber Optic", status: "Offline", warranty_expiry: "2025-12-01", comments: "Cable break detected - needs repair"},
+    {monitor_point: "West Perimeter", modules: "Module D-1", communication: "Ethernet", sensor: "Radar", status: "Warning", warranty_expiry: "2026-08-15", comments: "False positive alerts - calibration needed"},
+    {monitor_point: "North Entrance", modules: "Module E-2", communication: "Wireless", sensor: "Magnetic Contact", status: "Online", warranty_expiry: "2027-03-01", comments: "Working - recently serviced"}
+  ];
+}
+
 function getEmbeddedSRs() {
   return [
     {id: "SR-1847", client: "KFTL", site: "NORTH", subject: "8 Cameras Defective in NORTH Zone", from: "David Chen", category: "Camera", priority: "High", status: "Open", assigned: "Shanice Vernon", received: "Jun 15, 2026", body: "Multiple cameras showing as defective in NORTH zone. Need immediate attention.", notes: "Awaiting parts", history: [{time: "14:22", msg: "Created"}, {time: "15:00", msg: "Assigned to Shanice"}], attachments: []},
@@ -3990,6 +3833,7 @@ function getEmbeddedSRs() {
     {id: "SR-1850", client: "Lasco", site: "LML B Liquid Plant", subject: "Camera LML-01 Offline", from: "Vincent Hoo", category: "Camera", priority: "Medium", status: "Open", assigned: "Marvin Grant", received: "Jun 17, 2026", body: "Camera LML-01 reported offline at Liquid Plant.", notes: "", history: [{time: "06:30", msg: "Created"}], attachments: []}
   ];
 }
+
 // ============================================================
 // ── CLIENT NAVIGATION VISIBILITY ────────────────────────────
 // ============================================================
@@ -4100,10 +3944,11 @@ function renderAllClients() {
     html += '<div class="client-dropdown" id="client-dropdown-' + client + '" style="display:none;">';
     html += '<div class="nav-item nav-sub-item" data-tab="cameras" data-client="' + client + '"><i class="ti ti-video"></i> <span>Cameras</span></div>';
     html += '<div class="nav-item nav-sub-item" data-tab="doors" data-client="' + client + '"><i class="ti ti-door"></i> <span>Access Control</span></div>';
-    html += '<div class="nav-item nav-sub-item" data-tab="servers" data-client="' + client + '"><i class="ti ti-server"></i> <span>Servers</span></div>';
+    html += '<div class="nav-item nav-sub-item" data-tab="compute" data-client="' + client + '"><i class="ti ti-server"></i> <span>Compute & Storage</span></div>';
+    html += '<div class="nav-item nav-sub-item" data-tab="controlcenter" data-client="' + client + '"><i class="ti ti-database"></i> <span>Control Center</span></div>';
     html += '<div class="nav-item nav-sub-item" data-tab="switches" data-client="' + client + '"><i class="ti ti-router"></i> <span>Switches</span></div>';
     html += '<div class="nav-item nav-sub-item" data-tab="software" data-client="' + client + '"><i class="ti ti-code"></i> <span>Software</span></div>';
-    html += '<div class="nav-item nav-sub-item" data-tab="assets" data-client="' + client + '"><i class="ti ti-database"></i> <span>Assets</span></div>';
+    html += '<div class="nav-item nav-sub-item" data-tab="intrusion" data-client="' + client + '"><i class="ti ti-shield"></i> <span>Intrusion Detection</span></div>';
     html += '</div></div>';
   });
 
@@ -4135,12 +3980,84 @@ function selectZone(zone) {
   });
   if (currentTab === 'cameras') renderCamerasOptimized();
   else if (currentTab === 'doors') renderDoorsEnhanced();
-  else if (currentTab === 'servers') renderServersEnhanced();
+  else if (currentTab === 'compute') { renderServersEnhanced(); renderComputeStorage(); }
   else if (currentTab === 'switches') renderSwitchesEnhanced();
   else if (currentTab === 'software') renderSoftware();
-  else if (currentTab === 'assets') { renderStorage(); renderStations(); renderMonitors(); }
+  else if (currentTab === 'controlcenter') { renderStations(); renderMonitors(); }
+  else if (currentTab === 'intrusion') renderIntrusion();
   toast('Showing: ' + zone, 'info');
 }
+
+// ============================================================
+// ── COMPUTE & STORAGE FUNCTIONS ─────────────────────────────
+// ============================================================
+
+var currentComputeSubTab = 'servers';
+
+function switchComputeTab(tab) {
+  currentComputeSubTab = tab;
+  document.querySelectorAll('.compute-sub-tab').forEach(function(el) {
+    el.classList.remove('active');
+  });
+  document.querySelectorAll('.compute-sub-tab').forEach(function(el) {
+    if (el.dataset.subtab === tab) el.classList.add('active');
+  });
+  document.querySelectorAll('.compute-sub-content').forEach(function(el) {
+    el.classList.remove('active');
+  });
+  var content = document.getElementById('subtab-' + tab);
+  if (content) content.classList.add('active');
+  
+  if (tab === 'servers') renderServersEnhanced();
+  else if (tab === 'storage') renderComputeStorage();
+}
+
+function renderComputeStorage() {
+  var search = document.getElementById('compute-storage-search') ? document.getElementById('compute-storage-search').value.toLowerCase() : '';
+  showLoading('compute-storage-loading');
+  setTimeout(function() {
+    var filtered = STORAGE.filter(function(s) {
+      return s.name.toLowerCase().indexOf(search) !== -1 ||
+        (s.make || '').toLowerCase().indexOf(search) !== -1 ||
+        (s.model || '').toLowerCase().indexOf(search) !== -1;
+    });
+    if (currentClientFilter) {
+      filtered = filtered.filter(function(s) { return s.client === currentClientFilter; });
+    }
+    if (currentZoneFilter) {
+      filtered = filtered.filter(function(s) { return s.location === currentZoneFilter; });
+    }
+
+    var total = STORAGE.length;
+    var totalCap = STORAGE.reduce(function(acc, s) {
+      var cap = parseFloat(s.total);
+      if (!isNaN(cap)) return acc + cap;
+      return acc;
+    }, 0);
+    var avgHealth = STORAGE.length > 0 ? Math.round(STORAGE.reduce(function(acc, s) { return acc + (s.health || 0); }, 0) / STORAGE.length) : 0;
+
+    document.getElementById('compute-storage-total').textContent = total;
+    document.getElementById('compute-storage-capacity').textContent = totalCap.toFixed(1) + ' TB';
+    document.getElementById('compute-storage-health').textContent = avgHealth + '%';
+
+    var container = document.getElementById('compute-storage-groups-container');
+    if (!container) return;
+
+    if (filtered.length === 0) {
+      container.innerHTML = '<div class="empty-state"><span class="empty-icon">💾</span><div class="empty-title">No storage found</div></div>';
+    } else {
+      var html = '<table class="tbl"><thead><tr><th>Name</th><th>Client</th><th>Total</th><th>Usable</th><th>Health</th><th>Make</th><th>Model</th><th>Warranty</th></tr></thead><tbody>';
+      filtered.forEach(function(s) {
+        html += '<tr><td>' + s.name + '</td><td>' + s.client + '</td><td>' + s.total + '</td><td>' + s.usable + '</td><td>' + getStatusBadge(s.health || 0) + ' ' + (s.health || 0) + '%</td><td>' + (s.make || '—') + '</td><td>' + (s.model || '—') + '</td><td>' + getWarrantyDisplay(s.warranty_expiry) + '</td></tr>';
+      });
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+    document.querySelectorAll('.loading-overlay').forEach(function(el) { el.classList.remove('active'); });
+  }, 50);
+}
+
+function debounceRenderComputeStorage() { debounce(renderComputeStorage, 'compute-storage', 250); }
 
 // ============================================================
 // ── DASHBOARD ────────────────────────────────────────────────
@@ -4386,6 +4303,7 @@ function editComment(index) {
     if (newComment !== camera.comments) {
       camera.comments = newComment;
       addAuditLogEntry('System', 'updated', 'Camera ' + camera.name + ' comment');
+      localStorage.setItem('ccsm_cameras', JSON.stringify(CAMERAS));
     }
     restoreSpan(newComment);
     renderCamerasOptimized();
@@ -4425,6 +4343,7 @@ function updateLastUpdated() {
 }
 
 function openCameraDetail(index) {
+  currentCameraIndex = index;
   var camera = CAMERAS[index];
   if (!camera) return;
   var ip = camera.ip_address || 'N/A';
@@ -4442,6 +4361,7 @@ function openCameraDetail(index) {
     preview.innerHTML = '<div class="offline-msg" style="color:var(--text-muted);padding:40px;text-align:center;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;"><i class="ti ti-video-off" style="font-size:48px;display:block;margin-bottom:12px;"></i>Camera ' + camera.status.toLowerCase() + '<br><span style="font-size:11px;opacity:0.6;">Preview unavailable</span></div>';
   }
   
+  // Read-only details (except comments)
   document.getElementById('camera-detail-grid').innerHTML =
     '<div class="modal-field"><label>Zone</label><span>' + camera.zone + '</span></div>' +
     '<div class="modal-field"><label>Client</label><span>' + client + '</span></div>' +
@@ -4452,10 +4372,11 @@ function openCameraDetail(index) {
     '<div class="modal-field"><label>Resolution</label><span>' + (camera.resolution || '—') + '</span></div>' +
     '<div class="modal-field"><label>Archiver</label><span>' + (camera.archiver || '—') + '</span></div>' +
     '<div class="modal-field"><label>MAC Address</label><span class="mono">' + (camera.mac_address || '—') + '</span></div>' +
-    '<div class="modal-field"><label>Warranty Expiry</label><input type="date" value="' + (camera.warranty_expiry || '') + '" onchange="camera.warranty_expiry=this.value;" /></div>';
+    '<div class="modal-field"><label>Warranty Expiry</label><span>' + getWarrantyDisplay(camera.warranty_expiry) + '</span></div>';
+  
   var commentsSection = document.getElementById('cam-detail-comments-section');
   if (commentsSection) {
-    commentsSection.innerHTML = '<div class="modal-section-title">Comments</div><textarea class="notes-area" id="cam-modal-comments">' + (camera.comments || '') + '</textarea><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;"><button class="btn btn-sm btn-success" onclick="saveCameraModalComment()"><i class="ti ti-device-floppy"></i> Save</button></div>';
+    commentsSection.innerHTML = '<div class="modal-section-title">Comments</div><textarea class="notes-area" id="cam-modal-comments">' + (camera.comments || '') + '</textarea><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;"><button class="btn btn-sm btn-success" onclick="saveCameraModalComment()"><i class="ti ti-device-floppy"></i> Save</button><button class="btn btn-sm btn-accent" onclick="createSRFromAsset(\'camera\', ' + index + ')"><i class="ti ti-clipboard-list"></i> Create Support Request</button></div>';
   }
   document.getElementById('camera-detail-modal').classList.add('open');
 }
@@ -4470,6 +4391,7 @@ function saveCameraModalComment() {
   if (newComment === (camera.comments || '')) return;
   camera.comments = newComment;
   addAuditLogEntry('System', 'updated', 'Camera ' + camera.name + ' comment');
+  localStorage.setItem('ccsm_cameras', JSON.stringify(CAMERAS));
   renderCamerasOptimized();
   toast('Saved', 'success');
 }
@@ -4499,6 +4421,7 @@ function openCameraURL() {
 
 function closeCameraDetailModal() {
   document.getElementById('camera-detail-modal').classList.remove('open');
+  currentCameraIndex = null;
 }
 
 function toggleFullscreenPreview() {
@@ -4551,6 +4474,7 @@ document.addEventListener('keydown', function(e) {
     }
   }
 });
+
 // ============================================================
 // ── DOORS ── UPDATED FUNCTIONS ──────────────────────────────
 // ============================================================
@@ -4670,7 +4594,6 @@ function closeDoorComponentModal() {
   var modal = document.getElementById('door-component-modal');
   if (modal) {
     modal.classList.remove('open');
-    // Remove the modal from DOM after closing
     setTimeout(function() {
       if (modal.parentNode) {
         modal.parentNode.removeChild(modal);
@@ -4766,7 +4689,6 @@ function renderDoorsEnhanced() {
         html += '<div><span style="font-weight:600;color:var(--text-primary);font-size:15px;">' + d.name + '</span>';
         html += '<span style="margin-left:10px;font-size:12px;color:var(--text-muted);">' + d.site + ' · ' + d.client + '</span></div>';
         html += doorBadge(d.status);
-        // Door Swing badge next to status
         html += '<span style="font-size:10px;background:var(--select-bg);padding:2px 8px;border-radius:10px;border:1px solid var(--card-border);color:var(--text-secondary);">Swing: ' + (d.doorSwing || 'In') + '</span>';
         html += '</div>';
         html += '<div style="display:flex;align-items:center;gap:10px;">';
@@ -4776,7 +4698,6 @@ function renderDoorsEnhanced() {
         html += '</div>';
         html += '<div class="door-card-body" id="' + doorId + '-body" style="' + (isCollapsed ? 'display:none;' : '') + 'padding:16px 18px;">';
         
-        // Reader Section
         html += '<div class="door-component-section" style="margin-bottom:14px;border-left:3px solid #3b82f6;padding-left:12px;">';
         html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
         html += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">📡 Reader</span>';
@@ -4789,7 +4710,6 @@ function renderDoorsEnhanced() {
         html += '<div><span style="color:var(--text-muted);">Warranty:</span> <span style="color:var(--text-primary);">' + getWarrantyDisplay(d.reader_warranty) + '</span></div>';
         html += '</div></div>';
         
-        // Access Type Section (replaces RTE)
         html += '<div class="door-component-section" style="margin-bottom:14px;border-left:3px solid #8b5cf6;padding-left:12px;">';
         html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
         html += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">🔑 Access Type</span>';
@@ -4800,7 +4720,6 @@ function renderDoorsEnhanced() {
         html += '<div><span style="color:var(--text-muted);">Anti-Passback:</span> <span style="color:var(--text-primary);">' + (d.antiPassback || 'No') + '</span></div>';
         html += '</div></div>';
         
-        // Lock Section
         html += '<div class="door-component-section" style="margin-bottom:14px;border-left:3px solid #f59e0b;padding-left:12px;">';
         html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
         html += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">🔒 Lock</span>';
@@ -4812,7 +4731,6 @@ function renderDoorsEnhanced() {
         html += '<div><span style="color:var(--text-muted);">Warranty:</span> <span style="color:var(--text-primary);">' + getWarrantyDisplay(d.lock_warranty) + '</span></div>';
         html += '</div></div>';
         
-        // Sensor Section
         html += '<div class="door-component-section" style="margin-bottom:14px;border-left:3px solid #22c55e;padding-left:12px;">';
         html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
         html += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">🚪 Door Sensor</span>';
@@ -4824,7 +4742,6 @@ function renderDoorsEnhanced() {
         html += '<div><span style="color:var(--text-muted);">Warranty:</span> <span style="color:var(--text-primary);">' + getWarrantyDisplay(d.sensor_warranty) + '</span></div>';
         html += '</div></div>';
         
-        // Closer Section
         html += '<div class="door-component-section" style="margin-bottom:8px;border-left:3px solid #ec4899;padding-left:12px;">';
         html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
         html += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">🚪 Door Closer</span>';
@@ -4913,6 +4830,7 @@ function editDoorComment(index) {
     if (newComment !== door.comments) {
       door.comments = newComment;
       addAuditLogEntry('System', 'updated', 'Door ' + door.name + ' comment');
+      localStorage.setItem('ccsm_doors', JSON.stringify(DOORS));
     }
     restoreSpan(newComment);
     renderDoorsEnhanced();
@@ -4961,24 +4879,23 @@ function openDoorDetail(index) {
     '<div class="modal-field"><label>Door</label><span>' + door.name + '</span></div>' +
     '<div class="modal-field"><label>Site</label><span>' + door.site + '</span></div>' +
     '<div class="modal-field"><label>Client</label><span>' + door.client + '</span></div>' +
-    '<div class="modal-field"><label>Reader</label><input type="text" id="modal-door-reader" value="' + (door.reader || '') + '" onchange="door.reader=this.value;" placeholder="e.g., HID Prox" /></div>' +
-    '<div class="modal-field"><label>Lock Type</label><input type="text" id="modal-door-lock" value="' + (door.lock_type || '') + '" onchange="door.lock_type=this.value;" placeholder="e.g., 600lb, 1200lb, Z" /></div>' +
-    '<div class="modal-field"><label>Powered</label><select class="status-select" id="modal-door-powered" onchange="door.powered=this.value;"><option value="Yes" ' + (door.powered === 'Yes' ? 'selected' : '') + '>Yes</option><option value="No" ' + (door.powered === 'No' ? 'selected' : '') + '>No</option><option value="Not In Use" ' + (door.powered === 'Not In Use' ? 'selected' : '') + '>Not In Use</option></select></div>' +
-    '<div class="modal-field"><label>Status</label><select class="status-select" id="modal-door-status" onchange="door.status=this.value;renderDoorsEnhanced();"><option value="Online" ' + (door.status === 'Online' ? 'selected' : '') + '>Online</option><option value="Offline" ' + (door.status === 'Offline' ? 'selected' : '') + '>Offline</option><option value="Under Maintenance" ' + (door.status === 'Under Maintenance' ? 'selected' : '') + '>Under Maintenance</option></select></div>' +
-    '<div class="modal-field"><label>Technician</label><select class="status-select" id="modal-door-tech" onchange="door.tech=this.value;renderDoorsEnhanced();"><option value="Shanice Vernon" ' + (door.tech === 'Shanice Vernon' ? 'selected' : '') + '>Shanice Vernon</option><option value="Shavine" ' + (door.tech === 'Shavine' ? 'selected' : '') + '>Shavine</option><option value="Marvin Grant" ' + (door.tech === 'Marvin Grant' ? 'selected' : '') + '>Marvin Grant</option><option value="Ackeem" ' + (door.tech === 'Ackeem' ? 'selected' : '') + '>Ackeem</option><option value="Unassigned" ' + (door.tech === 'Unassigned' ? 'selected' : '') + '>Unassigned</option></select></div>' +
-    '<div class="modal-field"><label>Door Swing</label><select class="status-select" id="modal-door-swing" onchange="door.doorSwing=this.value;"><option value="In" ' + (door.doorSwing === 'In' ? 'selected' : '') + '>In</option><option value="Out" ' + (door.doorSwing === 'Out' ? 'selected' : '') + '>Out</option></select></div>' +
-    '<div class="modal-field"><label>Access Type</label><input type="text" id="modal-door-access-type" value="' + (door.accessType || '') + '" onchange="door.accessType=this.value;" placeholder="e.g., Read In + Read Out" /></div>' +
-    '<div class="modal-field"><label>Anti-Passback</label><select class="status-select" id="modal-door-anti-passback" onchange="door.antiPassback=this.value;"><option value="Yes" ' + (door.antiPassback === 'Yes' ? 'selected' : '') + '>Yes</option><option value="No" ' + (door.antiPassback === 'No' ? 'selected' : '') + '>No</option></select></div>' +
-    '<div class="modal-field"><label>Controller Type</label><select class="status-select" id="modal-door-controller-type" onchange="door.controllerType=this.value;"><option value="Standalone" ' + (door.controllerType === 'Standalone' ? 'selected' : '') + '>Standalone</option><option value="Integrated" ' + (door.controllerType === 'Integrated' ? 'selected' : '') + '>Integrated</option><option value="Networked/IP" ' + (door.controllerType === 'Networked/IP' ? 'selected' : '') + '>Networked/IP</option><option value="Centralized/Panel-Based" ' + (door.controllerType === 'Centralized/Panel-Based' ? 'selected' : '') + '>Centralized/Panel-Based</option></select></div>' +
-    '<div class="modal-field"><label>IP Address</label><input type="text" id="modal-door-ip" value="' + (door.ip || '') + '" onchange="door.ip=this.value;" placeholder="e.g., 10.19.1.100" /></div>' +
-    '<div class="modal-field"><label>Controller</label><input type="text" id="modal-door-controller" value="' + (door.controller || '') + '" onchange="door.controller=this.value;" placeholder="e.g., Controller A" /></div>' +
-    '<div class="modal-field"><label>Purchase Date</label><input type="date" id="modal-door-purchase" value="' + (door.purchase_date || '') + '" onchange="door.purchase_date=this.value;" /></div>' +
-    '<div class="modal-field"><label>Warranty Expiry</label><input type="date" id="modal-door-warranty" value="' + (door.warranty_expiry || '') + '" onchange="door.warranty_expiry=this.value;" /></div>' +
-    '<div class="modal-field" style="grid-column: 1 / -1;"><label>Comments</label><textarea class="notes-area" id="door-modal-comments" rows="3">' + (door.comments || '') + '</textarea></div>';
+    '<div class="modal-field"><label>Reader</label><span>' + (door.reader || '—') + '</span></div>' +
+    '<div class="modal-field"><label>Lock Type</label><span>' + (door.lock_type || '—') + '</span></div>' +
+    '<div class="modal-field"><label>Powered</label><span>' + (door.powered || '—') + '</span></div>' +
+    '<div class="modal-field"><label>Status</label><span>' + doorBadge(door.status) + '</span></div>' +
+    '<div class="modal-field"><label>Technician</label><span>' + (door.tech || 'Unassigned') + '</span></div>' +
+    '<div class="modal-field"><label>Door Swing</label><span>' + (door.doorSwing || '—') + '</span></div>' +
+    '<div class="modal-field"><label>Access Type</label><span>' + (door.accessType || '—') + '</span></div>' +
+    '<div class="modal-field"><label>Anti-Passback</label><span>' + (door.antiPassback || '—') + '</span></div>' +
+    '<div class="modal-field"><label>Controller Type</label><span>' + (door.controllerType || '—') + '</span></div>' +
+    '<div class="modal-field"><label>IP Address</label><span class="mono">' + (door.ip || '—') + '</span></div>' +
+    '<div class="modal-field"><label>Controller</label><span>' + (door.controller || '—') + '</span></div>' +
+    '<div class="modal-field"><label>Purchase Date</label><span>' + (door.purchase_date || '—') + '</span></div>' +
+    '<div class="modal-field"><label>Warranty Expiry</label><span>' + getWarrantyDisplay(door.warranty_expiry) + '</span></div>';
   
   var commentsSection = document.getElementById('door-detail-comments-section');
   if (commentsSection) {
-    commentsSection.innerHTML = '<div class="modal-section-title">Comments</div><textarea class="notes-area" id="door-modal-comments">' + (door.comments || '') + '</textarea><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;"><button class="btn btn-sm btn-success" onclick="saveDoorModalComment()"><i class="ti ti-device-floppy"></i> Save</button></div>';
+    commentsSection.innerHTML = '<div class="modal-section-title">Comments</div><textarea class="notes-area" id="door-modal-comments">' + (door.comments || '') + '</textarea><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;"><button class="btn btn-sm btn-success" onclick="saveDoorModalComment()"><i class="ti ti-device-floppy"></i> Save</button><button class="btn btn-sm btn-accent" onclick="createSRFromAsset(\'door\', ' + index + ')"><i class="ti ti-clipboard-list"></i> Create Support Request</button></div>';
   }
   var historyList = document.getElementById('door-history-list');
   if (door.history && door.history.length) {
@@ -5000,6 +4917,7 @@ function saveDoorModalComment() {
   var newComment = textarea.value.trim();
   if (newComment === (door.comments || '')) return;
   door.comments = newComment;
+  localStorage.setItem('ccsm_doors', JSON.stringify(DOORS));
   renderDoorsEnhanced();
   toast('Saved', 'success');
 }
@@ -5027,6 +4945,7 @@ function openDoorController() {
   if (door && door.ip) window.open('http://' + door.ip, '_blank');
   else toast('No IP', 'error');
 }
+
 // ============================================================
 // ── SERVERS ──────────────────────────────────────────────────
 // ============================================================
@@ -5131,18 +5050,18 @@ function openServerDetail(index) {
   document.getElementById('server-detail-grid').innerHTML =
     '<div class="modal-field"><label>Serial</label><span>' + server.serial + '</span></div>' +
     '<div class="modal-field"><label>Location</label><span>' + server.location + '</span></div>' +
-    '<div class="modal-field"><label>Make</label><input type="text" id="modal-server-make" value="' + (server.make || '') + '" onchange="server.make=this.value;" /></div>' +
-    '<div class="modal-field"><label>Model</label><input type="text" id="modal-server-model" value="' + (server.model || '') + '" onchange="server.model=this.value;" /></div>' +
+    '<div class="modal-field"><label>Make</label><span>' + (server.make || '—') + '</span></div>' +
+    '<div class="modal-field"><label>Model</label><span>' + (server.model || '—') + '</span></div>' +
     '<div class="modal-field"><label>Capacity</label><span>' + server.capacity + '</span></div>' +
     '<div class="modal-field"><label>In Use</label><span>' + server.used + '</span></div>' +
     '<div class="modal-field"><label>Health</label><span>' + server.health + '</span></div>' +
     '<div class="modal-field"><label>Apps</label><span>' + server.apps + '</span></div>' +
     '<div class="modal-field"><label>Status</label>' + srvBadge(server.status) + '</div>' +
-    '<div class="modal-field"><label>Purchase Date</label><input type="date" value="' + (server.purchase_date || '') + '" onchange="server.purchase_date=this.value;" /></div>' +
-    '<div class="modal-field"><label>Warranty Expiry</label><input type="date" value="' + (server.warranty_expiry || '') + '" onchange="server.warranty_expiry=this.value;" /></div>';
+    '<div class="modal-field"><label>Purchase Date</label><span>' + (server.purchase_date || '—') + '</span></div>' +
+    '<div class="modal-field"><label>Warranty Expiry</label><span>' + getWarrantyDisplay(server.warranty_expiry) + '</span></div>';
   var commentsSection = document.getElementById('server-detail-comments-section');
   if (commentsSection) {
-    commentsSection.innerHTML = '<div class="modal-section-title">Comments</div><textarea class="notes-area" id="server-modal-comments">' + (server.comments || '') + '</textarea><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;"><button class="btn btn-sm btn-success" onclick="saveServerModalComment()"><i class="ti ti-device-floppy"></i> Save</button></div>';
+    commentsSection.innerHTML = '<div class="modal-section-title">Comments</div><textarea class="notes-area" id="server-modal-comments">' + (server.comments || '') + '</textarea><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;"><button class="btn btn-sm btn-success" onclick="saveServerModalComment()"><i class="ti ti-device-floppy"></i> Save</button><button class="btn btn-sm btn-accent" onclick="createSRFromAsset(\'server\', ' + index + ')"><i class="ti ti-clipboard-list"></i> Create Support Request</button></div>';
   }
   var historyList = document.getElementById('server-history-list');
   var related = SERVICE_REQUESTS.filter(function(r) { return r.body && r.body.toLowerCase().indexOf(server.serial.toLowerCase()) !== -1; });
@@ -5165,6 +5084,7 @@ function saveServerModalComment() {
   var newComment = textarea.value.trim();
   if (newComment === (server.comments || '')) return;
   server.comments = newComment;
+  localStorage.setItem('ccsm_servers', JSON.stringify(SERVERS));
   renderServersEnhanced();
   toast('Saved', 'success');
 }
@@ -5301,11 +5221,11 @@ function openSwitchDetail(index) {
     '<div class="modal-field"><label>MAC</label><span class="mono">' + (sw.mac || '—') + '</span></div>' +
     '<div class="modal-field"><label>Firmware</label><span>' + sw.firmware + '</span></div>' +
     '<div class="modal-field"><label>Status</label>' + (isOffline ? '<span class="badge b-high">Offline</span>' : '<span class="badge b-done">Online</span>') + '</div>' +
-    '<div class="modal-field"><label>Purchase Date</label><input type="date" value="' + (sw.purchase_date || '') + '" onchange="sw.purchase_date=this.value;" /></div>' +
-    '<div class="modal-field"><label>Warranty Expiry</label><input type="date" value="' + (sw.warranty_expiry || '') + '" onchange="sw.warranty_expiry=this.value;" /></div>';
+    '<div class="modal-field"><label>Purchase Date</label><span>' + (sw.purchase_date || '—') + '</span></div>' +
+    '<div class="modal-field"><label>Warranty Expiry</label><span>' + getWarrantyDisplay(sw.warranty_expiry) + '</span></div>';
   var commentsSection = document.getElementById('switch-detail-comments-section');
   if (commentsSection) {
-    commentsSection.innerHTML = '<div class="modal-section-title">Comments</div><textarea class="notes-area" id="switch-modal-comments">' + (sw.comments || '') + '</textarea><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;"><button class="btn btn-sm btn-success" onclick="saveSwitchModalComment()"><i class="ti ti-device-floppy"></i> Save</button></div>';
+    commentsSection.innerHTML = '<div class="modal-section-title">Comments</div><textarea class="notes-area" id="switch-modal-comments">' + (sw.comments || '') + '</textarea><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;"><button class="btn btn-sm btn-success" onclick="saveSwitchModalComment()"><i class="ti ti-device-floppy"></i> Save</button><button class="btn btn-sm btn-accent" onclick="createSRFromAsset(\'switch\', ' + index + ')"><i class="ti ti-clipboard-list"></i> Create Support Request</button></div>';
   }
   var historyList = document.getElementById('switch-history-list');
   var related = SERVICE_REQUESTS.filter(function(r) { return r.body && r.body.toLowerCase().indexOf(sw.name.toLowerCase()) !== -1; });
@@ -5328,6 +5248,7 @@ function saveSwitchModalComment() {
   var newComment = textarea.value.trim();
   if (newComment === (sw.comments || '')) return;
   sw.comments = newComment;
+  localStorage.setItem('ccsm_switches', JSON.stringify(SWITCHES));
   renderSwitchesEnhanced();
   toast('Saved', 'success');
 }
@@ -5421,32 +5342,11 @@ function exportSoftwareCSV() {
   exportToCSV(data, headers, 'software');
 }
 
-function saveNewSoftware() {
-  var vendor = document.getElementById('software-vendor').value;
-  var client = document.getElementById('software-client').value;
-  if (!vendor) { toast('Please select a vendor', 'warning'); return; }
-  if (!client) { toast('Please select a client', 'warning'); return; }
-
-  var newSoftware = {
-    vendor: vendor,
-    client: client,
-    version: document.getElementById('software-version').value.trim(),
-    license_type: 'Regular license (1)',
-    sma_expiry: document.getElementById('software-sma').value,
-    status: document.getElementById('software-status').value
-  };
-
-  SOFTWARE.push(newSoftware);
-  localStorage.setItem('ccsm_software', JSON.stringify(SOFTWARE));
-  closeAddModal('add-software-modal');
-  toast('Software ' + vendor + ' added!', 'success');
-  renderSoftware();
-}
 // ============================================================
-// ── CLIENT ASSETS ────────────────────────────────────────────
+// ── CONTROL CENTER ───────────────────────────────────────────
 // ============================================================
 
-var currentAssetSubTab = 'storage';
+var currentAssetSubTab = 'stations';
 
 function switchAssetSubTab(tab) {
   currentAssetSubTab = tab;
@@ -5462,51 +5362,8 @@ function switchAssetSubTab(tab) {
   var content = document.getElementById('subtab-' + tab);
   if (content) content.classList.add('active');
   
-  if (tab === 'storage') renderStorage();
-  else if (tab === 'stations') renderStations();
+  if (tab === 'stations') renderStations();
   else if (tab === 'monitors') renderMonitors();
-}
-
-function renderStorage() {
-  var search = document.getElementById('storage-search') ? document.getElementById('storage-search').value.toLowerCase() : '';
-  showLoading('storage-loading');
-  setTimeout(function() {
-    var filtered = STORAGE.filter(function(s) {
-      return s.name.toLowerCase().indexOf(search) !== -1 ||
-        (s.make || '').toLowerCase().indexOf(search) !== -1 ||
-        (s.model || '').toLowerCase().indexOf(search) !== -1;
-    });
-    if (currentClientFilter) {
-      filtered = filtered.filter(function(s) { return s.client === currentClientFilter; });
-    }
-
-    var total = STORAGE.length;
-    var totalCap = STORAGE.reduce(function(acc, s) {
-      var cap = parseFloat(s.total);
-      if (!isNaN(cap)) return acc + cap;
-      return acc;
-    }, 0);
-    var avgHealth = STORAGE.length > 0 ? Math.round(STORAGE.reduce(function(acc, s) { return acc + (s.health || 0); }, 0) / STORAGE.length) : 0;
-
-    document.getElementById('storage-total').textContent = total;
-    document.getElementById('storage-capacity').textContent = totalCap.toFixed(1) + ' TB';
-    document.getElementById('storage-health').textContent = avgHealth + '%';
-
-    var container = document.getElementById('storage-groups-container');
-    if (!container) return;
-
-    if (filtered.length === 0) {
-      container.innerHTML = '<div class="empty-state"><span class="empty-icon">💾</span><div class="empty-title">No storage found</div></div>';
-    } else {
-      var html = '<table class="tbl"><thead><tr><th>Name</th><th>Client</th><th>Total</th><th>Usable</th><th>Health</th><th>Make</th><th>Model</th><th>Warranty</th></tr></thead><tbody>';
-      filtered.forEach(function(s) {
-        html += '<tr><td>' + s.name + '</td><td>' + s.client + '</td><td>' + s.total + '</td><td>' + s.usable + '</td><td>' + getStatusBadge(s.health || 0) + ' ' + (s.health || 0) + '%</td><td>' + (s.make || '—') + '</td><td>' + (s.model || '—') + '</td><td>' + getWarrantyDisplay(s.warranty_expiry) + '</td></tr>';
-      });
-      html += '</tbody></table>';
-      container.innerHTML = html;
-    }
-    document.querySelectorAll('.loading-overlay').forEach(function(el) { el.classList.remove('active'); });
-  }, 50);
 }
 
 function renderStations() {
@@ -5521,6 +5378,9 @@ function renderStations() {
     });
     if (currentClientFilter) {
       filtered = filtered.filter(function(s) { return s.client === currentClientFilter; });
+    }
+    if (currentZoneFilter) {
+      filtered = filtered.filter(function(s) { return s.location === currentZoneFilter; });
     }
 
     var total = STATIONS.length;
@@ -5564,6 +5424,9 @@ function renderMonitors() {
     if (currentClientFilter) {
       filtered = filtered.filter(function(s) { return s.client === currentClientFilter; });
     }
+    if (currentZoneFilter) {
+      filtered = filtered.filter(function(s) { return s.location === currentZoneFilter; });
+    }
 
     var total = MONITORS.length;
     var avgHealth = MONITORS.length > 0 ? Math.round(MONITORS.reduce(function(acc, s) { return acc + (s.health || 0); }, 0) / MONITORS.length) : 0;
@@ -5600,22 +5463,7 @@ function refreshAssets() {
 }
 
 function exportAssetsCSV() {
-  if (currentAssetSubTab === 'storage') {
-    var headers = ['name', 'client', 'total', 'usable', 'health', 'make', 'model', 'warranty_expiry'];
-    var data = STORAGE.map(function(s) {
-      return {
-        name: s.name || '',
-        client: s.client || '',
-        total: s.total || '',
-        usable: s.usable || '',
-        health: s.health || 0,
-        make: s.make || '',
-        model: s.model || '',
-        warranty_expiry: s.warranty_expiry || ''
-      };
-    });
-    exportToCSV(data, headers, 'storage');
-  } else if (currentAssetSubTab === 'stations') {
+  if (currentAssetSubTab === 'stations') {
     var headers = ['name', 'client', 'apps', 'storage', 'health', 'make', 'model', 'warranty_expiry'];
     var data = STATIONS.map(function(s) {
       return {
@@ -5647,75 +5495,302 @@ function exportAssetsCSV() {
   }
 }
 
-function saveNewStorage() {
-  var name = document.getElementById('storage-name').value.trim();
-  var client = document.getElementById('storage-client').value;
-  if (!name) { toast('Please enter a storage name', 'warning'); return; }
-  if (!client) { toast('Please select a client', 'warning'); return; }
+// ============================================================
+// ── INTRUSION DETECTION ──────────────────────────────────────
+// ============================================================
 
-  var newStorage = {
-    name: name,
-    client: client,
-    total: document.getElementById('storage-total').value.trim(),
-    usable: document.getElementById('storage-usable').value.trim(),
-    health: parseInt(document.getElementById('storage-health').value) || 0,
-    make: document.getElementById('storage-make').value.trim(),
-    model: document.getElementById('storage-model').value.trim(),
-    warranty_expiry: document.getElementById('storage-warranty').value
-  };
+function renderIntrusion() {
+  var search = document.getElementById('intrusion-search') ? document.getElementById('intrusion-search').value.toLowerCase() : '';
+  showLoading('intrusion-loading');
+  setTimeout(function() {
+    var filtered = INTRUSION.filter(function(i) {
+      var match = i.monitor_point.toLowerCase().indexOf(search) !== -1 ||
+        (i.modules || '').toLowerCase().indexOf(search) !== -1 ||
+        (i.sensor || '').toLowerCase().indexOf(search) !== -1 ||
+        (i.communication || '').toLowerCase().indexOf(search) !== -1;
+      return match;
+    });
+    if (currentClientFilter) {
+      filtered = filtered.filter(function(i) { return i.client === currentClientFilter; });
+    }
+    if (currentZoneFilter) {
+      filtered = filtered.filter(function(i) { return i.location === currentZoneFilter; });
+    }
 
-  STORAGE.push(newStorage);
-  localStorage.setItem('ccsm_storage', JSON.stringify(STORAGE));
-  closeAddModal('add-storage-modal');
-  toast('Storage ' + name + ' added!', 'success');
-  renderStorage();
+    var total = INTRUSION.length;
+    var online = INTRUSION.filter(function(i) { return i.status === 'Online'; }).length;
+    var offline = INTRUSION.filter(function(i) { return i.status === 'Offline'; }).length;
+    var warning = INTRUSION.filter(function(i) { return i.status === 'Warning'; }).length;
+
+    document.getElementById('intrusion-total').textContent = total;
+    document.getElementById('intrusion-online').textContent = online;
+    document.getElementById('intrusion-offline').textContent = offline;
+    document.getElementById('intrusion-warning').textContent = warning;
+
+    var container = document.getElementById('intrusion-groups-container');
+    if (!container) return;
+
+    if (filtered.length === 0) {
+      container.innerHTML = '<div class="empty-state"><span class="empty-icon">🛡️</span><div class="empty-title">No intrusion points found</div></div>';
+    } else {
+      var html = '<table class="tbl"><thead><tr><th>Monitor Point</th><th>Modules</th><th>Communication</th><th>Sensor</th><th>Status</th><th>Warranty</th><th>Comments</th></tr></thead><tbody>';
+      filtered.forEach(function(i, index) {
+        var realIndex = INTRUSION.indexOf(i);
+        html += '<tr class="clickable" onclick="openIntrusionDetail(' + realIndex + ')">' +
+          '<td>' + i.monitor_point + '</td>' +
+          '<td>' + (i.modules || '—') + '</td>' +
+          '<td>' + (i.communication || '—') + '</td>' +
+          '<td>' + (i.sensor || '—') + '</td>' +
+          '<td>' + intrusionBadge(i.status) + '</td>' +
+          '<td>' + getWarrantyDisplay(i.warranty_expiry) + '</td>' +
+          '<td><span class="comment-display ' + (!i.comments ? 'placeholder' : '') + '" data-intrusion-index="' + realIndex + '" onclick="event.stopPropagation();editIntrusionComment(' + realIndex + ')">' + (i.comments || 'Click to add note') + '</span></td>' +
+          '</tr>';
+      });
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+    document.querySelectorAll('.loading-overlay').forEach(function(el) { el.classList.remove('active'); });
+  }, 50);
 }
 
-function saveNewStation() {
-  var name = document.getElementById('station-name').value.trim();
-  var client = document.getElementById('station-client').value;
-  if (!name) { toast('Please enter a station name', 'warning'); return; }
-  if (!client) { toast('Please select a client', 'warning'); return; }
-
-  var newStation = {
-    name: name,
-    client: client,
-    apps: document.getElementById('station-apps').value.trim(),
-    storage: document.getElementById('station-storage').value.trim(),
-    health: parseInt(document.getElementById('station-health').value) || 0,
-    make: document.getElementById('station-make').value.trim(),
-    model: document.getElementById('station-model').value.trim(),
-    warranty_expiry: document.getElementById('station-warranty').value
-  };
-
-  STATIONS.push(newStation);
-  localStorage.setItem('ccsm_stations', JSON.stringify(STATIONS));
-  closeAddModal('add-station-modal');
-  toast('Station ' + name + ' added!', 'success');
-  renderStations();
+function openIntrusionDetail(index) {
+  currentIntrusionIndex = index;
+  var intrusion = INTRUSION[index];
+  if (!intrusion) return;
+  
+  document.getElementById('intrusion-detail-title').textContent = intrusion.monitor_point;
+  document.getElementById('intrusion-detail-sub').textContent = (intrusion.modules || '—') + ' · ' + (intrusion.status || '—');
+  
+  document.getElementById('intrusion-detail-grid').innerHTML =
+    '<div class="modal-field"><label>Monitor Point</label><span>' + intrusion.monitor_point + '</span></div>' +
+    '<div class="modal-field"><label>Modules</label><span>' + (intrusion.modules || '—') + '</span></div>' +
+    '<div class="modal-field"><label>Communication</label><span>' + (intrusion.communication || '—') + '</span></div>' +
+    '<div class="modal-field"><label>Sensor</label><span>' + (intrusion.sensor || '—') + '</span></div>' +
+    '<div class="modal-field"><label>Status</label>' + intrusionBadge(intrusion.status) + '</div>' +
+    '<div class="modal-field"><label>Warranty Expiry</label><span>' + getWarrantyDisplay(intrusion.warranty_expiry) + '</span></div>';
+  
+  var commentsSection = document.getElementById('intrusion-detail-comments-section');
+  if (commentsSection) {
+    commentsSection.innerHTML = '<div class="modal-section-title">Comments</div><textarea class="notes-area" id="intrusion-modal-comments">' + (intrusion.comments || '') + '</textarea><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;"><button class="btn btn-sm btn-success" onclick="saveIntrusionModalComment()"><i class="ti ti-device-floppy"></i> Save</button><button class="btn btn-sm btn-accent" onclick="createSRFromAsset(\'intrusion\', ' + index + ')"><i class="ti ti-clipboard-list"></i> Create Support Request</button></div>';
+  }
+  document.getElementById('intrusion-detail-modal').classList.add('open');
 }
 
-function saveNewMonitor() {
-  var name = document.getElementById('monitor-name').value.trim();
-  var client = document.getElementById('monitor-client').value;
-  if (!name) { toast('Please enter a monitor name', 'warning'); return; }
-  if (!client) { toast('Please select a client', 'warning'); return; }
+function saveIntrusionModalComment() {
+  var title = document.getElementById('intrusion-detail-title').textContent;
+  var intrusion = INTRUSION.find(function(i) { return i.monitor_point === title; });
+  if (!intrusion) return;
+  var textarea = document.getElementById('intrusion-modal-comments');
+  if (!textarea) return;
+  var newComment = textarea.value.trim();
+  if (newComment === (intrusion.comments || '')) return;
+  intrusion.comments = newComment;
+  localStorage.setItem('ccsm_intrusion', JSON.stringify(INTRUSION));
+  renderIntrusion();
+  toast('Saved', 'success');
+}
 
-  var newMonitor = {
-    name: name,
-    client: client,
-    size: document.getElementById('monitor-size').value.trim(),
-    health: parseInt(document.getElementById('monitor-health').value) || 0,
-    make: document.getElementById('monitor-make').value.trim(),
-    model: document.getElementById('monitor-model').value.trim(),
-    warranty_expiry: document.getElementById('monitor-warranty').value
+function editIntrusionComment(index) {
+  var intrusion = INTRUSION[index];
+  if (!intrusion) return;
+  var commentCell = document.querySelector('.comment-display[data-intrusion-index="' + index + '"]');
+  if (!commentCell) return;
+  var currentComment = intrusion.comments || '';
+  var wrapper = document.createElement('div');
+  wrapper.style.display = 'flex';
+  wrapper.style.gap = '4px';
+  wrapper.style.alignItems = 'center';
+  var input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'edit-comment-input';
+  input.value = currentComment;
+  input.style.flex = '1';
+  var saveBtn = document.createElement('button');
+  saveBtn.className = 'btn btn-xs btn-success';
+  saveBtn.innerHTML = '<i class="ti ti-check"></i>';
+  var cancelBtn = document.createElement('button');
+  cancelBtn.className = 'btn btn-xs';
+  cancelBtn.innerHTML = '<i class="ti ti-x"></i>';
+  wrapper.appendChild(input);
+  wrapper.appendChild(saveBtn);
+  wrapper.appendChild(cancelBtn);
+  commentCell.replaceWith(wrapper);
+  input.focus();
+  input.select();
+  var resolved = false;
+  var restoreSpan = function(text) {
+    var span = document.createElement('span');
+    span.className = 'comment-display ' + (!text ? 'placeholder' : '');
+    span.setAttribute('data-intrusion-index', index);
+    span.textContent = text || 'Click to add note';
+    span.onclick = function(e) { e.stopPropagation(); editIntrusionComment(index); };
+    wrapper.replaceWith(span);
   };
+  var doSave = function() {
+    if (resolved) return;
+    resolved = true;
+    var newComment = input.value.trim();
+    if (newComment !== intrusion.comments) {
+      intrusion.comments = newComment;
+      addAuditLogEntry('System', 'updated', 'Intrusion ' + intrusion.monitor_point + ' comment');
+      localStorage.setItem('ccsm_intrusion', JSON.stringify(INTRUSION));
+    }
+    restoreSpan(newComment);
+    renderIntrusion();
+  };
+  saveBtn.addEventListener('click', function(e) { e.stopPropagation(); doSave(); });
+  cancelBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (resolved) return;
+    resolved = true;
+    restoreSpan(currentComment);
+  });
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); doSave(); }
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      if (resolved) return;
+      resolved = true;
+      restoreSpan(currentComment);
+    }
+  });
+  input.addEventListener('blur', function() {
+    setTimeout(function() { if (!resolved) doSave(); }, 120);
+  });
+}
 
-  MONITORS.push(newMonitor);
-  localStorage.setItem('ccsm_monitors', JSON.stringify(MONITORS));
-  closeAddModal('add-monitor-modal');
-  toast('Monitor ' + name + ' added!', 'success');
-  renderMonitors();
+function closeIntrusionDetailModal() {
+  document.getElementById('intrusion-detail-modal').classList.remove('open');
+  currentIntrusionIndex = null;
+}
+
+function pingIntrusion() {
+  var title = document.getElementById('intrusion-detail-title').textContent;
+  var intrusion = INTRUSION.find(function(i) { return i.monitor_point === title; });
+  if (!intrusion) return;
+  var resultDiv = document.getElementById('intrusion-ping-result');
+  resultDiv.innerHTML = '<span class="ping-result pending" style="color:var(--warning);">Pinging ' + intrusion.monitor_point + '...</span>';
+  setTimeout(function() {
+    var online = Math.random() > 0.2;
+    resultDiv.innerHTML = online ? '<span class="ping-result success" style="color:var(--success);">✅ Online</span>' : '<span class="ping-result fail" style="color:var(--danger);">❌ Unreachable</span>';
+  }, 1500);
+}
+
+function refreshIntrusion() {
+  toast('Intrusion data refreshed', 'success');
+  loadData();
+}
+
+function exportIntrusionCSV() {
+  var headers = ['monitor_point', 'modules', 'communication', 'sensor', 'status', 'warranty_expiry', 'comments'];
+  var data = INTRUSION.map(function(i) {
+    return {
+      monitor_point: i.monitor_point || '',
+      modules: i.modules || '',
+      communication: i.communication || '',
+      sensor: i.sensor || '',
+      status: i.status || '',
+      warranty_expiry: i.warranty_expiry || '',
+      comments: i.comments || ''
+    };
+  });
+  exportToCSV(data, headers, 'intrusion');
+}
+
+function debounceRenderIntrusion() { debounce(renderIntrusion, 'intrusion', 250); }
+
+// ============================================================
+// ── CREATE SUPPORT REQUEST FROM ASSET ────────────────────────
+// ============================================================
+
+function createSRFromAsset(assetType, index) {
+  var asset = null;
+  var name = '';
+  var client = '';
+  var site = '';
+  
+  if (assetType === 'camera') {
+    asset = CAMERAS[index];
+    if (!asset) return;
+    name = asset.name;
+    client = getClient(asset.zone);
+    site = asset.zone || 'Unknown';
+  } else if (assetType === 'door') {
+    asset = DOORS[index];
+    if (!asset) return;
+    name = asset.name;
+    client = asset.client || getClient(asset.site);
+    site = asset.site || 'Unknown';
+  } else if (assetType === 'server') {
+    asset = SERVERS[index];
+    if (!asset) return;
+    name = asset.serial;
+    client = getClient(asset.location);
+    site = asset.location || 'Unknown';
+  } else if (assetType === 'switch') {
+    asset = SWITCHES[index];
+    if (!asset) return;
+    name = asset.name;
+    client = getClient(asset.location);
+    site = asset.location || 'Unknown';
+  } else if (assetType === 'intrusion') {
+    asset = INTRUSION[index];
+    if (!asset) return;
+    name = asset.monitor_point;
+    client = 'Unknown';
+    site = 'Unknown';
+  }
+  
+  if (!asset) return;
+  
+  // Close the current modal
+  closeCameraDetailModal();
+  closeDoorDetailModal();
+  closeServerDetailModal();
+  closeSwitchDetailModal();
+  closeIntrusionDetailModal();
+  
+  // Open the add SR modal with pre-filled fields
+  openAddSRModal();
+  
+  // Populate fields
+  var subjectField = document.getElementById('sr-subject');
+  if (subjectField) {
+    subjectField.value = 'Issue with ' + assetType.charAt(0).toUpperCase() + assetType.slice(1) + ' ' + name;
+  }
+  
+  var clientField = document.getElementById('sr-client');
+  if (clientField && client) {
+    for (var i = 0; i < clientField.options.length; i++) {
+      if (clientField.options[i].value === client) {
+        clientField.value = client;
+        break;
+      }
+    }
+  }
+  
+  var siteField = document.getElementById('sr-site');
+  if (siteField) {
+    siteField.value = site;
+  }
+  
+  var categoryField = document.getElementById('sr-category');
+  if (categoryField) {
+    var catMap = { 'camera': 'Camera', 'door': 'Access Control', 'server': 'Server', 'switch': 'Network', 'intrusion': 'Other' };
+    categoryField.value = catMap[assetType] || 'Other';
+  }
+  
+  var descriptionField = document.getElementById('sr-description');
+  if (descriptionField) {
+    var desc = 'Asset: ' + name + '\n';
+    desc += 'Client: ' + client + '\n';
+    desc += 'Site: ' + site + '\n';
+    desc += 'Status: ' + (asset.status || 'Unknown') + '\n\n';
+    desc += 'Please describe the issue:';
+    descriptionField.value = desc;
+  }
+  
+  toast('Service request pre-filled for ' + name, 'success');
 }
 
 // ============================================================
@@ -6154,6 +6229,7 @@ function exportToCSV(data, headers, filename) {
   URL.revokeObjectURL(url);
   toast('Exported ' + data.length + ' items', 'success');
 }
+
 // ============================================================
 // ── INBOX ────────────────────────────────────────────────────
 // ============================================================
@@ -6743,144 +6819,10 @@ function debounceRenderServers() { debounce(renderServersEnhanced, 'srv', 250); 
 function debounceRenderSwitches() { debounce(renderSwitchesEnhanced, 'sw', 250); }
 function debounceRenderFiles() { debounce(renderFileExplorer, 'file', 250); }
 function debounceRenderSoftware() { debounce(renderSoftware, 'sw', 250); }
-function debounceRenderStorage() { debounce(renderStorage, 'storage', 250); }
+function debounceRenderComputeStorage() { debounce(renderComputeStorage, 'compute-storage', 250); }
 function debounceRenderStations() { debounce(renderStations, 'stations', 250); }
 function debounceRenderMonitors() { debounce(renderMonitors, 'monitors', 250); }
-
-function saveNewCamera() {
-  var name = document.getElementById('cam-name').value.trim();
-  var client = document.getElementById('cam-client').value;
-  if (!name) { toast('Please enter a camera name', 'warning'); return; }
-  if (!client) { toast('Please select a client', 'warning'); return; }
-
-  var newCam = {
-    name: name,
-    client: client,
-    zone: document.getElementById('cam-zone').value.trim() || 'Unknown',
-    ip_address: document.getElementById('cam-ip').value.trim(),
-    model: document.getElementById('cam-model').value.trim(),
-    resolution: document.getElementById('cam-resolution').value.trim(),
-    archiver: document.getElementById('cam-archiver').value.trim(),
-    status: document.getElementById('cam-status').value,
-    comments: document.getElementById('cam-comments').value.trim(),
-    purchase_date: document.getElementById('cam-purchase-date').value,
-    warranty_expiry: document.getElementById('cam-warranty-expiry').value
-  };
-
-  CAMERAS.push(newCam);
-  localStorage.setItem('ccsm_cameras', JSON.stringify(CAMERAS));
-  closeAddModal('add-camera-modal');
-  toast('Camera ' + name + ' added!', 'success');
-  renderCamerasOptimized();
-}
-
-function saveNewDoor() {
-  var name = document.getElementById('door-name').value.trim();
-  var client = document.getElementById('door-client').value;
-  if (!name) { toast('Please enter a door name', 'warning'); return; }
-  if (!client) { toast('Please select a client', 'warning'); return; }
-
-  var newDoor = {
-    name: name,
-    client: client,
-    site: document.getElementById('door-site').value.trim() || 'Unknown',
-    reader: document.getElementById('door-reader').value.trim(),
-    lock_type: document.getElementById('door-lock').value.trim(),
-    powered: document.getElementById('door-powered').value,
-    status: document.getElementById('door-status').value,
-    tech: document.getElementById('door-tech').value,
-    doorSwing: document.getElementById('door-swing').value,
-    accessType: document.getElementById('door-access-type').value.trim(),
-    antiPassback: document.getElementById('door-anti-passback').value,
-    controllerType: document.getElementById('door-controller-type').value,
-    ip: document.getElementById('door-ip').value.trim(),
-    controller: document.getElementById('door-controller').value.trim(),
-    purchase_date: document.getElementById('door-purchase-date').value,
-    warranty_expiry: document.getElementById('door-warranty-expiry').value,
-    comments: '',
-    history: [],
-    controller_model: '',
-    controller_warranty: '',
-    controller_status: 'Online',
-    reader_port: 'Port 1',
-    reader_model: '',
-    reader_warranty: '',
-    reader_status: 'Online',
-    lock_model: '',
-    lock_warranty: '',
-    lock_status: 'Online',
-    sensor_type: 'Magnetic',
-    sensor_model: '',
-    sensor_warranty: '',
-    sensor_status: 'Online',
-    closer_type: 'Hydraulic',
-    closer_model: '',
-    closer_warranty: '',
-    closer_status: 'Online'
-  };
-
-  DOORS.push(newDoor);
-  localStorage.setItem('ccsm_doors', JSON.stringify(DOORS));
-  closeAddModal('add-door-modal');
-  toast('Door ' + name + ' added!', 'success');
-  renderDoorsEnhanced();
-}
-
-function saveNewServer() {
-  var serial = document.getElementById('server-serial').value.trim();
-  var location = document.getElementById('server-location').value.trim();
-  var client = document.getElementById('server-client').value;
-  if (!serial) { toast('Please enter a serial number', 'warning'); return; }
-  if (!location) { toast('Please enter a location', 'warning'); return; }
-  if (!client) { toast('Please select a client', 'warning'); return; }
-
-  var newServer = {
-    serial: serial,
-    location: location,
-    make: document.getElementById('server-make').value.trim(),
-    model: document.getElementById('server-model').value.trim(),
-    capacity: document.getElementById('server-capacity').value.trim(),
-    used: document.getElementById('server-used').value.trim(),
-    health: document.getElementById('server-health').value.trim() || 'Good',
-    apps: document.getElementById('server-apps').value.trim(),
-    status: document.getElementById('server-status').value,
-    purchase_date: document.getElementById('server-purchase-date').value,
-    warranty_expiry: document.getElementById('server-warranty-expiry').value,
-    comments: ''
-  };
-
-  SERVERS.push(newServer);
-  localStorage.setItem('ccsm_servers', JSON.stringify(SERVERS));
-  closeAddModal('add-server-modal');
-  toast('Server ' + serial + ' added!', 'success');
-  renderServersEnhanced();
-}
-
-function saveNewSwitch() {
-  var name = document.getElementById('switch-name').value.trim();
-  var client = document.getElementById('switch-client').value;
-  if (!name) { toast('Please enter a switch name', 'warning'); return; }
-  if (!client) { toast('Please select a client', 'warning'); return; }
-
-  var newSwitch = {
-    name: name,
-    client: client,
-    location: document.getElementById('switch-location').value.trim() || 'Unknown',
-    model: document.getElementById('switch-model').value,
-    ip_address: document.getElementById('switch-ip').value.trim(),
-    firmware: document.getElementById('switch-firmware').value.trim(),
-    mac: document.getElementById('switch-mac').value.trim(),
-    purchase_date: document.getElementById('switch-purchase-date').value,
-    warranty_expiry: document.getElementById('switch-warranty-expiry').value,
-    comments: ''
-  };
-
-  SWITCHES.push(newSwitch);
-  localStorage.setItem('ccsm_switches', JSON.stringify(SWITCHES));
-  closeAddModal('add-switch-modal');
-  toast('Switch ' + name + ' added!', 'success');
-  renderSwitchesEnhanced();
-}
+function debounceRenderIntrusion() { debounce(renderIntrusion, 'intrusion', 250); }
 
 function saveNewClient() {
   var name = document.getElementById('client-name').value.trim();
@@ -7033,14 +6975,6 @@ window.closeThemeDropdown = closeThemeDropdown;
 window.toggleAddDropdown = toggleAddDropdown;
 window.closeAddDropdown = closeAddDropdown;
 window.openAddSRModal = openAddSRModal;
-window.openAddCameraModal = openAddCameraModal;
-window.openAddDoorModal = openAddDoorModal;
-window.openAddServerModal = openAddServerModal;
-window.openAddSwitchModal = openAddSwitchModal;
-window.openAddSoftwareModal = openAddSoftwareModal;
-window.openAddStorageModal = openAddStorageModal;
-window.openAddStationModal = openAddStationModal;
-window.openAddMonitorModal = openAddMonitorModal;
 window.openAddClientModal = openAddClientModal;
 window.closeAddModal = closeAddModal;
 window.previewClientLogo = previewClientLogo;
@@ -7050,6 +6984,8 @@ window.editClient = editClient;
 window.deleteClient = deleteClient;
 window.saveEditClient = saveEditClient;
 window.switchTab = switchTab;
+window.switchComputeTab = switchComputeTab;
+window.switchAssetSubTab = switchAssetSubTab;
 window.toggleSidebar = toggleSidebar;
 window.acknowledgeAlarm = acknowledgeAlarm;
 window.closeConfirm = closeConfirm;
@@ -7061,12 +6997,13 @@ window.debounceRenderSR = debounceRenderSR;
 window.debounceRenderCameras = debounceRenderCameras;
 window.debounceRenderDoors = debounceRenderDoors;
 window.debounceRenderServers = debounceRenderServers;
+window.debounceRenderComputeStorage = debounceRenderComputeStorage;
 window.debounceRenderSwitches = debounceRenderSwitches;
 window.debounceRenderFiles = debounceRenderFiles;
 window.debounceRenderSoftware = debounceRenderSoftware;
-window.debounceRenderStorage = debounceRenderStorage;
 window.debounceRenderStations = debounceRenderStations;
 window.debounceRenderMonitors = debounceRenderMonitors;
+window.debounceRenderIntrusion = debounceRenderIntrusion;
 window.renderInbox = renderInbox;
 window.setInboxFolder = setInboxFolder;
 window.openComposeModal = openComposeModal;
@@ -7085,14 +7022,6 @@ window.closeModal = closeModal;
 window.autoSave = autoSave;
 window.printTicket = printTicket;
 window.saveNewSR = saveNewSR;
-window.saveNewCamera = saveNewCamera;
-window.saveNewDoor = saveNewDoor;
-window.saveNewServer = saveNewServer;
-window.saveNewSwitch = saveNewSwitch;
-window.saveNewSoftware = saveNewSoftware;
-window.saveNewStorage = saveNewStorage;
-window.saveNewStation = saveNewStation;
-window.saveNewMonitor = saveNewMonitor;
 window.saveNewClient = saveNewClient;
 window.exportSRsCSV = exportSRsCSV;
 window.exportCamerasCSV = exportCamerasCSV;
@@ -7101,6 +7030,7 @@ window.exportServersCSV = exportServersCSV;
 window.exportSwitchesCSV = exportSwitchesCSV;
 window.exportSoftwareCSV = exportSoftwareCSV;
 window.exportAssetsCSV = exportAssetsCSV;
+window.exportIntrusionCSV = exportIntrusionCSV;
 window.handleAttachmentUpload = handleAttachmentUpload;
 window.removeAttachment = removeAttachment;
 window.toggleSelectAll = toggleSelectAll;
@@ -7123,29 +7053,32 @@ window.togglePin = togglePin;
 window.openFilePreview = openFilePreview;
 window.closeFilePreview = closeFilePreview;
 window.downloadFile = downloadFile;
-window.switchAssetSubTab = switchAssetSubTab;
 window.renderCamerasOptimized = renderCamerasOptimized;
 window.renderDoorsEnhanced = renderDoorsEnhanced;
 window.renderServersEnhanced = renderServersEnhanced;
+window.renderComputeStorage = renderComputeStorage;
 window.renderSwitchesEnhanced = renderSwitchesEnhanced;
 window.renderSoftware = renderSoftware;
-window.renderStorage = renderStorage;
 window.renderStations = renderStations;
 window.renderMonitors = renderMonitors;
+window.renderIntrusion = renderIntrusion;
 window.refreshCameras = refreshCameras;
 window.refreshDoors = refreshDoors;
 window.refreshServers = refreshServers;
 window.refreshSwitches = refreshSwitches;
 window.refreshSoftware = refreshSoftware;
 window.refreshAssets = refreshAssets;
+window.refreshIntrusion = refreshIntrusion;
 window.openCameraDetail = openCameraDetail;
 window.openDoorDetail = openDoorDetail;
 window.openServerDetail = openServerDetail;
 window.openSwitchDetail = openSwitchDetail;
+window.openIntrusionDetail = openIntrusionDetail;
 window.closeCameraDetailModal = closeCameraDetailModal;
 window.closeDoorDetailModal = closeDoorDetailModal;
 window.closeServerDetailModal = closeServerDetailModal;
 window.closeSwitchDetailModal = closeSwitchDetailModal;
+window.closeIntrusionDetailModal = closeIntrusionDetailModal;
 window.pingCameraFromDetail = pingCameraFromDetail;
 window.openCameraURL = openCameraURL;
 window.toggleFullscreenPreview = toggleFullscreenPreview;
@@ -7155,18 +7088,22 @@ window.pingServer = pingServer;
 window.openServerConsole = openServerConsole;
 window.pingSwitchDetail = pingSwitchDetail;
 window.openSwitchAdmin = openSwitchAdmin;
+window.pingIntrusion = pingIntrusion;
 window.saveCameraModalComment = saveCameraModalComment;
 window.saveDoorModalComment = saveDoorModalComment;
 window.saveServerModalComment = saveServerModalComment;
 window.saveSwitchModalComment = saveSwitchModalComment;
+window.saveIntrusionModalComment = saveIntrusionModalComment;
 window.editComment = editComment;
 window.editDoorComment = editDoorComment;
+window.editIntrusionComment = editIntrusionComment;
 window.toggleZone = toggleZone;
 window.changePage = changePage;
 window.toggleDoorCard = toggleDoorCard;
 window.editDoorComponent = editDoorComponent;
 window.saveDoorComponent = saveDoorComponent;
 window.pingDoorIP = pingDoorIP;
+window.createSRFromAsset = createSRFromAsset;
 
 // ============================================================
 // ── INIT ──────────────────────────────────────────────────────
@@ -7210,6 +7147,7 @@ console.log('📸 Assets loaded:', {
   storage: STORAGE.length,
   stations: STATIONS.length,
   monitors: MONITORS.length,
+  intrusion: INTRUSION.length,
   srs: SERVICE_REQUESTS.length
 });
 console.log('🔐 Login with admin/admin123 or client credentials');
