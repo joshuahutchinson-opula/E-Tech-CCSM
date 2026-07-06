@@ -598,7 +598,7 @@ input::placeholder, textarea::placeholder {
 .app { display: flex; height: 100vh; width: 100%; max-width: 100%; background: var(--main-bg); overflow: hidden; display: none; }
 .app.client-mode { background: #f5f5f5; }
 
-.sidebar { width: 200px; background: var(--sidebar-bg); display: flex; flex-direction: column; flex-shrink: 0; border-right: 1px solid var(--sidebar-border); transition: width 0.2s; position: relative; }
+.sidebar { width: 200px; background: var(--sidebar-bg); display: flex; flex-direction: column; flex-shrink: 0; border-right: 1px solid var(--sidebar-border); transition: width 0.2s; position: relative; overflow: hidden; }
 .sidebar.collapsed { width: 56px; }
 .sidebar.collapsed .logo-area { padding: 16px 12px; }
 .sidebar.collapsed .logo-img { width: 32px; }
@@ -3045,17 +3045,13 @@ function buildClientView(data, user) {
         html += '</div>';
       }
       
-      html += '<div style="display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--card-border);flex-wrap:wrap;">';
-      html += '<button class="btn btn-sm" onclick="editDoorComponent(' + index + ', \'controller\')"><i class="ti ti-edit"></i> Edit Controller</button>';
-      html += '<button class="btn btn-sm" onclick="editDoorComponent(' + index + ', \'reader\')"><i class="ti ti-edit"></i> Edit Reader</button>';
-      html += '<button class="btn btn-sm" onclick="editDoorComponent(' + index + ', \'accessType\')"><i class="ti ti-edit"></i> Edit Access Type</button>';
-      html += '<button class="btn btn-sm" onclick="editDoorComponent(' + index + ', \'lock\')"><i class="ti ti-edit"></i> Edit Lock</button>';
-      html += '<button class="btn btn-sm" onclick="editDoorComponent(' + index + ', \'sensor\')"><i class="ti ti-edit"></i> Edit Sensor</button>';
-      html += '<button class="btn btn-sm" onclick="editDoorComponent(' + index + ', \'closer\')"><i class="ti ti-edit"></i> Edit Closer</button>';
+      // Removed the 6 edit buttons per request
+      
       if (door.ip) {
+        html += '<div style="display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--card-border);flex-wrap:wrap;">';
         html += '<button class="btn btn-sm" onclick="pingDoorIP(\'' + door.ip + '\')"><i class="ti ti-network"></i> Ping</button>';
+        html += '</div>';
       }
-      html += '</div>';
       
       html += '</div>';
     });
@@ -4361,7 +4357,6 @@ function openCameraDetail(index) {
     preview.innerHTML = '<div class="offline-msg" style="color:var(--text-muted);padding:40px;text-align:center;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;"><i class="ti ti-video-off" style="font-size:48px;display:block;margin-bottom:12px;"></i>Camera ' + camera.status.toLowerCase() + '<br><span style="font-size:11px;opacity:0.6;">Preview unavailable</span></div>';
   }
   
-  // Read-only details (except comments)
   document.getElementById('camera-detail-grid').innerHTML =
     '<div class="modal-field"><label>Zone</label><span>' + camera.zone + '</span></div>' +
     '<div class="modal-field"><label>Client</label><span>' + client + '</span></div>' +
@@ -4490,143 +4485,6 @@ function toggleDoorCard(doorId) {
     body.style.display = 'none';
     toggle.style.transform = 'rotate(-90deg)';
   }
-}
-
-function editDoorComponent(index, component) {
-  var door = DOORS[index];
-  if (!door) return;
-  
-  var componentNames = {
-    controller: 'Controller',
-    reader: 'Reader',
-    accessType: 'Access Type',
-    lock: 'Lock',
-    sensor: 'Door Sensor',
-    closer: 'Door Closer'
-  };
-  
-  var fields = {
-    controller: [
-      {key: 'controllerType', label: 'Controller Type', value: door.controllerType || 'Standalone'},
-      {key: 'ip', label: 'IP Address', value: door.ip || ''},
-      {key: 'controller_model', label: 'Model', value: door.controller_model || ''},
-      {key: 'controller_warranty', label: 'Warranty Expiry', value: door.controller_warranty || '', type: 'date'},
-      {key: 'controller_status', label: 'Status', value: door.controller_status || door.status || 'Online', type: 'select', options: ['Online', 'Offline', 'Under Maintenance']}
-    ],
-    reader: [
-      {key: 'reader', label: 'Reader Type', value: door.reader || 'HID Prox'},
-      {key: 'reader_port', label: 'Controller Port', value: door.reader_port || 'Port 1'},
-      {key: 'reader_model', label: 'Model', value: door.reader_model || ''},
-      {key: 'reader_warranty', label: 'Warranty Expiry', value: door.reader_warranty || '', type: 'date'},
-      {key: 'reader_status', label: 'Status', value: door.reader_status || door.status || 'Online', type: 'select', options: ['Online', 'Offline', 'Under Maintenance']}
-    ],
-    accessType: [
-      {key: 'accessType', label: 'Access Type', value: door.accessType || 'Read In + Read Out'},
-      {key: 'doorSwing', label: 'Door Swing', value: door.doorSwing || 'In', type: 'select', options: ['In', 'Out']}
-    ],
-    lock: [
-      {key: 'lock_type', label: 'Lock Size', value: door.lock_type || '600lb'},
-      {key: 'lock_model', label: 'Model', value: door.lock_model || ''},
-      {key: 'lock_warranty', label: 'Warranty Expiry', value: door.lock_warranty || '', type: 'date'},
-      {key: 'lock_status', label: 'Status', value: door.lock_status || door.status || 'Online', type: 'select', options: ['Online', 'Offline', 'Under Maintenance']}
-    ],
-    sensor: [
-      {key: 'sensor_type', label: 'Sensor Type', value: door.sensor_type || 'Magnetic'},
-      {key: 'sensor_model', label: 'Model', value: door.sensor_model || ''},
-      {key: 'sensor_warranty', label: 'Warranty Expiry', value: door.sensor_warranty || '', type: 'date'},
-      {key: 'sensor_status', label: 'Status', value: door.sensor_status || 'Online', type: 'select', options: ['Online', 'Offline', 'Under Maintenance']}
-    ],
-    closer: [
-      {key: 'closer_type', label: 'Closer Type', value: door.closer_type || 'Hydraulic'},
-      {key: 'closer_model', label: 'Model', value: door.closer_model || ''},
-      {key: 'closer_warranty', label: 'Warranty Expiry', value: door.closer_warranty || '', type: 'date'},
-      {key: 'closer_status', label: 'Status', value: door.closer_status || 'Online', type: 'select', options: ['Online', 'Offline', 'Under Maintenance']}
-    ]
-  };
-  
-  var compFields = fields[component] || [];
-  var compName = componentNames[component] || component;
-  
-var modalHtml = '<div class="modal" style="max-width:500px;">';
-modalHtml += '<button class="modal-close" onclick="closeDoorComponentModal()"><i class="ti ti-x"></i></button>';
-modalHtml += '<div class="modal-title">✏️ Edit ' + compName + '</div>';
-modalHtml += '<div class="modal-sub">' + door.name + ' · ' + door.site + '</div>';
-modalHtml += '<div class="modal-section">';
-modalHtml += '<div class="modal-grid">';
-  
-  compFields.forEach(function(field) {
-    modalHtml += '<div class="modal-field">';
-    modalHtml += '<label>' + field.label + '</label>';
-    if (field.type === 'select') {
-      modalHtml += '<select id="door-edit-' + field.key + '" class="status-select">';
-      field.options.forEach(function(opt) {
-        modalHtml += '<option value="' + opt + '" ' + (field.value === opt ? 'selected' : '') + '>' + opt + '</option>';
-      });
-      modalHtml += '</select>';
-    } else if (field.type === 'date') {
-      modalHtml += '<input type="date" id="door-edit-' + field.key + '" value="' + (field.value || '') + '" />';
-    } else {
-      modalHtml += '<input type="text" id="door-edit-' + field.key + '" value="' + (field.value || '') + '" />';
-    }
-    modalHtml += '</div>';
-  });
-  
-  modalHtml += '</div></div>';
-modalHtml += '<div class="modal-footer">';
-modalHtml += '<button class="btn" onclick="closeDoorComponentModal()">Cancel</button>';
-modalHtml += '<button class="btn btn-accent" onclick="saveDoorComponent(' + index + ', \'' + component + '\')"><i class="ti ti-device-floppy"></i> Save</button>';
-modalHtml += '</div></div>';
-  
-  var overlay = document.createElement('div');
-  overlay.id = 'door-component-modal';
-  overlay.className = 'modal-overlay open';
-  overlay.innerHTML = modalHtml;
-  document.body.appendChild(overlay);
-  
-overlay.addEventListener('click', function(e) {
-  if (e.target === this) {
-    closeDoorComponentModal();
-  }
-});
-}
-
-function closeDoorComponentModal() {
-  var modal = document.getElementById('door-component-modal');
-  if (modal) {
-    modal.classList.remove('open');
-    setTimeout(function() {
-      if (modal.parentNode) {
-        modal.parentNode.removeChild(modal);
-      }
-    }, 300);
-  }
-}
-
-function saveDoorComponent(index, component) {
-  var door = DOORS[index];
-  if (!door) return;
-  
-  var fieldMap = {
-    controller: ['controllerType', 'ip', 'controller_model', 'controller_warranty', 'controller_status'],
-    reader: ['reader', 'reader_port', 'reader_model', 'reader_warranty', 'reader_status'],
-    accessType: ['accessType', 'doorSwing'],
-    lock: ['lock_type', 'lock_model', 'lock_warranty', 'lock_status'],
-    sensor: ['sensor_type', 'sensor_model', 'sensor_warranty', 'sensor_status'],
-    closer: ['closer_type', 'closer_model', 'closer_warranty', 'closer_status']
-  };
-  
-  var fields = fieldMap[component] || [];
-  fields.forEach(function(key) {
-    var el = document.getElementById('door-edit-' + key);
-    if (el) {
-      door[key] = el.value;
-    }
-  });
-  
-  localStorage.setItem('ccsm_doors', JSON.stringify(DOORS));
-  closeAddModal('door-component-modal');
-  toast(component.charAt(0).toUpperCase() + component.slice(1) + ' updated!', 'success');
-  renderDoorsEnhanced();
 }
 
 function pingDoorIP(ip) {
@@ -4759,17 +4617,13 @@ function renderDoorsEnhanced() {
           html += '</div>';
         }
         
-        html += '<div style="display:flex;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--card-border);flex-wrap:wrap;">';
-        html += '<button class="btn btn-sm" onclick="editDoorComponent(' + realIndex + ', \'controller\')"><i class="ti ti-edit"></i> Edit Controller</button>';
-        html += '<button class="btn btn-sm" onclick="editDoorComponent(' + realIndex + ', \'reader\')"><i class="ti ti-edit"></i> Edit Reader</button>';
-        html += '<button class="btn btn-sm" onclick="editDoorComponent(' + realIndex + ', \'accessType\')"><i class="ti ti-edit"></i> Edit Access Type</button>';
-        html += '<button class="btn btn-sm" onclick="editDoorComponent(' + realIndex + ', \'lock\')"><i class="ti ti-edit"></i> Edit Lock</button>';
-        html += '<button class="btn btn-sm" onclick="editDoorComponent(' + realIndex + ', \'sensor\')"><i class="ti ti-edit"></i> Edit Sensor</button>';
-        html += '<button class="btn btn-sm" onclick="editDoorComponent(' + realIndex + ', \'closer\')"><i class="ti ti-edit"></i> Edit Closer</button>';
+        // Only Ping button remains
         if (d.ip) {
+          html += '<div style="display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--card-border);flex-wrap:wrap;">';
           html += '<button class="btn btn-sm" onclick="pingDoorIP(\'' + d.ip + '\')"><i class="ti ti-network"></i> Ping</button>';
+          html += '</div>';
         }
-        html += '</div>';
+        
         html += '</div></div>';
       });
       container.innerHTML = html;
