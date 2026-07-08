@@ -3813,11 +3813,11 @@ function getEmbeddedMonitors() {
 
 function getEmbeddedIntrusion() {
   return [
-    {monitor_point: "Front Gate", modules: "Module A-1", communication: "Ethernet", sensor: "Motion Sensor", status: "Online", warranty_expiry: "2027-01-15", comments: "Operational - no issues"},
-    {monitor_point: "Back Gate", modules: "Module B-2", communication: "Wireless", sensor: "PIR Sensor", status: "Online", warranty_expiry: "2026-06-01", comments: "Battery replaced 2026-05-15"},
-    {monitor_point: "East Perimeter", modules: "Module C-3", communication: "Fiber", sensor: "Fiber Optic", status: "Offline", warranty_expiry: "2025-12-01", comments: "Cable break detected - needs repair"},
-    {monitor_point: "West Perimeter", modules: "Module D-1", communication: "Ethernet", sensor: "Radar", status: "Warning", warranty_expiry: "2026-08-15", comments: "False positive alerts - calibration needed"},
-    {monitor_point: "North Entrance", modules: "Module E-2", communication: "Wireless", sensor: "Magnetic Contact", status: "Online", warranty_expiry: "2027-03-01", comments: "Working - recently serviced"}
+    {monitor_point: "Front Gate", modules: "Module A-1", communication: "Ethernet", sensor: "Motion Sensor", status: "Online", warranty_expiry: "2027-01-15", comments: "Operational - no issues", client: "KFTL", location: "Security Office"},
+    {monitor_point: "Back Gate", modules: "Module B-2", communication: "Wireless", sensor: "PIR Sensor", status: "Online", warranty_expiry: "2026-06-01", comments: "Battery replaced 2026-05-15", client: "KFTL", location: "Security Office"},
+    {monitor_point: "East Perimeter", modules: "Module C-3", communication: "Fiber", sensor: "Fiber Optic", status: "Offline", warranty_expiry: "2025-12-01", comments: "Cable break detected - needs repair", client: "KFTL", location: "Perimeter"},
+    {monitor_point: "West Perimeter", modules: "Module D-1", communication: "Ethernet", sensor: "Radar", status: "Warning", warranty_expiry: "2026-08-15", comments: "False positive alerts - calibration needed", client: "KFTL", location: "Perimeter"},
+    {monitor_point: "North Entrance", modules: "Module E-2", communication: "Wireless", sensor: "Magnetic Contact", status: "Online", warranty_expiry: "2027-03-01", comments: "Working - recently serviced", client: "KFTL", location: "Entrance"}
   ];
 }
 
@@ -5365,10 +5365,17 @@ function renderIntrusion() {
       return match;
     });
     if (currentClientFilter) {
-      filtered = filtered.filter(function(i) { return i.client === currentClientFilter; });
+      filtered = filtered.filter(function(i) { 
+        // Check if client field exists and matches, or if no client field, include it
+        if (!i.client) return true;
+        return i.client === currentClientFilter; 
+      });
     }
     if (currentZoneFilter) {
-      filtered = filtered.filter(function(i) { return i.location === currentZoneFilter; });
+      filtered = filtered.filter(function(i) { 
+        if (!i.location) return true;
+        return i.location === currentZoneFilter; 
+      });
     }
 
     var total = INTRUSION.length;
