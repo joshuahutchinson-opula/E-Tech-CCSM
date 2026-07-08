@@ -2,42 +2,17 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
-const multer = require('multer');
-const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// ============================================================
-// ── CONFIGURATION ──
-// ============================================================
-
 // Middleware
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-railway-app.railway.app', 'https://*.railway.app']
-    : '*',
+  origin: '*',
   credentials: true
 }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static(__dirname));
-
-// File upload configuration
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = './uploads';
-    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = uuidv4() + path.extname(file.originalname);
-    cb(null, uniqueName);
-  }
-});
-const upload = multer({ 
-  storage,
-  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
-});
 
 // Ensure data directory exists
 const DATA_DIR = './data';
@@ -57,10 +32,7 @@ defaultFiles.forEach(file => {
   }
 });
 
-// ============================================================
-// ── HELPERS ──
-// ============================================================
-
+// Helpers
 function readData(file) {
   try {
     const filePath = path.join(DATA_DIR, `${file}.json`);
@@ -91,10 +63,7 @@ function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
 }
 
-// ============================================================
-// ── DEVICE DETECTION ──
-// ============================================================
-
+// Device Detection
 const isMobileDevice = (userAgent) => {
   return /Android|iPhone|iPod|BlackBerry|Opera Mini|IEMobile|webOS|Windows Phone|iPad|Tablet|Silk|PlayBook/i.test(userAgent);
 };
@@ -124,15 +93,10 @@ app.get('/field', (req, res) => {
   res.sendFile(path.join(__dirname, 'field-app.html'));
 });
 
-// ============================================================
-// ── API ROUTES ──
-// ============================================================
-
 // Auth
 app.post('/api/auth/login', (req, res) => {
   const { username, password } = req.body;
   
-  // Check admin
   if (username === 'admin' && password === 'admin123') {
     return res.json({ 
       success: true, 
@@ -146,7 +110,6 @@ app.post('/api/auth/login', (req, res) => {
     });
   }
   
-  // Check technicians
   const techs = ['tech', 'shanice', 'shavine', 'marvin', 'ackeem'];
   if (techs.includes(username.toLowerCase()) && password === 'tech123') {
     return res.json({ 
@@ -161,7 +124,6 @@ app.post('/api/auth/login', (req, res) => {
     });
   }
   
-  // Check clients
   const clients = ['kftl', 'kwl', 'lasco', 'nestle', 'nids', 'nutrien', 'fidelity'];
   if (clients.includes(username.toLowerCase()) && password === username.toLowerCase() + '123') {
     return res.json({ 
@@ -222,16 +184,12 @@ app.get('/api/tickets', (req, res) => {
   const { status, priority, assigned, client, limit = 100 } = req.query;
   let data = readData('tickets');
   
-  // Apply filters
   if (status) data = data.filter(t => t.status === status);
   if (priority) data = data.filter(t => t.priority === priority);
   if (assigned) data = data.filter(t => t.assigned === assigned);
   if (client) data = data.filter(t => t.client === client);
   
-  // Sort by date descending
   data.sort((a, b) => new Date(b.received || b.created) - new Date(a.received || a.created));
-  
-  // Apply limit
   if (limit > 0) data = data.slice(0, parseInt(limit));
   
   res.json({ success: true, data, count: data.length, total: readData('tickets').length });
@@ -255,38 +213,7 @@ app.get('/api/inbox', (req, res) => {
   res.json({ success: true, data, count: data.length });
 });
 
-app.get('/api/files', (req, res) => {
-  const { path: dirPath = '' } = req.query;
-  const baseDir = path.join(__dirname, 'files', dirPath);
-  
-  if (!fs.existsSync(baseDir)) {
-    return res.json({ success: true, data: { name: 'Root', type: 'folder', children: [] } });
-  }
-  
-  const items = fs.readdirSync(baseDir).map(name => {
-    const fullPath = path.join(baseDir, name);
-    const stats = fs.statSync(fullPath);
-    return {
-      name,
-      type: stats.isDirectory() ? 'folder' : 'file',
-      size: stats.size,
-      modified: stats.mtime,
-      path: path.join(dirPath, name)
-    };
-  });
-  
-  res.json({ 
-    success: true, 
-    data: { 
-      name: dirPath || 'Root', 
-      type: 'folder', 
-      children: items,
-      currentPath: dirPath
-    } 
-  });
-});
-
-// GET single item endpoints
+// GET single items
 app.get('/api/cameras/:id', (req, res) => {
   const data = readData('cameras');
   const item = data.find(c => c.id === req.params.id);
@@ -307,7 +234,7 @@ app.get('/api/tickets/:id', (req, res) => {
   }
 });
 
-// POST endpoints (create)
+// POST endpoints
 app.post('/api/cameras', (req, res) => {
   try {
     const data = readData('cameras');
@@ -366,7 +293,7 @@ app.post('/api/audit', (req, res) => {
   }
 });
 
-// PUT endpoints (update)
+// PUT endpoints
 app.put('/api/cameras/:id', (req, res) => {
   try {
     const data = readData('cameras');
@@ -405,7 +332,6 @@ app.put('/api/tickets/:id', (req, res) => {
       return res.status(404).json({ success: false, message: 'Ticket not found' });
     }
     
-    // Add to history if status changed
     if (req.body.status && data[index].status !== req.body.status) {
       if (!data[index].history) data[index].history = [];
       data[index].history.push({
@@ -422,27 +348,7 @@ app.put('/api/tickets/:id', (req, res) => {
   }
 });
 
-// File upload
-app.post('/api/upload', upload.single('file'), (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ success: false, message: 'No file uploaded' });
-    }
-    res.json({ 
-      success: true, 
-      data: { 
-        filename: req.file.filename,
-        originalName: req.file.originalname,
-        size: req.file.size,
-        path: `/uploads/${req.file.filename}`
-      } 
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-// Bulk save endpoint
+// Bulk save
 app.post('/api/save/:type', (req, res) => {
   const { type } = req.params;
   const validTypes = ['cameras', 'doors', 'servers', 'switches', 'tickets', 'audit', 'inbox', 'software', 'clients'];
@@ -459,7 +365,7 @@ app.post('/api/save/:type', (req, res) => {
   }
 });
 
-// Stats endpoint
+// Stats
 app.get('/api/stats', (req, res) => {
   const stats = {};
   const types = ['cameras', 'doors', 'servers', 'switches', 'tickets', 'audit', 'inbox', 'software', 'clients'];
@@ -472,10 +378,7 @@ app.get('/api/stats', (req, res) => {
   stats.openTickets = tickets.filter(t => t.status !== 'Resolved').length;
   stats.highPriorityTickets = tickets.filter(t => t.priority === 'High' && t.status !== 'Resolved').length;
   
-  res.json({
-    success: true,
-    data: stats
-  });
+  res.json({ success: true, data: stats });
 });
 
 // Health check
@@ -488,10 +391,7 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// ============================================================
-// ── CATCH-ALL ──
-// ============================================================
-
+// Catch-all
 app.get('*', (req, res) => {
   const userAgent = req.headers['user-agent'] || '';
   const isMobile = isMobileDevice(userAgent);
@@ -504,15 +404,11 @@ app.get('*', (req, res) => {
   }
 });
 
-// ============================================================
-// ── START ──
-// ============================================================
-
+// Start
 app.listen(PORT, () => {
   console.log('🚀 CAMS Server running on port ' + PORT);
   console.log('📱 Mobile users → field-app.html (auto-detected)');
   console.log('💻 Desktop users → index.html (auto-detected)');
   console.log('📌 Direct: /admin (desktop) or /field (mobile)');
   console.log('💾 Data stored in /data/ folder');
-  console.log(`🔗 API ready at http://localhost:${PORT}/api/`);
 });
