@@ -1,56 +1,121 @@
-server js file: const express = require('express');
+const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const multer = require('multer');
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware
-app.use(cors());
-app.use(express.json({ limit: '50mb' }));
+// ============================================================
+// ── CONFIGURATION ──
+// ============================================================
 
-// Serve static files from root directory
+// Middleware
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://your-railway-app.railway.app', 'https://*.railway.app']
+    : '*',
+  credentials: true
+}));
+app.use(express.json({ limit: '50mb' }));
 app.use(express.static(__dirname));
 
+// File upload configuration
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = './uploads';
+    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = uuidv4() + path.extname(file.originalname);
+    cb(null, uniqueName);
+  }
+});
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+});
+
 // Ensure data directory exists
-if (!fs.existsSync('./data')) {
-  fs.mkdirSync('./data');
-  ['cameras.json', 'doors.json', 'servers.json', 'switches.json', 'tickets.json', 'audit.json', 'inbox.json'].forEach(file => {
-    if (!fs.existsSync(`./data/${file}`)) {
-      fs.writeFileSync(`./data/${file}`, '[]');
+const DATA_DIR = './data';
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+}
+
+// Initialize data files if they don't exist
+const defaultFiles = [
+  'cameras.json', 'doors.json', 'servers.json', 'switches.json', 
+  'tickets.json', 'audit.json', 'inbox.json', 'clients.json', 'software.json'
+];
+defaultFiles.forEach(file => {
+  const filePath = path.join(DATA_DIR, file);
+  if (!fs.existsSync(filePath)) {
+    fs.writeFileSync(filePath, '[]');
+  }
+});
+
+// ============================================================
+// ── HELPERS ──
+// ============================================================
+
+function readData(file) {
+  try {
+    const filePath = path.join(DATA_DIR, `${file}.json`);
+    if (!fs.existsSync(filePath)) {
+      fs.writeFileSync(filePath, '[]');
+      return [];
     }
-  });
+    const data = fs.readFileSync(filePath, 'utf8');
+    return data ? JSON.parse(data) : [];
+  } catch (error) {
+    console.error(`Error reading ${file}:`, error);
+    return [];
+  }
+}
+
+function writeData(file, data) {
+  try {
+    const filePath = path.join(DATA_DIR, `${file}.json`);
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+    return true;
+  } catch (error) {
+    console.error(`Error writing ${file}:`, error);
+    return false;
+  }
+}
+
+function generateId() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
 }
 
 // ============================================================
 // ── DEVICE DETECTION ──
 // ============================================================
 
+const isMobileDevice = (userAgent) => {
+  return /Android|iPhone|iPod|BlackBerry|Opera Mini|IEMobile|webOS|Windows Phone|iPad|Tablet|Silk|PlayBook/i.test(userAgent);
+};
+
 app.get('/', (req, res) => {
   const userAgent = req.headers['user-agent'] || '';
-  
-  // Detect mobile devices (phones + tablets)
-  const isPhone = /Android|iPhone|iPod|BlackBerry|Opera Mini|IEMobile|webOS|Windows Phone/i.test(userAgent);
-  const isTablet = /iPad|Tablet|Silk|PlayBook/i.test(userAgent);
-  const isMobile = isPhone || isTablet;
-  
-  // Manual override
   const forceMobile = req.query.mobile === 'true';
   const forceDesktop = req.query.desktop === 'true';
   
-  let serveMobile = isMobile;
+  let serveMobile = isMobileDevice(userAgent);
   if (forceMobile) serveMobile = true;
   if (forceDesktop) serveMobile = false;
   
-  if (serveMobile && fs.existsSync(path.join(__dirname, 'field-app.html'))) {
-    res.sendFile(path.join(__dirname, 'field-app.html'));
+  const file = serveMobile ? 'field-app.html' : 'index.html';
+  if (fs.existsSync(path.join(__dirname, file))) {
+    res.sendFile(path.join(__dirname, file));
   } else {
     res.sendFile(path.join(__dirname, 'index.html'));
   }
 });
 
-// Explicit routes
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -60,108 +125,258 @@ app.get('/field', (req, res) => {
 });
 
 // ============================================================
-// ── API ROUTES (Shared between both apps) ──
+// ── API ROUTES ──
 // ============================================================
 
-// Helper to read/write data
-function readData(file) {
-  try {
-    return JSON.parse(fs.readFileSync(`./data/${file}.json`, 'utf8') || '[]');
-  } catch {
-    return [];
-  }
-}
-function writeData(file, data) {
-  fs.writeFileSync(`./data/${file}.json`, JSON.stringify(data, null, 2));
-}
-
-// GET endpoints
-app.get('/api/cameras', (req, res) => {
-  res.json({ success: true, data: readData('cameras') });
-});
-
-app.get('/api/doors', (req, res) => {
-  res.json({ success: true, data: readData('doors') });
-});
-
-app.get('/api/servers', (req, res) => {
-  res.json({ success: true, data: readData('servers') });
-});
-
-app.get('/api/switches', (req, res) => {
-  res.json({ success: true, data: readData('switches') });
-});
-
-app.get('/api/tickets', (req, res) => {
-  res.json({ success: true, data: readData('tickets') });
-});
-
-app.get('/api/audit', (req, res) => {
-  res.json({ success: true, data: readData('audit') });
-});
-
-app.get('/api/inbox', (req, res) => {
-  res.json({ success: true, data: readData('inbox') });
-});
-
-app.get('/api/files', (req, res) => {
-  res.json({ success: true, data: { name: 'Root', type: 'folder', children: [] } });
-});
-
-// POST / PUT endpoints
+// Auth
 app.post('/api/auth/login', (req, res) => {
   const { username, password } = req.body;
   
+  // Check admin
   if (username === 'admin' && password === 'admin123') {
-    res.json({ 
+    return res.json({ 
       success: true, 
       token: 'admin-token-' + Date.now(), 
-      user: { username: 'admin', role: 'Administrator', isAdmin: true } 
+      user: { 
+        username: 'admin', 
+        role: 'Administrator', 
+        isAdmin: true,
+        client: null
+      } 
     });
-  } else if (username === 'tech' && password === 'tech123') {
-    res.json({ 
+  }
+  
+  // Check technicians
+  const techs = ['tech', 'shanice', 'shavine', 'marvin', 'ackeem'];
+  if (techs.includes(username.toLowerCase()) && password === 'tech123') {
+    return res.json({ 
       success: true, 
       token: 'tech-token-' + Date.now(), 
-      user: { username: 'tech', role: 'Field Technician', isAdmin: false } 
+      user: { 
+        username: username, 
+        role: 'Field Technician', 
+        isAdmin: false,
+        client: null
+      } 
     });
-  } else {
-    res.status(401).json({ success: false, message: 'Invalid credentials' });
   }
+  
+  // Check clients
+  const clients = ['kftl', 'kwl', 'lasco', 'nestle', 'nids', 'nutrien', 'fidelity'];
+  if (clients.includes(username.toLowerCase()) && password === username.toLowerCase() + '123') {
+    return res.json({ 
+      success: true, 
+      token: 'client-token-' + Date.now(), 
+      user: { 
+        username: username, 
+        role: 'Client User', 
+        isAdmin: false,
+        client: username.toLowerCase()
+      } 
+    });
+  }
+  
+  res.status(401).json({ success: false, message: 'Invalid credentials' });
 });
 
 app.post('/api/auth/microsoft', (req, res) => {
-  res.json({ access_token: 'mock-token' });
+  res.json({ 
+    success: true,
+    access_token: 'mock-token-' + Date.now(),
+    user: { username: 'microsoft-user', role: 'User', isAdmin: false }
+  });
 });
 
-// Generic save endpoint
-app.post('/api/save/:type', (req, res) => {
-  const { type } = req.params;
-  const validTypes = ['cameras', 'doors', 'servers', 'switches', 'tickets', 'audit', 'inbox'];
+// GET endpoints
+app.get('/api/cameras', (req, res) => {
+  const data = readData('cameras');
+  res.json({ success: true, data, count: data.length });
+});
+
+app.get('/api/doors', (req, res) => {
+  const data = readData('doors');
+  res.json({ success: true, data, count: data.length });
+});
+
+app.get('/api/servers', (req, res) => {
+  const data = readData('servers');
+  res.json({ success: true, data, count: data.length });
+});
+
+app.get('/api/switches', (req, res) => {
+  const data = readData('switches');
+  res.json({ success: true, data, count: data.length });
+});
+
+app.get('/api/software', (req, res) => {
+  const data = readData('software');
+  res.json({ success: true, data, count: data.length });
+});
+
+app.get('/api/clients', (req, res) => {
+  const data = readData('clients');
+  res.json({ success: true, data, count: data.length });
+});
+
+app.get('/api/tickets', (req, res) => {
+  const { status, priority, assigned, client, limit = 100 } = req.query;
+  let data = readData('tickets');
   
-  if (!validTypes.includes(type)) {
-    return res.status(400).json({ success: false, message: 'Invalid data type' });
+  // Apply filters
+  if (status) data = data.filter(t => t.status === status);
+  if (priority) data = data.filter(t => t.priority === priority);
+  if (assigned) data = data.filter(t => t.assigned === assigned);
+  if (client) data = data.filter(t => t.client === client);
+  
+  // Sort by date descending
+  data.sort((a, b) => new Date(b.received || b.created) - new Date(a.received || a.created));
+  
+  // Apply limit
+  if (limit > 0) data = data.slice(0, parseInt(limit));
+  
+  res.json({ success: true, data, count: data.length, total: readData('tickets').length });
+});
+
+app.get('/api/audit', (req, res) => {
+  const { limit = 100, user, action } = req.query;
+  let data = readData('audit');
+  
+  if (user) data = data.filter(a => a.user === user);
+  if (action) data = data.filter(a => a.action === action);
+  
+  data.sort((a, b) => new Date(b.time) - new Date(a.time));
+  if (limit > 0) data = data.slice(0, parseInt(limit));
+  
+  res.json({ success: true, data, count: data.length });
+});
+
+app.get('/api/inbox', (req, res) => {
+  const data = readData('inbox');
+  res.json({ success: true, data, count: data.length });
+});
+
+app.get('/api/files', (req, res) => {
+  const { path: dirPath = '' } = req.query;
+  const baseDir = path.join(__dirname, 'files', dirPath);
+  
+  if (!fs.existsSync(baseDir)) {
+    return res.json({ success: true, data: { name: 'Root', type: 'folder', children: [] } });
   }
   
+  const items = fs.readdirSync(baseDir).map(name => {
+    const fullPath = path.join(baseDir, name);
+    const stats = fs.statSync(fullPath);
+    return {
+      name,
+      type: stats.isDirectory() ? 'folder' : 'file',
+      size: stats.size,
+      modified: stats.mtime,
+      path: path.join(dirPath, name)
+    };
+  });
+  
+  res.json({ 
+    success: true, 
+    data: { 
+      name: dirPath || 'Root', 
+      type: 'folder', 
+      children: items,
+      currentPath: dirPath
+    } 
+  });
+});
+
+// GET single item endpoints
+app.get('/api/cameras/:id', (req, res) => {
+  const data = readData('cameras');
+  const item = data.find(c => c.id === req.params.id);
+  if (item) {
+    res.json({ success: true, data: item });
+  } else {
+    res.status(404).json({ success: false, message: 'Item not found' });
+  }
+});
+
+app.get('/api/tickets/:id', (req, res) => {
+  const data = readData('tickets');
+  const item = data.find(t => t.id === req.params.id);
+  if (item) {
+    res.json({ success: true, data: item });
+  } else {
+    res.status(404).json({ success: false, message: 'Ticket not found' });
+  }
+});
+
+// POST endpoints (create)
+app.post('/api/cameras', (req, res) => {
   try {
-    writeData(type, req.body);
-    res.json({ success: true });
+    const data = readData('cameras');
+    const newItem = { id: generateId(), ...req.body, created: new Date().toISOString() };
+    data.push(newItem);
+    writeData('cameras', data);
+    res.status(201).json({ success: true, data: newItem });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 });
 
-// Individual update endpoints
+app.post('/api/doors', (req, res) => {
+  try {
+    const data = readData('doors');
+    const newItem = { id: generateId(), ...req.body, created: new Date().toISOString() };
+    data.push(newItem);
+    writeData('doors', data);
+    res.status(201).json({ success: true, data: newItem });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+app.post('/api/tickets', (req, res) => {
+  try {
+    const data = readData('tickets');
+    const newTicket = { 
+      id: 'SR-' + String(Math.floor(Math.random() * 9000) + 1000),
+      ...req.body,
+      created: new Date().toISOString(),
+      history: [{ time: new Date().toISOString(), msg: 'Created' }],
+      attachments: []
+    };
+    data.push(newTicket);
+    writeData('tickets', data);
+    res.status(201).json({ success: true, data: newTicket });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+app.post('/api/audit', (req, res) => {
+  try {
+    const data = readData('audit');
+    const entry = { 
+      ...req.body, 
+      time: new Date().toISOString(),
+      id: generateId()
+    };
+    data.push(entry);
+    writeData('audit', data);
+    res.status(201).json({ success: true, data: entry });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// PUT endpoints (update)
 app.put('/api/cameras/:id', (req, res) => {
   try {
     const data = readData('cameras');
     const index = data.findIndex(c => c.id === req.params.id);
-    if (index !== -1) {
-      data[index] = { ...data[index], ...req.body };
-      writeData('cameras', data);
-      res.json({ success: true });
-    } else {
-      res.status(404).json({ success: false, message: 'Camera not found' });
+    if (index === -1) {
+      return res.status(404).json({ success: false, message: 'Camera not found' });
     }
+    data[index] = { ...data[index], ...req.body, updated: new Date().toISOString() };
+    writeData('cameras', data);
+    res.json({ success: true, data: data[index] });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -171,45 +386,12 @@ app.put('/api/doors/:id', (req, res) => {
   try {
     const data = readData('doors');
     const index = data.findIndex(d => d.id === req.params.id);
-    if (index !== -1) {
-      data[index] = { ...data[index], ...req.body };
-      writeData('doors', data);
-      res.json({ success: true });
-    } else {
-      res.status(404).json({ success: false, message: 'Door not found' });
+    if (index === -1) {
+      return res.status(404).json({ success: false, message: 'Door not found' });
     }
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-app.put('/api/servers/:id', (req, res) => {
-  try {
-    const data = readData('servers');
-    const index = data.findIndex(s => s.id === req.params.id);
-    if (index !== -1) {
-      data[index] = { ...data[index], ...req.body };
-      writeData('servers', data);
-      res.json({ success: true });
-    } else {
-      res.status(404).json({ success: false, message: 'Server not found' });
-    }
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-app.put('/api/switches/:id', (req, res) => {
-  try {
-    const data = readData('switches');
-    const index = data.findIndex(s => s.id === req.params.id);
-    if (index !== -1) {
-      data[index] = { ...data[index], ...req.body };
-      writeData('switches', data);
-      res.json({ success: true });
-    } else {
-      res.status(404).json({ success: false, message: 'Switch not found' });
-    }
+    data[index] = { ...data[index], ...req.body, updated: new Date().toISOString() };
+    writeData('doors', data);
+    res.json({ success: true, data: data[index] });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -219,38 +401,91 @@ app.put('/api/tickets/:id', (req, res) => {
   try {
     const data = readData('tickets');
     const index = data.findIndex(t => t.id === req.params.id);
-    if (index !== -1) {
-      data[index] = { ...data[index], ...req.body };
-      writeData('tickets', data);
-      res.json({ success: true });
-    } else {
-      res.status(404).json({ success: false, message: 'Ticket not found' });
+    if (index === -1) {
+      return res.status(404).json({ success: false, message: 'Ticket not found' });
     }
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-app.post('/api/tickets', (req, res) => {
-  try {
-    const data = readData('tickets');
-    data.push(req.body);
+    
+    // Add to history if status changed
+    if (req.body.status && data[index].status !== req.body.status) {
+      if (!data[index].history) data[index].history = [];
+      data[index].history.push({
+        time: new Date().toISOString(),
+        msg: `Status → ${req.body.status}`
+      });
+    }
+    
+    data[index] = { ...data[index], ...req.body, updated: new Date().toISOString() };
     writeData('tickets', data);
-    res.status(201).json({ success: true, data: req.body });
+    res.json({ success: true, data: data[index] });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 });
 
-app.post('/api/audit', (req, res) => {
+// File upload
+app.post('/api/upload', upload.single('file'), (req, res) => {
   try {
-    const data = readData('audit');
-    data.push(req.body);
-    writeData('audit', data);
-    res.status(201).json({ success: true, data: req.body });
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+    res.json({ 
+      success: true, 
+      data: { 
+        filename: req.file.filename,
+        originalName: req.file.originalname,
+        size: req.file.size,
+        path: `/uploads/${req.file.filename}`
+      } 
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
+});
+
+// Bulk save endpoint
+app.post('/api/save/:type', (req, res) => {
+  const { type } = req.params;
+  const validTypes = ['cameras', 'doors', 'servers', 'switches', 'tickets', 'audit', 'inbox', 'software', 'clients'];
+  
+  if (!validTypes.includes(type)) {
+    return res.status(400).json({ success: false, message: 'Invalid data type' });
+  }
+  
+  try {
+    writeData(type, req.body);
+    res.json({ success: true, count: req.body.length });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Stats endpoint
+app.get('/api/stats', (req, res) => {
+  const stats = {};
+  const types = ['cameras', 'doors', 'servers', 'switches', 'tickets', 'audit', 'inbox', 'software', 'clients'];
+  types.forEach(type => {
+    const data = readData(type);
+    stats[type] = data.length;
+  });
+  
+  const tickets = readData('tickets');
+  stats.openTickets = tickets.filter(t => t.status !== 'Resolved').length;
+  stats.highPriorityTickets = tickets.filter(t => t.priority === 'High' && t.status !== 'Resolved').length;
+  
+  res.json({
+    success: true,
+    data: stats
+  });
+});
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    memory: process.memoryUsage()
+  });
 });
 
 // ============================================================
@@ -259,10 +494,11 @@ app.post('/api/audit', (req, res) => {
 
 app.get('*', (req, res) => {
   const userAgent = req.headers['user-agent'] || '';
-  const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|Opera Mini|IEMobile|webOS|Windows Phone|Tablet|Silk/i.test(userAgent);
+  const isMobile = isMobileDevice(userAgent);
+  const file = isMobile ? 'field-app.html' : 'index.html';
   
-  if (isMobile && fs.existsSync(path.join(__dirname, 'field-app.html'))) {
-    res.sendFile(path.join(__dirname, 'field-app.html'));
+  if (fs.existsSync(path.join(__dirname, file))) {
+    res.sendFile(path.join(__dirname, file));
   } else {
     res.sendFile(path.join(__dirname, 'index.html'));
   }
@@ -278,4 +514,5 @@ app.listen(PORT, () => {
   console.log('💻 Desktop users → index.html (auto-detected)');
   console.log('📌 Direct: /admin (desktop) or /field (mobile)');
   console.log('💾 Data stored in /data/ folder');
+  console.log(`🔗 API ready at http://localhost:${PORT}/api/`);
 });
