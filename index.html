@@ -1,4 +1,4 @@
-this is my app: <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -134,14 +134,6 @@ input, select, textarea, button { font-family: var(--font); }
 .nav-scroll-bottom::-webkit-scrollbar-track { background: transparent; }
 .nav-scroll-bottom::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; }
 
-.nav-scroll-bottom::-webkit-scrollbar-thumb:hover,
-.content::-webkit-scrollbar-thumb:hover,
-.modal::-webkit-scrollbar-thumb:hover,
-.outlook-list-pane::-webkit-scrollbar-thumb:hover,
-.outlook-reading-pane::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary);
-}
-
 .content, .sidebar, .modal, .outlook-list-pane, .outlook-reading-pane, .nav-scroll-bottom {
   scrollbar-width: thin;
   scrollbar-color: var(--text-muted) transparent;
@@ -211,7 +203,7 @@ input, select, textarea, button { font-family: var(--font); }
 .sla-warn { color: var(--warning); }
 .sla-critical { color: var(--danger); }
 
-/* ── UNIVERSAL SELECT STYLES (FIXED FOR ALL THEMES) ── */
+/* ── UNIVERSAL SELECT STYLES ── */
 select,
 .status-select,
 .priority-select,
@@ -937,7 +929,7 @@ input::placeholder, textarea::placeholder {
           <i class="ti ti-alert-triangle em-icon"></i>
           <div class="em-text">
             <div class="em-title">🚨 ALARM — Tinson Pen Perimeter Breach</div>
-            <div class="em-detail">Cam 282-TP Pole 21 — Motion detection · 172.16.19.91</div>
+            <div class="em-detail">Cam 282-TP Pole 21 · Motion detection · 172.16.19.91</div>
           </div>
           <span class="em-time">Today, 14:32</span>
           <button class="btn btn-danger btn-sm" onclick="acknowledgeAlarm()"><i class="ti ti-check"></i> Ack</button>
@@ -2497,24 +2489,466 @@ var CLIENTS_VIEW_DATA = {
     secondary: '#b91c1c',
     assets: {
       cameras: [
-        { name: 'HM3 PTZ', zone: 'NORTH', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.19.1.150', install_date: '2024-01-15', history: [{ date: '2024-06-15', event: 'Firmware updated' }, { date: '2024-03-10', event: 'Lens cleaned' }] },
-        { name: 'HM11 PTZ', zone: 'NORTH', status: 'Defective', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.19.1.159', install_date: '2023-06-01', history: [{ date: '2024-05-20', event: 'Reported defective' }] },
-        { name: 'N25 PTZ', zone: 'NORTH', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM6', ip: '10.19.1.175', install_date: '2024-08-15', history: [{ date: '2024-09-01', event: 'Initial setup complete' }] },
-        { name: 'C1 PTZ', zone: 'SOUTH', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.19.1.140', install_date: '2023-11-01', history: [{ date: '2024-07-12', event: 'Replaced power supply' }] },
-        { name: 'W1', zone: 'WEST', status: 'No Power', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.19.1.180', install_date: '2024-03-15', history: [{ date: '2024-08-05', event: 'Power outage reported' }] },
-        { name: 'A7 PTZ', zone: 'EAST', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.19.1.130', install_date: '2024-05-20', history: [] }
+        // ============================================================
+        // NORTH ZONE
+        // ============================================================
+        
+        // HIGH MAST
+        {name: "HM3 PTZ", zone: "HIGH MAST", status: "Offline", comments: "Defective - POE added, camera shows signs of being defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 2", ip_address: "172.17.102.218", mac_address: "00-04-7D-27-9F-CF", resolution: "", warranty_expiry: ""},
+        {name: "HM4 PTZ", zone: "HIGH MAST", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.102.219", mac_address: "00-04-7D-27-9F-FF", resolution: "", warranty_expiry: ""},
+        {name: "HM5 PTZ", zone: "HIGH MAST", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 5", ip_address: "172.17.102.223", mac_address: "00-04-7D-27-A0-03", resolution: "", warranty_expiry: ""},
+        {name: "HM5", zone: "HIGH MAST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.222", mac_address: "00-18-85-2F-E7-97", resolution: "", warranty_expiry: ""},
+        {name: "HM5(11)", zone: "HIGH MAST", status: "Online", comments: "Camera had default IP reconfigured", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "HM5(134)", zone: "HIGH MAST", status: "Online", comments: "Camera lens damaged", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "HM8", zone: "HIGH MAST", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.102.221", mac_address: "00-04-7D-27-9F-C9", resolution: "", warranty_expiry: ""},
+        {name: "HM8", zone: "HIGH MAST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.102.220", mac_address: "00-18-85-30-A2-16", resolution: "", warranty_expiry: ""},
+        {name: "HM8 PTZ", zone: "HIGH MAST", status: "Online", comments: "", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "HM10 PTZ", zone: "HIGH MAST", status: "Online", comments: "Camera is reconfigured, had default IP", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.102.224", mac_address: "00-04-7D-27-9F-C8", resolution: "", warranty_expiry: ""},
+        {name: "HM11 PTZ", zone: "HIGH MAST", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.102.225", mac_address: "00-04-7D-27-9F-F0", resolution: "", warranty_expiry: ""},
+        {name: "HM14", zone: "HIGH MAST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.102.212", mac_address: "00-18-85-30-A2-22", resolution: "", warranty_expiry: ""},
+        {name: "HM14 PTZ", zone: "HIGH MAST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "HM14 PTZ 2", zone: "HIGH MAST", status: "Online", comments: "Will be added genetec (172.17.103.200)", model: "", manufacturer: "", archiver: "", ip_address: "172.17.103.200", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "HM23", zone: "HIGH MAST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "HM23 PTZ", zone: "HIGH MAST", status: "Offline", comments: "Defective - cables corroded, overheating", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.102.200", mac_address: "00-04-7D-27-9F-D2", resolution: "", warranty_expiry: ""},
+        {name: "HM24A", zone: "HIGH MAST", status: "Offline", comments: "No Fibre link", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "HM24A PTZ", zone: "HIGH MAST", status: "Offline", comments: "No Fibre link due to HM26 being down", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "HM28 PTZ", zone: "HIGH MAST", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.102.202", mac_address: "00-04-7D-27-9F-D4", resolution: "", warranty_expiry: ""},
+        {name: "Manager Car Park Dome", zone: "HIGH MAST", status: "Online", comments: "Camera lens damaged", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Manager Car Park PTZ", zone: "HIGH MAST", status: "Offline", comments: "Defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.102.186", mac_address: "00-04-7D-27-A0-06", resolution: "", warranty_expiry: ""},
+        {name: "N25 PTZ", zone: "HIGH MAST", status: "Offline", comments: "Defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.102.216", mac_address: "00-04-7D-27-9F-BA", resolution: "", warranty_expiry: ""},
+        {name: "N30", zone: "HIGH MAST", status: "Online", comments: "Camera damaged", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N30 PTZ", zone: "HIGH MAST", status: "Online", comments: "Reset needs to be done", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.102.210", mac_address: "00-04-7D-27-9F-EF", resolution: "", warranty_expiry: ""},
+        {name: "N30 Thermal", zone: "HIGH MAST", status: "Offline", comments: "Cable replacement needed, camera taken down", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N31", zone: "HIGH MAST", status: "Online", comments: "Camera needs to be reset, POE replaced", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N31 PTZ - Context", zone: "HIGH MAST", status: "Offline", comments: "POE injector changed, needs reset, maybe defective", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N31 PTZ - Thermal", zone: "HIGH MAST", status: "Offline", comments: "POE injector changed, camera defective", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N33", zone: "HIGH MAST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N34", zone: "HIGH MAST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N34 PTZ - Context", zone: "HIGH MAST", status: "Offline", comments: "Defective", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N34 PTZ - Thermal", zone: "HIGH MAST", status: "Offline", comments: "No camera on Pole", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Visitor Car Park PTZ 1", zone: "HIGH MAST", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 2", ip_address: "172.17.102.184", mac_address: "00-04-7D-27-9F-C3", resolution: "", warranty_expiry: ""},
+        {name: "Visitor Car Park PTZ 2", zone: "HIGH MAST", status: "Offline", comments: "Replacement/AXIS Q6318-LE 60HZ to be installed", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 2", ip_address: "172.17.102.185", mac_address: "00-04-7D-27-9F-E2", resolution: "", warranty_expiry: ""},
+        
+        // NORTH TERMINAL PERIMETER
+        {name: "N Fence", zone: "NORTH TERMINAL PERIMETER", status: "Online", comments: "Analytics Applied", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "East West Corner Perimeter Rest Bay", zone: "NORTH TERMINAL PERIMETER", status: "Online", comments: "Analytics Applied", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N Terminal NW Corner", zone: "NORTH TERMINAL PERIMETER", status: "Online", comments: "Analytics Applied", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "North South Corner Rest Bay", zone: "NORTH TERMINAL PERIMETER", status: "Online", comments: "Analytics Applied", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "PPE Store Perim N", zone: "NORTH TERMINAL PERIMETER", status: "Online", comments: "Analytics Applied", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "PPE Store Perim PTZ", zone: "NORTH TERMINAL PERIMETER", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.102.203", mac_address: "00-04-7D-27-9F-C1", resolution: "", warranty_expiry: ""},
+        {name: "PPE Store Perim S", zone: "NORTH TERMINAL PERIMETER", status: "Online", comments: "Analytics Applied", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Wharfage Perim", zone: "NORTH TERMINAL PERIMETER", status: "Offline", comments: "Replacement needed", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Wharfage Perim N Exit Gate PTZ", zone: "NORTH TERMINAL PERIMETER", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.102.183", mac_address: "00-04-7D-27-9F-FA", resolution: "", warranty_expiry: ""},
+        
+        // NORTH TERMINAL THERMAL
+        {name: "Refueling N KWC Perim Thermal", zone: "NORTH TERMINAL THERMAL", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N Fence 1 (W) Thermal", zone: "NORTH TERMINAL THERMAL", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N Fence 2 (E) Thermal", zone: "NORTH TERMINAL THERMAL", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N Fence 3 (W) Thermal", zone: "NORTH TERMINAL THERMAL", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N Fence Stripping Warehouse Thermal", zone: "NORTH TERMINAL THERMAL", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "PPE Perim N Thermal", zone: "NORTH TERMINAL THERMAL", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "PPE Perim S Thermal", zone: "NORTH TERMINAL THERMAL", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "S Perim Berth 9 Area Thermal", zone: "NORTH TERMINAL THERMAL", status: "Online", comments: "Analytics Applied", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "W Perim Berth 9 Area Thermal", zone: "NORTH TERMINAL THERMAL", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // ADMIN/HR
+        {name: "ATM Walkway", zone: "ADMIN/HR", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Board N Ceo Secretary", zone: "ADMIN/HR", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Executive 2nd Fl Exit Stair Lower Case", zone: "ADMIN/HR", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Executive 2nd Fl Exit Stair Top Case", zone: "ADMIN/HR", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "HR Meeting Rm Passage", zone: "ADMIN/HR", status: "Online", comments: "Camera refocused", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "HR Waiting Area", zone: "ADMIN/HR", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Lobby HR", zone: "ADMIN/HR", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Meeting RM Passage", zone: "ADMIN/HR", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Payroll Walkway", zone: "ADMIN/HR", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Planning Main Entry", zone: "ADMIN/HR", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Procurement Passage", zone: "ADMIN/HR", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // ENGINEERING
+        {name: "Bathroom Passage 1", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Bathroom Passage 2", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Battery Shop", zone: "ENGINEERING", status: "Online", comments: "Lift Required", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Data Center A", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Data Center B Unit", zone: "ENGINEERING", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 1", ip_address: "172.17.103.108", mac_address: "00-18-85-30-A2-14", resolution: "", warranty_expiry: ""},
+        {name: "Eng Rear Passage", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Eng Workshop 3", zone: "ENGINEERING", status: "Online", comments: "Lift Required", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Engineering East Stair", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Engineering Entry", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Engineering Entry Passage", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Engineering Gym", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Engineering Lunch Room", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Engineering Lunch RM Kitchen", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Engineering Rear Passage", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Engineering Stationary Passage", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Engineering West Stair", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "F Changing Room Exit Passage", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "IT Entry", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "IT Exit", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "IT Stairwell", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Training Room East", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Training Room West", zone: "ENGINEERING", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Tyre Shop", zone: "ENGINEERING", status: "Online", comments: "Lift Required", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // HR TOWERS PTZ
+        {name: "HR Tower 1 PTZ", zone: "HR TOWERS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "HR Tower 2 PTZ", zone: "HR TOWERS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // WELFARE
+        {name: "Canteen East Entry", zone: "WELFARE", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Canteen West Entry", zone: "WELFARE", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Cashier / Service Counter Canteen", zone: "WELFARE", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Dining Area 1 Canteen", zone: "WELFARE", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Dining Area 2 Canteen", zone: "WELFARE", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Welfare Passage", zone: "WELFARE", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // PPE STORE/INVENTORY
+        {name: "Engineering Stationary Passage", zone: "PPE STORE/INVENTORY", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "PPE N Stationary Entry/Exit Gate", zone: "PPE STORE/INVENTORY", status: "Online", comments: "Lift Required", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "PPE Store Entrance", zone: "PPE STORE/INVENTORY", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "PPE Store Inventory", zone: "PPE STORE/INVENTORY", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Store Entrance", zone: "PPE STORE/INVENTORY", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Store Rear Entry N Passage", zone: "PPE STORE/INVENTORY", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Store Warehouse 3", zone: "PPE STORE/INVENTORY", status: "Online", comments: "Lift Required", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Store Warehouse", zone: "PPE STORE/INVENTORY", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // WHARFAGE
+        {name: "Cashier Window 1 Wharfage", zone: "WHARFAGE", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Cashier Window 2 Wharfage", zone: "WHARFAGE", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Cashier Window 3 Wharfage", zone: "WHARFAGE", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Customer / Broker Entry", zone: "WHARFAGE", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Customer/Broker Lobby NW Corner", zone: "WHARFAGE", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Customer/Broker Lobby SE Corner", zone: "WHARFAGE", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Wharfage Office Cashier 1", zone: "WHARFAGE", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Wharfage Office Cashier 2", zone: "WHARFAGE", status: "Online", comments: "Dome needs to be changed", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Wharfage Office Cashier 3", zone: "WHARFAGE", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Wharfage Office Cashier Emergency Door", zone: "WHARFAGE", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Wharfage Office NW Corner", zone: "WHARFAGE", status: "Online", comments: "Ceiling tile replaced", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Wharfage Storage Area/Safe", zone: "WHARFAGE", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Wharfage Staff Entry Office", zone: "WHARFAGE", status: "Online", comments: "Ceiling tile replaced", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // LPR SYSTEM UNITS
+        {name: "Tollgate Entry LPR - LPR", zone: "LPR SYSTEM UNITS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Tollgate Exit LPR", zone: "LPR SYSTEM UNITS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Truck Entry 1 LPR", zone: "LPR SYSTEM UNITS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Truck Entry 2 LPR", zone: "LPR SYSTEM UNITS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Truck Entry LPR 3", zone: "LPR SYSTEM UNITS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Truck Entry LPR 4", zone: "LPR SYSTEM UNITS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Truck Exit LPR", zone: "LPR SYSTEM UNITS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // PORT ENTRY EXIT
+        {name: "Toll Booth Exit PTZ", zone: "PORT ENTRY EXIT", status: "Online", comments: "Lift required", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Toll Gate Entry PTZ", zone: "PORT ENTRY EXIT", status: "Online", comments: "Lift required", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Car Park 3", zone: "PORT ENTRY EXIT", status: "Online", comments: "Lift required", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Exit Gate", zone: "PORT ENTRY EXIT", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Gate Office E Side Outside", zone: "PORT ENTRY EXIT", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "KFTL Port Main Entry Exit", zone: "PORT ENTRY EXIT", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "MainEntry/Exit Security Walkway", zone: "PORT ENTRY EXIT", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Toll Gate Entry", zone: "PORT ENTRY EXIT", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Toll Gate Exit", zone: "PORT ENTRY EXIT", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Tollgate Entry LPR - Context", zone: "PORT ENTRY EXIT", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Tollgate Exit LPR - Context", zone: "PORT ENTRY EXIT", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Truck Entry 1", zone: "PORT ENTRY EXIT", status: "Online", comments: "Analytics Applied", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Truck Entry 1 LPR Context", zone: "PORT ENTRY EXIT", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Truck Entry 2", zone: "PORT ENTRY EXIT", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Truck entry 2 LPR - Context", zone: "PORT ENTRY EXIT", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Truck Entry LPR 3 - Context", zone: "PORT ENTRY EXIT", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Truck Entry LPR 4 - Context", zone: "PORT ENTRY EXIT", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Truck Exit", zone: "PORT ENTRY EXIT", status: "Online", comments: "Analytics Applied", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Truck Exit LPR - Context", zone: "PORT ENTRY EXIT", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Truck Guard House Exit", zone: "PORT ENTRY EXIT", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // OTHERS
+        {name: "Broker Parking area", zone: "OTHERS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Car Park 1", zone: "OTHERS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Car Park 2", zone: "OTHERS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Car Park 4", zone: "OTHERS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Car Park 5", zone: "OTHERS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Car Park 6", zone: "OTHERS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Gate Office Eastern Side", zone: "OTHERS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Monitoring Room 1", zone: "OTHERS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Monitoring Room 2", zone: "OTHERS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Productions Turn Style", zone: "OTHERS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Radio Room", zone: "OTHERS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Recreation Area Rest Bay", zone: "OTHERS", status: "Online", comments: "Camera replaced - RESOLVED", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Registry Entry Passage", zone: "OTHERS", status: "Offline", comments: "Offline", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Registry Office Passage Rear", zone: "OTHERS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Registry Passage to Warehouse", zone: "OTHERS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Rest Bay Turn Style", zone: "OTHERS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Security Dept West Side 1", zone: "OTHERS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Security Dept West Side 2", zone: "OTHERS", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "HR Building Rear Walkway", zone: "OTHERS", status: "Offline", comments: "Offline", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // CRANES
+        {name: "Crane K", zone: "CRANES", status: "Online", comments: "Crane is offline due to Maintenance", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Crane M", zone: "CRANES", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Crane S", zone: "CRANES", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Crane A", zone: "CRANES", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Crane B", zone: "CRANES", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Crane N", zone: "CRANES", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Crane O", zone: "CRANES", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Crane P", zone: "CRANES", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Crane Q", zone: "CRANES", status: "Online", comments: "Crane is offline due to Maintenance", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Crane C Under", zone: "CRANES", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Crane D Under", zone: "CRANES", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Crane C Backreach", zone: "CRANES", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Crane T", zone: "CRANES", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Crane Y", zone: "CRANES", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Crane U", zone: "CRANES", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Crane R", zone: "CRANES", status: "Online", comments: "Switch replaced with Blind Spot switch", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Crane Z", zone: "CRANES", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Crane L", zone: "CRANES", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Crane V", zone: "CRANES", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // VET OFFICE
+        {name: "Vet Waiting Area", zone: "VET OFFICE", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Vet Office 2 Window", zone: "VET OFFICE", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Vet Office entry Walkway", zone: "VET OFFICE", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Scanning Area 1", zone: "VET OFFICE", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Scanning Area 2", zone: "VET OFFICE", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Vet Office 1", zone: "VET OFFICE", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // ============================================================
+        // WEST ZONE
+        // ============================================================
+        {name: "W1", zone: "WEST", status: "Online", comments: "RESOLVED - Network connection come from W2", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.155", mac_address: "00-18-85-30-A2-10", resolution: "", warranty_expiry: ""},
+        {name: "W2", zone: "WEST", status: "Online", comments: "RESOLVED - Power Supply for switch replaced", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "W3", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.230", mac_address: "00-18-85-2F-E7-9C", resolution: "", warranty_expiry: ""},
+        {name: "W4", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.232", mac_address: "00-18-85-30-A2-1A", resolution: "", warranty_expiry: ""},
+        {name: "W5", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.228", mac_address: "00-18-85-30-A2-0F", resolution: "", warranty_expiry: ""},
+        {name: "W6", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.233", mac_address: "00-18-85-2F-0B-A6", resolution: "", warranty_expiry: ""},
+        {name: "W7", zone: "WEST", status: "Online", comments: "Ends recrimped. Cable is water logged, water seeping through.", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.234", mac_address: "00-18-85-30-A2-1F", resolution: "", warranty_expiry: ""},
+        {name: "W8", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 4", ip_address: "172.17.102.235", mac_address: "00-18-85-30-A2-17", resolution: "", warranty_expiry: ""},
+        {name: "W9", zone: "WEST", status: "Online", comments: "Firmware Update Done POE injector added", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 4", ip_address: "172.17.102.236", mac_address: "00-18-85-30-A2-2C", resolution: "", warranty_expiry: ""},
+        {name: "W10", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 4", ip_address: "172.17.102.231", mac_address: "00-18-85-30-A2-1D", resolution: "", warranty_expiry: ""},
+        {name: "W11", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.239", mac_address: "00-18-85-30-A2-52", resolution: "", warranty_expiry: ""},
+        {name: "W12", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.240", mac_address: "00-18-85-30-A2-4C", resolution: "", warranty_expiry: ""},
+        {name: "W13", zone: "WEST", status: "Offline", comments: "Damaged by VTR, cable needs to be replaced", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.102.241", mac_address: "00-18-85-30-A2-29", resolution: "", warranty_expiry: ""},
+        {name: "W16", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.242", mac_address: "00-18-85-30-A2-4F", resolution: "", warranty_expiry: ""},
+        {name: "WB11", zone: "WEST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "W Perim 6 Adjacent W9", zone: "WEST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // WEST PTZ
+        {name: "W1 PTZ", zone: "WEST", status: "Online", comments: "RESOLVED - Network connection from W2", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "W2 PTZ", zone: "WEST", status: "Online", comments: "RESOLVED - Power Supply for switch replaced", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "W3 PTZ", zone: "WEST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "W4 PTZ", zone: "WEST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "W5 PTZ", zone: "WEST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "W6 PTZ", zone: "WEST", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 2", ip_address: "172.17.102.248", mac_address: "00-04-7D-27-9F-ED", resolution: "", warranty_expiry: ""},
+        {name: "W7 PTZ", zone: "WEST", status: "Online", comments: "Ends recrimped. Cable is water logged, water seeping through.Camera is operational", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "W8 PTZ", zone: "WEST", status: "Offline", comments: "Firmware Update Done POE injector added,Unable to pan, camera has blank screen is defective", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "W9 PTZ", zone: "WEST", status: "Online", comments: "Firmware Update Done POE injector added", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "W11 PTZ", zone: "WEST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "W12 PTZ", zone: "WEST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "W13 PTZ", zone: "WEST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "W16 PTZ", zone: "WEST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "WB1 PTZ - Stream 1", zone: "WEST", status: "Online", comments: "RESOLVED - Replacement done P14767-LE. Camera defective replaced June 17th", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "W Perim PTZ", zone: "WEST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "WB11 PTZ", zone: "WEST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "WB1 PTZ", zone: "WEST", status: "Online", comments: "RESOLVED - Camera replaced by P1467 Bullet", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // WEST THERMAL
+        {name: "W Perim 1 Thermal Adjacent to W4", zone: "WEST", status: "Offline", comments: "No camera on pole", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "W Perim 2 Thermal Adjacent to W7", zone: "WEST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "W Perim 3 Thermal Adjacent to W7", zone: "WEST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "W Perim 4 Thermal Adjacent to W9", zone: "WEST", status: "Offline", comments: "No camera on pole", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "W Perim 5 Thermal Adjacent to W4", zone: "WEST", status: "Offline", comments: "No camera on pole", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "WB11 Thermal", zone: "WEST", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // ============================================================
+        // SOUTH ZONE
+        // ============================================================
+        
+        // A STILL
+        {name: "A1", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "A2", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "A3", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "A4", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "A5", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "A6", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "A7", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "A8", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "A9", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "A10", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "A11", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "A12", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "A13 (197)", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "A13 (192)", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "A14", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 3", ip_address: "172.17.103.5", mac_address: "00-18-85-2F-E7-88", resolution: "", warranty_expiry: ""},
+        
+        // A PTZ
+        {name: "A1 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.30", mac_address: "00-04-7D-27-9F-CB", resolution: "", warranty_expiry: ""},
+        {name: "A2 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 5", ip_address: "172.17.103.144", mac_address: "00-04-7D-27-9F-C4", resolution: "", warranty_expiry: ""},
+        {name: "A3 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.32", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "A4 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.33", mac_address: "00-04-7D-27-A0-00", resolution: "", warranty_expiry: ""},
+        {name: "A5 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.103.34", mac_address: "00-04-7D-27-9F-C6", resolution: "", warranty_expiry: ""},
+        {name: "A6 PTZ", zone: "SOUTH", status: "Online", comments: "Camera on default, reconfigured", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.103.35", mac_address: "00-04-7D-27-9F-FC", resolution: "", warranty_expiry: ""},
+        {name: "A7 PTZ", zone: "SOUTH", status: "Offline", comments: "Camera defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.103.36", mac_address: "00-04-7D-27-9F-CA", resolution: "", warranty_expiry: ""},
+        {name: "A8 PTZ", zone: "SOUTH", status: "Offline", comments: "Camera defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.103.37", mac_address: "00-04-7D-27-9F-F9", resolution: "", warranty_expiry: ""},
+        {name: "A9 PTZ Context Stream", zone: "SOUTH", status: "Offline", comments: "Camera defective", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "A10 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.39", mac_address: "00-04-7D-27-9F-F3", resolution: "", warranty_expiry: ""},
+        {name: "A11 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.40", mac_address: "00-04-7D-27-A0-0A", resolution: "", warranty_expiry: ""},
+        {name: "A12 PTZ", zone: "SOUTH", status: "Online", comments: "Body adjusted", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.41", mac_address: "00-04-7D-27-9F-FD", resolution: "", warranty_expiry: ""},
+        {name: "A13 PTZ Stream 1", zone: "SOUTH", status: "Offline", comments: "Camera defective", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "A13 PTZ Thermal", zone: "SOUTH", status: "Offline", comments: "cable tested good, cable ends are good, no POE light present. Camera defective", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "A9 PTZ Thermal", zone: "SOUTH", status: "Offline", comments: "cable tested good, cable ends are good, no POE light present. Camera defective", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "A13 Strad Park", zone: "SOUTH", status: "Online", comments: "Adjusted, Steel Straps replaced", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "A14 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // B STILL
+        {name: "B1 (216)", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "B1 (363)", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "B2", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "B3", zone: "SOUTH", status: "Online", comments: "RESOLVED - weatherproof box falling off pole, needs attention", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "B5 (209)", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "B5 (212)", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "B5 (217)", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "B6 (218)", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "B6 (211)", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "B7 (213)", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "B7 (215)", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "B8", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 4", ip_address: "172.17.103.54", mac_address: "00-18-85-2F-E7-93", resolution: "", warranty_expiry: ""},
+        {name: "B9", zone: "SOUTH", status: "Online", comments: "RESOLVED - Cable replaced(5/6/2026), Weather proof box needs to be attached correctly", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 1", ip_address: "172.17.103.55", mac_address: "00-18-85-2F-E7-C2", resolution: "", warranty_expiry: ""},
+        {name: "B10", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "B11", zone: "SOUTH", status: "Online", comments: "RESOLVED - Cable was replaced (6/24/2026)", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.57", mac_address: "00-18-85-30-A2-56", resolution: "", warranty_expiry: ""},
+        {name: "B12", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.58", mac_address: "00-18-85-2F-E7-95", resolution: "", warranty_expiry: ""},
+        {name: "B13", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.59", mac_address: "00-18-85-2F-E7-ED", resolution: "", warranty_expiry: ""},
+        {name: "B14", zone: "SOUTH", status: "Online", comments: "Obstacles, unable to clean", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.7", mac_address: "00-18-85-2F-E7-98", resolution: "", warranty_expiry: ""},
+        
+        // B PTZ
+        {name: "B1 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.60", mac_address: "00-04-7D-27-9F-F6", resolution: "", warranty_expiry: ""},
+        {name: "B2 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.61", mac_address: "00-04-7D-27-9F-F7", resolution: "", warranty_expiry: ""},
+        {name: "B3 PTZ", zone: "SOUTH", status: "Online", comments: "RESOLVED - CONFIRMED ONLINE June 8th", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.46", mac_address: "00-18-85-30-A2-3D", resolution: "", warranty_expiry: ""},
+        {name: "B5 PTZ", zone: "SOUTH", status: "Offline", comments: "Only Pole mount present", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.63", mac_address: "00-04-7D-27-9F-EB", resolution: "", warranty_expiry: ""},
+        {name: "B6 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.64", mac_address: "00-04-7D-27-9F-F8", resolution: "", warranty_expiry: ""},
+        {name: "B7 PTZ", zone: "SOUTH", status: "Online", comments: "RESOLVED - REPLACED CAMERA on 5/6/2026", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 1", ip_address: "172.17.103.52", mac_address: "00-18-85-30-A2-32", resolution: "", warranty_expiry: ""},
+        {name: "B8 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.66", mac_address: "00-04-7D-27-9F-BD", resolution: "", warranty_expiry: ""},
+        {name: "B9 PTZ", zone: "SOUTH", status: "Online", comments: "RESOLVED - Cable Replacement done", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.67", mac_address: "00-04-7D-27-9F-C2", resolution: "", warranty_expiry: ""},
+        {name: "B10 PTZ", zone: "SOUTH", status: "Online", comments: "POE replaced with SW perim PTZ POE", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.68", mac_address: "00-04-7D-27-A0-02", resolution: "", warranty_expiry: ""},
+        {name: "B11 PTZ", zone: "SOUTH", status: "Online", comments: "RESOLVED - Cable was replaced (6/24/2026)", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.69", mac_address: "00-04-7D-27-F4-30", resolution: "", warranty_expiry: ""},
+        {name: "B12 PTZ", zone: "SOUTH", status: "Online", comments: "Camera was reset to default IP adjustments made.", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.70", mac_address: "00-04-7D-27-9F-F5", resolution: "", warranty_expiry: ""},
+        {name: "B14 PTZ", zone: "SOUTH", status: "Online", comments: "Obstacles, unable to clean", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // C STILL
+        {name: "C1", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.71", mac_address: "00-18-85-30-A2-40", resolution: "", warranty_expiry: ""},
+        {name: "C2", zone: "SOUTH", status: "Online", comments: "Obstacles, unable to clean.", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.72", mac_address: "00-18-85-30-A2-51", resolution: "", warranty_expiry: ""},
+        {name: "C4", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.73", mac_address: "00-18-85-2F-E7-8E", resolution: "", warranty_expiry: ""},
+        {name: "C5 (236)", zone: "SOUTH", status: "Offline", comments: "Camera Defective", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.75", mac_address: "00-18-85-2F-E7-B8", resolution: "", warranty_expiry: ""},
+        {name: "C5 (237)", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.74", mac_address: "00-18-85-2F-E7-A4", resolution: "", warranty_expiry: ""},
+        {name: "C9 (285)", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.77", mac_address: "00-18-85-30-A2-2D", resolution: "", warranty_expiry: ""},
+        {name: "C9 (286)", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "C11", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.78", mac_address: "00-18-85-30-A2-28", resolution: "", warranty_expiry: ""},
+        {name: "C12 (239)", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.79", mac_address: "00-18-85-2F-E7-89", resolution: "", warranty_expiry: ""},
+        {name: "C12 (240)", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.80", mac_address: "00-18-85-30-A2-21", resolution: "", warranty_expiry: ""},
+        
+        // C PTZ
+        {name: "C1 PTZ (243)", zone: "SOUTH", status: "Offline", comments: "Camera is defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.103.81", mac_address: "00-04-7D-27-9F-F2", resolution: "", warranty_expiry: ""},
+        {name: "C2 PTZ", zone: "SOUTH", status: "Online", comments: "Obstacles, unable to clean.", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 5", ip_address: "172.17.103.82", mac_address: "00-04-7D-27-9F-D0", resolution: "", warranty_expiry: ""},
+        {name: "C4 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.83", mac_address: "00-04-7D-27-F4-32", resolution: "", warranty_expiry: ""},
+        {name: "C9 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.143", mac_address: "00-04-7D-27-9F-D3", resolution: "", warranty_expiry: ""},
+        {name: "C11 PTZ", zone: "SOUTH", status: "Offline", comments: "Only Pole mount present", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.85", mac_address: "00-04-7D-27-F4-2A", resolution: "", warranty_expiry: ""},
+        {name: "C12 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // D STILL
+        {name: "D1", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.87", mac_address: "00-18-85-30-A2-24", resolution: "", warranty_expiry: ""},
+        {name: "D2", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.88", mac_address: "00-18-85-30-A2-1B", resolution: "", warranty_expiry: ""},
+        {name: "D4", zone: "SOUTH", status: "Online", comments: "RESOLVED - CONFIRMED ONLINE June 8th", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.89", mac_address: "00-18-85-30-A2-2A", resolution: "", warranty_expiry: ""},
+        {name: "D5", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.90", mac_address: "00-18-85-2F-E7-FF", resolution: "", warranty_expiry: ""},
+        {name: "D6", zone: "SOUTH", status: "Online", comments: "RESOLVED - Cable Replacement done", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 4", ip_address: "172.17.103.106", mac_address: "00-18-85-2F-0B-93", resolution: "", warranty_expiry: ""},
+        {name: "D7", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.92", mac_address: "00-18-85-30-A2-26", resolution: "", warranty_expiry: ""},
+        {name: "D8", zone: "SOUTH", status: "Online", comments: "RESOLVED - No Fibre Cable Replacement done", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.93", mac_address: "00-18-85-30-A2-11", resolution: "", warranty_expiry: ""},
+        {name: "D11", zone: "SOUTH", status: "Offline", comments: "No camera on Pole", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "D12", zone: "SOUTH", status: "Online", comments: "Obstacles, unable to clean.", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.105", mac_address: "00-04-7D-27-9F-BE", resolution: "", warranty_expiry: ""},
+        
+        // D PTZ
+        {name: "D1 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "D2 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "D4 PTZ", zone: "SOUTH", status: "Online", comments: "RESOLVED - CONFIRMED ONLINE June 8th", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 2", ip_address: "172.17.103.99", mac_address: "00-04-7D-27-A0-05", resolution: "", warranty_expiry: ""},
+        {name: "D5 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 2", ip_address: "172.17.103.100", mac_address: "00-04-7D-27-F4-2F", resolution: "", warranty_expiry: ""},
+        {name: "D6 PTZ", zone: "SOUTH", status: "Online", comments: "RESOLVED - Cable replacement done", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "D7 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "D8 PTZ", zone: "SOUTH", status: "Online", comments: "RESOLVED - Cable Replacement done (16/5/2026)", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "D10 PTZ", zone: "SOUTH", status: "Online", comments: "Obstacles, unable to clean.", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 5", ip_address: "172.17.103.104", mac_address: "00-04-7D-27-DD-C2", resolution: "", warranty_expiry: ""},
+        {name: "D12 PTZ", zone: "SOUTH", status: "Online", comments: "Camera moved to Archiver 3", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.105", mac_address: "00-04-7D-27-9F-BE", resolution: "", warranty_expiry: ""},
+        
+        // E STILL & PTZ
+        {name: "E 2", zone: "SOUTH", status: "Online", comments: "Analytics configured", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 3", ip_address: "172.17.103.11", mac_address: "00-18-85-2F-E7-92", resolution: "", warranty_expiry: ""},
+        {name: "E2 PTZ", zone: "SOUTH", status: "Online", comments: "RESOLVED - Replaced with B7 old removed camera (5/7/2026)", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // SOUTH THERMAL
+        {name: "D4 Thermal", zone: "SOUTH", status: "Online", comments: "Analytics Applied", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "D6 Perim Fence Thermal 2", zone: "SOUTH", status: "Online", comments: "Analytics Applied", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "D6 Perim Fence Thermal", zone: "SOUTH", status: "Online", comments: "Analytics Applied", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "D8 Thermal", zone: "SOUTH", status: "Offline", comments: "No fibre link", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "D8 Thermal 2", zone: "SOUTH", status: "Offline", comments: "No fibre link", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "D11 Thermal", zone: "SOUTH", status: "Online", comments: "Analytics Applied", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "MEZ SE Corner Thermal", zone: "SOUTH", status: "Online", comments: "Analytics Applied", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "South Perim 2 Thermal", zone: "SOUTH", status: "Online", comments: "Analytics Applied", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "South Perim Thermal", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "South East Tower Thermal", zone: "SOUTH", status: "Online", comments: "RESOLVED - REPLACED on 6/23/2026", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // SOUTH OTHERS
+        {name: "MEZ SW Corner", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "MEZ SE Corner PTZ", zone: "SOUTH", status: "Online", comments: "Online POE needed.", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "South Perim PTZ - Context", zone: "SOUTH", status: "Online", comments: "Working", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "South Perim PTZ", zone: "SOUTH", status: "Offline", comments: "Camera defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.86", mac_address: "00-04-7D-27-9F-CC", resolution: "", warranty_expiry: ""},
+        {name: "South Perim PTZ Thermal", zone: "SOUTH", status: "Offline", comments: "Camera defective", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // SE TOWER
+        {name: "SE Tower PTZ - Thermal", zone: "SOUTH", status: "Online", comments: "Needs injector", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // ============================================================
+        // JIEIC WAREHOUSE
+        // ============================================================
+        {name: "S Bay T", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N Bay 2", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N Bay 5", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N Bay 7", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N Bay 8", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Obstacle blocking area", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N Bay 9", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N Bay 10", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N Bay 11", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N Bay 12", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N Platform 1 Stripping", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "N Platform 2 Stripping", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "NE Corner Stripping", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "NW Corner Stripping", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Rear Entry/ Exit", zone: "JIEIC WAREHOUSE", status: "Online", comments: "RESOLVED - Camera replaced 6/20/2026", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "S Bay AB", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "S Bay CD", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "S Bay EF", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "S Bay G", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "S Bay HI", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "S Bay J", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "S Bay KL", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "S Bay M", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "S Bay NO", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "S Bay PQ", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "S Bay RS", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "S Bay U", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "SE Corner Stripping", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Security Station N Pedestrian Gate", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "SW Corner Perimeter 1 Stripping", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "SW Corner Perimeter 2 Stripping", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "SW Corner Stripping", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Warehouse Passage", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Warehouse Walkway N Parking", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Analytics applied", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        
+        // JIEIC WAREHOUSE PTZ
+        {name: "SW Corner Perim PTZ", zone: "JIEIC WAREHOUSE", status: "Online", comments: "RESOLVED - REPLACED (6/29/2026)", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.102.155", mac_address: "00-04-7D-27-A0-04", resolution: "", warranty_expiry: ""},
+        {name: "Warehouse Central PTZ 2", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""},
+        {name: "Warehouse Central PTZ", zone: "JIEIC WAREHOUSE", status: "Online", comments: "Switch rebooted and port bandwidth adjusted", model: "", manufacturer: "", archiver: "", ip_address: "", mac_address: "", resolution: "", warranty_expiry: ""}
       ],
       doors: [
-        { name: 'Main Entrance', zone: 'Security Office', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Shanice Vernon', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-01-01', history: [{ date: '2024-06-10', event: 'Routine maintenance' }] },
-        { name: '2nd Entrance', zone: 'SAL Duty Office', status: 'Offline', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Marvin Grant', doorSwing: 'Out', accessType: 'Read In + Push Out', antiPassback: 'No', controllerType: 'Integrated', install_date: '2024-02-15', history: [{ date: '2024-05-30', event: 'Offline alert' }] }
+        {name: "Main Entrance", zone: "Security Office", status: "Online", reader: "HID Prox", lock: "Magnetic", powered: "Yes", tech: "Shanice Vernon", doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "Yes", controllerType: "Standalone", install_date: "2024-01-01", history: [{time: "08:00", event: "Door installed"}]},
+        {name: "2nd Entrance", zone: "SAL Duty Office", status: "Offline", reader: "HID Prox", lock: "Magnetic", powered: "Yes", tech: "Marvin Grant", doorSwing: "Out", accessType: "Read In + Push Out", antiPassback: "No", controllerType: "Integrated", install_date: "2024-02-15", history: [{time: "09:30", event: "Offline reported"}]}
       ],
       servers: [
-        { name: 'J1013DDR', zone: 'Kingport', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', serial: 'J1013DDR', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5, LPR', install_date: '2024-01-15', history: [{ date: '2024-07-01', event: 'Firmware update' }] },
-        { name: 'J1013DDV', zone: 'Kingport', status: 'ONLINE', make: 'HP', model: 'ProLiant DL380', serial: 'J1013DDV', capacity: '6.11TB', used: '1.4TB', health: 'Good, Failed drive', apps: 'Ocularis DM6, Eyelock', install_date: '2023-06-01', history: [{ date: '2024-06-20', event: 'Drive replacement advised' }] }
+        {name: "J1013DDR", zone: "Kingport", status: "ONLINE", make: "Dell", model: "PowerEdge R740", serial: "J1013DDR", capacity: "6.11TB", used: "1.4TB", health: "Good (23%)", apps: "Ocularis DM5, LPR", install_date: "2024-01-15", history: [{date: "2024-07-01", event: "Firmware update"}]},
+        {name: "J1013DDV", zone: "Kingport", status: "ONLINE", make: "HP", model: "ProLiant DL380", serial: "J1013DDV", capacity: "6.11TB", used: "1.4TB", health: "Good, Failed drive", apps: "Ocularis DM6, Eyelock", install_date: "2023-06-01", history: [{date: "2024-06-20", event: "Drive replacement advised"}]}
       ],
       switches: [
-        { name: 'Main Entrance', zone: 'Security Office', status: 'Online', model: 'AXIS T8508', ip_address: '10.19.1.21', firmware: '6.54.2739', install_date: '2024-02-01', history: [{ date: '2024-07-15', event: 'Firmware updated' }] },
-        { name: '2nd entrance', zone: 'SAL Duty Office', status: 'Online', model: 'AXIS T8516', ip_address: '10.19.1.23', firmware: '6.54.2739', install_date: '2024-03-15', history: [] }
+        {name: "Main Entrance", zone: "Security Office", status: "Online", model: "AXIS T8508", ip_address: "10.19.1.21", firmware: "6.54.2739", install_date: "2024-02-01", history: [{date: "2024-07-15", event: "Firmware updated"}]},
+        {name: "2nd entrance", zone: "SAL Duty Office", status: "Online", model: "AXIS T8516", ip_address: "10.19.1.23", firmware: "6.54.2739", install_date: "2024-03-15", history: []}
       ]
     },
     srs: [
@@ -2526,174 +2960,6 @@ var CLIENTS_VIEW_DATA = {
       { time: '09:15', msg: 'Camera HM11 PTZ marked as Defective', type: 'warning' },
       { time: '10:00', msg: 'Server J1013DDR health check passed', type: 'success' },
       { time: '11:45', msg: 'Door 2nd Entrance offline alert', type: 'urgent' }
-    ]
-  },
-  'kwl': {
-    name: 'KWL',
-    logo: 'logo-kwl.png',
-    color: '#1e3a8a',
-    secondary: '#1e40af',
-    assets: {
-      cameras: [
-        { name: 'TP-01', zone: 'Tinson Pen', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '172.16.19.91', install_date: '2024-04-01', history: [{ date: '2024-07-10', event: 'Camera recalibrated' }] },
-        { name: 'TP-02', zone: 'Tinson Pen', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '172.16.19.92', install_date: '2024-05-15', history: [] },
-        { name: 'WH-01', zone: 'Warehouse 1', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '172.16.20.10', install_date: '2024-03-01', history: [{ date: '2024-06-20', event: 'Lens cleaned' }] }
-      ],
-      doors: [
-        { name: 'Warehouse Main', zone: 'Warehouse 1', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Ackeem', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-02-01', history: [{ date: '2024-05-15', event: 'Battery replaced' }] }
-      ],
-      servers: [
-        { name: 'KWL-SRV-01', zone: 'Tinson Pen', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', serial: 'KWL-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-01-01', history: [] }
-      ],
-      switches: [
-        { name: 'TP Switch 1', zone: 'Tinson Pen', status: 'Online', model: 'AXIS T8508', ip_address: '10.19.1.21', firmware: '6.54.2739', install_date: '2024-02-15', history: [{ date: '2024-06-01', event: 'Port configuration updated' }] }
-      ]
-    },
-    srs: [
-      { id: 'SR-1848', subject: '5 Cameras Offline - Tinson Pen', priority: 'High', status: 'In Progress', date: 'Jun 15, 2026' }
-    ],
-    activity: [
-      { time: '07:00', msg: 'SR-1848 escalated to High priority', type: 'urgent' },
-      { time: '09:30', msg: 'Marvin dispatched to Tinson Pen', type: 'info' },
-      { time: '13:00', msg: 'Camera TP-01 back online', type: 'success' }
-    ]
-  },
-  'lasco': {
-    name: 'Lasco',
-    logo: 'logo-lasco.png',
-    color: '#ec4899',
-    secondary: '#db2777',
-    assets: {
-      cameras: [
-        { name: 'LP-01', zone: 'Liquid Plant', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.20.1.10', install_date: '2024-02-01', history: [{ date: '2024-06-10', event: 'Firmware updated' }] },
-        { name: 'LP-02', zone: 'Liquid Plant', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.20.1.11', install_date: '2024-03-15', history: [] },
-        { name: 'LDL-01', zone: 'LDL Warehouse', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.20.2.20', install_date: '2024-01-15', history: [{ date: '2024-05-20', event: 'Lens cleaned' }] },
-        { name: 'LML-01', zone: 'LML B Liquid Plant', status: 'Offline', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.20.3.30', install_date: '2023-12-01', history: [{ date: '2024-06-01', event: 'Power outage reported' }] }
-      ],
-      doors: [
-        { name: 'Main Gate', zone: 'Liquid Plant', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Shanice Vernon', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-01-15', history: [{ date: '2024-05-15', event: 'Routine maintenance' }] }
-      ],
-      servers: [
-        { name: 'LASCO-SRV-01', zone: 'Liquid Plant', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', serial: 'LASCO-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-01-01', history: [] }
-      ],
-      switches: [
-        { name: 'LP Switch 1', zone: 'Liquid Plant', status: 'Online', model: 'AXIS T8508', ip_address: '10.20.1.21', firmware: '6.54.2739', install_date: '2024-02-01', history: [{ date: '2024-06-01', event: 'Port configuration updated' }] }
-      ]
-    },
-    srs: [
-      { id: 'SR-1850', subject: 'Camera LML-01 Offline', priority: 'Medium', status: 'Open', date: 'Jun 17, 2026' }
-    ],
-    activity: [
-      { time: '06:30', msg: 'Camera LML-01 reported offline', type: 'urgent' },
-      { time: '08:00', msg: 'SR-1850 assigned to Marvin', type: 'info' }
-    ]
-  },
-  'nestle': {
-    name: 'Nestle',
-    logo: 'logo-nestle.png',
-    color: '#dc2626',
-    secondary: '#b91c1c',
-    assets: {
-      cameras: [
-        { name: 'NE-01', zone: 'Main Plant', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.21.1.10', install_date: '2024-03-01', history: [] },
-        { name: 'NE-02', zone: 'Main Plant', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.21.1.11', install_date: '2024-04-15', history: [{ date: '2024-07-01', event: 'Firmware updated' }] },
-        { name: 'NE-03', zone: 'Warehouse', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.21.2.20', install_date: '2024-02-15', history: [{ date: '2024-06-15', event: 'Lens cleaned' }] }
-      ],
-      doors: [
-        { name: 'Plant Main', zone: 'Main Plant', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Ackeem', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-03-01', history: [{ date: '2024-06-20', event: 'Battery replaced' }] }
-      ],
-      servers: [
-        { name: 'NESTLE-SRV-01', zone: 'Main Plant', status: 'ONLINE', make: 'HP', model: 'ProLiant DL380', serial: 'NESTLE-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-02-01', history: [] }
-      ],
-      switches: [
-        { name: 'NE Switch 1', zone: 'Main Plant', status: 'Online', model: 'AXIS T8516', ip_address: '10.21.1.21', firmware: '6.54.2739', install_date: '2024-03-15', history: [] }
-      ]
-    },
-    srs: [],
-    activity: [
-      { time: '09:00', msg: 'System health check passed', type: 'success' },
-      { time: '11:30', msg: 'Camera NE-03 lens cleaned', type: 'info' }
-    ]
-  },
-  'nids': {
-    name: 'NIDS',
-    logo: 'logo-nids.png',
-    color: '#059669',
-    secondary: '#d4af37',
-    assets: {
-      cameras: [
-        { name: 'NIDS-01', zone: 'Main Office', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.22.1.10', install_date: '2024-01-15', history: [{ date: '2024-06-01', event: 'Firmware updated' }] },
-        { name: 'NIDS-02', zone: 'Main Office', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.22.1.11', install_date: '2024-03-01', history: [] }
-      ],
-      doors: [
-        { name: 'Office Main', zone: 'Main Office', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Shavine', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-02-01', history: [{ date: '2024-05-20', event: 'Routine maintenance' }] }
-      ],
-      servers: [
-        { name: 'NIDS-SRV-01', zone: 'Main Office', status: 'ONLINE', make: 'Lenovo', model: 'ThinkSystem SR650', serial: 'NIDS-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-01-01', history: [] }
-      ],
-      switches: [
-        { name: 'NIDS Switch 1', zone: 'Main Office', status: 'Online', model: 'AXIS T8508', ip_address: '10.22.1.21', firmware: '6.54.2739', install_date: '2024-02-15', history: [] }
-      ]
-    },
-    srs: [],
-    activity: [
-      { time: '07:30', msg: 'System online - all assets operational', type: 'success' }
-    ]
-  },
-  'nutrien': {
-    name: 'Nutrien',
-    logo: 'logo-nutrien.png',
-    color: '#22c55e',
-    secondary: '#16a34a',
-    assets: {
-      cameras: [
-        { name: 'NU-01', zone: 'Main Plant', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.23.1.10', install_date: '2024-03-15', history: [{ date: '2024-06-30', event: 'Firmware updated' }] },
-        { name: 'NU-02', zone: 'Main Plant', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.23.1.11', install_date: '2024-04-01', history: [] },
-        { name: 'NU-03', zone: 'Warehouse', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.23.2.20', install_date: '2024-02-01', history: [{ date: '2024-06-20', event: 'Lens cleaned' }] }
-      ],
-      doors: [
-        { name: 'Plant Main', zone: 'Main Plant', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Marvin Grant', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-03-01', history: [{ date: '2024-06-10', event: 'Battery replaced' }] }
-      ],
-      servers: [
-        { name: 'NUTRIEN-SRV-01', zone: 'Main Plant', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', serial: 'NUTRIEN-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-02-15', history: [] }
-      ],
-      switches: [
-        { name: 'NU Switch 1', zone: 'Main Plant', status: 'Online', model: 'AXIS T8516', ip_address: '10.23.1.21', firmware: '6.54.2739', install_date: '2024-03-15', history: [{ date: '2024-06-01', event: 'Port configuration updated' }] }
-      ]
-    },
-    srs: [],
-    activity: [
-      { time: '08:00', msg: 'System health check - all nominal', type: 'success' },
-      { time: '10:30', msg: 'Camera NU-03 lens cleaned', type: 'info' }
-    ]
-  },
-  'fidelity': {
-    name: 'Fidelity Motors',
-    logo: 'logo-fidelity.png',
-    color: '#b91c1c',
-    secondary: '#7f1d1d',
-    assets: {
-      cameras: [
-        { name: 'FM-01', zone: 'Showroom', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.24.1.10', install_date: '2024-03-15', history: [{ date: '2024-06-20', event: 'Firmware updated' }] },
-        { name: 'FM-02', zone: 'Showroom', status: 'Online', model: 'AXIS Q6075', resolution: '4K', archiver: 'DM5', ip: '10.24.1.11', install_date: '2024-04-01', history: [] },
-        { name: 'FM-03', zone: 'Service Center', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.24.2.20', install_date: '2024-02-15', history: [{ date: '2024-06-10', event: 'Lens cleaned' }] },
-        { name: 'FM-04', zone: 'Service Center', status: 'Online', model: 'AXIS P5635', resolution: '1080p', archiver: 'DM5', ip: '10.24.2.21', install_date: '2024-05-01', history: [] }
-      ],
-      doors: [
-        { name: 'Showroom Main', zone: 'Showroom', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Shanice Vernon', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-03-01', history: [{ date: '2024-06-15', event: 'Routine maintenance' }] },
-        { name: 'Service Center Main', zone: 'Service Center', status: 'Online', reader: 'HID Prox', lock: 'Magnetic', powered: 'Yes', tech: 'Marvin Grant', doorSwing: 'In', accessType: 'Read In + Read Out', antiPassback: 'Yes', controllerType: 'Standalone', install_date: '2024-04-01', history: [] }
-      ],
-      servers: [
-        { name: 'FIDELITY-SRV-01', zone: 'Showroom', status: 'ONLINE', make: 'Dell', model: 'PowerEdge R740', serial: 'FIDELITY-SRV-01', capacity: '6.11TB', used: '1.4TB', health: 'Good (23%)', apps: 'Ocularis DM5', install_date: '2024-02-01', history: [] }
-      ],
-      switches: [
-        { name: 'FM Switch 1', zone: 'Showroom', status: 'Online', model: 'AXIS T8508', ip_address: '10.24.1.21', firmware: '6.54.2739', install_date: '2024-03-15', history: [{ date: '2024-06-01', event: 'Port configuration updated' }] }
-      ]
-    },
-    srs: [],
-    activity: [
-      { time: '08:30', msg: 'All systems online', type: 'success' },
-      { time: '10:00', msg: 'Camera FM-04 installed', type: 'info' }
     ]
   }
 };
@@ -2731,7 +2997,6 @@ function buildClientView(data, user) {
   var container = document.getElementById('client-view-container');
   if (!container) return;
   
-  // Make sure container fills the viewport
   container.style.display = 'block';
   container.style.height = '100vh';
   container.style.overflow = 'hidden';
@@ -2740,13 +3005,11 @@ function buildClientView(data, user) {
   var primaryColor = data.color || '#e31b23';
   var secondaryColor = data.secondary || '#8b0000';
   
-  // Apply client colors to the container
   container.style.setProperty('--client-primary', primaryColor);
   container.style.setProperty('--client-secondary', secondaryColor);
   
   var html = '';
   
-  // Get time of day for greeting
   var hour = new Date().getHours();
   var greeting = 'Good ';
   if (hour < 12) greeting += 'Morning';
@@ -2756,19 +3019,18 @@ function buildClientView(data, user) {
   
   var clientName = data.name || 'Client';
   
-  // Get current date for greeting message
   var now = new Date();
   var dateStr = now.toLocaleDateString('en-JM', { weekday: 'long', month: 'long', day: 'numeric' });
   
-  // Calculate client-specific stats
   var totalCameras = data.assets && data.assets.cameras ? data.assets.cameras.length : 0;
   var totalDoors = data.assets && data.assets.doors ? data.assets.doors.length : 0;
   var totalServers = data.assets && data.assets.servers ? data.assets.servers.length : 0;
   var totalSwitches = data.assets && data.assets.switches ? data.assets.switches.length : 0;
   var totalDevices = totalCameras + totalDoors + totalServers + totalSwitches;
   
-  // Calculate health, alerts, offline, open SRs for this client
-  var defective = data.assets && data.assets.cameras ? data.assets.cameras.filter(function(c) { return c.status === 'Defective' || c.status === 'Offline' || c.status === 'No Power' || c.status === 'No Camera'; }).length : 0;
+  var defective = data.assets && data.assets.cameras ? data.assets.cameras.filter(function(c) { 
+    return c.status === 'Defective' || c.status === 'Offline' || c.status === 'No Power' || c.status === 'No Camera'; 
+  }).length : 0;
   var acOffline = data.assets && data.assets.doors ? data.assets.doors.filter(function(d) { return d.status === 'Offline'; }).length : 0;
   var swOffline = data.assets && data.assets.switches ? data.assets.switches.filter(function(s) { return s.status !== 'Online'; }).length : 0;
   var srvOffline = data.assets && data.assets.servers ? data.assets.servers.filter(function(s) { return s.status === 'OFFLINE'; }).length : 0;
@@ -2777,7 +3039,6 @@ function buildClientView(data, user) {
   var health = totalDevices > 0 ? Math.round((onlineDevices / totalDevices) * 100) : 100;
   var openSRs = data.srs ? data.srs.filter(function(r) { return r.status !== 'Resolved'; }).length : 0;
   
-  // ===== HEADER - WHITE BACKGROUND =====
   html += '<div style="background:#ffffff;padding:8px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;min-height:50px;">';
   html += '<div style="display:flex;align-items:center;gap:12px;">';
   html += '<img src="' + (data.logo || 'logo.png') + '" style="height:28px;width:auto;" onerror="this.style.display=\'none\'" />';
@@ -2789,17 +3050,13 @@ function buildClientView(data, user) {
   html += '<button onclick="logoutClientView()" style="background:rgba(0,0,0,0.06);border:1px solid rgba(0,0,0,0.1);color:#555;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:11px;font-family:var(--font);transition:all 0.2s;" onmouseover="this.style.background=\'rgba(0,0,0,0.12)\'" onmouseout="this.style.background=\'rgba(0,0,0,0.06)\'">Logout</button>';
   html += '</div></div>';
   
-  // ===== MAIN LAYOUT =====
   html += '<div style="display:flex;flex:1;overflow:hidden;min-height:0;">';
   
-  // ===== SIDEBAR =====
   html += '<div style="width:200px;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border);padding:12px 0;overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;">';
   
-  // Main section
   html += '<div class="nav-section" style="padding:8px 20px 4px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;">Main</div>';
   html += '<div class="nav-item active" data-tab="dashboard" onclick="switchClientViewTab(\'dashboard\', this)" style="padding:9px 20px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;border-left:2px solid var(--accent);background:rgba(79,140,247,0.08);"><i class="ti ti-layout-dashboard" style="font-size:17px;width:20px;text-align:center;"></i> <span>Dashboard</span></div>';
   
-  // Assets section
   html += '<div class="nav-section" style="padding:8px 20px 4px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-top:4px;">Assets</div>';
   
   if (totalCameras > 0) {
@@ -2815,7 +3072,6 @@ function buildClientView(data, user) {
     html += '<div class="nav-item" data-tab="switches" onclick="switchClientViewTab(\'switches\', this)" style="padding:9px 20px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;border-left:2px solid transparent;"><i class="ti ti-router" style="font-size:17px;width:20px;text-align:center;"></i> <span>Switches</span></div>';
   }
   
-  // Support section
   html += '<div class="nav-section" style="padding:8px 20px 4px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-top:4px;">Support</div>';
   html += '<div class="nav-item" data-tab="srs" onclick="switchClientViewTab(\'srs\', this)" style="padding:9px 20px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;border-left:2px solid transparent;"><i class="ti ti-clipboard-list" style="font-size:17px;width:20px;text-align:center;"></i> <span>Service Requests</span></div>';
   html += '<div class="nav-item" data-tab="support" onclick="switchClientViewTab(\'support\', this)" style="padding:9px 20px;cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;gap:10px;font-size:13px;border-left:2px solid transparent;"><i class="ti ti-headset" style="font-size:17px;width:20px;text-align:center;"></i> <span>Contact Support</span></div>';
@@ -2823,13 +3079,10 @@ function buildClientView(data, user) {
   html += '<div style="flex:1;"></div>';
   html += '</div>';
   
-  // ===== CONTENT AREA =====
   html += '<div style="flex:1;overflow-y:auto;padding:20px 24px;background:var(--main-bg);min-height:0;" id="client-view-content">';
   
-  // ===== DASHBOARD TAB =====
   html += '<div id="client-tab-dashboard" class="client-tab-content">';
   
-  // Custom Greeting Message with red background
   html += '<div style="background:linear-gradient(135deg, ' + primaryColor + ', ' + secondaryColor + ');border-radius:12px;padding:28px 32px;margin-bottom:20px;position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(227,27,35,0.3);">';
   html += '<div style="position:relative;z-index:1;">';
   html += '<div style="font-size:14px;color:rgba(255,255,255,0.85);font-weight:500;margin-bottom:2px;letter-spacing:0.04em;">' + greeting + ', ' + clientName + '! 👋</div>';
@@ -2846,7 +3099,6 @@ function buildClientView(data, user) {
   html += '</div>';
   html += '</div></div></div>';
   
-  // Emergency banner (if there are alerts)
   var hasAlerts = defective > 0 || acOffline > 0 || swOffline > 0 || srvOffline > 0;
   if (hasAlerts) {
     var alertMsg = '';
@@ -2862,7 +3114,6 @@ function buildClientView(data, user) {
     html += '</div>';
   }
   
-  // Stats cards - RED with white text
   html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">';
   
   html += '<div style="background:linear-gradient(135deg, ' + primaryColor + ', ' + secondaryColor + ');border-radius:10px;padding:16px 18px;box-shadow:0 2px 12px rgba(227,27,35,0.2);">';
@@ -2891,10 +3142,8 @@ function buildClientView(data, user) {
   
   html += '</div>';
   
-  // Today's Activity & Open Service Requests
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">';
   
-  // Activity
   html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px 20px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">';
   html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">';
   html += '<span style="font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;">Today\'s Activity</span>';
@@ -2910,7 +3159,6 @@ function buildClientView(data, user) {
   }
   html += '</div></div>';
   
-  // Open Service Requests
   html += '<div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px 20px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">';
   html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">';
   html += '<span style="font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;">Open Service Requests</span>';
@@ -2933,9 +3181,8 @@ function buildClientView(data, user) {
   }
   html += '</tbody></table></div></div></div>';
   
-  html += '</div>'; // End dashboard tab
+  html += '</div>';
   
-  // ===== CAMERAS TAB =====
   html += '<div id="client-tab-cameras" class="client-tab-content" style="display:none;">';
   html += '<div class="panel" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px 20px;position:relative;">';
   html += '<div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">';
@@ -2948,7 +3195,7 @@ html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;lette
     html += '<tbody>';
     data.assets.cameras.forEach(function(cam) {
       var statusBadge = cam.status === 'Online' ? 'b-done' : cam.status === 'Defective' ? 'b-high' : cam.status === 'No Power' ? 'b-high' : cam.status === 'No Camera' ? 'b-open' : 'b-info';
-      html += '<tr><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + cam.zone + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + cam.name + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-family:monospace;font-size:11px;">' + (cam.ip || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="badge ' + statusBadge + '" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + cam.status + '</span></td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.comments || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.model || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.manufacturer || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.resolution || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.archiver || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-family:monospace;font-size:10px;">' + (cam.mac_address || '—') + '</td></tr>';
+      html += '<tr><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + cam.zone + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + cam.name + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-family:monospace;font-size:11px;">' + (cam.ip_address || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="badge ' + statusBadge + '" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + cam.status + '</span></td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.comments || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.model || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.manufacturer || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.resolution || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.archiver || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-family:monospace;font-size:10px;">' + (cam.mac_address || '—') + '</td></tr>';
     });
     html += '</tbody></table></div>';
   } else {
@@ -2956,7 +3203,6 @@ html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;lette
   }
   html += '</div></div>';
   
-  // ===== DOORS TAB =====
   html += '<div id="client-tab-doors" class="client-tab-content" style="display:none;">';
   if (data.assets && data.assets.doors && data.assets.doors.length > 0) {
     html += '<div style="max-height:calc(100vh - 180px);overflow-y:auto;padding-right:4px;">';
@@ -2979,7 +3225,6 @@ html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;lette
       html += '<span style="font-size:11px;color:var(--text-muted);">' + (door.tech || 'Unassigned') + '</span>';
       html += '</div>';
       
-      // Reader Section
       html += '<div class="door-component-section" style="margin-bottom:12px;border-left:3px solid #3b82f6;padding-left:12px;">';
       html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
       html += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">📡 Reader</span>';
@@ -2992,7 +3237,6 @@ html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;lette
       html += '<div><span style="color:var(--text-muted);">Warranty:</span> <span style="color:var(--text-primary);">' + getWarrantyDisplay(door.reader_warranty) + '</span></div>';
       html += '</div></div>';
       
-      // Access Type Section
       html += '<div class="door-component-section" style="margin-bottom:12px;border-left:3px solid #8b5cf6;padding-left:12px;">';
       html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
       html += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">🔑 Access Type</span>';
@@ -3003,7 +3247,6 @@ html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;lette
       html += '<div><span style="color:var(--text-muted);">Anti-Passback:</span> <span style="color:var(--text-primary);">' + (door.antiPassback || 'No') + '</span></div>';
       html += '</div></div>';
       
-      // Lock Section
       html += '<div class="door-component-section" style="margin-bottom:12px;border-left:3px solid #f59e0b;padding-left:12px;">';
       html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
       html += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">🔒 Lock</span>';
@@ -3015,7 +3258,6 @@ html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;lette
       html += '<div><span style="color:var(--text-muted);">Warranty:</span> <span style="color:var(--text-primary);">' + getWarrantyDisplay(door.lock_warranty) + '</span></div>';
       html += '</div></div>';
       
-      // Sensor Section
       html += '<div class="door-component-section" style="margin-bottom:12px;border-left:3px solid #22c55e;padding-left:12px;">';
       html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
       html += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">🚪 Door Sensor</span>';
@@ -3027,7 +3269,6 @@ html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;lette
       html += '<div><span style="color:var(--text-muted);">Warranty:</span> <span style="color:var(--text-primary);">' + getWarrantyDisplay(door.sensor_warranty) + '</span></div>';
       html += '</div></div>';
       
-      // Closer Section
       html += '<div class="door-component-section" style="margin-bottom:4px;border-left:3px solid #ec4899;padding-left:12px;">';
       html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
       html += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">🚪 Door Closer</span>';
@@ -3045,8 +3286,6 @@ html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;lette
         html += '</div>';
       }
       
-      // Removed the 6 edit buttons per request
-      
       if (door.ip) {
         html += '<div style="display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--card-border);flex-wrap:wrap;">';
         html += '<button class="btn btn-sm" onclick="pingDoorIP(\'' + door.ip + '\')"><i class="ti ti-network"></i> Ping</button>';
@@ -3061,7 +3300,6 @@ html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;lette
   }
   html += '</div>';
   
-  // ===== SERVERS TAB =====
   html += '<div id="client-tab-servers" class="client-tab-content" style="display:none;">';
   html += '<div class="panel" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px 20px;position:relative;">';
   html += '<div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">';
@@ -3086,7 +3324,6 @@ html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;lette
   }
   html += '</div></div>';
   
-  // ===== SWITCHES TAB =====
   html += '<div id="client-tab-switches" class="client-tab-content" style="display:none;">';
   html += '<div class="panel" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px 20px;position:relative;">';
   html += '<div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">';
@@ -3110,7 +3347,6 @@ html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;lette
   }
   html += '</div></div>';
   
-  // ===== SERVICE REQUESTS TAB =====
   html += '<div id="client-tab-srs" class="client-tab-content" style="display:none;">';
   html += '<div class="panel" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px 20px;position:relative;">';
   html += '<div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">';
@@ -3134,7 +3370,6 @@ html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;lette
   }
   html += '</div></div>';
   
-  // ===== CONTACT SUPPORT TAB =====
   html += '<div id="client-tab-support" class="client-tab-content" style="display:none;">';
   html += '<div class="panel" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:18px 20px;position:relative;max-width:600px;">';
   html += '<div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">';
@@ -3148,11 +3383,10 @@ html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;lette
   html += '</div>';
   html += '</div></div>';
   
-  html += '</div></div>'; // End content and main layout
+  html += '</div></div>';
   
   container.innerHTML = html;
   
-  // Set initial active state styles
   var activeItem = container.querySelector('.nav-item.active');
   if (activeItem) {
     activeItem.style.background = 'rgba(79,140,247,0.08)';
@@ -3162,7 +3396,6 @@ html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;lette
 }
 
 function switchClientViewTab(tab, element) {
-  // Update active state
   document.querySelectorAll('#client-view-container .nav-item').forEach(function(el) {
     el.classList.remove('active');
     el.style.background = '';
@@ -3177,7 +3410,6 @@ function switchClientViewTab(tab, element) {
     element.style.color = 'var(--text-primary)';
   }
   
-  // Show the right tab content
   document.querySelectorAll('#client-view-container .client-tab-content').forEach(function(el) {
     el.style.display = 'none';
   });
@@ -3193,7 +3425,6 @@ function switchClientViewTab(tab, element) {
 // ============================================================
 
 function openClientSRModal() {
-  // Create modal overlay
   var overlay = document.createElement('div');
   overlay.id = 'client-sr-modal';
   overlay.className = 'modal-overlay open';
@@ -3264,7 +3495,6 @@ function submitClientSR() {
   SERVICE_REQUESTS.unshift(newSR);
   localStorage.setItem('ccsm_sr', JSON.stringify(SERVICE_REQUESTS));
   
-  // Add to client's own SR list
   if (clientViewData && clientViewData.srs) {
     clientViewData.srs.unshift({
       id: id,
@@ -3278,9 +3508,7 @@ function submitClientSR() {
   closeClientSRModal();
   toast('Service Request ' + id + ' submitted!', 'success');
   
-  // Rebuild client view to show new SR
   buildClientView(clientViewData, clientViewUser);
-  // Switch to SRS tab
   var container = document.getElementById('client-view-container');
   if (container) {
     var srsTab = container.querySelector('.nav-item[onclick*="srs"]');
@@ -3393,7 +3621,6 @@ function loadMockData() {
     localStorage.setItem('ccsm_clients', JSON.stringify(CLIENTS));
   }
 
-  // Set client for each asset based on zone
   CAMERAS.forEach(function(c) {
     if (!c.client) c.client = getClient(c.zone);
   });
@@ -3430,398 +3657,21 @@ function loadMockData() {
 // ============================================================
 
 function getEmbeddedCameras() {
-  return [
-    {name: "N25 PTZ", zone: "NORTH", status: "Offline", comments: "Defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.102.216", mac_address: "00-04-7D-27-9F-BA", resolution: "", warranty_expiry: ""},
-    {name: "B8 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.66", mac_address: "00-04-7D-27-9F-BD", resolution: "", warranty_expiry: ""},
-    {name: "D12 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.105", mac_address: "00-04-7D-27-9F-BE", resolution: "", warranty_expiry: ""},
-    {name: "PPE Store Perim PTZ", zone: "NORTH TERMINAL PERIMETER", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.102.203", mac_address: "00-04-7D-27-9F-C1", resolution: "", warranty_expiry: ""},
-    {name: "B9 PTZ", zone: "SOUTH", status: "Offline", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.67", mac_address: "00-04-7D-27-9F-C2", resolution: "", warranty_expiry: ""},
-    {name: "Visitor Car Park Ptz 1", zone: "HIGH MAST", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 2", ip_address: "172.17.102.184", mac_address: "00-04-7D-27-9F-C3", resolution: "", warranty_expiry: ""},
-    {name: "A2 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 5", ip_address: "172.17.103.144", mac_address: "00-04-7D-27-9F-C4", resolution: "", warranty_expiry: ""},
-    {name: "A5 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.103.34", mac_address: "00-04-7D-27-9F-C6", resolution: "", warranty_expiry: ""},
-    {name: "HM10 PTZ", zone: "HIGH MAST", status: "Online", comments: "Camera is reconfigured, had default IP", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.102.224", mac_address: "00-04-7D-27-9F-C8", resolution: "", warranty_expiry: ""},
-    {name: "HM8 PTZ", zone: "HIGH MAST", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.102.221", mac_address: "00-04-7D-27-9F-C9", resolution: "", warranty_expiry: ""},
-    {name: "A7 PTZ", zone: "SOUTH", status: "Offline", comments: "Camera defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.103.36", mac_address: "00-04-7D-27-9F-CA", resolution: "", warranty_expiry: ""},
-    {name: "A1 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.30", mac_address: "00-04-7D-27-9F-CB", resolution: "", warranty_expiry: ""},
-    {name: "South Perim PTZ", zone: "SOUTH", status: "Offline", comments: "Camera defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.86", mac_address: "00-04-7D-27-9F-CC", resolution: "", warranty_expiry: ""},
-    {name: "HM3 PTZ", zone: "HIGH MAST", status: "Offline", comments: "POE added, camera shows signs of being defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 2", ip_address: "172.17.102.218", mac_address: "00-04-7D-27-9F-CF", resolution: "", warranty_expiry: ""},
-    {name: "C2 PTZ", zone: "SOUTH", status: "Online", comments: "Obstacles, unable to clean", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 5", ip_address: "172.17.103.82", mac_address: "00-04-7D-27-9F-D0", resolution: "", warranty_expiry: ""},
-    {name: "HM23 PTZ", zone: "HIGH MAST", status: "Offline", comments: "cables ends corroded, camera overheating, defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.102.200", mac_address: "00-04-7D-27-9F-D2", resolution: "", warranty_expiry: ""},
-    {name: "C9 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.143", mac_address: "00-04-7D-27-9F-D3", resolution: "", warranty_expiry: ""},
-    {name: "HM28 PTZ", zone: "HIGH MAST", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.102.202", mac_address: "00-04-7D-27-9F-D4", resolution: "", warranty_expiry: ""},
-    {name: "Visitor Car Park Ptz 2", zone: "HIGH MAST", status: "Offline", comments: "REPLACEMENT/AXIS Q6318-LE 60HZ to be installed", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 2", ip_address: "172.17.102.185", mac_address: "00-04-7D-27-9F-E2", resolution: "", warranty_expiry: ""},
-    {name: "B5 PTZ", zone: "SOUTH", status: "Offline", comments: "Only Pole mount present", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.63", mac_address: "00-04-7D-27-9F-EB", resolution: "", warranty_expiry: ""},
-    {name: "W6 PTZ", zone: "WEST", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 2", ip_address: "172.17.102.248", mac_address: "00-04-7D-27-9F-ED", resolution: "", warranty_expiry: ""},
-    {name: "N30 PTZ", zone: "HIGH MAST", status: "Online", comments: "Reset needs to be done", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.102.210", mac_address: "00-04-7D-27-9F-EF", resolution: "", warranty_expiry: ""},
-    {name: "HM11 PTZ", zone: "HIGH MAST", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.102.225", mac_address: "00-04-7D-27-9F-F0", resolution: "", warranty_expiry: ""},
-    {name: "C1 PTZ", zone: "SOUTH", status: "Offline", comments: "Camera is defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.103.81", mac_address: "00-04-7D-27-9F-F2", resolution: "", warranty_expiry: ""},
-    {name: "A10 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.39", mac_address: "00-04-7D-27-9F-F3", resolution: "", warranty_expiry: ""},
-    {name: "B12 PTZ", zone: "SOUTH", status: "Online", comments: "Camera was reset to default IP adjustments made.", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.70", mac_address: "00-04-7D-27-9F-F5", resolution: "", warranty_expiry: ""},
-    {name: "B1 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.60", mac_address: "00-04-7D-27-9F-F6", resolution: "", warranty_expiry: ""},
-    {name: "B2 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.61", mac_address: "00-04-7D-27-9F-F7", resolution: "", warranty_expiry: ""},
-    {name: "B6 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.64", mac_address: "00-04-7D-27-9F-F8", resolution: "", warranty_expiry: ""},
-    {name: "A8 PTZ", zone: "SOUTH", status: "Offline", comments: "Camera defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.103.37", mac_address: "00-04-7D-27-9F-F9", resolution: "", warranty_expiry: ""},
-    {name: "Wharfage Perim N Exit Gate PTZ", zone: "NORTH TERMINAL PERIMETER", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.102.183", mac_address: "00-04-7D-27-9F-FA", resolution: "", warranty_expiry: ""},
-    {name: "Toll Gate Entry PTZ", zone: "Port Entry Exit", status: "Online", comments: "Lift required", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.102.182", mac_address: "00-04-7D-27-9F-FB", resolution: "", warranty_expiry: ""},
-    {name: "A6 PTZ", zone: "SOUTH", status: "Online", comments: "Camera on default, reconfigured", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.103.35", mac_address: "00-04-7D-27-9F-FC", resolution: "", warranty_expiry: ""},
-    {name: "A12 PTZ", zone: "SOUTH", status: "Online", comments: "Body adjusted", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.41", mac_address: "00-04-7D-27-9F-FD", resolution: "", warranty_expiry: ""},
-    {name: "HM4 PTZ", zone: "HIGH MAST", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.102.219", mac_address: "00-04-7D-27-9F-FF", resolution: "", warranty_expiry: ""},
-    {name: "A4 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.33", mac_address: "00-04-7D-27-A0-00", resolution: "", warranty_expiry: ""},
-    {name: "B10 PTZ", zone: "SOUTH", status: "Online", comments: "POE replaced with SW perim PTZ POE", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.68", mac_address: "00-04-7D-27-A0-02", resolution: "", warranty_expiry: ""},
-    {name: "HM5 PTZ", zone: "HIGH MAST", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 5", ip_address: "172.17.102.223", mac_address: "00-04-7D-27-A0-03", resolution: "", warranty_expiry: ""},
-    {name: "SW Corner Perim PTZ", zone: "JIEIC Warehouse", status: "Online", comments: "To be replaced", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.102.155", mac_address: "00-04-7D-27-A0-04", resolution: "", warranty_expiry: ""},
-    {name: "D4 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 2", ip_address: "172.17.103.99", mac_address: "00-04-7D-27-A0-05", resolution: "", warranty_expiry: ""},
-    {name: "Manager Car Park PTZ", zone: "HIGH MAST", status: "Offline", comments: "Defective", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.102.186", mac_address: "00-04-7D-27-A0-06", resolution: "", warranty_expiry: ""},
-    {name: "A11 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.40", mac_address: "00-04-7D-27-A0-0A", resolution: "", warranty_expiry: ""},
-    {name: "D10 PTZ", zone: "SOUTH", status: "Online", comments: "Obstacles, unable to clean", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 5", ip_address: "172.17.103.104", mac_address: "00-04-7D-27-DD-C2", resolution: "", warranty_expiry: ""},
-    {name: "C11 PTZ", zone: "SOUTH", status: "Offline", comments: "Only Pole mount present", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.85", mac_address: "00-04-7D-27-F4-2A", resolution: "", warranty_expiry: ""},
-    {name: "D5 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 2", ip_address: "172.17.103.100", mac_address: "00-04-7D-27-F4-2F", resolution: "", warranty_expiry: ""},
-    {name: "B11 PTZ", zone: "SOUTH", status: "Online", comments: "Cable was replaced (6/24/2026)", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 3", ip_address: "172.17.103.69", mac_address: "00-04-7D-27-F4-30", resolution: "", warranty_expiry: ""},
-    {name: "W2 PTZ", zone: "WEST", status: "Offline", comments: "Switch needs power supply replacement", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 4", ip_address: "172.17.102.244", mac_address: "00-04-7D-27-F4-31", resolution: "", warranty_expiry: ""},
-    {name: "C4 PTZ", zone: "SOUTH", status: "Online", comments: "Working", model: "P2820-ESR", manufacturer: "pelco", archiver: "Archiver 1", ip_address: "172.17.103.83", mac_address: "00-04-7D-27-F4-32", resolution: "", warranty_expiry: ""},
-    {name: "D6", zone: "SOUTH", status: "Online", comments: "Cable replacement done", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 4", ip_address: "172.17.103.106", mac_address: "00-18-85-2F-0B-93", resolution: "", warranty_expiry: ""},
-    {name: "W6", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.233", mac_address: "00-18-85-2F-0B-A6", resolution: "", warranty_expiry: ""},
-    {name: "A14", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 3", ip_address: "172.17.103.5", mac_address: "00-18-85-2F-E7-88", resolution: "", warranty_expiry: ""},
-    {name: "C12", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.79", mac_address: "00-18-85-2F-E7-89", resolution: "", warranty_expiry: ""},
-    {name: "C4", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.73", mac_address: "00-18-85-2F-E7-8E", resolution: "", warranty_expiry: ""},
-    {name: "E2", zone: "SOUTH", status: "Online", comments: "Replaced with B7 old removed camera", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 3", ip_address: "172.17.103.11", mac_address: "00-18-85-2F-E7-92", resolution: "", warranty_expiry: ""},
-    {name: "B8", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 4", ip_address: "172.17.103.54", mac_address: "00-18-85-2F-E7-93", resolution: "", warranty_expiry: ""},
-    {name: "B12", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.58", mac_address: "00-18-85-2F-E7-95", resolution: "", warranty_expiry: ""},
-    {name: "HM5", zone: "HIGH MAST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.222", mac_address: "00-18-85-2F-E7-97", resolution: "", warranty_expiry: ""},
-    {name: "B14", zone: "SOUTH", status: "Online", comments: "Obstacles, unable to clean", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.7", mac_address: "00-18-85-2F-E7-98", resolution: "", warranty_expiry: ""},
-    {name: "W3", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.230", mac_address: "00-18-85-2F-E7-9C", resolution: "", warranty_expiry: ""},
-    {name: "C5", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.74", mac_address: "00-18-85-2F-E7-A4", resolution: "", warranty_expiry: ""},
-    {name: "C5", zone: "SOUTH", status: "Offline", comments: "Camera Defective", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.75", mac_address: "00-18-85-2F-E7-B8", resolution: "", warranty_expiry: ""},
-    {name: "B9", zone: "SOUTH", status: "Online", comments: "Cable Replacement done", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 1", ip_address: "172.17.103.55", mac_address: "00-18-85-2F-E7-C2", resolution: "", warranty_expiry: ""},
-    {name: "B13", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.59", mac_address: "00-18-85-2F-E7-ED", resolution: "", warranty_expiry: ""},
-    {name: "D5", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.90", mac_address: "00-18-85-2F-E7-FF", resolution: "", warranty_expiry: ""},
-    {name: "W5", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.228", mac_address: "00-18-85-30-A2-0F", resolution: "", warranty_expiry: ""},
-    {name: "W1", zone: "WEST", status: "Offline", comments: "Cabinet box and lock damaged therefore no power or connectivity", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.155", mac_address: "00-18-85-30-A2-10", resolution: "", warranty_expiry: ""},
-    {name: "D8", zone: "SOUTH", status: "Online", comments: "No Fibre Cable Replacement done", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.93", mac_address: "00-18-85-30-A2-11", resolution: "", warranty_expiry: ""},
-    {name: "Data Center B Unit", zone: "ENGINEERING", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 1", ip_address: "172.17.103.108", mac_address: "00-18-85-30-A2-14", resolution: "", warranty_expiry: ""},
-    {name: "HM8", zone: "HIGH MAST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.102.220", mac_address: "00-18-85-30-A2-16", resolution: "", warranty_expiry: ""},
-    {name: "W8", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 4", ip_address: "172.17.102.235", mac_address: "00-18-85-30-A2-17", resolution: "", warranty_expiry: ""},
-    {name: "W4", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.232", mac_address: "00-18-85-30-A2-1A", resolution: "", warranty_expiry: ""},
-    {name: "D2", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.88", mac_address: "00-18-85-30-A2-1B", resolution: "", warranty_expiry: ""},
-    {name: "W10", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 4", ip_address: "172.17.102.231", mac_address: "00-18-85-30-A2-1D", resolution: "", warranty_expiry: ""},
-    {name: "W7", zone: "WEST", status: "Online", comments: "Ends recrimped. Cable is water logged, water seeping through.", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.234", mac_address: "00-18-85-30-A2-1F", resolution: "", warranty_expiry: ""},
-    {name: "C12", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.80", mac_address: "00-18-85-30-A2-21", resolution: "", warranty_expiry: ""},
-    {name: "HM14", zone: "HIGH MAST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.102.212", mac_address: "00-18-85-30-A2-22", resolution: "", warranty_expiry: ""},
-    {name: "D1", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.87", mac_address: "00-18-85-30-A2-24", resolution: "", warranty_expiry: ""},
-    {name: "D7", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.92", mac_address: "00-18-85-30-A2-26", resolution: "", warranty_expiry: ""},
-    {name: "C11", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.78", mac_address: "00-18-85-30-A2-28", resolution: "", warranty_expiry: ""},
-    {name: "W13", zone: "WEST", status: "Offline", comments: "Damaged by VTR, cable needs to be replaced", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.102.241", mac_address: "00-18-85-30-A2-29", resolution: "", warranty_expiry: ""},
-    {name: "D4", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.89", mac_address: "00-18-85-30-A2-2A", resolution: "", warranty_expiry: ""},
-    {name: "W9", zone: "WEST", status: "Online", comments: "Firmware Update Done POE injector added", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 4", ip_address: "172.17.102.236", mac_address: "00-18-85-30-A2-2C", resolution: "", warranty_expiry: ""},
-    {name: "C9", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.77", mac_address: "00-18-85-30-A2-2D", resolution: "", warranty_expiry: ""},
-    {name: "B5", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 1", ip_address: "172.17.103.49", mac_address: "00-18-85-30-A2-2E", resolution: "", warranty_expiry: ""},
-    {name: "B1", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.44", mac_address: "00-18-85-30-A2-2F", resolution: "", warranty_expiry: ""},
-    {name: "B7", zone: "SOUTH", status: "Online", comments: "REPLACED CAMERA on 5/6/2026 Old camera installed at E2", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 1", ip_address: "172.17.103.52", mac_address: "00-18-85-30-A2-32", resolution: "", warranty_expiry: ""},
-    {name: "B10", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.56", mac_address: "00-18-85-30-A2-34", resolution: "", warranty_expiry: ""},
-    {name: "B5", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 1", ip_address: "172.17.103.48", mac_address: "00-18-85-30-A2-35", resolution: "", warranty_expiry: ""},
-    {name: "B2", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.45", mac_address: "00-18-85-30-A2-37", resolution: "", warranty_expiry: ""},
-    {name: "B1", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.43", mac_address: "00-18-85-30-A2-3B", resolution: "", warranty_expiry: ""},
-    {name: "B3", zone: "SOUTH", status: "Online", comments: "Camera to be replaced, Arm needed", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 1", ip_address: "172.17.103.46", mac_address: "00-18-85-30-A2-3D", resolution: "", warranty_expiry: ""},
-    {name: "C9", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.76", mac_address: "00-18-85-30-A2-3E", resolution: "", warranty_expiry: ""},
-    {name: "C1", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.71", mac_address: "00-18-85-30-A2-40", resolution: "", warranty_expiry: ""},
-    {name: "B5", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.47", mac_address: "00-18-85-30-A2-41", resolution: "", warranty_expiry: ""},
-    {name: "B6", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 1", ip_address: "172.17.103.51", mac_address: "00-18-85-30-A2-42", resolution: "", warranty_expiry: ""},
-    {name: "B7", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 1", ip_address: "172.17.103.53", mac_address: "00-18-85-30-A2-48", resolution: "", warranty_expiry: ""},
-    {name: "W12", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.240", mac_address: "00-18-85-30-A2-4C", resolution: "", warranty_expiry: ""},
-    {name: "W16", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.242", mac_address: "00-18-85-30-A2-4F", resolution: "", warranty_expiry: ""},
-    {name: "C2", zone: "SOUTH", status: "Online", comments: "Obstacles, unable to clean", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 5", ip_address: "172.17.103.72", mac_address: "00-18-85-30-A2-51", resolution: "", warranty_expiry: ""},
-    {name: "W11", zone: "WEST", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.102.239", mac_address: "00-18-85-30-A2-52", resolution: "", warranty_expiry: ""},
-    {name: "B11", zone: "SOUTH", status: "Online", comments: "Cable was replaced (6/24/2026)", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 2", ip_address: "172.17.103.57", mac_address: "00-18-85-30-A2-56", resolution: "", warranty_expiry: ""},
-    {name: "B6", zone: "SOUTH", status: "Online", comments: "Working", model: "5.0C-H5A-DP2", manufacturer: "Avigilon", archiver: "Archiver 1", ip_address: "172.17.103.50", mac_address: "00-18-85-30-A2-5A", resolution: "", warranty_expiry: ""},
-    {name: "N34 PTZ", zone: "NORTH TERMINAL PERIMETER", status: "Offline", comments: "No camera on Pole", model: "DX-624", manufacturer: "FLIR Systems", archiver: "Archiver 1", ip_address: "172.17.102.204", mac_address: "00-1B-D8-90-07-DC", resolution: "", warranty_expiry: ""},
-    {name: "A13 PTZ", zone: "SOUTH", status: "Offline", comments: "cable tested good, cable ends are good, no POE light present", model: "DX-612", manufacturer: "FLIR Systems", archiver: "Archiver 1", ip_address: "172.17.103.42", mac_address: "00-1B-D8-90-07-E3", resolution: "", warranty_expiry: ""},
-    {name: "A9 PTZ", zone: "SOUTH", status: "Offline", comments: "cable tested good, cable ends are good, no POE light present", model: "DX-612", manufacturer: "FLIR Systems", archiver: "Archiver 4", ip_address: "172.17.103.38", mac_address: "00-1B-D8-90-07-F2", resolution: "", warranty_expiry: ""},
-    {name: "N31 PTZ", zone: "NORTH TERMINAL PERIMETER", status: "Offline", comments: "POE injector changed, Camera needs reset", model: "DX-624", manufacturer: "FLIR Systems", archiver: "Archiver 4", ip_address: "172.17.102.207", mac_address: "00-1B-D8-90-07-FA", resolution: "", warranty_expiry: ""},
-    {name: "Truck Entry 1 LPR", zone: "LPR System Units", status: "Online", comments: "Working", model: "AutoVu SharpOS", manufacturer: "AutoVu", archiver: "Archiver 1", ip_address: "172.17.103.186", mac_address: "0C-BF-15-01-A1-5F", resolution: "", warranty_expiry: ""},
-    {name: "Truck Entry 2 LPR", zone: "LPR System Units", status: "Online", comments: "Working", model: "AutoVu SharpOS", manufacturer: "AutoVu", archiver: "Archiver 1", ip_address: "172.17.103.167", mac_address: "0C-BF-15-01-A1-A6", resolution: "", warranty_expiry: ""},
-    {name: "Tollgate Exit LPR", zone: "LPR System Units", status: "Online", comments: "Working", model: "AutoVu SharpOS", manufacturer: "AutoVu", archiver: "Archiver 1", ip_address: "172.17.102.189", mac_address: "0C-BF-15-01-A1-A9", resolution: "", warranty_expiry: ""},
-    {name: "Tollgate Entry LPR", zone: "LPR System Units", status: "Online", comments: "Working", model: "AutoVu SharpOS", manufacturer: "AutoVu", archiver: "Archiver 1", ip_address: "172.17.102.188", mac_address: "0C-BF-15-01-A1-CB", resolution: "", warranty_expiry: ""},
-    {name: "Truck Exit LPR", zone: "LPR System Units", status: "Online", comments: "Working", model: "AutoVu SharpOS", manufacturer: "AutoVu", archiver: "Archiver 1", ip_address: "172.17.102.194", mac_address: "0C-BF-15-01-A1-E0", resolution: "", warranty_expiry: ""},
-    {name: "Truck entry LPR 4", zone: "LPR System Units", status: "Online", comments: "Working", model: "SharpV (Gen 3)", manufacturer: "Genetec", archiver: "Archiver 1", ip_address: "172.17.103.191", mac_address: "0C-BF-15-02-9D-2B", resolution: "", warranty_expiry: ""},
-    {name: "Truck entry LPR 3", zone: "LPR System Units", status: "Online", comments: "Working", model: "SharpV (Gen 3)", manufacturer: "Genetec", archiver: "Archiver 1", ip_address: "172.17.103.190", mac_address: "0C-BF-15-02-9F-30", resolution: "", warranty_expiry: ""}
-  ];
+  // Return the KFTL camera data from CLIENTS_VIEW_DATA
+  return CLIENTS_VIEW_DATA.kftl.assets.cameras || [];
 }
 
-function getEmbeddedDoors() {
-  return [
-    {name: "Batching room", site: "LML B Liquid Plant", client: "Lasco", status: "Online", tech: "Unassigned",
-     controllerType: "Standalone", ip: "", controller_model: "SALTO XS4", controller_warranty: "", controller_status: "Online",
-     reader: "HID Prox", reader_port: "Port 1", reader_model: "HID R40", reader_warranty: "", reader_status: "Online",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "", rte_status: "Online",
-     lock_type: "600lb", lock_model: "SDC 621", lock_warranty: "", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "", sensor_status: "Online",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "", closer_status: "Online",
-     doorSwing: "In", accessType: "Read In Only", antiPassback: "No", powered: "Yes",
-     comments: "No longer use equipment has been removed", history: []},
-    {name: "Blow mold entrance 1", site: "LML B Liquid Plant", client: "Lasco", status: "Online", tech: "Unassigned",
-     controllerType: "Standalone", ip: "", controller_model: "SALTO XS4", controller_warranty: "", controller_status: "Online",
-     reader: "HID Prox", reader_port: "Port 1", reader_model: "HID R40", reader_warranty: "", reader_status: "Online",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "", rte_status: "Online",
-     lock_type: "1200lb", lock_model: "SDC 622", lock_warranty: "", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "", sensor_status: "Online",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "", closer_status: "Online",
-     doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", powered: "Yes",
-     comments: "Door needs repair door drop", history: []},
-    {name: "Blow mold entrance 2", site: "LML B Liquid Plant", client: "Lasco", status: "Online", tech: "Unassigned",
-     controllerType: "Standalone", ip: "", controller_model: "SALTO XS4", controller_warranty: "", controller_status: "Online",
-     reader: "HID Prox", reader_port: "Port 2", reader_model: "HID R40", reader_warranty: "", reader_status: "Online",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "", rte_status: "Online",
-     lock_type: "600lb", lock_model: "SDC 621", lock_warranty: "", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "", sensor_status: "Online",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "", closer_status: "Online",
-     doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", powered: "Yes",
-     comments: "Door needs repair door drop", history: []},
-    {name: "Chemistry lab", site: "LML B Liquid Plant", client: "Lasco", status: "Online", tech: "Unassigned",
-     controllerType: "Integrated", ip: "", controller_model: "SALTO XS4", controller_warranty: "", controller_status: "Online",
-     reader: "HID Prox", reader_port: "Port 1", reader_model: "HID R40", reader_warranty: "", reader_status: "Online",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "", rte_status: "Online",
-     lock_type: "600lb", lock_model: "SDC 621", lock_warranty: "", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "", sensor_status: "Online",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "", closer_status: "Online",
-     doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", powered: "Yes",
-     comments: "", history: []},
-    {name: "Electrical room to utilites", site: "LML B Liquid Plant", client: "Lasco", status: "Online", tech: "Unassigned",
-     controllerType: "Standalone", ip: "", controller_model: "SALTO XS4", controller_warranty: "", controller_status: "Online",
-     reader: "HID Prox", reader_port: "Port 1", reader_model: "HID R40", reader_warranty: "", reader_status: "Online",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "", rte_status: "Online",
-     lock_type: "Z", lock_model: "SDC 623", lock_warranty: "", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "", sensor_status: "Online",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "", closer_status: "Online",
-     doorSwing: "In", accessType: "Read In Only", antiPassback: "No", powered: "Yes",
-     comments: "", history: []},
-    {name: "Lobby", site: "LML B Liquid Plant", client: "Lasco", status: "Online", tech: "Unassigned",
-     controllerType: "Standalone", ip: "", controller_model: "SALTO XS4", controller_warranty: "", controller_status: "Online",
-     reader: "HID Prox", reader_port: "Port 1", reader_model: "HID R40", reader_warranty: "", reader_status: "Online",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "", rte_status: "Online",
-     lock_type: "600lb", lock_model: "SDC 621", lock_warranty: "", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "", sensor_status: "Online",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "", closer_status: "Online",
-     doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", powered: "Yes",
-     comments: "", history: []},
-    {name: "Filling room 1", site: "LML B Liquid Plant", client: "Lasco", status: "Online", tech: "Unassigned",
-     controllerType: "Standalone", ip: "", controller_model: "SALTO XS4", controller_warranty: "", controller_status: "Online",
-     reader: "HID Prox", reader_port: "Port 1", reader_model: "HID R40", reader_warranty: "", reader_status: "Online",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "", rte_status: "Online",
-     lock_type: "600lb", lock_model: "SDC 621", lock_warranty: "", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "", sensor_status: "Online",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "", closer_status: "Online",
-     doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", powered: "Yes",
-     comments: "", history: []},
-    {name: "Filling room 2", site: "LML B Liquid Plant", client: "Lasco", status: "Online", tech: "Unassigned",
-     controllerType: "Standalone", ip: "", controller_model: "SALTO XS4", controller_warranty: "", controller_status: "Online",
-     reader: "HID Prox", reader_port: "Port 2", reader_model: "HID R40", reader_warranty: "", reader_status: "Online",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "", rte_status: "Online",
-     lock_type: "600lb", lock_model: "SDC 621", lock_warranty: "", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "", sensor_status: "Online",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "", closer_status: "Online",
-     doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", powered: "Yes",
-     comments: "", history: []},
-    {name: "Filling room 3", site: "LML B Liquid Plant", client: "Lasco", status: "Online", tech: "Unassigned",
-     controllerType: "Standalone", ip: "", controller_model: "SALTO XS4", controller_warranty: "", controller_status: "Online",
-     reader: "HID Prox", reader_port: "Port 3", reader_model: "HID R40", reader_warranty: "", reader_status: "Online",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "", rte_status: "Online",
-     lock_type: "600lb", lock_model: "SDC 621", lock_warranty: "", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "", sensor_status: "Online",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "", closer_status: "Online",
-     doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", powered: "Yes",
-     comments: "", history: []},
-    {name: "Filling room 4", site: "LML B Liquid Plant", client: "Lasco", status: "Online", tech: "Unassigned",
-     controllerType: "Standalone", ip: "", controller_model: "SALTO XS4", controller_warranty: "", controller_status: "Online",
-     reader: "HID Prox", reader_port: "Port 4", reader_model: "HID R40", reader_warranty: "", reader_status: "Online",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "", rte_status: "Online",
-     lock_type: "1200lb", lock_model: "SDC 622", lock_warranty: "", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "", sensor_status: "Online",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "", closer_status: "Online",
-     doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", powered: "Yes",
-     comments: "", history: []},
-    {name: "Guest access - IN", site: "LML B Liquid Plant", client: "Lasco", status: "Online", tech: "Unassigned",
-     controllerType: "Standalone", ip: "", controller_model: "SALTO XS4", controller_warranty: "", controller_status: "Online",
-     reader: "HID Prox", reader_port: "Port 1", reader_model: "HID R40", reader_warranty: "", reader_status: "Online",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "", rte_status: "Online",
-     lock_type: "600lb", lock_model: "SDC 621", lock_warranty: "", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "", sensor_status: "Online",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "", closer_status: "Online",
-     doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", powered: "Yes",
-     comments: "", history: []},
-    {name: "Guest access - OUT", site: "LML B Liquid Plant", client: "Lasco", status: "Online", tech: "Unassigned",
-     controllerType: "Standalone", ip: "", controller_model: "SALTO XS4", controller_warranty: "", controller_status: "Online",
-     reader: "HID Prox", reader_port: "Port 2", reader_model: "HID R40", reader_warranty: "", reader_status: "Online",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "", rte_status: "Online",
-     lock_type: "600lb", lock_model: "SDC 621", lock_warranty: "", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "", sensor_status: "Online",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "", closer_status: "Online",
-     doorSwing: "Out", accessType: "Push Out Only", antiPassback: "No", powered: "Yes",
-     comments: "", history: []},
-    {name: "Microbiology lab", site: "LML B Liquid Plant", client: "Lasco", status: "Online", tech: "Unassigned",
-     controllerType: "Integrated", ip: "", controller_model: "SALTO XS4", controller_warranty: "", controller_status: "Online",
-     reader: "HID Prox", reader_port: "Port 1", reader_model: "HID R40", reader_warranty: "", reader_status: "Online",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "", rte_status: "Online",
-     lock_type: "600lb", lock_model: "SDC 621", lock_warranty: "", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "", sensor_status: "Online",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "", closer_status: "Online",
-     doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", powered: "Yes",
-     comments: "", history: []},
-    {name: "Prep Room", site: "LML B Liquid Plant", client: "Lasco", status: "Online", tech: "Unassigned",
-     controllerType: "Standalone", ip: "", controller_model: "SALTO XS4", controller_warranty: "", controller_status: "Online",
-     reader: "HID Prox", reader_port: "Port 1", reader_model: "HID R40", reader_warranty: "", reader_status: "Online",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "", rte_status: "Online",
-     lock_type: "600lb", lock_model: "SDC 621", lock_warranty: "", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "", sensor_status: "Online",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "", closer_status: "Online",
-     doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", powered: "Yes",
-     comments: "", history: []},
-    {name: "Processing room 1", site: "LML B Liquid Plant", client: "Lasco", status: "Online", tech: "Unassigned",
-     controllerType: "Standalone", ip: "", controller_model: "SALTO XS4", controller_warranty: "", controller_status: "Online",
-     reader: "HID Prox", reader_port: "Port 1", reader_model: "HID R40", reader_warranty: "", reader_status: "Online",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "", rte_status: "Online",
-     lock_type: "600lb", lock_model: "SDC 621", lock_warranty: "", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "", sensor_status: "Online",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "", closer_status: "Online",
-     doorSwing: "In", accessType: "Read In Only", antiPassback: "No", powered: "Yes",
-     comments: "No longer use equipment has been removed", history: []},
-    {name: "Processing room 2", site: "LML B Liquid Plant", client: "Lasco", status: "Online", tech: "Unassigned",
-     controllerType: "Standalone", ip: "", controller_model: "SALTO XS4", controller_warranty: "", controller_status: "Online",
-     reader: "HID Prox", reader_port: "Port 2", reader_model: "HID R40", reader_warranty: "", reader_status: "Online",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "", rte_status: "Online",
-     lock_type: "600lb", lock_model: "SDC 621", lock_warranty: "", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "", sensor_status: "Online",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "", closer_status: "Online",
-     doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", powered: "Yes",
-     comments: "", history: []},
-    {name: "Product dev lab", site: "LML B Liquid Plant", client: "Lasco", status: "Online", tech: "Unassigned",
-     controllerType: "Standalone", ip: "", controller_model: "SALTO XS4", controller_warranty: "", controller_status: "Online",
-     reader: "HID Prox", reader_port: "Port 1", reader_model: "HID R40", reader_warranty: "", reader_status: "Online",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "", rte_status: "Online",
-     lock_type: "600lb", lock_model: "SDC 621", lock_warranty: "", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "", sensor_status: "Online",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "", closer_status: "Online",
-     doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", powered: "Yes",
-     comments: "", history: []},
-    {name: "Production floor - IN", site: "LML B Liquid Plant", client: "Lasco", status: "Online", tech: "Unassigned",
-     controllerType: "Standalone", ip: "", controller_model: "SALTO XS4", controller_warranty: "", controller_status: "Online",
-     reader: "HID Prox", reader_port: "Port 1", reader_model: "HID R40", reader_warranty: "", reader_status: "Online",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "", rte_status: "Online",
-     lock_type: "600lb", lock_model: "SDC 621", lock_warranty: "", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "", sensor_status: "Online",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "", closer_status: "Online",
-     doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", powered: "Yes",
-     comments: "", history: []},
-    {name: "Production floor - OUT", site: "LML B Liquid Plant", client: "Lasco", status: "Online", tech: "Unassigned",
-     controllerType: "Standalone", ip: "", controller_model: "SALTO XS4", controller_warranty: "", controller_status: "Online",
-     reader: "HID Prox", reader_port: "Port 2", reader_model: "HID R40", reader_warranty: "", reader_status: "Online",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "", rte_status: "Online",
-     lock_type: "600lb", lock_model: "SDC 621", lock_warranty: "", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "", sensor_status: "Online",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "", closer_status: "Online",
-     doorSwing: "Out", accessType: "Push Out Only", antiPassback: "No", powered: "Yes",
-     comments: "", history: []},
-    {name: "QA office", site: "LML B Liquid Plant", client: "Lasco", status: "Online", tech: "Unassigned",
-     controllerType: "Standalone", ip: "", controller_model: "SALTO XS4", controller_warranty: "", controller_status: "Online",
-     reader: "HID Prox", reader_port: "Port 1", reader_model: "HID R40", reader_warranty: "", reader_status: "Online",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "", rte_status: "Online",
-     lock_type: "600lb", lock_model: "SDC 621", lock_warranty: "", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "", sensor_status: "Online",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "", closer_status: "Online",
-     doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", powered: "Yes",
-     comments: "", history: []},
-    {name: "Shop and spare parts", site: "LML B Liquid Plant", client: "Lasco", status: "Online", tech: "Unassigned",
-     controllerType: "Standalone", ip: "", controller_model: "SALTO XS4", controller_warranty: "", controller_status: "Online",
-     reader: "HID Prox", reader_port: "Port 1", reader_model: "HID R40", reader_warranty: "", reader_status: "Online",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "", rte_status: "Online",
-     lock_type: "600lb", lock_model: "SDC 621", lock_warranty: "", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "", sensor_status: "Online",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "", closer_status: "Online",
-     doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "No", powered: "Yes",
-     comments: "", history: []},
-    {name: "Main Entrance", site: "Security Office", client: "KFTL", status: "Online", tech: "Shanice Vernon",
-     controllerType: "Standalone", ip: "10.19.1.100", controller_model: "SALTO XS4", controller_warranty: "2027-01-15", controller_status: "Online",
-     reader: "HID Prox", reader_port: "Port 1", reader_model: "HID R40", reader_warranty: "2027-01-15", reader_status: "Online",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "2027-01-15", rte_status: "Online",
-     lock_type: "600lb", lock_model: "SDC 621", lock_warranty: "2027-01-15", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "2027-01-15", sensor_status: "Online",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "2027-01-15", closer_status: "Online",
-     doorSwing: "In", accessType: "Read In + Read Out", antiPassback: "Yes", powered: "Yes",
-     comments: "Main entrance door - high traffic", history: [{time: "08:00", event: "Door installed"}]},
-    {name: "2nd Entrance", site: "SAL Duty Office", client: "KFTL", status: "Offline", tech: "Marvin Grant",
-     controllerType: "Integrated", ip: "10.19.1.101", controller_model: "SALTO XS4", controller_warranty: "2026-12-01", controller_status: "Offline",
-     reader: "HID Prox", reader_port: "Port 2", reader_model: "HID R40", reader_warranty: "2026-12-01", reader_status: "Offline",
-     rte_type: "Hardwire", rte_model: "RTE-200", rte_warranty: "2026-12-01", rte_status: "Online",
-     lock_type: "1200lb", lock_model: "SDC 622", lock_warranty: "2026-12-01", lock_status: "Online",
-     sensor_type: "Magnetic", sensor_model: "SEN-100", sensor_warranty: "2026-12-01", sensor_status: "Offline",
-     closer_type: "Hydraulic", closer_model: "LCN 4040", closer_warranty: "2026-12-01", closer_status: "Online",
-     doorSwing: "Out", accessType: "Read In + Push Out", antiPassback: "No", powered: "Yes",
-     comments: "Offline - needs attention", history: [{time: "09:30", event: "Offline reported"}]}
-  ];
-}
-
-function getEmbeddedServers() {
-  return [
-    {location: "Kingport", serial: "J1013DDR", make: "Dell", model: "PowerEdge R740", capacity: "6.11TB", used: "1.4TB", health: "Good (23%)", apps: "Ocularis DM5, LPR", status: "ONLINE", comments: "", purchase_date: "2024-01-15", warranty_expiry: "2026-01-15"},
-    {location: "Kingport", serial: "J1013DDV", make: "HP", model: "ProLiant DL380", capacity: "6.11TB", used: "1.4TB", health: "Good, Failed drive", apps: "Ocularis DM6, Eyelock", status: "ONLINE", comments: "", purchase_date: "2023-06-01", warranty_expiry: "2025-06-01"},
-    {location: "Kingport", serial: "J1013DDX", make: "Lenovo", model: "ThinkSystem SR650", capacity: "45TB", used: "178GB", health: "Excellent", apps: "—", status: "ONLINE", comments: "", purchase_date: "2024-08-15", warranty_expiry: "2026-08-15"}
-  ];
-}
-
-function getEmbeddedSwitches() {
-  return [
-    {name: "Main Entrance", location: "Security Office", model: "AXIS T8508", ip_address: "10.19.1.21", firmware: "6.54.2739", mac: "AC:CC:8E:FA:4B:1B", comments: "", purchase_date: "2024-02-01", warranty_expiry: "2026-02-01"},
-    {name: "2nd entrance", location: "SAL Duty Office", model: "AXIS T8516", ip_address: "10.19.1.23", firmware: "6.54.2739", mac: "AC:CC:8E:B6:DF:99", comments: "", purchase_date: "2024-03-15", warranty_expiry: "2026-03-15"}
-  ];
-}
-
-function getEmbeddedSoftware() {
-  return [
-    {vendor: "Genetec", client: "KFTL", version: "14.0.2.27", license_type: "Regular license (1)", sma_expiry: "2026-12-31", status: "Good"},
-    {vendor: "Axis", client: "KFTL", version: "Various", license_type: "Regular license (1)", sma_expiry: "2026-12-31", status: "Good"},
-    {vendor: "Avigilon", client: "KFTL", version: "4.8.0.12", license_type: "Regular license (1)", sma_expiry: "2026-12-31", status: "Good"},
-    {vendor: "Pelco", client: "KFTL", version: "Various", license_type: "Regular license (1)", sma_expiry: "2026-12-31", status: "Good"},
-    {vendor: "FLIR Systems", client: "KFTL", version: "v1.6.0.31", license_type: "Regular license (2)", sma_expiry: "2026-12-31", status: "Good"},
-    {vendor: "AutoVu", client: "KFTL", version: "12.8.465.0", license_type: "Regular license (1)", sma_expiry: "2026-12-31", status: "Good"},
-    {vendor: "Opgal Optronic Industries Ltd", client: "KFTL", version: "V 4.2.111", license_type: "Regular license (2)", sma_expiry: "2026-12-31", status: "Good"},
-    {vendor: "Lenel", client: "KWL", version: "7.3.1", license_type: "Enterprise", sma_expiry: "2026-06-15", status: "Warning"},
-    {vendor: "AMAG", client: "KFTL", version: "9.0.0", license_type: "Enterprise", sma_expiry: "2025-01-01", status: "Expired"},
-    {vendor: "Arecont Vision", client: "Lasco", version: "65200", license_type: "Regular license (1)", sma_expiry: "2026-12-31", status: "Good"},
-    {vendor: "Salto", client: "Lasco", version: "4.2.0", license_type: "Regular license (1)", sma_expiry: "2026-12-31", status: "Good"}
-  ];
-}
-
-function getEmbeddedStorage() {
-  return [
-    {name: "NAS-01", client: "KFTL", total: "10TB", usable: "8.2TB", health: 85, make: "Dell", model: "PowerVault", warranty_expiry: "2027-01-15"},
-    {name: "SAN-02", client: "KWL", total: "20TB", usable: "15.6TB", health: 92, make: "NetApp", model: "FAS2750", warranty_expiry: "2026-08-01"}
-  ];
-}
-
-function getEmbeddedStations() {
-  return [
-    {name: "Client-PC-01", client: "KFTL", apps: "Ocularis, Office", storage: "512GB", health: 90, make: "Dell", model: "OptiPlex", warranty_expiry: "2027-03-15"},
-    {name: "Client-PC-02", client: "KWL", apps: "Eyelock, Office", storage: "256GB", health: 78, make: "HP", model: "EliteDesk", warranty_expiry: "2026-06-01"}
-  ];
-}
-
-function getEmbeddedMonitors() {
-  return [
-    {name: "Monitor-01", client: "KFTL", size: "27\"", health: 95, make: "Dell", model: "UltraSharp", warranty_expiry: "2027-02-01"},
-    {name: "Monitor-02", client: "KWL", size: "32\"", health: 88, make: "LG", model: "UltraWide", warranty_expiry: "2026-09-15"}
-  ];
-}
-
-function getEmbeddedIntrusion() {
-  return [
-    {monitor_point: "Front Gate", modules: "Module A-1", communication: "Ethernet", sensor: "Motion Sensor", status: "Online", warranty_expiry: "2027-01-15", comments: "Operational - no issues", client: "KFTL", location: "Security Office"},
-    {monitor_point: "Back Gate", modules: "Module B-2", communication: "Wireless", sensor: "PIR Sensor", status: "Online", warranty_expiry: "2026-06-01", comments: "Battery replaced 2026-05-15", client: "KFTL", location: "Security Office"},
-    {monitor_point: "East Perimeter", modules: "Module C-3", communication: "Fiber", sensor: "Fiber Optic", status: "Offline", warranty_expiry: "2025-12-01", comments: "Cable break detected - needs repair", client: "KFTL", location: "Perimeter"},
-    {monitor_point: "West Perimeter", modules: "Module D-1", communication: "Ethernet", sensor: "Radar", status: "Warning", warranty_expiry: "2026-08-15", comments: "False positive alerts - calibration needed", client: "KFTL", location: "Perimeter"},
-    {monitor_point: "North Entrance", modules: "Module E-2", communication: "Wireless", sensor: "Magnetic Contact", status: "Online", warranty_expiry: "2027-03-01", comments: "Working - recently serviced", client: "KFTL", location: "Entrance"}
-  ];
-}
+function getEmbeddedDoors() { return CLIENTS_VIEW_DATA.kftl.assets.doors || []; }
+function getEmbeddedServers() { return CLIENTS_VIEW_DATA.kftl.assets.servers || []; }
+function getEmbeddedSwitches() { return CLIENTS_VIEW_DATA.kftl.assets.switches || []; }
+function getEmbeddedSoftware() { return SOFTWARE.length ? SOFTWARE : []; }
+function getEmbeddedStorage() { return STORAGE.length ? STORAGE : []; }
+function getEmbeddedStations() { return STATIONS.length ? STATIONS : []; }
+function getEmbeddedMonitors() { return MONITORS.length ? MONITORS : []; }
+function getEmbeddedIntrusion() { return INTRUSION.length ? INTRUSION : []; }
 
 function getEmbeddedSRs() {
+  if (SERVICE_REQUESTS.length) return SERVICE_REQUESTS;
   return [
     {id: "SR-1847", client: "KFTL", site: "NORTH", subject: "8 Cameras Defective in NORTH Zone", from: "David Chen", category: "Camera", priority: "High", status: "Open", assigned: "Shanice Vernon", received: "Jun 15, 2026", body: "Multiple cameras showing as defective in NORTH zone. Need immediate attention.", notes: "Awaiting parts", history: [{time: "14:22", msg: "Created"}, {time: "15:00", msg: "Assigned to Shanice"}], attachments: []},
     {id: "SR-1848", client: "KWL", site: "Tinson Pen", subject: "5 Cameras Offline - Urgent", from: "Andrea Williams", category: "Camera", priority: "High", status: "In Progress", assigned: "Marvin Grant", received: "Jun 15, 2026", body: "5 cameras down simultaneously at Tinson Pen. Need eyes back up ASAP.", notes: "On-site investigation", history: [{time: "11:05", msg: "Created"}, {time: "12:30", msg: "Dispatched to site"}], attachments: []},
@@ -4365,7 +4215,7 @@ function openCameraDetail(index) {
     '<div class="modal-field"><label>Model</label><span>' + (camera.model || '—') + '</span></div>' +
     '<div class="modal-field"><label>Manufacturer</label><span>' + (camera.manufacturer || '—') + '</span></div>' +
     '<div class="modal-field"><label>Resolution</label><span>' + (camera.resolution || '—') + '</span></div>' +
-'<div class="modal-field"><label>Recorder</label><span>' + (camera.archiver || '—') + '</span></div>' +
+    '<div class="modal-field"><label>Recorder</label><span>' + (camera.archiver || '—') + '</span></div>' +
     '<div class="modal-field"><label>MAC Address</label><span class="mono">' + (camera.mac_address || '—') + '</span></div>' +
     '<div class="modal-field"><label>Warranty Expiry</label><span>' + getWarrantyDisplay(camera.warranty_expiry) + '</span></div>';
   
@@ -4617,7 +4467,6 @@ function renderDoorsEnhanced() {
           html += '</div>';
         }
         
-        // Only Ping button remains
         if (d.ip) {
           html += '<div style="display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--card-border);flex-wrap:wrap;">';
           html += '<button class="btn btn-sm" onclick="pingDoorIP(\'' + d.ip + '\')"><i class="ti ti-network"></i> Ping</button>';
@@ -5366,7 +5215,6 @@ function renderIntrusion() {
     });
     if (currentClientFilter) {
       filtered = filtered.filter(function(i) { 
-        // Check if client field exists and matches, or if no client field, include it
         if (!i.client) return true;
         return i.client === currentClientFilter; 
       });
@@ -5604,17 +5452,14 @@ function createSRFromAsset(assetType, index) {
   
   if (!asset) return;
   
-  // Close the current modal
   closeCameraDetailModal();
   closeDoorDetailModal();
   closeServerDetailModal();
   closeSwitchDetailModal();
   closeIntrusionDetailModal();
   
-  // Open the add SR modal with pre-filled fields
   openAddSRModal();
   
-  // Populate fields
   var subjectField = document.getElementById('sr-subject');
   if (subjectField) {
     subjectField.value = 'Issue with ' + assetType.charAt(0).toUpperCase() + assetType.slice(1) + ' ' + name;
