@@ -2944,7 +2944,7 @@ function buildClientView(data, user) {
   if (data.assets && data.assets.cameras && data.assets.cameras.length > 0) {
     html += '<div style="overflow-x:auto;">';
     html += '<table class="tbl" style="width:100%;border-collapse:collapse;font-size:12px;">';
-    html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Zone</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Camera</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">IP</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Comments</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Model</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Manufacturer</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Resolution</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Archiver</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">MAC Address</th></tr></thead>';
+html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Zone</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Camera</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">IP</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Comments</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Model</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Manufacturer</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Resolution</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Recorder</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">MAC Address</th></tr></thead>';
     html += '<tbody>';
     data.assets.cameras.forEach(function(cam) {
       var statusBadge = cam.status === 'Online' ? 'b-done' : cam.status === 'Defective' ? 'b-high' : cam.status === 'No Power' ? 'b-high' : cam.status === 'No Camera' ? 'b-open' : 'b-info';
@@ -4207,7 +4207,7 @@ function renderCamerasOptimized() {
         var pageCameras = cameras.slice(start, end);
         html += '<div class="cam-zone-group"><div class="cam-zone-header" onclick="toggleZone(\'zone-' + zone + '\')"><div><span class="zone-name">' + zone + '</span><span class="zone-client">(' + client + ')</span></div><div><span class="zone-count">' + totalInZone + ' cameras</span> <i class="ti ti-chevron-down zone-toggle" id="zone-toggle-' + zone + '"></i></div></div><div class="cam-zone-body" id="zone-body-' + zone + '">';
         if (pageCameras.length > 0) {
-          html += '<table class="tbl"><thead><tr><th>Zone</th><th>Camera</th><th>IP</th><th>Status</th><th>Comments</th><th>Model</th><th>Manufacturer</th><th>Resolution</th><th>Archiver</th><th>MAC Address</th><th>Warranty</th></tr></thead><tbody>';
+          html += '<table class="tbl"><thead><tr><th>Zone</th><th>Camera</th><th>IP</th><th>Status</th><th>Comments</th><th>Model</th><th>Manufacturer</th><th>Resolution</th><th>Recorder</th><th>MAC Address</th><th>Warranty</th></tr></thead><tbody>';
           pageCameras.forEach(function(c) {
             var globalIndex = CAMERAS.indexOf(c);
             html += '<tr class="clickable" onclick="openCameraDetail(' + globalIndex + ')"><td>' + c.zone + '</td><td>' + c.name + '</td><td>' + (c.ip_address || '—') + '</td><td>' + camBadge(c.status) + '</td><td><span class="comment-display ' + (!c.comments ? 'placeholder' : '') + '" data-cam-index="' + globalIndex + '" onclick="event.stopPropagation();editComment(' + globalIndex + ')">' + (c.comments || 'Click to add note') + '</span></td><td>' + (c.model || '—') + '</td><td>' + (c.manufacturer || '—') + '</td><td>' + (c.resolution || '—') + '</td><td>' + (c.archiver || '—') + '</td><td class="mono">' + (c.mac_address || '—') + '</td><td>' + getWarrantyDisplay(c.warranty_expiry) + '</td></tr>';
@@ -4365,7 +4365,7 @@ function openCameraDetail(index) {
     '<div class="modal-field"><label>Model</label><span>' + (camera.model || '—') + '</span></div>' +
     '<div class="modal-field"><label>Manufacturer</label><span>' + (camera.manufacturer || '—') + '</span></div>' +
     '<div class="modal-field"><label>Resolution</label><span>' + (camera.resolution || '—') + '</span></div>' +
-    '<div class="modal-field"><label>Archiver</label><span>' + (camera.archiver || '—') + '</span></div>' +
+'<div class="modal-field"><label>Recorder</label><span>' + (camera.archiver || '—') + '</span></div>' +
     '<div class="modal-field"><label>MAC Address</label><span class="mono">' + (camera.mac_address || '—') + '</span></div>' +
     '<div class="modal-field"><label>Warranty Expiry</label><span>' + getWarrantyDisplay(camera.warranty_expiry) + '</span></div>';
   
@@ -5984,7 +5984,7 @@ function exportSRsCSV() {
 }
 
 function exportCamerasCSV() {
-  var headers = ['name', 'zone', 'ip_address', 'status', 'comments', 'model', 'manufacturer', 'archiver', 'mac_address', 'resolution', 'warranty_expiry'];
+var headers = ['name', 'zone', 'ip_address', 'status', 'comments', 'model', 'manufacturer', 'recorder', 'mac_address', 'resolution', 'warranty_expiry'];
   var data = CAMERAS.map(function(c) {
     return {
       name: c.name || '',
@@ -5994,7 +5994,7 @@ function exportCamerasCSV() {
       comments: c.comments || '',
       model: c.model || '',
       manufacturer: c.manufacturer || '',
-      archiver: c.archiver || '',
+recorder: c.archiver || '',
       mac_address: c.mac_address || '',
       resolution: c.resolution || '',
       warranty_expiry: c.warranty_expiry || ''
