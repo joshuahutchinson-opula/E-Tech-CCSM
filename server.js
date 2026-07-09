@@ -270,7 +270,10 @@ app.put('/api/service-requests/:id', async (req, res) => {
       [priority, assigned_to, status, notes, id, 1]
     );
     await pool.query('INSERT INTO sr_history (sr_id, time, msg) VALUES ($1, $2, $3)', [id, new Date().toLocaleTimeString(), `Updated: ${status}`]);
-    res.json({ success: true });
+    
+    // Return the updated record so frontend can refresh immediately
+    const updated = await pool.query('SELECT * FROM service_requests WHERE id = $1 AND client_id = $2', [id, 1]);
+    res.json({ success: true, data: updated.rows[0] });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
