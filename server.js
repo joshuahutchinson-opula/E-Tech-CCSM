@@ -316,7 +316,7 @@ app.get('/api/activity-log', async (req, res) => {
   if (!dbConnected) return res.json([]);
   try {
     const limit = parseInt(req.query.limit) || 100;
-    const result = await pool.query('SELECT * FROM activity_log WHERE client_id = $1 ORDER BY created_at DESC LIMIT $2', [1, limit]);
+    const result = await pool.query('SELECT id, client_id, username, action, detail, created_at FROM activity_log WHERE client_id = $1 ORDER BY created_at DESC LIMIT $2', [1, limit]);
     res.json(result.rows);
   } catch (err) {
     res.json([]);
@@ -328,7 +328,7 @@ app.post('/api/activity-log', async (req, res) => {
 
   const { user, action, detail } = req.body;
   try {
-const result = await pool.query('SELECT * FROM activity_log WHERE client_id = $1 ORDER BY created_at DESC LIMIT $2', [1, limit]);
+    await pool.query('INSERT INTO activity_log (client_id, username, action, detail) VALUES ($1, $2, $3, $4)', [1, req.user?.username || 'system', action, detail]);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
