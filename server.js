@@ -242,14 +242,14 @@ app.get('/api/service-requests', async (req, res) => {
 app.post('/api/service-requests', async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
 
-  const { subject, category, priority, assigned_to, body } = req.body;
+  const { subject, client, site, category, priority, assigned_to, body } = req.body;
   const srId = `SR-${String(Math.floor(Math.random() * 9000) + 1000)}`;
 
   try {
     const result = await pool.query(
-      `INSERT INTO service_requests (client_id, sr_id, subject, category, priority, assigned_to, body, received, created_by) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, $8) RETURNING *`,
-      [1, srId, subject, category, priority, assigned_to, body, 'admin']
+      `INSERT INTO service_requests (client_id, sr_id, subject, client, site, category, priority, assigned_to, body, received, created_by) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_DATE, $10) RETURNING *`,
+      [1, srId, subject, client, site, category, priority, assigned_to, body, 'admin']
     );
     await pool.query('INSERT INTO sr_history (sr_id, time, msg) VALUES ($1, $2, $3)', [result.rows[0].id, new Date().toLocaleTimeString(), 'Created']);
     res.json(result.rows[0]);
