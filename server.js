@@ -8,20 +8,31 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Database connection
+// Database connection - Railway injects DATABASE_URL automatically
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
 
+// Test database connection
+pool.query('SELECT NOW()', (err, res) => {
+  if (err) {
+    console.error('Database connection failed:', err.message);
+  } else {
+    console.log('Database connected successfully');
+  }
+});
+
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
 
 // Auth middleware
 const authenticate = async (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ error: 'Unauthorized' });
+  if (!token) {
+    return res.status(401).json({ error: 'Unauthorized - No token provided' });
+  }
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
     req.user = decoded;
@@ -43,25 +54,47 @@ app.post('/api/auth/login', async (req, res) => {
       [username]
     );
     const user = result.rows[0];
-    if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
     
     // For demo - in production use bcrypt.compare
-    const valid = password === 'admin123' || password === 'kftl123';
-    if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
+    // Since we used placeholder hashes, we'll check against known passwords
+    const valid = (password === 'admin123' && username === 'admin') || 
+                  (password === 'kftl123' && username === 'kftl');
+    
+    if (!valid) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
     
     const token = jwt.sign(
-      { id: user.id, username: user.username, client_id: user.client_id, role: user.role },
+      { 
+        id: user.id, 
+        username: user.username, 
+        client_id: user.client_id, 
+        role: user.role 
+      },
       process.env.JWT_SECRET || 'secret',
       { expiresIn: '24h' }
     );
-    res.json({ token, user: { id: user.id, username: user.username, client_id: user.client_id, role: user.role } });
+    
+    res.json({ 
+      token, 
+      user: { 
+        id: user.id, 
+        username: user.username, 
+        client_id: user.client_id, 
+        role: user.role 
+      } 
+    });
   } catch (err) {
+    console.error('Login error:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
 // ============================================================
-// DASHBOARD ENDPOINTS
+// DASHBOARD STATS
 // ============================================================
 
 app.get('/api/dashboard/stats', authenticate, async (req, res) => {
@@ -71,7 +104,10 @@ app.get('/api/dashboard/stats', authenticate, async (req, res) => {
     const doors = await pool.query('SELECT status FROM doors WHERE client_id = $1', [clientId]);
     const servers = await pool.query('SELECT status FROM servers WHERE client_id = $1', [clientId]);
     const switches = await pool.query('SELECT status FROM switches WHERE client_id = $1', [clientId]);
-    const srs = await pool.query("SELECT status FROM service_requests WHERE client_id = $1 AND status != 'Resolved'", [clientId]);
+    const srs = await pool.query(
+      "SELECT status FROM service_requests WHERE client_id = $1 AND status != 'Resolved'", 
+      [clientId]
+    );
     
     const totalDevices = cameras.rowCount + doors.rowCount + servers.rowCount + switches.rowCount;
     const offline = cameras.rows.filter(c => c.status !== 'Online' && c.status !== 'Working').length +
@@ -90,6 +126,7 @@ app.get('/api/dashboard/stats', authenticate, async (req, res) => {
       online_devices: online
     });
   } catch (err) {
+    console.error('Stats error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -107,6 +144,7 @@ app.get('/api/cameras', authenticate, async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
+    console.error('Cameras error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -126,6 +164,7 @@ app.put('/api/cameras/:id/comment', authenticate, async (req, res) => {
     );
     res.json({ success: true });
   } catch (err) {
+    console.error('Update comment error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -134,11 +173,12 @@ app.get('/api/cameras/export', authenticate, async (req, res) => {
   const clientId = req.user.client_id;
   try {
     const result = await pool.query(
-      'SELECT * FROM cameras WHERE client_id = $1',
+      'SELECT * FROM cameras WHERE client_id = $1 ORDER BY zone, name',
       [clientId]
     );
     res.json(result.rows);
   } catch (err) {
+    console.error('Export error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -156,6 +196,7 @@ app.get('/api/doors', authenticate, async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
+    console.error('Doors error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -173,6 +214,7 @@ app.get('/api/servers', authenticate, async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
+    console.error('Servers error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -190,6 +232,7 @@ app.get('/api/switches', authenticate, async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
+    console.error('Switches error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -207,6 +250,7 @@ app.get('/api/software', authenticate, async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
+    console.error('Software error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -224,6 +268,7 @@ app.get('/api/intrusion', authenticate, async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
+    console.error('Intrusion error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -249,12 +294,13 @@ app.get('/api/service-requests', authenticate, async (req, res) => {
     }
     res.json(result.rows);
   } catch (err) {
+    console.error('Service requests error:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
 app.post('/api/service-requests', authenticate, async (req, res) => {
-  const { subject, category, priority, assigned_to, body, site } = req.body;
+  const { subject, category, priority, assigned_to, body } = req.body;
   const clientId = req.user.client_id;
   const srId = `SR-${String(Math.floor(Math.random() * 9000) + 1000)}`;
   try {
@@ -275,6 +321,7 @@ app.post('/api/service-requests', authenticate, async (req, res) => {
     );
     res.json(result.rows[0]);
   } catch (err) {
+    console.error('Create SR error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -300,6 +347,7 @@ app.put('/api/service-requests/:id', authenticate, async (req, res) => {
     );
     res.json({ success: true });
   } catch (err) {
+    console.error('Update SR error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -310,7 +358,7 @@ app.put('/api/service-requests/:id', authenticate, async (req, res) => {
 
 app.get('/api/activity-log', authenticate, async (req, res) => {
   const clientId = req.user.client_id;
-  const limit = req.query.limit || 100;
+  const limit = parseInt(req.query.limit) || 100;
   try {
     const result = await pool.query(
       'SELECT * FROM activity_log WHERE client_id = $1 ORDER BY created_at DESC LIMIT $2',
@@ -318,6 +366,7 @@ app.get('/api/activity-log', authenticate, async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
+    console.error('Activity log error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -332,6 +381,7 @@ app.post('/api/activity-log', authenticate, async (req, res) => {
     );
     res.json({ success: true });
   } catch (err) {
+    console.error('Add activity log error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -345,6 +395,7 @@ app.get('/api/clients', authenticate, async (req, res) => {
     const result = await pool.query('SELECT id, name, email, phone, address, logo_url FROM clients');
     res.json(result.rows);
   } catch (err) {
+    console.error('Clients error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -362,6 +413,7 @@ app.post('/api/clients', authenticate, async (req, res) => {
     );
     res.json(result.rows[0]);
   } catch (err) {
+    console.error('Create client error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -380,6 +432,7 @@ app.get('/api/emails', authenticate, async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
+    console.error('Emails error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -394,17 +447,19 @@ app.post('/api/emails', authenticate, async (req, res) => {
     );
     res.json(result.rows[0]);
   } catch (err) {
+    console.error('Create email error:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
 // ============================================================
-// DATA IMPORT ENDPOINT (for initial data load)
+// DATA IMPORT ENDPOINT (for initial camera data)
 // ============================================================
 
 app.post('/api/import/cameras', authenticate, async (req, res) => {
   const clientId = req.user.client_id;
   const cameras = req.body;
+  let imported = 0;
   try {
     for (const cam of cameras) {
       await pool.query(
@@ -414,11 +469,25 @@ app.post('/api/import/cameras', authenticate, async (req, res) => {
         [clientId, cam.name, cam.zone, cam.status, cam.comments, cam.model, cam.manufacturer, 
          cam.resolution, cam.archiver, cam.ip_address, cam.mac_address, cam.warranty, cam.date_cleaned]
       );
+      imported++;
     }
-    res.json({ success: true, imported: cameras.length });
+    await pool.query(
+      'INSERT INTO activity_log (client_id, user, action, detail) VALUES ($1, $2, $3, $4)',
+      [clientId, req.user.username, 'imported', `Imported ${imported} cameras`]
+    );
+    res.json({ success: true, imported: imported });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Import error:', err);
+    res.status(500).json({ error: err.message, imported: imported });
   }
+});
+
+// ============================================================
+// HEALTH CHECK
+// ============================================================
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // ============================================================
