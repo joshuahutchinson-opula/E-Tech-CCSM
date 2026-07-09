@@ -9,21 +9,11 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // ============================================================
-// DATABASE CONNECTION
+// DATABASE CONNECTION - USES DATABASE_URL
 // ============================================================
 
-const password = process.env.POSTGRES_PASSWORD;
-
-if (!password) {
-  console.error('❌ POSTGRES_PASSWORD is not set!');
-}
-
 const pool = new Pool({
-  host: process.env.RAILWAY_PRIVATE_DOMAIN || 'hayabusa.proxy.rlwy.net',
-  port: parseInt(process.env.PGPORT) || 13542,
-  database: process.env.PGDATABASE || 'postgres',
-  user: process.env.PGUSER || 'postgres',
-  password: password,
+  connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
   connectionTimeoutMillis: 10000,
 });
@@ -55,7 +45,7 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     db: dbConnected ? 'connected' : 'disconnected',
-    hasPassword: !!process.env.POSTGRES_PASSWORD
+    hasDbUrl: !!process.env.DATABASE_URL
   });
 });
 
@@ -395,5 +385,5 @@ app.get('*', (req, res) => {
 app.listen(port, () => {
   console.log(`🚀 Running on port ${port}`);
   console.log(`📊 DB: ${dbConnected ? '✅ Connected' : '❌ Disconnected'}`);
-  console.log(`🔑 Password set: ${!!process.env.POSTGRES_PASSWORD}`);
+  console.log(`🔑 DATABASE_URL exists: ${!!process.env.DATABASE_URL}`);
 });
