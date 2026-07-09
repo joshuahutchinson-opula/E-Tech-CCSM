@@ -141,7 +141,7 @@ app.post('/api/import/cameras', async (req, res) => {
 await pool.query(
   `INSERT INTO cameras (client_id, name, zone, status, comments, model, manufacturer, resolution, archiver, ip_address, mac_address, warranty, date_cleaned) 
    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
-  [1, cam.name, cam.zone, cam.status, cam.comments || '', cam.model || '', cam.manufacturer || '', cam.resolution || '', cam.archiver || '', cam.ip_address || '', cam.mac_address || '', cam.warranty || '', cam.date_cleaned || null]
+[1, cam.name, cam.zone, cam.status, cam.comments || '', cam.model || '', cam.manufacturer || '', cam.resolution || '', cam.archiver || '', cam.ip_address || '', cam.mac_address || '', cam.warranty || '', cam.date_cleaned || null]
 );
       imported++;
     }
