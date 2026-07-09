@@ -9,7 +9,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // ============================================================
-// DATABASE CONNECTION - USING YOUR EXACT STRING
+// DATABASE CONNECTION
 // ============================================================
 
 const pool = new Pool({
@@ -138,10 +138,11 @@ app.post('/api/import/cameras', async (req, res) => {
 
   try {
     for (const cam of cameras) {
-await pool.query(
-  `INSERT INTO cameras (client_id, name, zone, status, comments, model, manufacturer, resolution, archiver, ip_address, mac_address, warranty, date_cleaned) 
-   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
-[1, cam.name || '', cam.zone || '', cam.status || 'Working', cam.comments || '', cam.model || '', cam.manufacturer || '', cam.resolution || '', cam.archiver || '', cam.ip_address || '', cam.mac_address || '', cam.warranty || '', cam.date_cleaned || null]
+      await pool.query(
+        `INSERT INTO cameras (client_id, name, zone, status, comments, model, manufacturer, resolution, archiver, ip_address, mac_address, warranty, date_cleaned) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+        [1, cam.name || '', cam.zone || '', cam.status || 'Working', cam.comments || '', cam.model || '', cam.manufacturer || '', cam.resolution || '', cam.archiver || '', cam.ip_address || '', cam.mac_address || '', cam.warranty || '', cam.date_cleaned || null]
+      );
       imported++;
     }
     res.json({ success: true, imported });
@@ -362,7 +363,7 @@ app.post('/api/emails', async (req, res) => {
 });
 
 // ============================================================
-// SERVE HTML - index.html in SAME folder as server.js
+// SERVE HTML
 // ============================================================
 
 app.get('/', (req, res) => {
