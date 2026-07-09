@@ -837,7 +837,7 @@ input::placeholder, textarea::placeholder {
 <div id="login-page">
   <div class="login-box">
     <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:8px;">
-      <img src="logo.png" alt="CAMS" style="height:48px; width:auto;">
+      <img src="/logo.png" alt="CAMS" style="height:48px; width:auto;">
     </div>
     <h2>CAMS</h2>
     <p>Client Assessment Management System</p>
@@ -866,7 +866,7 @@ input::placeholder, textarea::placeholder {
   <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
     <div class="logo-area">
-      <img class="logo-img" src="logo.png" alt="CAMS" id="logo-img">
+      <img class="logo-img" src="/logo.png" alt="CAMS" id="logo-img">
     </div>
     <button class="collapse-toggle" onclick="toggleSidebar()"><i class="ti ti-chevron-left" id="collapse-icon"></i></button>
     <nav class="nav" id="nav">
@@ -2473,7 +2473,7 @@ function buildClientView(data, user) {
   html += '<img src="' + (data.logo || 'logo.png') + '" style="height:28px;width:auto;" onerror="this.style.display=\'none\'" />';
   html += '</div>';
   html += '<div style="display:flex;align-items:center;gap:12px;">';
-  html += '<img src="logo-light.png" style="height:24px;width:auto;" onerror="this.style.display=\'none\'" />';
+  html += '<img src="/logo-light.png" style="height:24px;width:auto;" onerror="this.style.display=\'none\'" />';
   html += '<span style="color:rgba(0,0,0,0.2);font-size:16px;">|</span>';
   html += '<span style="color:rgba(0,0,0,0.6);font-size:12px;">' + (user ? user.client : 'Client') + '</span>';
   html += '<button onclick="logoutClientView()" style="background:rgba(0,0,0,0.06);border:1px solid rgba(0,0,0,0.1);color:#555;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:11px;font-family:var(--font);transition:all 0.2s;" onmouseover="this.style.background=\'rgba(0,0,0,0.12)\'" onmouseout="this.style.background=\'rgba(0,0,0,0.06)\'">Logout</button>';
