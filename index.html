@@ -2941,7 +2941,7 @@ async function submitClientSR() {
 
 async function loadData() {
   try {
-    const [cameras, doors, servers, switches, software, intrusion, srs, clients] = await Promise.all([
+    const [cameras, doors, servers, switches, software, intrusion, srs, clients, emails] = await Promise.all([
       apiCall('/cameras'),
       apiCall('/doors'),
       apiCall('/servers'),
@@ -2949,7 +2949,8 @@ async function loadData() {
       apiCall('/software'),
       apiCall('/intrusion'),
       apiCall('/service-requests'),
-      apiCall('/clients')
+      apiCall('/clients'),
+      apiCall('/emails')
     ]);
     
     CAMERAS = cameras || [];
@@ -2962,6 +2963,7 @@ async function loadData() {
     CLIENTS = (clients || []).map(c => c.name);
     CLIENT_LOGO_DATA = {};
     (clients || []).forEach(c => { if (c.logo_url) CLIENT_LOGO_DATA[c.name] = c.logo_url; });
+    EMAILS = emails || [];
     
     renderDashboard();
     renderSR();
@@ -2980,6 +2982,7 @@ async function loadData() {
     renderFileExplorer();
     updateClientNavVisibility();
     populateClientDropdowns();
+    updateBadges();
     
     console.log('✅ Data loaded successfully');
     console.log(`📸 Cameras: ${CAMERAS.length}, 🚪 Doors: ${DOORS.length}, 🖥️ Servers: ${SERVERS.length}`);
@@ -3677,10 +3680,97 @@ function renderIntrusion() {
 function renderInbox() {
   var container = document.getElementById('inbox-email-list');
   if (!container) return;
-  container.innerHTML = '<div class="empty-state"><span class="empty-icon">📧</span><div class="empty-title">No emails</div><div class="empty-desc">Your inbox is empty</div></div>';
+  var search = document.getElementById('inbox-search') ? document.getElementById('inbox-search').value.toLowerCase() : '';
+  var filtered = EMAILS.filter(function(e) { return e.folder === inboxFolder; });
+  if (search) {
+    filtered = filtered.filter(function(e) { return e.subject.toLowerCase().indexOf(search) !== -1 || (e.sender || '').toLowerCase().indexOf(search) !== -1; });
+  }
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="empty-state"><span class="empty-icon">📧</span><div class="empty-title">No emails</div><div class="empty-desc">Your inbox is empty</div></div>';
+    updateBadges();
+    return;
+  }
+  var html = '';
+  filtered.forEach(function(email) {
+    var unreadClass = email.is_read ? '' : 'unread';
+    var flaggedClass = email.is_flagged ? 'flagged' : '';
+    var avatarLetter = (email.sender || '?').charAt(0).toUpperCase();
+    html += '<div class="outlook-email ' + unreadClass + '" onclick="viewEmail(\'' + email.id + '\')">' +
+      '<span class="oe-flag ' + flaggedClass + '" onclick="event.stopPropagation();toggleEmailFlag(\'' + email.id + '\')">' + (email.is_flagged ? '⭐' : '☆') + '</span>' +
+      '<div class="oe-avatar">' + avatarLetter + '</div>' +
+      '<div class="oe-content">' +
+      '<div class="oe-sender">' + (email.sender || 'Unknown') + '</div>' +
+      '<div class="oe-subject">' + (email.subject || '(no subject)') + '</div>' +
+      '<div class="oe-preview">' + (email.body || '').substring(0, 60) + '</div>' +
+      '</div>' +
+      '<div class="oe-meta"><span class="oe-date">' + timeAgo(email.created_at) + '</span></div>' +
+      '</div>';
+  });
+  container.innerHTML = html;
+  updateBadges();
 }
 
-async function renderSR() {
+function updateBadges() {
+  updateInboxBadge();
+  updateSRBadge();
+}
+
+function updateInboxBadge() {
+  var badge = document.getElementById('inbox-badge');
+  if (!badge) return;
+  var unread = EMAILS.filter(function(e) { return !e.is_read && e.folder === 'inbox'; }).length;
+  badge.textContent = unread || 0;
+  badge.style.display = unread > 0 ? '' : 'none';
+}
+
+function updateSRBadge() {
+  var badge = document.getElementById('sr-badge');
+  if (!badge) return;
+  var open = SERVICE_REQUESTS.filter(function(r) { return r.status !== 'Resolved'; }).length;
+  badge.textContent = open || 0;
+  badge.style.display = open > 0 ? '' : 'none';
+}
+
+function viewEmail(id) {
+  var email = EMAILS.find(function(e) { return e.id == id; });
+  if (!email) return;
+  if (!email.is_read) {
+    email.is_read = true;
+    updateBadges();
+  }
+  activeEmailId = id;
+  document.getElementById('inbox-empty').style.display = 'none';
+  document.getElementById('inbox-detail-content').classList.add('active');
+  document.getElementById('inbox-detail-subject').textContent = email.subject || '(no subject)';
+  document.getElementById('inbox-detail-from').textContent = email.sender || 'Unknown';
+  document.getElementById('inbox-detail-meta').textContent = 'To: ' + (email.recipient || 'me') + ' · ' + new Date(email.created_at).toLocaleString();
+  document.getElementById('inbox-detail-body').textContent = email.body || 'No content';
+  var avatar = document.getElementById('inbox-sender-avatar');
+  avatar.textContent = (email.sender || '?').charAt(0).toUpperCase();
+  avatar.className = 'ore-sender-avatar';
+  var flagIcon = document.getElementById('inbox-detail-flag-icon');
+  if (flagIcon) {
+    flagIcon.className = email.is_flagged ? 'ti ti-flag' : 'ti ti-flag';
+    flagIcon.style.color = email.is_flagged ? '#fbbf24' : '';
+  }
+}
+
+function toggleEmailFlag(id) {
+  var email = EMAILS.find(function(e) { return e.id == id; });
+  if (!email) return;
+  email.is_flagged = !email.is_flagged;
+  renderInbox();
+  if (activeEmailId == id) {
+    var flagIcon = document.getElementById('inbox-detail-flag-icon');
+    if (flagIcon) {
+      flagIcon.className = email.is_flagged ? 'ti ti-flag' : 'ti ti-flag';
+      flagIcon.style.color = email.is_flagged ? '#fbbf24' : '';
+    }
+  }
+  updateBadges();
+}
+
+function renderSR() {
   var container = document.getElementById('sr-tbody');
   if (!container) return;
   
@@ -3701,15 +3791,16 @@ async function renderSR() {
   document.getElementById('sr-count-label').textContent = 'Service Requests (' + filtered.length + ')';
   
   if (filtered.length === 0) {
-    container.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:20px;color:var(--text-muted);">No service requests found</td></tr>';
+    container.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:20px;color:var(--text-muted);">No service requests found</td></tr>';
     return;
   }
   
   var html = '';
   filtered.forEach(function(sr) {
-html += '<tr onclick="openModal(\'' + sr.sr_id + '\')"><td><input type="checkbox" onclick="event.stopPropagation();toggleSelectRow(this, \'' + sr.sr_id + '\')" /></td><td>' + sr.sr_id + '</td><td>' + (sr.client || '—') + '</td><td>' + (sr.site || '—') + '</td><td>' + sr.subject + '</td><td>' + getCategoryIcon(sr.category) + ' ' + (sr.category || '—') + '</td><td>' + priBadge(sr.priority) + '</td><td>' + (sr.assigned_to || '—') + '</td><td><span class="comment-display ' + (!sr.notes ? 'placeholder' : '') + '" onclick="event.stopPropagation();editSRNote(\'' + sr.sr_id + '\')">' + (sr.notes || 'Click to add note') + '</span></td><td>' + srStatusBadge(sr.status) + '</td></tr>';
+    html += '<tr onclick="openModal(\'' + sr.sr_id + '\')"><td><input type="checkbox" onclick="event.stopPropagation();toggleSelectRow(this, \'' + sr.sr_id + '\')" /></td><td>' + sr.sr_id + '</td><td>' + (sr.client || '—') + '</td><td>' + (sr.site || '—') + '</td><td>' + sr.subject + '</td><td>' + getCategoryIcon(sr.category) + ' ' + (sr.category || '—') + '</td><td>' + priBadge(sr.priority) + '</td><td>' + (sr.assigned_to || '—') + '</td><td><span class="comment-display ' + (!sr.notes ? 'placeholder' : '') + '" onclick="event.stopPropagation();editSRNote(\'' + sr.sr_id + '\')">' + (sr.notes || 'Click to add note') + '</span></td><td>' + srStatusBadge(sr.status) + '</td></tr>';
   });
   container.innerHTML = html;
+  updateSRBadge();
 }
 
 async function renderAuditLog() {
