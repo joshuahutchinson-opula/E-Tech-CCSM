@@ -328,7 +328,7 @@ app.post('/api/activity-log', async (req, res) => {
 
   const { user, action, detail } = req.body;
   try {
-    await pool.query('INSERT INTO activity_log (client_id, user, action, detail) VALUES ($1, $2, $3, $4)', [1, user || 'system', action, detail]);
+const result = await pool.query('SELECT * FROM activity_log WHERE client_id = $1 ORDER BY created_at DESC LIMIT $2', [1, limit]);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
