@@ -3889,18 +3889,67 @@ async function autoSave() {
   var notes = document.getElementById('m-notes').value;
   
   try {
-    await apiCall('/service-requests/' + sr.id, {
+    const result = await apiCall('/service-requests/' + sr.id, {
       method: 'PUT',
       body: JSON.stringify({ priority, assigned_to: assigned, status, notes })
     });
+    
+    // Update the local data immediately
     sr.priority = priority;
     sr.assigned_to = assigned;
     sr.status = status;
     sr.notes = notes;
+    
+    // If the server returned updated data, use it
+    if (result && result.data) {
+      Object.assign(sr, result.data);
+    }
+    
     setUnsaved(false);
+    
+    // Update the status badge in the table without full refresh
+    updateSRStatusInTable(sr.sr_id, status);
+    
+    // Update the detail modal if it's open
+    updateSRDetailModal(sr);
+    
+    toast('Updated: ' + status, 'success');
   } catch (err) {
     console.error('Auto-save failed:', err);
+    toast('Save failed: ' + err.message, 'error');
   }
+}
+
+// Add this new function to update just the status badge in the table
+function updateSRStatusInTable(srId, status) {
+  var rows = document.querySelectorAll('#sr-tbody tr');
+  rows.forEach(function(row) {
+    var cells = row.querySelectorAll('td');
+    if (cells.length > 0 && cells[0].textContent === srId) {
+      var statusCell = cells[cells.length - 1];
+      if (statusCell) {
+        statusCell.innerHTML = srStatusBadge(status);
+      }
+    }
+  });
+}
+
+// Add this new function to update the detail modal
+function updateSRDetailModal(sr) {
+  if (!sr) return;
+  var statusSelect = document.getElementById('m-status-sel');
+  var prioritySelect = document.getElementById('m-priority-sel');
+  var assignedSelect = document.getElementById('m-assigned-sel');
+  var notesField = document.getElementById('m-notes');
+  
+  if (statusSelect) statusSelect.value = sr.status || 'Open';
+  if (prioritySelect) prioritySelect.value = sr.priority || 'Medium';
+  if (assignedSelect) assignedSelect.value = sr.assigned_to || 'Unassigned';
+  if (notesField) notesField.value = sr.notes || '';
+  
+  // Update SLA display (remove if you want)
+  var slaSpan = document.getElementById('m-sla');
+  if (slaSpan) slaSpan.textContent = '—';
 }
 
 async function addAuditLogEntry(user, action, detail) {
