@@ -1720,410 +1720,95 @@ input::placeholder, textarea::placeholder {
 
 <script>
 // ============================================================
-// ── CLIENTS_VIEW_DATA — ALL CAMERAS FROM EXCEL ──────────────
+// ── API CONFIGURATION ────────────────────────────────────────
 // ============================================================
 
-var CLIENTS_VIEW_DATA = {
-  "kftl": {
-    "name": "KFTL",
-    "logo": "logo-kftl.png",
-    "color": "#e31b23",
-    "secondary": "#b91c1c",
-    "assets": {
-"cameras": [
-  {"name":"ATM Walkway","zone":"Admin/HR","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.102.79","mac_address":"AC-CC-8E-FD-4C-E4","warranty":"5-year (Axis standard)"},
-  {"name":"Bathroom Passage 1","zone":"Engineering","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.102.156","mac_address":"AC-CC-8E-FD-14-C9","warranty":"5-year (Axis standard)"},
-  {"name":"Board N Ceo Secretary","zone":"Admin/HR","status":"Working","comments":"","model":"AXIS P3245-LV","manufacturer":"Axis","resolution":"1920x1080 (2.1MP)","archiver":"Archiver 4","ip_address":"172.17.102.130","mac_address":"AC-CC-8E-FE-C8-D8","warranty":"5-year (Axis standard)"},
-  {"name":"Bathroom Passage 2","zone":"Engineering","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.102.157","mac_address":"AC-CC-8E-FD-15-D8","warranty":"5-year (Axis standard)"},
-  {"name":"Executive 2nd Fl Exit Stair Lower Case","zone":"Admin/HR","status":"Working","comments":"","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Battery Shop","zone":"Engineering","status":"Working","comments":"Lift Required","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 4","ip_address":"172.17.102.154","mac_address":"AC-CC-8E-FD-5F-15","warranty":"5-year (Axis standard)"},
-  {"name":"Executive 2nd Fl Exit Stair Top Case","zone":"Admin/HR","status":"Working","comments":"","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Data Center A","zone":"Engineering","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 2","ip_address":"172.17.103.153","mac_address":"AC-CC-8E-FD-4D-15","warranty":"5-year (Axis standard)"},
-  {"name":"HR Meeting Rm Passage","zone":"Admin/HR","status":"Working","comments":"Camera refocused","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"F Changing Room Exit Passage","zone":"Engineering","status":"Working","comments":"","model":"AXIS P3245-LV","manufacturer":"Axis","resolution":"1920x1080 (2.1MP)","archiver":"Archiver 5","ip_address":"172.17.102.149","mac_address":"AC-CC-8E-F7-1F-A4","warranty":"5-year (Axis standard)"},
-  {"name":"HR Waiting Area","zone":"Admin/HR","status":"Working","comments":"","model":"AXIS P3245-LV","manufacturer":"Axis","resolution":"1920x1080 (2.1MP)","archiver":"Archiver 3","ip_address":"172.17.102.133","mac_address":"AC-CC-8E-FE-CA-4E","warranty":"5-year (Axis standard)"},
-  {"name":"Eng Workshop 3","zone":"Engineering","status":"Working","comments":"Lift Required","model":"AXIS P3245-LV","manufacturer":"Axis","resolution":"1920x1080 (2.1MP)","archiver":"Archiver 5","ip_address":"172.17.102.152","mac_address":"AC-CC-8E-FE-C8-B3","warranty":"5-year (Axis standard)"},
-  {"name":"Lobby HR","zone":"Admin/HR","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.102.80","mac_address":"AC-CC-8E-FD-4C-E5","warranty":"5-year (Axis standard)"},
-  {"name":"Eng Rear Passage","zone":"Engineering","status":"Working","comments":"","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Meeting RM Passage","zone":"Admin/HR","status":"Working","comments":"","model":"AXIS P3245-LV","manufacturer":"Axis","resolution":"1920x1080 (2.1MP)","archiver":"Archiver 3","ip_address":"172.17.102.128","mac_address":"AC-CC-8E-FE-C8-B5","warranty":"5-year (Axis standard)"},
-  {"name":"Engineering East Stair","zone":"Engineering","status":"Working","comments":"","model":"AXIS P3245-LV","manufacturer":"Axis","resolution":"1920x1080 (2.1MP)","archiver":"Archiver 5","ip_address":"172.17.102.146","mac_address":"AC-CC-8E-F0-36-5B","warranty":"5-year (Axis standard)"},
-  {"name":"Payroll Walkway","zone":"Admin/HR","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.102.93","mac_address":"AC-CC-8E-FD-4D-01","warranty":"5-year (Axis standard)"},
-  {"name":"Engineering West Stair","zone":"Engineering","status":"Working","comments":"","model":"AXIS P3245-LV","manufacturer":"Axis","resolution":"1920x1080 (2.1MP)","archiver":"Archiver 4","ip_address":"172.17.102.147","mac_address":"AC-CC-8E-F0-36-86","warranty":"5-year (Axis standard)"},
-  {"name":"Planning Main Entry","zone":"Admin/HR","status":"Working","comments":"","model":"AXIS P3245-LV","manufacturer":"Axis","resolution":"1920x1080 (2.1MP)","archiver":"Archiver 3","ip_address":"172.17.102.129","mac_address":"AC-CC-8E-FE-C8-BF","warranty":"5-year (Axis standard)"},
-  {"name":"IT Entry","zone":"Engineering","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 2","ip_address":"172.17.103.152","mac_address":"AC-CC-8E-FD-4D-0B","warranty":"5-year (Axis standard)"},
-  {"name":"Procurement Passage","zone":"Admin/HR","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 2","ip_address":"172.17.102.92","mac_address":"AC-CC-8E-FD-4C-F7","warranty":"5-year (Axis standard)"},
-  {"name":"IT Exit","zone":"Engineering","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 2","ip_address":"172.17.103.151","mac_address":"AC-CC-8E-FD-4C-D1","warranty":"5-year (Axis standard)"},
-  {"name":"IT Stairwell","zone":"Engineering","status":"Working","comments":"","model":"AXIS P3245-LV","manufacturer":"Axis","resolution":"1920x1080 (2.1MP)","archiver":"Archiver 4","ip_address":"172.17.102.145","mac_address":"AC-CC-8E-F0-36-56","warranty":"5-year (Axis standard)"},
-  {"name":"Engineering Lunch Room","zone":"Engineering","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 2","ip_address":"172.17.102.97","mac_address":"AC-CC-8E-FD-42-75","warranty":"5-year (Axis standard)"},
-  {"name":"Engineering Entry","zone":"Engineering","status":"Working","comments":"","model":"AXIS P3245-LV","manufacturer":"Axis","resolution":"1920x1080 (2.1MP)","archiver":"Archiver 5","ip_address":"172.17.102.151","mac_address":"AC-CC-8E-F7-1F-E3","warranty":"5-year (Axis standard)"},
-  {"name":"Engineering Gym","zone":"Engineering","status":"Working","comments":"","model":"AXIS P3245-LV","manufacturer":"Axis","resolution":"1920x1080 (2.1MP)","archiver":"Archiver 4","ip_address":"172.17.102.150","mac_address":"AC-CC-8E-FE-D7-D3","warranty":"5-year (Axis standard)"},
-  {"name":"Training Room East","zone":"Engineering","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 5","ip_address":"172.17.102.84","mac_address":"AC-CC-8E-FD-4C-74","warranty":"5-year (Axis standard)"},
-  {"name":"Training Room West","zone":"Engineering","status":"Working","comments":"","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Eng Lunch RM Kitchen","zone":"Engineering","status":"Working","comments":"","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Engineering Enrty Passage","zone":"Engineering","status":"Working","comments":"","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Tyre Shop","zone":"High Mast","status":"Working","comments":"Lift Required","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.102.153","mac_address":"AC-CC-8E-FD-5B-F2","warranty":"5-year (Axis standard)"},
-  {"name":"HM5(11)","zone":"High Mast","status":"Working","comments":"Camera had default IP reconfigured","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.102.222","mac_address":"00-18-85-2F-E7-97","warranty":"5-year (Avigilon standard)"},
-  {"name":"HM5(134)","zone":"High Mast","status":"Working","comments":"Camera lens damaged","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.102.222","mac_address":"00-18-85-2F-E7-97","warranty":"5-year (Avigilon standard)"},
-  {"name":"HM8","zone":"High Mast","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.102.220","mac_address":"00-18-85-30-A2-16","warranty":"5-year (Avigilon standard)"},
-  {"name":"Berth 9 PTZ","zone":"High Mast","status":"Working","comments":"","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 5","ip_address":"172.17.103.146","mac_address":"AC-CC-8E-FF-C9-9F","warranty":"5-year (Axis standard)"},
-  {"name":"HM14","zone":"High Mast","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.102.212","mac_address":"00-18-85-30-A2-22","warranty":"5-year (Avigilon standard)"},
-  {"name":"HM3 PTZ","zone":"High Mast","status":"OFFLINE","comments":"POE added, camera shows signs of beign defective","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 2","ip_address":"172.17.102.218","mac_address":"00-04-7D-27-9F-CF","warranty":"3-year (Pelco standard)"},
-  {"name":"HM23","zone":"High Mast","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 5","ip_address":"172.17.102.201","mac_address":"AC-CC-8E-FD-43-FE","warranty":"5-year (Axis standard)"},
-  {"name":"HM4 PTZ","zone":"High Mast","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 1","ip_address":"172.17.102.219","mac_address":"00-04-7D-27-9F-FF","warranty":"3-year (Pelco standard)"},
-  {"name":"HM24A","zone":"High Mast","status":"Not Working","comments":"No Fibre link","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.102.214","mac_address":"AC-CC-8E-FD-60-76","warranty":"5-year (Axis standard)"},
-  {"name":"HM5 PTZ","zone":"High Mast","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 5","ip_address":"172.17.102.223","mac_address":"00-04-7D-27-A0-03","warranty":"3-year (Pelco standard)"},
-  {"name":"Manager Car Park Dome","zone":"High Mast","status":"Working","comments":"Camera lens Damaged","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.102.187","mac_address":"AC-CC-8E-FD-15-C7","warranty":"5-year (Axis standard)"},
-  {"name":"HM8 PTZ","zone":"High Mast","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 1","ip_address":"172.17.102.221","mac_address":"00-04-7D-27-9F-C9","warranty":"3-year (Pelco standard)"},
-  {"name":"N30","zone":"High Mast","status":"Working","comments":"Camera damaged","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.102.209","mac_address":"AC-CC-8E-FD-42-79","warranty":"5-year (Axis standard)"},
-  {"name":"HM10 PTZ","zone":"High Mast","status":"Working","comments":"Camera is reconfigured , had default IP","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 1","ip_address":"172.17.102.224","mac_address":"00-04-7D-27-9F-C8","warranty":"3-year (Pelco standard)"},
-  {"name":"N31","zone":"High Mast","status":"Working","comments":"Camera needs to be reset , POE replaced","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 5","ip_address":"172.17.102.208","mac_address":"AC-CC-8E-FD-43-27","warranty":"5-year (Axis standard)"},
-  {"name":"HM11 PTZ","zone":"High Mast","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 3","ip_address":"172.17.102.225","mac_address":"00-04-7D-27-9F-F0","warranty":"3-year (Pelco standard)"},
-  {"name":"N33","zone":"High Mast","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.102.206","mac_address":"AC-CC-8E-FD-4C-C2","warranty":"5-year (Axis standard)"},
-  {"name":"HM14 PTZ","zone":"High Mast","status":"Working","comments":"","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 3","ip_address":"172.17.103.145","mac_address":"AC-CC-8E-F7-F4-5A","warranty":"5-year (Axis standard)"},
-  {"name":"N34","zone":"High Mast","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 5","ip_address":"172.17.102.205","mac_address":"AC-CC-8E-FD-41-4E","warranty":"5-year (Axis standard)"},
-  {"name":"HM23 PTZ","zone":"High Mast","status":"Not Working","comments":"cables ends were corroded. Ends recrimped. Camera is online. Camera remained online for a week, second checks revealed the camera is over heating. Camera is deemed defective","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 3","ip_address":"172.17.102.200","mac_address":"00-04-7D-27-9F-D2","warranty":"3-year (Pelco standard)"},
-  {"name":"HM14 PTZ 2","zone":"High Mast","status":"Working","comments":"Will be added genetec(172.17.103.200)","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"HM24A PTZ","zone":"High Mast","status":"Not Working","comments":"No Fibre link due to HM26 being down","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 3","ip_address":"172.17.102.215","mac_address":"AC-CC-8E-FF-B8-93","warranty":"5-year (Axis standard)"},
-  {"name":"HM28 PTZ","zone":"High Mast","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 3","ip_address":"172.17.102.202","mac_address":"00-04-7D-27-9F-D4","warranty":"3-year (Pelco standard)"},
-  {"name":"Manager Car Park PTZ","zone":"High Mast","status":"Not Working","comments":"Defective","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 4","ip_address":"172.17.102.186","mac_address":"00-04-7D-27-A0-06","warranty":"3-year (Pelco standard)"},
-  {"name":"N Terminal NW Corner PTZ","zone":"High Mast","status":"Working","comments":"","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 2","ip_address":"172.17.102.226","mac_address":"AC-CC-8E-FF-B8-DF","warranty":"5-year (Axis standard)"},
-  {"name":"N25 PTZ","zone":"High Mast","status":"Not Working","comments":"Defective","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 1","ip_address":"172.17.102.216","mac_address":"00-04-7D-27-9F-BA","warranty":"3-year (Pelco standard)"},
-  {"name":"N30 PTZ","zone":"High Mast","status":"Working","comments":"Reset needs to be done","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 4","ip_address":"172.17.102.210","mac_address":"00-04-7D-27-9F-EF","warranty":"3-year (Pelco standard)"},
-  {"name":"N31 PTZ- Context","zone":"High Mast","status":"Not Working","comments":"POE injector changed, Camera needs reset, maybe defective","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"N34 PTZ - Context","zone":"High Mast","status":"Not Working","comments":"Defective","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Visitor Car Park PTZ 1","zone":"High Mast","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 2","ip_address":"172.17.102.184","mac_address":"00-04-7D-27-9F-C3","warranty":"3-year (Pelco standard)"},
-  {"name":"Visitor Car Park PTZ 2","zone":"High Mast","status":"Not Working","comments":"REPLACEMENT/AXIS Q6318-LE 60HZ to be installed","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 2","ip_address":"172.17.102.185","mac_address":"00-04-7D-27-9F-E2","warranty":"3-year (Pelco standard)"},
-  {"name":"N Fence","zone":"North Terminal Perimeter","status":"Working","comments":"Analytics Applied","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.103.109","mac_address":"AC-CC-8E-FD-43-F1","warranty":"5-year (Axis standard)"},
-  {"name":"East West Corner Perimeter Rest Bay","zone":"North Terminal Perimeter","status":"Working","comments":"Analytics Applied","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 1","ip_address":"172.17.102.108","mac_address":"AC-CC-8E-F4-14-45","warranty":"5-year (Axis standard)"},
-  {"name":"HR Tower 1 PTZ","zone":"North Terminal Perimeter","status":"Working","comments":"","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 2","ip_address":"172.17.102.195","mac_address":"AC-CC-8E-FF-BA-30","warranty":"5-year (Axis standard)"},
-  {"name":"N Terminal NW Corner","zone":"North Terminal Perimeter","status":"Working","comments":"Analytics Applied","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.102.227","mac_address":"AC-CC-8E-F4-13-C0","warranty":"5-year (Axis standard)"},
-  {"name":"HR Tower 2 PTZ","zone":"North Terminal Perimeter","status":"Working","comments":"","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 2","ip_address":"172.17.102.196","mac_address":"AC-CC-8E-FF-B8-E9","warranty":"5-year (Axis standard)"},
-  {"name":"North South Corner Rest Bay","zone":"North Terminal Perimeter","status":"Working","comments":"Analytics Applied","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 4","ip_address":"172.17.102.107","mac_address":"AC-CC-8E-FD-5E-A9","warranty":"5-year (Axis standard)"},
-  {"name":"PPE Store Perim PTZ","zone":"North Terminal Perimeter","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 1","ip_address":"172.17.102.203","mac_address":"00-04-7D-27-9F-C1","warranty":"3-year (Pelco standard)"},
-  {"name":"PPE Store Perim N","zone":"North Terminal Perimeter","status":"Working","comments":"Analytics Applied","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.162","mac_address":"AC-CC-8E-FD-5B-D2","warranty":"5-year (Axis standard)"},
-  {"name":"Wharfage Perim N Exit Gate PTZ","zone":"North Terminal Perimeter","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 1","ip_address":"172.17.102.183","mac_address":"00-04-7D-27-9F-FA","warranty":"3-year (Pelco standard)"},
-  {"name":"PPE Store Perim S","zone":"North Terminal Perimeter","status":"Working","comments":"Analytics Applied","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 4","ip_address":"172.17.102.159","mac_address":"AC-CC-8E-FD-5E-9B","warranty":"5-year (Axis standard)"},
-  {"name":"Wharfage Perim","zone":"North Terminal Perimeter","status":"Not Working","comments":"replacement needed","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 1","ip_address":"172.17.102.180","mac_address":"AC-CC-8E-FD-5E-8B","warranty":"5-year (Axis standard)"},
-  {"name":"Refueling N KWC Perim Thermal","zone":"North Terminal Thermal","status":"Working","comments":"","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"N31 PTZ - Thermal","zone":"North Terminal Thermal","status":"Not Working","comments":"POE injector changed, Camera needs reset, maybe defective","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"N Fence 1 (W) Thermal","zone":"North Terminal Thermal","status":"Working","comments":"","model":"AXIS Q1941-E","manufacturer":"Axis","resolution":"384x288 (thermal)","archiver":"Archiver 2","ip_address":"172.17.102.193","mac_address":"B8-A4-4F-04-D4-84","warranty":"5-year (Axis standard)"},
-  {"name":"N34 PTZ - Thermal","zone":"North Terminal Thermal","status":"Not Working","comments":"No camera on Pole","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"N Fence 2 (E) Thermal","zone":"North Terminal Thermal","status":"Working","comments":"","model":"AXIS Q1942-E","manufacturer":"Axis","resolution":"640x480 (thermal)","archiver":"Archiver 2","ip_address":"172.17.102.169","mac_address":"AC-CC-8E-CA-3D-7E","warranty":"5-year (Axis standard)"},
-  {"name":"N Fence 3 (W) Thermal","zone":"North Terminal Thermal","status":"Working","comments":"","model":"AXIS Q1941-E","manufacturer":"Axis","resolution":"384x288 (thermal)","archiver":"Archiver 2","ip_address":"172.17.102.181","mac_address":"B8-A4-4F-04-D4-86","warranty":"5-year (Axis standard)"},
-  {"name":"N Fence Stripping Warehouse Thermal","zone":"North Terminal Thermal","status":"Working","comments":"","model":"AXIS Q1942-E","manufacturer":"Axis","resolution":"640x480 (thermal)","archiver":"Archiver 4","ip_address":"172.17.102.170","mac_address":"AC-CC-8E-CA-3D-52","warranty":"5-year (Axis standard)"},
-  {"name":"N30 Thermal","zone":"North Terminal Thermal","status":"Not Working","comments":"Cable replacement needed , camera taken down","model":"AXIS Q1941-E","manufacturer":"Axis","resolution":"384x288 (thermal)","archiver":"Archiver 2","ip_address":"172.17.102.178","mac_address":"B8-A4-4F-05-0D-E5","warranty":"5-year (Axis standard)"},
-  {"name":"PPE Perim N Thermal","zone":"North Terminal Thermal","status":"Working","comments":"","model":"AXIS Q1941-E","manufacturer":"Axis","resolution":"384x288 (thermal)","archiver":"Archiver 2","ip_address":"172.17.102.173","mac_address":"AC-CC-8E-FB-EA-75","warranty":"5-year (Axis standard)"},
-  {"name":"PPE Perim S Thermal","zone":"North Terminal Thermal","status":"Working","comments":"","model":"AXIS Q1942-E","manufacturer":"Axis","resolution":"640x480 (thermal)","archiver":"Archiver 2","ip_address":"172.17.102.171","mac_address":"AC-CC-8E-CA-3F-C7","warranty":"5-year (Axis standard)"},
-  {"name":"S Perim Berth 9 Area Thermal","zone":"North Terminal Thermal","status":"Working","comments":"Analytics Applied","model":"AXIS Q1942-E","manufacturer":"Axis","resolution":"640x480 (thermal)","archiver":"Archiver 5","ip_address":"172.17.102.190","mac_address":"AC-CC-8E-CA-3D-DD","warranty":"5-year (Axis standard)"},
-  {"name":"W Perim Berth 9 Area Thermal","zone":"North Terminal Thermal","status":"Working","comments":"","model":"AXIS Q1941-E","manufacturer":"Axis","resolution":"384x288 (thermal)","archiver":"Archiver 3","ip_address":"172.17.102.191","mac_address":"B8-A4-4F-05-0E-5E","warranty":"5-year (Axis standard)"},
-  {"name":"Canteen East Entry","zone":"Welfare","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.102.53","mac_address":"AC-CC-8E-FD-43-C4","warranty":"5-year (Axis standard)"},
-  {"name":"Engineering Stationary Passage","zone":"PPE Store/Inventory( Engineering )","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.102.163","mac_address":"AC-CC-8E-FD-16-3A","warranty":"5-year (Axis standard)"},
-  {"name":"Canteen West Entry","zone":"Welfare","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.102.54","mac_address":"AC-CC-8E-FD-43-D1","warranty":"5-year (Axis standard)"},
-  {"name":"PPE N Stationary Entry/Exit Gate","zone":"PPE Store/Inventory( Engineering )","status":"Working","comments":"Lift Required","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Cashier / Service Counter Canteen","zone":"Welfare","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.102.52","mac_address":"AC-CC-8E-FD-43-9C","warranty":"5-year (Axis standard)"},
-  {"name":"PPE Store Entrance","zone":"PPE Store/Inventory( Engineering )","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 2","ip_address":"172.17.102.91","mac_address":"AC-CC-8E-FD-4C-F1","warranty":"5-year (Axis standard)"},
-  {"name":"Dining Area 1 Canteen","zone":"Welfare","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.102.50","mac_address":"AC-CC-8E-FC-EA-04","warranty":"5-year (Axis standard)"},
-  {"name":"PPE Store Inventory","zone":"PPE Store/Inventory( Engineering )","status":"Working","comments":"","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Dining Area 2 Canteen","zone":"Welfare","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.102.51","mac_address":"AC-CC-8E-FD-42-FE","warranty":"5-year (Axis standard)"},
-  {"name":"Store Entrance","zone":"PPE Store/Inventory( Engineering )","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 2","ip_address":"172.17.102.86","mac_address":"AC-CC-8E-FD-42-93","warranty":"5-year (Axis standard)"},
-  {"name":"Welfare Passage","zone":"Welfare","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.102.55","mac_address":"AC-CC-8E-FD-43-D6","warranty":"5-year (Axis standard)"},
-  {"name":"Store Rear Entry N Passage","zone":"PPE Store/Inventory( Engineering )","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.102.158","mac_address":"AC-CC-8E-FD-16-29","warranty":"5-year (Axis standard)"},
-  {"name":"Store Warehouse 3","zone":"PPE Store/Inventory( Engineering )","status":"Working","comments":"Lift Required","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 4","ip_address":"172.17.102.161","mac_address":"AC-CC-8E-FD-60-A9","warranty":"5-year (Axis standard)"},
-  {"name":"Store Warehouse","zone":"PPE Store/Inventory( Engineering )","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 2","ip_address":"172.17.102.88","mac_address":"AC-CC-8E-FD-42-9B","warranty":"5-year (Axis standard)"},
-  {"name":"Wharfage Office Cashier 2","zone":"Wharfage","status":"Working","comments":"Dome needs to be changed","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.102.69","mac_address":"AC-CC-8E-F4-76-63","warranty":"5-year (Axis standard)"},
-  {"name":"Cashier Window 1 Wharfage","zone":"Wharfage","status":"Working","comments":"YES","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.102.76","mac_address":"AC-CC-8E-FD-4B-B8","warranty":"5-year (Axis standard)"},
-  {"name":"Cashier Window 2 Wharfage","zone":"Wharfage","status":"Working","comments":"YES","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.102.77","mac_address":"AC-CC-8E-FD-4C-0C","warranty":"5-year (Axis standard)"},
-  {"name":"Cashier Window 3 Wharfage","zone":"Wharfage","status":"Working","comments":"YES","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.102.78","mac_address":"AC-CC-8E-FD-4C-CB","warranty":"5-year (Axis standard)"},
-  {"name":"Registry Entry Passage","zone":"Registry Office","status":"OFFLINE","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.102.94","mac_address":"AC-CC-8E-FD-4D-35","warranty":"5-year (Axis standard)"},
-  {"name":"Customer / Broker Entry","zone":"Wharfage","status":"Working","comments":"YES","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Registry Office Passage Rear","zone":"Registry Office","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.102.89","mac_address":"AC-CC-8E-FD-4C-1B","warranty":"5-year (Axis standard)"},
-  {"name":"Customer/Broker Lobby NW Corner","zone":"Wharfage","status":"Working","comments":"YES","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Registry Passage to Warehouse","zone":"Registry Office","status":"Working","comments":"","model":"AXIS P3245-LV","manufacturer":"Axis","resolution":"1920x1080 (2.1MP)","archiver":"Archiver 3","ip_address":"172.17.102.144","mac_address":"AC-CC-8E-FE-C8-D5","warranty":"5-year (Axis standard)"},
-  {"name":"Customer/Broker Lobby SE Corner","zone":"Wharfage","status":"Working","comments":"YES","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Wharfage Office Cashier 1","zone":"Wharfage","status":"Working","comments":"YES","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 1","ip_address":"172.17.102.68","mac_address":"AC-CC-8E-FD-16-FD","warranty":"5-year (Axis standard)"},
-  {"name":"Wharfage Office Cashier 3","zone":"Wharfage","status":"Working","comments":"YES","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 1","ip_address":"172.17.102.70","mac_address":"AC-CC-8E-FD-15-DB","warranty":"5-year (Axis standard)"},
-  {"name":"Wharfage Office Cashier Emergency Door","zone":"Wharfage","status":"Working","comments":"YES","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 1","ip_address":"172.17.102.71","mac_address":"AC-CC-8E-FD-16-EA","warranty":"5-year (Axis standard)"},
-  {"name":"Wharfage Office NW Corner","zone":"Wharfage","status":"Working","comments":"Ceiling tile replaced","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 1","ip_address":"172.17.102.66","mac_address":"AC-CC-8E-FD-4B-8A","warranty":"5-year (Axis standard)"},
-  {"name":"Wharface Storage Area/Safe","zone":"Wharfage","status":"Working","comments":"YES","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Wharfage Staff Entry Office","zone":"Wharfage","status":"Working","comments":"Ceiling tile replaced","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Tollgate Entry LPR - LPR","zone":"LPR System Units","status":"Working","comments":"","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Tolgate Exit LPR LPR","zone":"LPR System Units","status":"Working","comments":"","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Truck Entry 1 LPR","zone":"LPR System Units","status":"Working","comments":"","model":"AutoVu SharpOS","manufacturer":"AutoVu","resolution":"","archiver":"Archiver 1","ip_address":"172.17.103.186","mac_address":"0C-BF-15-01-A1-5F","warranty":""},
-  {"name":"Truck Entry 2 LPR","zone":"LPR System Units","status":"Working","comments":"","model":"AutoVu SharpOS","manufacturer":"AutoVu","resolution":"","archiver":"Archiver 1","ip_address":"172.17.103.167","mac_address":"0C-BF-15-01-A1-A6","warranty":""},
-  {"name":"Truck Entry LPR 3","zone":"LPR System Units","status":"Working","comments":"","model":"SharpV (Gen 3)","manufacturer":"Genetec","resolution":"","archiver":"Archiver 1","ip_address":"172.17.103.190","mac_address":"0C-BF-15-02-9F-30","warranty":""},
-  {"name":"Truck Entry LPR 4","zone":"LPR System Units","status":"Working","comments":"","model":"SharpV (Gen 3)","manufacturer":"Genetec","resolution":"","archiver":"Archiver 1","ip_address":"172.17.103.191","mac_address":"0C-BF-15-02-9D-2B","warranty":""},
-  {"name":"Truck Exit LPR","zone":"LPR System Units","status":"Working","comments":"","model":"AutoVu SharpOS","manufacturer":"AutoVu","resolution":"","archiver":"Archiver 1","ip_address":"172.17.102.194","mac_address":"0C-BF-15-01-A1-E0","warranty":""},
-  {"name":"S Bay T","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.138","mac_address":"AC-CC-8E-FD-5B-CE","warranty":"5-year (Axis standard)"},
-  {"name":"SW Corner Perim PTZ","zone":"JIEIC Warehouse","status":"Working","comments":"REPLACED (6/29/2026)","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 4","ip_address":"172.17.102.155","mac_address":"00-04-7D-27-A0-04","warranty":"3-year (Pelco standard)"},
-  {"name":"N Bay 2","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 1","ip_address":"172.17.102.111","mac_address":"AC-CC-8E-F4-14-2C","warranty":"5-year (Axis standard)"},
-  {"name":"Warehouse Central PTZ 2","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 2","ip_address":"172.17.102.175","mac_address":"AC-CC-8E-FF-B8-A2","warranty":"5-year (Axis standard)"},
-  {"name":"N Bay 5","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 1","ip_address":"172.17.102.114","mac_address":"AC-CC-8E-F4-6F-D7","warranty":"5-year (Axis standard)"},
-  {"name":"Warehouse Central PTZ","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 2","ip_address":"172.17.102.96","mac_address":"AC-CC-8E-FF-CB-38","warranty":"5-year (Axis standard)"},
-  {"name":"N Bay 7","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 1","ip_address":"172.17.102.116","mac_address":"AC-CC-8E-FD-5B-CA","warranty":"5-year (Axis standard)"},
-  {"name":"N Bay 8","zone":"JIEIC Warehouse","status":"Working","comments":"Obstacle blocking area","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 1","ip_address":"172.17.102.117","mac_address":"B8-A4-4F-01-5F-77","warranty":"5-year (Axis standard)"},
-  {"name":"N Bay 9","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 1","ip_address":"172.17.102.113","mac_address":"AC-CC-8E-F4-14-3D","warranty":"5-year (Axis standard)"},
-  {"name":"N Bay 10","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 1","ip_address":"172.17.102.115","mac_address":"AC-CC-8E-FD-5B-AC","warranty":"5-year (Axis standard)"},
-  {"name":"N Bay 11","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 1","ip_address":"172.17.102.110","mac_address":"AC-CC-8E-FD-5F-95","warranty":"5-year (Axis standard)"},
-  {"name":"N Bay 12","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 1","ip_address":"172.17.102.112","mac_address":"AC-CC-8E-F4-14-38","warranty":"5-year (Axis standard)"},
-  {"name":"N Platform 1 Stripping","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.102","mac_address":"AC-CC-8E-F4-13-CF","warranty":"5-year (Axis standard)"},
-  {"name":"N Platform 2 Stripping","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.103","mac_address":"AC-CC-8E-F4-70-D6","warranty":"5-year (Axis standard)"},
-  {"name":"NE Corner Stripping","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.140","mac_address":"AC-CC-8E-F4-6F-D4","warranty":"5-year (Axis standard)"},
-  {"name":"NW Corner Stripping","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.139","mac_address":"AC-CC-8E-F4-14-3B","warranty":"5-year (Axis standard)"},
-  {"name":"Rear Entry/ Exit","zone":"JIEIC Warehouse","status":"Working","comments":"Camera replaced 6/20/2026)","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"S Bay AB","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.118","mac_address":"AC-CC-8E-F4-6F-D8","warranty":"5-year (Axis standard)"},
-  {"name":"S Bay CD","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.119","mac_address":"AC-CC-8E-FD-5B-E4","warranty":"5-year (Axis standard)"},
-  {"name":"S Bay EF","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.120","mac_address":"B8-A4-4F-01-5F-B3","warranty":"5-year (Axis standard)"},
-  {"name":"S Bay G","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.121","mac_address":"AC-CC-8E-F4-13-85","warranty":"5-year (Axis standard)"},
-  {"name":"S Bay HI","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.122","mac_address":"AC-CC-8E-F4-13-B8","warranty":"5-year (Axis standard)"},
-  {"name":"S Bay J","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.123","mac_address":"AC-CC-8E-F4-6F-EB","warranty":"5-year (Axis standard)"},
-  {"name":"S Bay KL","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.124","mac_address":"AC-CC-8E-F4-70-44","warranty":"5-year (Axis standard)"},
-  {"name":"S Bay M","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.125","mac_address":"AC-CC-8E-F4-70-D5","warranty":"5-year (Axis standard)"},
-  {"name":"S Bay NO","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.126","mac_address":"AC-CC-8E-F4-9E-5C","warranty":"5-year (Axis standard)"},
-  {"name":"S Bay PQ","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.127","mac_address":"AC-CC-8E-F4-9F-3C","warranty":"5-year (Axis standard)"},
-  {"name":"S Bay RS","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.137","mac_address":"AC-CC-8E-FD-5B-C7","warranty":"5-year (Axis standard)"},
-  {"name":"S Bay U","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.106","mac_address":"AC-CC-8E-F4-13-83","warranty":"5-year (Axis standard)"},
-  {"name":"SE Corner Stripping","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.142","mac_address":"AC-CC-8E-F4-B8-84","warranty":"5-year (Axis standard)"},
-  {"name":"Security Station N Pedestrian Gate","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.102.58","mac_address":"AC-CC-8E-FD-4B-79","warranty":"5-year (Axis standard)"},
-  {"name":"SW Corner Perimeter 1 Stripping","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"SW Corner Perimer 2 Stripping","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.105","mac_address":"AC-CC-8E-F4-14-39","warranty":"5-year (Axis standard)"},
-  {"name":"SW Corner Stripping","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.141","mac_address":"AC-CC-8E-F4-70-E5","warranty":"5-year (Axis standard)"},
-  {"name":"Warehouse Passage","zone":"JIEIC Warehouse","status":"Working","comments":"Switch rebooted and port bandwidth adjusted","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.102.100","mac_address":"AC-CC-8E-F4-6F-EC","warranty":"5-year (Axis standard)"},
-  {"name":"Warehouse Walkway N Parking","zone":"JIEIC Warehouse","status":"Working","comments":"Analytics applied","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.101","mac_address":"AC-CC-8E-F4-70-CD","warranty":"5-year (Axis standard)"},
-  {"name":"Car Park 3","zone":"Port Entry Exit","status":"Working","comments":"Lift required","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.102.166","mac_address":"AC-CC-8E-F4-9E-4F","warranty":"5-year (Axis standard)"},
-  {"name":"Toll Booth Exit PTZ","zone":"Port Entry Exit","status":"Working","comments":"Lift required","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 4","ip_address":"172.17.102.176","mac_address":"AC-CC-8E-FF-B9-9B","warranty":"5-year (Axis standard)"},
-  {"name":"Exit Gate","zone":"Port Entry Exit","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.102.90","mac_address":"AC-CC-8E-FD-4C-2B","warranty":"5-year (Axis standard)"},
-  {"name":"Toll Gate Entry PTZ","zone":"Port Entry Exit","status":"Working","comments":"Lift required","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 4","ip_address":"172.17.102.182","mac_address":"00-04-7D-27-9F-FB","warranty":"3-year (Pelco standard)"},
-  {"name":"Gate Office E Side Outside","zone":"Port Entry Exit","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.102.62","mac_address":"AC-CC-8E-FD-4B-66","warranty":"5-year (Axis standard)"},
-  {"name":"KFTL Port Main Entry Exit","zone":"Port Entry Exit","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.102.61","mac_address":"AC-CC-8E-FD-43-09","warranty":"5-year (Axis standard)"},
-  {"name":"MainEntry/Exit Security Walkway","zone":"Port Entry Exit","status":"Working","comments":"","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Main Entry/Exit Turn style","zone":"Port Entry Exit","status":"Not Working","comments":"Camera no longer exist.","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.99","mac_address":"AC-CC-8E-FD-5E-B4","warranty":"5-year (Axis standard)"},
-  {"name":"Toll Gate Entry","zone":"Port Entry Exit","status":"Working","comments":"","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 4","ip_address":"172.17.102.172","mac_address":"AC-CC-8E-F4-9E-32","warranty":"5-year (Axis standard)"},
-  {"name":"Toll Gate Exit","zone":"Port Entry Exit","status":"Working","comments":"","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 4","ip_address":"172.17.102.174","mac_address":"AC-CC-8E-FD-60-9A","warranty":"5-year (Axis standard)"},
-  {"name":"Tollgate Entry LPR - Context","zone":"Port Entry Exit","status":"Working","comments":"","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Tollgate Exit LPR - Context","zone":"Port Entry Exit","status":"Working","comments":"","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Truck Entry 1","zone":"Port Entry Exit","status":"Working","comments":"Analytics Applied","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.103.150","mac_address":"AC-CC-8E-FD-43-0B","warranty":"5-year (Axis standard)"},
-  {"name":"Truck Entry 1 LPR Context","zone":"Port Entry Exit","status":"Working","comments":"","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Truck Entry 2","zone":"Port Entry Exit","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.103.149","mac_address":"AC-CC-8E-FD-4D-47","warranty":"5-year (Axis standard)"},
-  {"name":"Truck entry 2 LPR - Context","zone":"Port Entry Exit","status":"Working","comments":"","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Truck Entry LPR 3 - Context","zone":"Port Entry Exit","status":"Working","comments":"","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Truck Entry LPR 4 - Context","zone":"Port Entry Exit","status":"Working","comments":"","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Truck Exit","zone":"Port Entry Exit","status":"Working","comments":"Analytics Applied","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.103.148","mac_address":"B8-A4-4F-08-13-1C","warranty":"5-year (Axis standard)"},
-  {"name":"Truck Exit LPR - Context","zone":"Port Entry Exit","status":"Working","comments":"","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Truck Guard House Exit","zone":"Port Entry Exit","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 2","ip_address":"172.17.102.179","mac_address":"AC-CC-8E-FD-4C-C0","warranty":"5-year (Axis standard)"},
-  {"name":"Broker Parking area","zone":"Car Parks","status":"Working","comments":"","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.102.85","mac_address":"AC-CC-8E-F4-70-D4","warranty":"5-year (Axis standard)"},
-  {"name":"Car Park 1","zone":"Car Parks","status":"Working","comments":"","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 4","ip_address":"172.17.102.164","mac_address":"AC-CC-8E-F4-6F-CD","warranty":"5-year (Axis standard)"},
-  {"name":"Car Park 2","zone":"Car Parks","status":"Working","comments":"","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 4","ip_address":"172.17.102.165","mac_address":"AC-CC-8E-F4-6F-E2","warranty":"5-year (Axis standard)"},
-  {"name":"Car Park 4","zone":"Car Parks","status":"Working","comments":"","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.102.167","mac_address":"AC-CC-8E-FD-5B-CD","warranty":"5-year (Axis standard)"},
-  {"name":"Car Park 5","zone":"Car Parks","status":"Working","comments":"","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.102.168","mac_address":"AC-CC-8E-FD-60-3D","warranty":"5-year (Axis standard)"},
-  {"name":"Car Park 6","zone":"Car Parks","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.102.56","mac_address":"AC-CC-8E-FD-43-D7","warranty":"5-year (Axis standard)"},
-  {"name":"Gate Office Eastern Side","zone":"Others","status":"Working","comments":"","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Monitoring Room 1","zone":"Others","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.103.180","mac_address":"AC-CC-8E-FD-4E-64","warranty":"5-year (Axis standard)"},
-  {"name":"Monitoring Room 2","zone":"Others","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.103.179","mac_address":"AC-CC-8E-FD-4E-77","warranty":"5-year (Axis standard)"},
-  {"name":"Productions Turn Style","zone":"Others","status":"Working","comments":"","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"Radio Room","zone":"Others","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.102.87","mac_address":"AC-CC-8E-FD-42-98","warranty":"5-year (Axis standard)"},
-  {"name":"Recreation Area Rest Bay","zone":"Others","status":"Working","comments":"Camera replaced","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 4","ip_address":"172.17.102.109","mac_address":"AC-CC-8E-F4-6F-CA","warranty":"5-year (Axis standard)"},
-  {"name":"Rest Bay Turn Style","zone":"Others","status":"Working","comments":"","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 4","ip_address":"172.17.102.81","mac_address":"AC-CC-8E-FD-5F-A0","warranty":"5-year (Axis standard)"},
-  {"name":"Security Dept West Side 1","zone":"Others","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.102.63","mac_address":"AC-CC-8E-FD-4B-69","warranty":"5-year (Axis standard)"},
-  {"name":"Security Dept West Side 2","zone":"Others","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.102.64","mac_address":"AC-CC-8E-FD-4B-6A","warranty":"5-year (Axis standard)"},
-  {"name":"Crane K","zone":"Crane","status":"Working","comments":"Crane is offline due to Maintenance","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 2","ip_address":"172.17.103.171","mac_address":"AC-CC-8E-FD-13-1A","warranty":"5-year (Axis standard)"},
-  {"name":"Crane M","zone":"Crane","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 2","ip_address":"172.17.103.173","mac_address":"AC-CC-8E-FD-14-81","warranty":"5-year (Axis standard)"},
-  {"name":"Crane S","zone":"Crane","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.103.182","mac_address":"AC-CC-8E-FD-4E-47","warranty":"5-year (Axis standard)"},
-  {"name":"Crane A","zone":"Crane","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.103.163","mac_address":"AC-CC-8E-FD-43-86","warranty":"5-year (Axis standard)"},
-  {"name":"Crane B","zone":"Crane","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 5","ip_address":"172.17.103.164","mac_address":"AC-CC-8E-FD-43-4B","warranty":"5-year (Axis standard)"},
-  {"name":"Crane N","zone":"Crane","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 5","ip_address":"172.17.103.166","mac_address":"AC-CC-8E-FD-14-6C","warranty":"5-year (Axis standard)"},
-  {"name":"Crane O","zone":"Crane","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 5","ip_address":"172.17.103.177","mac_address":"AC-CC-8E-FD-4D-EA","warranty":"5-year (Axis standard)"},
-  {"name":"Crane P","zone":"Crane","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 2","ip_address":"172.17.103.178","mac_address":"AC-CC-8E-FD-42-E0","warranty":"5-year (Axis standard)"},
-  {"name":"Crane Q","zone":"Crane","status":"Working","comments":"Crane is offline due to Maintenance","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 5","ip_address":"172.17.103.175","mac_address":"AC-CC-8E-FD-42-DA","warranty":"5-year (Axis standard)"},
-  {"name":"Crane C Under","zone":"Crane","status":"Working","comments":"","model":"AXIS Q3839-PVE","manufacturer":"Axis","resolution":"","archiver":"Archiver 3","ip_address":"172.17.102.32","mac_address":"B8-A4-4F-F4-74-13","warranty":""},
-  {"name":"Crane D Under","zone":"Crane","status":"Working","comments":"","model":"AXIS Q3839-PVE","manufacturer":"Axis","resolution":"","archiver":"Archiver 3","ip_address":"172.17.102.33","mac_address":"B8-A4-4F-F4-5F-C7","warranty":""},
-  {"name":"Crane C Backreach","zone":"Crane","status":"Working","comments":"","model":"AXIS Q3839-PVE","manufacturer":"Axis","resolution":"","archiver":"Archiver 3","ip_address":"172.17.102.34","mac_address":"B8-A4-4F-F4-66-C7","warranty":""},
-  {"name":"Crane T","zone":"Crane","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.103.168","mac_address":"AC-CC-8E-FD-13-2B","warranty":"5-year (Axis standard)"},
-  {"name":"Crane Y","zone":"Crane","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 5","ip_address":"172.17.103.174","mac_address":"AC-CC-8E-FD-4E-2A","warranty":"5-year (Axis standard)"},
-  {"name":"Crane U","zone":"Crane","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.103.169","mac_address":"AC-CC-8E-FD-13-00","warranty":"5-year (Axis standard)"},
-  {"name":"Crane R","zone":"Crane","status":"Working","comments":"Switch replaced with Blind Spot switch","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 3","ip_address":"172.17.103.181","mac_address":"AC-CC-8E-FD-4E-5F","warranty":"5-year (Axis standard)"},
-  {"name":"Crane Z","zone":"Crane","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 2","ip_address":"172.17.103.170","mac_address":"AC-CC-8E-FD-14-4A","warranty":"5-year (Axis standard)"},
-  {"name":"Crane L","zone":"Crane","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 1","ip_address":"172.17.103.172","mac_address":"AC-CC-8E-FD-12-F8","warranty":"5-year (Axis standard)"},
-  {"name":"Crane V","zone":"Crane","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 5","ip_address":"172.17.103.162","mac_address":"AC-CC-8E-FD-4C-FA","warranty":"5-year (Axis standard)"},
-  {"name":"Vet Waiting Area","zone":"Vet","status":"Working","comments":"","model":"AXIS P3267-LV","manufacturer":"Axis","resolution":"2592x1944 (5MP)","archiver":"Archiver 5","ip_address":"172.17.103.230","mac_address":"B8-A4-4F-CB-A7-8E","warranty":"5-year (Axis standard)"},
-  {"name":"Vet Office 2 Window","zone":"Vet","status":"Working","comments":"","model":"AXIS P3267-LVE","manufacturer":"Axis","resolution":"2592x1944 (5MP)","archiver":"Archiver 5","ip_address":"172.17.103.229","mac_address":"B8-A4-4F-D3-3B-1E","warranty":"5-year (Axis standard)"},
-  {"name":"Vet Office entry Walkway","zone":"Vet","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.102.73","mac_address":"AC-CC-8E-F4-76-3E","warranty":"5-year (Axis standard)"},
-  {"name":"Scanning Area 1","zone":"Others","status":"Working","comments":"","model":"AXIS M4216-V","manufacturer":"Axis","resolution":"2688x1512 (4MP, 4:3) / 3MP (16:9)","archiver":"Archiver 4","ip_address":"172.17.103.226","mac_address":"B8-A4-4F-92-F2-3D","warranty":"5-year (Axis standard)"},
-  {"name":"Scanning Area 2","zone":"Others","status":"Working","comments":"","model":"AXIS M4216-V","manufacturer":"Axis","resolution":"2688x1512 (4MP, 4:3) / 3MP (16:9)","archiver":"Archiver 4","ip_address":"172.17.103.227","mac_address":"B8-A4-4F-92-D8-3B","warranty":"5-year (Axis standard)"},
-  {"name":"Vet Office 1","zone":"Vet","status":"Working","comments":"","model":"AXIS P3267-LV","manufacturer":"Axis","resolution":"2592x1944 (5MP)","archiver":"Archiver 4","ip_address":"172.17.103.228","mac_address":"B8-A4-4F-EC-66-CA","warranty":"5-year (Axis standard)"},
-  {"name":"W1","zone":"West","status":"Working","comments":"Network connection come from W2","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.103.155","mac_address":"00-18-85-30-A2-10","warranty":"5-year (Avigilon standard)"},
-  {"name":"W1 PTZ","zone":"West","status":"Not Working","comments":"Network connection come from W2","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 2","ip_address":"172.17.102.243","mac_address":"AC-CC-8E-FF-CB-37","warranty":"5-year (Axis standard)"},
-  {"name":"W2","zone":"West","status":"Working","comments":"Power Supply for switch to be replaced","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.102.237","mac_address":"AC-CC-8E-FD-4C-D3","warranty":"5-year (Axis standard)"},
-  {"name":"W2 PTZ","zone":"West","status":"Not Working","comments":"Power Supply for switch to be replaced","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 4","ip_address":"172.17.102.244","mac_address":"00-04-7D-27-F4-31","warranty":"3-year (Pelco standard)"},
-  {"name":"W3","zone":"West","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.102.230","mac_address":"00-18-85-2F-E7-9C","warranty":"5-year (Avigilon standard)"},
-  {"name":"W3 PTZ","zone":"West","status":"Working","comments":"","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 2","ip_address":"172.17.102.245","mac_address":"AC-CC-8E-FF-B9-4A","warranty":"5-year (Axis standard)"},
-  {"name":"W4","zone":"West","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.102.232","mac_address":"00-18-85-30-A2-1A","warranty":"5-year (Avigilon standard)"},
-  {"name":"W4 PTZ","zone":"West","status":"Working","comments":"","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 2","ip_address":"172.17.102.246","mac_address":"AC-CC-8E-FF-B8-B5","warranty":"5-year (Axis standard)"},
-  {"name":"W5","zone":"West","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.102.228","mac_address":"00-18-85-30-A2-0F","warranty":"5-year (Avigilon standard)"},
-  {"name":"W5 PTZ","zone":"West","status":"Working","comments":"","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 2","ip_address":"172.17.102.247","mac_address":"AC-CC-8E-F5-19-BE","warranty":"5-year (Axis standard)"},
-  {"name":"W6","zone":"West","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.102.233","mac_address":"00-18-85-2F-0B-A6","warranty":"5-year (Avigilon standard)"},
-  {"name":"W6 PTZ","zone":"West","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 2","ip_address":"172.17.102.248","mac_address":"00-04-7D-27-9F-ED","warranty":"3-year (Pelco standard)"},
-  {"name":"W7","zone":"West","status":"Working","comments":"Ends recrimped. Cable is water logged , water seeping through.","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.102.234","mac_address":"00-18-85-30-A2-1F","warranty":"5-year (Avigilon standard)"},
-  {"name":"W7 PTZ","zone":"West","status":"Working","comments":"Ends recrimped. Cable is water logged , water seeping through.Camera is operatinal","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 2","ip_address":"172.17.102.249","mac_address":"AC-CC-8E-FF-B8-DA","warranty":"5-year (Axis standard)"},
-  {"name":"W8","zone":"West","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 4","ip_address":"172.17.102.235","mac_address":"00-18-85-30-A2-17","warranty":"5-year (Avigilon standard)"},
-  {"name":"W8 PTZ","zone":"West","status":"Not Working","comments":"Firmware Update Done POE injector added,Unable to pan, camera. has blank screen is defective","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 4","ip_address":"172.17.102.250","mac_address":"AC-CC-8E-FF-CB-76","warranty":"5-year (Axis standard)"},
-  {"name":"W9","zone":"West","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 4","ip_address":"172.17.102.236","mac_address":"00-18-85-30-A2-2C","warranty":"5-year (Avigilon standard)"},
-  {"name":"W9 PTZ","zone":"West","status":"Working","comments":"Firmware Update Done POE injector added","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 3","ip_address":"172.17.102.251","mac_address":"AC-CC-8E-FF-CB-66","warranty":"5-year (Axis standard)"},
-  {"name":"W10","zone":"West","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 4","ip_address":"172.17.102.231","mac_address":"00-18-85-30-A2-1D","warranty":"5-year (Avigilon standard)"},
-  {"name":"W11 PTZ","zone":"West","status":"Working","comments":"","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 2","ip_address":"172.17.102.253","mac_address":"AC-CC-8E-FF-B8-A5","warranty":"5-year (Axis standard)"},
-  {"name":"W11","zone":"West","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.102.239","mac_address":"00-18-85-30-A2-52","warranty":"5-year (Avigilon standard)"},
-  {"name":"W12 PTZ","zone":"West","status":"Working","comments":"","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 2","ip_address":"172.17.102.254","mac_address":"AC-CC-8E-FF-B9-20","warranty":"5-year (Axis standard)"},
-  {"name":"W12","zone":"West","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.102.240","mac_address":"00-18-85-30-A2-4C","warranty":"5-year (Avigilon standard)"},
-  {"name":"W13 PTZ","zone":"West","status":"Working","comments":"","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 2","ip_address":"172.17.103.2","mac_address":"E8-27-25-06-8F-4B","warranty":"5-year (Axis standard)"},
-  {"name":"W13","zone":"West","status":"Not working","comments":"Damaged by VTR , cable needs to be replaced","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.102.241","mac_address":"00-18-85-30-A2-29","warranty":"5-year (Avigilon standard)"},
-  {"name":"W16 PTZ","zone":"West","status":"Working","comments":"","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 2","ip_address":"172.17.103.3","mac_address":"AC-CC-8E-FF-C7-2B","warranty":"5-year (Axis standard)"},
-  {"name":"W16","zone":"West","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.102.242","mac_address":"00-18-85-30-A2-4F","warranty":"5-year (Avigilon standard)"},
-  {"name":"WB1 PTZ - Stream 1","zone":"West","status":"Working","comments":"Camera defective (To be replaced with P-series camera) Replacement done June 17th","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"WB11","zone":"West","status":"Working","comments":"","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.103.156","mac_address":"AC-CC-8E-FD-60-84","warranty":"5-year (Axis standard)"},
-  {"name":"W Perim PTZ","zone":"West","status":"Working","comments":"","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 5","ip_address":"172.17.103.157","mac_address":"AC-CC-8E-FF-CB-4C","warranty":"5-year (Axis standard)"},
-  {"name":"W Perim 6 Adjacent W9","zone":"West","status":"Working","comments":"","model":"AXIS P1447-LE","manufacturer":"Axis","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.103.147","mac_address":"B8-A4-4F-57-F6-AA","warranty":"5-year (Axis standard)"},
-  {"name":"WB11 PTZ","zone":"West","status":"Working","comments":"","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 2","ip_address":"172.17.103.9","mac_address":"AC-CC-8E-FF-BA-21","warranty":"5-year (Axis standard)"},
-  {"name":"W Perim 1 Thermal Adjacent to W4","zone":"West","status":"Not Working","comments":"No camera,","model":"AXIS Q1942-E","manufacturer":"Axis","resolution":"640x480 (thermal)","archiver":"Archiver 2","ip_address":"172.17.102.197","mac_address":"B8-A4-4F-08-84-96","warranty":"5-year (Axis standard)"},
-  {"name":"WB1 PTZ - Thermal","zone":"West","status":"Not Working","comments":"camera is defective","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"W Perim 2 Thermal Adjacent to W7","zone":"West","status":"Working","comments":"","model":"AXIS Q1942-E","manufacturer":"Axis","resolution":"640x480 (thermal)","archiver":"Archiver 2","ip_address":"172.17.102.199","mac_address":"B8-A4-4F-08-84-7C","warranty":"5-year (Axis standard)"},
-  {"name":"W Perim 3 Thermal Adjacent to W7","zone":"West","status":"Working","comments":"","model":"AXIS Q1942-E","manufacturer":"Axis","resolution":"640x480 (thermal)","archiver":"Archiver 2","ip_address":"172.17.103.158","mac_address":"AC-CC-8E-69-16-6A","warranty":"5-year (Axis standard)"},
-  {"name":"W Perim 4 Thermal Adjacent to W9","zone":"West","status":"Not Working","comments":"No camera,","model":"AXIS Q1942-E","manufacturer":"Axis","resolution":"640x480 (thermal)","archiver":"Archiver 5","ip_address":"172.17.103.159","mac_address":"B8-A4-4F-08-84-A2","warranty":"5-year (Axis standard)"},
-  {"name":"W Perim 5 Thermal Adjacent to W4","zone":"West","status":"Not Working","comments":"No camera,","model":"AXIS Q1942-E","manufacturer":"Axis","resolution":"640x480 (thermal)","archiver":"Archiver 5","ip_address":"172.17.103.160","mac_address":"B8-A4-4F-08-84-9C","warranty":"5-year (Axis standard)"},
-  {"name":"WB11 Thermal","zone":"West","status":"Working","comments":"","model":"AXIS Q1942-E","manufacturer":"Axis","resolution":"640x480 (thermal)","archiver":"Archiver 3","ip_address":"172.17.103.183","mac_address":"B8-A4-4F-08-84-7E","warranty":"5-year (Axis standard)"},
-  {"name":"A1","zone":"South","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.103.16","mac_address":"AC-CC-8E-FD-14-CD","warranty":"5-year (Axis standard)"},
-  {"name":"A1 PTZ","zone":"South","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 1","ip_address":"172.17.103.30","mac_address":"00-04-7D-27-9F-CB","warranty":"3-year (Pelco standard)"},
-  {"name":"A2","zone":"South","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.103.17","mac_address":"AC-CC-8E-FD-43-F4","warranty":"5-year (Axis standard)"},
-  {"name":"A2 PTZ","zone":"South","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 5","ip_address":"172.17.103.144","mac_address":"00-04-7D-27-9F-C4","warranty":"3-year (Pelco standard)"},
-  {"name":"A3","zone":"South","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.103.18","mac_address":"AC-CC-8E-FD-15-D5","warranty":"5-year (Axis standard)"},
-  {"name":"A3 PTZ","zone":"South","status":"Working","comments":"","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 4","ip_address":"172.17.103.176","mac_address":"AC-CC-8E-FF-C9-DA","warranty":"5-year (Axis standard)"},
-  {"name":"A4","zone":"South","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.103.19","mac_address":"AC-CC-8E-FD-42-DD","warranty":"5-year (Axis standard)"},
-  {"name":"A4 PTZ","zone":"South","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 1","ip_address":"172.17.103.33","mac_address":"00-04-7D-27-A0-00","warranty":"3-year (Pelco standard)"},
-  {"name":"A5","zone":"South","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.103.20","mac_address":"AC-CC-8E-FD-42-C2","warranty":"5-year (Axis standard)"},
-  {"name":"A5 PTZ","zone":"South","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 4","ip_address":"172.17.103.34","mac_address":"00-04-7D-27-9F-C6","warranty":"3-year (Pelco standard)"},
-  {"name":"A6","zone":"South","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.103.21","mac_address":"AC-CC-8E-FD-42-8F","warranty":"5-year (Axis standard)"},
-  {"name":"A6 PTZ","zone":"South","status":"Working","comments":"Camera on default , reconfigured","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 4","ip_address":"172.17.103.35","mac_address":"00-04-7D-27-9F-FC","warranty":"3-year (Pelco standard)"},
-  {"name":"A7","zone":"South","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.103.22","mac_address":"AC-CC-8E-FD-42-DC","warranty":"5-year (Axis standard)"},
-  {"name":"A7 PTZ","zone":"South","status":"Not Working","comments":"Camera defective","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 4","ip_address":"172.17.103.36","mac_address":"00-04-7D-27-9F-CA","warranty":"3-year (Pelco standard)"},
-  {"name":"A8","zone":"South","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.103.23","mac_address":"AC-CC-8E-FD-42-C8","warranty":"5-year (Axis standard)"},
-  {"name":"A8 PTZ","zone":"South","status":"Not Working","comments":"Camera defective","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 4","ip_address":"172.17.103.37","mac_address":"00-04-7D-27-9F-F9","warranty":"3-year (Pelco standard)"},
-  {"name":"A9","zone":"South","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.103.24","mac_address":"AC-CC-8E-FD-42-D6","warranty":"5-year (Axis standard)"},
-  {"name":"A9 PTZ Context Stream","zone":"South","status":"Not Working","comments":"Camera defective","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"A10","zone":"South","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.103.25","mac_address":"AC-CC-8E-FD-4E-6F","warranty":"5-year (Axis standard)"},
-  {"name":"A10 PTZ","zone":"South","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 1","ip_address":"172.17.103.39","mac_address":"00-04-7D-27-9F-F3","warranty":"3-year (Pelco standard)"},
-  {"name":"A11","zone":"South","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.103.26","mac_address":"AC-CC-8E-FD-42-A2","warranty":"5-year (Axis standard)"},
-  {"name":"A11 PTZ","zone":"South","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 1","ip_address":"172.17.103.40","mac_address":"00-04-7D-27-A0-0A","warranty":"3-year (Pelco standard)"},
-  {"name":"A12","zone":"South","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.103.27","mac_address":"AC-CC-8E-FD-43-22","warranty":"5-year (Axis standard)"},
-  {"name":"A12 PTZ","zone":"South","status":"Working","comments":"Body adjusted","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 3","ip_address":"172.17.103.41","mac_address":"00-04-7D-27-9F-FD","warranty":"3-year (Pelco standard)"},
-  {"name":"A13 (197)","zone":"South","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.103.28","mac_address":"AC-CC-8E-FD-43-2F","warranty":"5-year (Axis standard)"},
-  {"name":"A13 PTZ Stream 1","zone":"South","status":"Not Working","comments":"Camera defective","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"A13 (192)","zone":"South","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 4","ip_address":"172.17.103.28","mac_address":"AC-CC-8E-FD-43-2F","warranty":"5-year (Axis standard)"},
-  {"name":"A14 PTZ","zone":"South","status":"Working","comments":"","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 3","ip_address":"172.17.103.4","mac_address":"AC-CC-8E-EE-C1-FE","warranty":"5-year (Axis standard)"},
-  {"name":"A14","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 3","ip_address":"172.17.103.5","mac_address":"00-18-85-2F-E7-88","warranty":"5-year (Avigilon standard)"},
-  {"name":"A13 Strad Park","zone":"South","status":"Working","comments":"Adjusted , Steel Straps replaceed","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"B1 (216)","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.103.44","mac_address":"00-18-85-30-A2-2F","warranty":"5-year (Avigilon standard)"},
-  {"name":"B1 PTZ","zone":"South","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 3","ip_address":"172.17.103.60","mac_address":"00-04-7D-27-9F-F6","warranty":"3-year (Pelco standard)"},
-  {"name":"B1 (363)","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.103.44","mac_address":"00-18-85-30-A2-2F","warranty":"5-year (Avigilon standard)"},
-  {"name":"B2 PTZ","zone":"South","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 3","ip_address":"172.17.103.61","mac_address":"00-04-7D-27-9F-F7","warranty":"3-year (Pelco standard)"},
-  {"name":"B2","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.103.45","mac_address":"00-18-85-30-A2-37","warranty":"5-year (Avigilon standard)"},
-  {"name":"B3 PTZ","zone":"South","status":"Not Working","comments":"Camera to be replaced,Arm needed,","model":"AXIS P3267-LVE","manufacturer":"Axis","resolution":"2592x1944 (5MP)","archiver":"Archiver 1","ip_address":"172.17.103.62","mac_address":"B8-A4-4F-D3-96-B6","warranty":"5-year (Axis standard)"},
-  {"name":"B3","zone":"South","status":"Working","comments":"the weatherproof box is falling off the pole need to be address","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 1","ip_address":"172.17.103.46","mac_address":"00-18-85-30-A2-3D","warranty":"5-year (Avigilon standard)"},
-  {"name":"B5 PTZ","zone":"South","status":"Not Working","comments":"Only Pole mount present","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 3","ip_address":"172.17.103.63","mac_address":"00-04-7D-27-9F-EB","warranty":"3-year (Pelco standard)"},
-  {"name":"B5 (209)","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 1","ip_address":"172.17.103.49","mac_address":"00-18-85-30-A2-2E","warranty":"5-year (Avigilon standard)"},
-  {"name":"B6 PTZ","zone":"South","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 3","ip_address":"172.17.103.64","mac_address":"00-04-7D-27-9F-F8","warranty":"3-year (Pelco standard)"},
-  {"name":"B5 (212)","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 1","ip_address":"172.17.103.49","mac_address":"00-18-85-30-A2-2E","warranty":"5-year (Avigilon standard)"},
-  {"name":"B7 PTZ","zone":"South","status":"Working","comments":"(REPLACED CAMERA on 5/6/2026) Old camera installed at E2","model":"AXIS P3267-LVE","manufacturer":"Axis","resolution":"2592x1944 (5MP)","archiver":"Archiver 1","ip_address":"172.17.103.63","mac_address":"B8-A4-4F-D3-46-94","warranty":"5-year (Axis standard)"},
-  {"name":"B5 (217)","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 1","ip_address":"172.17.103.49","mac_address":"00-18-85-30-A2-2E","warranty":"5-year (Avigilon standard)"},
-  {"name":"B8 PTZ","zone":"South","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 3","ip_address":"172.17.103.66","mac_address":"00-04-7D-27-9F-BD","warranty":"3-year (Pelco standard)"},
-  {"name":"B6 (218)","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 1","ip_address":"172.17.103.51","mac_address":"00-18-85-30-A2-42","warranty":"5-year (Avigilon standard)"},
-  {"name":"B9 PTZ","zone":"South","status":"Working","comments":"Cable Replacement done","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 3","ip_address":"172.17.103.67","mac_address":"00-04-7D-27-9F-C2","warranty":"3-year (Pelco standard)"},
-  {"name":"B6 (211)","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 1","ip_address":"172.17.103.51","mac_address":"00-18-85-30-A2-42","warranty":"5-year (Avigilon standard)"},
-  {"name":"B10 PTZ","zone":"South","status":"Working","comments":"POE replaced with SW perim PTZ POE","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 3","ip_address":"172.17.103.68","mac_address":"00-04-7D-27-A0-02","warranty":"3-year (Pelco standard)"},
-  {"name":"B7 (213)","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 1","ip_address":"172.17.103.52","mac_address":"00-18-85-30-A2-32","warranty":"5-year (Avigilon standard)"},
-  {"name":"B11 PTZ","zone":"South","status":"Working","comments":"Cable was replaced (6/24/2026)","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 3","ip_address":"172.17.103.69","mac_address":"00-04-7D-27-F4-30","warranty":"3-year (Pelco standard)"},
-  {"name":"B7 (215)","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 1","ip_address":"172.17.103.52","mac_address":"00-18-85-30-A2-32","warranty":"5-year (Avigilon standard)"},
-  {"name":"B12 PTZ","zone":"South","status":"Working","comments":"Camera was reset to default IP adjustments made.","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 3","ip_address":"172.17.103.70","mac_address":"00-04-7D-27-9F-F5","warranty":"3-year (Pelco standard)"},
-  {"name":"B8","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 4","ip_address":"172.17.103.54","mac_address":"00-18-85-2F-E7-93","warranty":"5-year (Avigilon standard)"},
-  {"name":"B14 PTZ","zone":"South","status":"Working","comments":"Obstacles ,unable to clean","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 3","ip_address":"172.17.103.6","mac_address":"AC-CC-8E-FF-CB-18","warranty":"5-year (Axis standard)"},
-  {"name":"B9","zone":"South","status":"Working","comments":"Cable replaced(5/6/2026), Weather proof box needs to be attached corectly to post.","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 1","ip_address":"172.17.103.55","mac_address":"00-18-85-2F-E7-C2","warranty":"5-year (Avigilon standard)"},
-  {"name":"B10","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.103.56","mac_address":"00-18-85-30-A2-34","warranty":"5-year (Avigilon standard)"},
-  {"name":"B11","zone":"South","status":"Working","comments":"Cable was replaced (6/24/2026)","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.103.57","mac_address":"00-18-85-30-A2-56","warranty":"5-year (Avigilon standard)"},
-  {"name":"B12","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.103.58","mac_address":"00-18-85-2F-E7-95","warranty":"5-year (Avigilon standard)"},
-  {"name":"B13","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 2","ip_address":"172.17.103.59","mac_address":"00-18-85-2F-E7-ED","warranty":"5-year (Avigilon standard)"},
-  {"name":"B14","zone":"South","status":"Working","comments":"Obstacles ,unable to clean","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.103.7","mac_address":"00-18-85-2F-E7-98","warranty":"5-year (Avigilon standard)"},
-  {"name":"C1","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.103.71","mac_address":"00-18-85-30-A2-40","warranty":"5-year (Avigilon standard)"},
-  {"name":"C1 PTZ (243)","zone":"South","status":"Not Working","comments":"Camera is defective","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 4","ip_address":"172.17.103.81","mac_address":"00-04-7D-27-9F-F2","warranty":"3-year (Pelco standard)"},
-  {"name":"C2","zone":"South","status":"Working","comments":"Obstacles , unable to clean.","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.103.72","mac_address":"00-18-85-30-A2-51","warranty":"5-year (Avigilon standard)"},
-  {"name":"C2 PTZ (460)","zone":"South","status":"Working","comments":"Obstacles , unable to clean.","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 5","ip_address":"172.17.103.82","mac_address":"00-04-7D-27-9F-D0","warranty":"3-year (Pelco standard)"},
-  {"name":"C4","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.103.73","mac_address":"00-18-85-2F-E7-8E","warranty":"5-year (Avigilon standard)"},
-  {"name":"C4 PTZ","zone":"South","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 1","ip_address":"172.17.103.83","mac_address":"00-04-7D-27-F4-32","warranty":"3-year (Pelco standard)"},
-  {"name":"C5 (236)","zone":"South","status":"Not Working","comments":"Camera Defective","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.103.74","mac_address":"00-18-85-2F-E7-A4","warranty":"5-year (Avigilon standard)"},
-  {"name":"C9 PTZ","zone":"South","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 3","ip_address":"172.17.103.143","mac_address":"00-04-7D-27-9F-D3","warranty":"3-year (Pelco standard)"},
-  {"name":"C5 (237)","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.103.74","mac_address":"00-18-85-2F-E7-A4","warranty":"5-year (Avigilon standard)"},
-  {"name":"C11 PTZ","zone":"South","status":"Not Working","comments":"Only Pole mount present","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 1","ip_address":"172.17.103.85","mac_address":"00-04-7D-27-F4-2A","warranty":"3-year (Pelco standard)"},
-  {"name":"C9 (285)","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.103.77","mac_address":"00-18-85-30-A2-2D","warranty":"5-year (Avigilon standard)"},
-  {"name":"C12 PTZ","zone":"South","status":"Working","comments":"","model":"AXIS P3267-LVE","manufacturer":"Axis","resolution":"2592x1944 (5MP)","archiver":"Archiver 1","ip_address":"172.17.103.117","mac_address":"B8-A4-4F-D3-43-D0","warranty":"5-year (Axis standard)"},
-  {"name":"C9 (286)","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.103.77","mac_address":"00-18-85-30-A2-2D","warranty":"5-year (Avigilon standard)"},
-  {"name":"C11","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.103.78","mac_address":"00-18-85-30-A2-28","warranty":"5-year (Avigilon standard)"},
-  {"name":"C12 (239)","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.103.79","mac_address":"00-18-85-2F-E7-89","warranty":"5-year (Avigilon standard)"},
-  {"name":"C12 (240)","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.103.79","mac_address":"00-18-85-2F-E7-89","warranty":"5-year (Avigilon standard)"},
-  {"name":"D1","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.103.87","mac_address":"00-18-85-30-A2-24","warranty":"5-year (Avigilon standard)"},
-  {"name":"D1 PTZ","zone":"South","status":"Working","comments":"","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 4","ip_address":"172.17.103.97","mac_address":"AC-CC-8E-EE-C2-32","warranty":"5-year (Axis standard)"},
-  {"name":"D2","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.103.88","mac_address":"00-18-85-30-A2-1B","warranty":"5-year (Avigilon standard)"},
-  {"name":"D2 PTZ","zone":"South","status":"Working","comments":"","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 3","ip_address":"172.17.103.98","mac_address":"AC-CC-8E-FF-B8-D2","warranty":"5-year (Axis standard)"},
-  {"name":"D4","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.103.89","mac_address":"00-18-85-30-A2-2A","warranty":"5-year (Avigilon standard)"},
-  {"name":"D4 PTZ","zone":"South","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 2","ip_address":"172.17.103.99","mac_address":"00-04-7D-27-A0-05","warranty":"3-year (Pelco standard)"},
-  {"name":"D5","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.103.90","mac_address":"00-18-85-2F-E7-FF","warranty":"5-year (Avigilon standard)"},
-  {"name":"D5 PTZ","zone":"South","status":"Working","comments":"","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 2","ip_address":"172.17.103.100","mac_address":"00-04-7D-27-F4-2F","warranty":"3-year (Pelco standard)"},
-  {"name":"D6","zone":"South","status":"Working","comments":"Cable Replacement done","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 4","ip_address":"172.17.103.106","mac_address":"00-18-85-2F-0B-93","warranty":"5-year (Avigilon standard)"},
-  {"name":"D6 PTZ","zone":"South","status":"Working","comments":"Cable replacement done","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 1","ip_address":"172.17.103.101","mac_address":"AC-CC-8E-FF-C9-D7","warranty":"5-year (Axis standard)"},
-  {"name":"D7","zone":"South","status":"Working","comments":"","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.103.92","mac_address":"00-18-85-30-A2-26","warranty":"5-year (Avigilon standard)"},
-  {"name":"D7 PTZ","zone":"South","status":"Working","comments":"","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 2","ip_address":"172.17.103.102","mac_address":"B8-A4-4F-93-C7-AF","warranty":"5-year (Axis standard)"},
-  {"name":"D8","zone":"South","status":"Working","comments":"No Fibre Cable Replacement done","model":"5.0C-H5A-DP2","manufacturer":"Avigilon","resolution":"5MP","archiver":"Archiver 5","ip_address":"172.17.103.93","mac_address":"00-18-85-30-A2-11","warranty":"5-year (Avigilon standard)"},
-  {"name":"D8 PTZ","zone":"South","status":"Working","comments":"Cable Replacement done (16/5/2026)","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 2","ip_address":"172.17.103.103","mac_address":"AC-CC-8E-EE-C2-BF","warranty":"5-year (Axis standard)"},
-  {"name":"D12","zone":"South","status":"Working","comments":"Obstacles , unable to clean.","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 5","ip_address":"172.17.103.96","mac_address":"AC-CC-8E-FD-4C-E9","warranty":"5-year (Axis standard)"},
-  {"name":"D10 PTZ","zone":"South","status":"Working","comments":"Obstacles , unable to clean.","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 5","ip_address":"172.17.103.104","mac_address":"00-04-7D-27-DD-C2","warranty":"3-year (Pelco standard)"},
-  {"name":"D11","zone":"South","status":"Not Working","comments":"No camera on Pole","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"D12 PTZ","zone":"South","status":"Working","comments":"Camera moved to Archiver 3","model":"P2820-ESR","manufacturer":"pelco","resolution":"3840x2160 (8MP / 4K)","archiver":"Archiver 3","ip_address":"172.17.103.105","mac_address":"00-04-7D-27-9F-BE","warranty":"3-year (Pelco standard)"},
-  {"name":"E 2","zone":"South","status":"Working","comments":"Analytics configured","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"E2 PTZ","zone":"South","status":"Working","comments":"Replaced with B7 old removed camera (5/7/2026) Barrier needs to be adjusted.","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 3","ip_address":"172.17.103.10","mac_address":"AC-CC-8E-FF-B9-92","warranty":"5-year (Axis standard)"},
-  {"name":"D4 Thermal","zone":"South","status":"Working","comments":"Analytics Applied","model":"AXIS Q1941-E","manufacturer":"Axis","resolution":"384x288 (thermal)","archiver":"Archiver 4","ip_address":"172.17.103.113","mac_address":"B8-A4-4F-04-D5-10","warranty":"5-year (Axis standard)"},
-  {"name":"A13 PTZ Thermal","zone":"South","status":"Not Working","comments":"cable tested good, cable ends are good. , no POE light present.","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"D6 Perim Fence Thermal 2","zone":"South","status":"Working","comments":"Analytics Applied","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"A9 PTZ Thermal","zone":"South","status":"Not Working","comments":"cable tested good, cable ends are good, no POE light present.","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"D6 Perim Fence Thermal","zone":"South","status":"Working","comments":"Analytics Applied","model":"AXIS Q1941-E","manufacturer":"Axis","resolution":"384x288 (thermal)","archiver":"Archiver 4","ip_address":"172.17.103.111","mac_address":"B8-A4-4F-04-D4-F6","warranty":"5-year (Axis standard)"},
-  {"name":"South Perim PTZ Thermal","zone":"South","status":"Not Working","comments":"Camera defective","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"D8 Thermal","zone":"South","status":"","comments":"No fibre link","model":"AXIS Q1941-E","manufacturer":"Axis","resolution":"384x288 (thermal)","archiver":"Archiver 5","ip_address":"172.17.103.94","mac_address":"B8-A4-4F-04-D4-DD","warranty":"5-year (Axis standard)"},
-  {"name":"SE Tower PTZ - Thermal","zone":"South","status":"Working","comments":"Needs injector","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"D8 Thermal 2","zone":"South","status":"","comments":"No fibre link","model":"AXIS Q1942-E","manufacturer":"Axis","resolution":"640x480 (thermal)","archiver":"Archiver 5","ip_address":"172.17.103.95","mac_address":"B8-A4-4F-05-0C-E0","warranty":"5-year (Axis standard)"},
-  {"name":"A13 PTZ Stream 1","zone":"South","status":"Not Working","comments":"cable tested good, cable ends are good., no POE light present.","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"D11 Thermal","zone":"South","status":"Working","comments":"Analytics Applied","model":"AXIS Q1942-E","manufacturer":"Axis","resolution":"640x480 (thermal)","archiver":"Archiver 4","ip_address":"172.17.103.187","mac_address":"AC-CC-8E-CA-3C-EC","warranty":"5-year (Axis standard)"},
-  {"name":"MEZ SE Corner Thermal","zone":"South","status":"Working","comments":"Analytics Applied","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""},
-  {"name":"South Perim 2 Thermal","zone":"South","status":"Working","comments":"Analytics Applied","model":"AXIS Q1941-E","manufacturer":"Axis","resolution":"384x288 (thermal)","archiver":"Archiver 4","ip_address":"172.17.103.116","mac_address":"B8-A4-4F-05-0E-2E","warranty":"5-year (Axis standard)"},
-  {"name":"South Perim Thermal","zone":"South","status":"Working","comments":"","model":"AXIS Q1941-E","manufacturer":"Axis","resolution":"384x288 (thermal)","archiver":"Archiver 4","ip_address":"172.17.103.115","mac_address":"B8-A4-4F-05-0E-30","warranty":"5-year (Axis standard)"},
-  {"name":"South East Tower Thermal","zone":"South","status":"Working","comments":"REPLACED on 6/23/2026","model":"AXIS Q1942-E","manufacturer":"Axis","resolution":"640x480 (thermal)","archiver":"Archiver 4","ip_address":"172.17.103.110","mac_address":"AC-CC-8E-CA-3F-89","warranty":"5-year (Axis standard)"},
-  {"name":"MEZ SW Corner","zone":"South","status":"Working","comments":"","model":"AXIS P3227-LVE","manufacturer":"Axis","resolution":"3072x1728 (5.3MP)","archiver":"Archiver 2","ip_address":"172.17.103.14","mac_address":"AC-CC-8E-FD-4C-DA","warranty":"5-year (Axis standard)"},
-  {"name":"MEZ SE Corner PTZ","zone":"South","status":"Working","comments":"Online POE needed.","model":"AXIS P5655-E","manufacturer":"Axis","resolution":"1920x1080 (2MP)","archiver":"Archiver 2","ip_address":"172.17.103.12","mac_address":"AC-CC-8E-FF-C9-A2","warranty":"5-year (Axis standard)"},
-  {"name":"South Perim PTZ - Context","zone":"South","status":"Working","comments":"","model":"","manufacturer":"","resolution":"","archiver":"","ip_address":"","mac_address":"","warranty":""}
-]
+// Get the API URL from the current origin or environment
+// This works whether you're on localhost or Railway
+const API_URL = window.location.origin;
+let authToken = localStorage.getItem('token') || null;
+
+// ============================================================
+// ── API HELPER FUNCTIONS ─────────────────────────────────────
+// ============================================================
+
+async function apiCall(endpoint, options = {}) {
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${authToken}`
+  };
+  
+  const response = await fetch(`${API_URL}/api${endpoint}`, {
+    ...options,
+    headers: { ...headers, ...options.headers }
+  });
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+    throw new Error(error.error || `API call failed: ${response.status}`);
+  }
+  
+  return response.json();
+}
+
+// ============================================================
+// ── TOAST FUNCTIONS ──────────────────────────────────────────
+// ============================================================
+
+function toast(m, type) {
+  type = type || 'info';
+  var c = document.getElementById('toast-container');
+  if (!c) return;
+  var t = document.createElement('div');
+  t.className = 'toast ' + type;
+  var icons = { info: 'ti ti-info-circle', success: 'ti ti-check', warning: 'ti ti-alert-triangle', error: 'ti ti-x' };
+  t.innerHTML = '<i class="' + (icons[type] || icons.info) + '"></i> ' + m;
+  c.appendChild(t);
+  setTimeout(function() {
+    t.style.opacity = '0';
+    t.style.transition = 'opacity 0.3s';
+    setTimeout(function() { if (t.parentNode) t.remove(); }, 300);
+  }, 3000);
+}
+
+// ============================================================
+// ── CONFIRM FUNCTIONS ────────────────────────────────────────
+// ============================================================
+
+function openConfirm(title, desc, cb, isDanger) {
+  isDanger = isDanger || false;
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-desc').textContent = desc;
+  document.getElementById('confirm-btn').textContent = isDanger ? 'Delete' : 'Confirm';
+  document.getElementById('confirm-btn').className = 'btn ' + (isDanger ? 'btn-danger' : 'btn-accent');
+  confirmCallback = cb;
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+
+function closeConfirm() {
+  document.getElementById('confirm-overlay').classList.remove('open');
+  confirmCallback = null;
+}
+
+function executeConfirm() {
+  if (confirmCallback) {
+    try {
+      confirmCallback();
+    } catch (e) {
+      toast('Error: ' + e.message, 'error');
     }
   }
-};
-</script>
+  closeConfirm();
+}
 
-<script>
+document.getElementById('confirm-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeConfirm();
+});
+
 // ============================================================
-// ── CONFIGURATION ────────────────────────────────────────────
+// ── DATA STORES ──────────────────────────────────────────────
 // ============================================================
 
-var MS_CLIENT_ID = 'e87a6592-aaa5-4a13-9c85-8dbc8e9cd7b2';
-var MS_TENANT_ID = '799ae988-9d3d-40d3-bf5c-93197f5d8d44';
-var MS_REDIRECT_URI = window.location.origin + window.location.pathname;
-var msCodeVerifier = '';
-
-var API_URL = '/api';
-var token = localStorage.getItem('token');
-var currentUser = JSON.parse(localStorage.getItem('user') || 'null');
-
-// Data stores
 var CAMERAS = [];
 var DOORS = [];
 var SERVERS = [];
@@ -2137,7 +1822,7 @@ var SERVICE_REQUESTS = [];
 var AUDIT_LOG = [];
 var EMAILS = [];
 var CLIENTS = [];
-var CLIENT_LOGO_DATA = JSON.parse(localStorage.getItem('ccsm_client_logos') || '{}');
+var CLIENT_LOGO_DATA = {};
 var PINNED_FILES = JSON.parse(localStorage.getItem('ccsm_pinned') || '[]');
 
 var SENT_EMAILS = [];
@@ -2236,60 +1921,6 @@ function setTheme(theme) {
 }
 
 // ============================================================
-// ── TOAST FUNCTIONS ──────────────────────────────────────────
-// ============================================================
-
-function toast(m, type) {
-  type = type || 'info';
-  var c = document.getElementById('toast-container');
-  if (!c) return;
-  var t = document.createElement('div');
-  t.className = 'toast ' + type;
-  var icons = { info: 'ti ti-info-circle', success: 'ti ti-check', warning: 'ti ti-alert-triangle', error: 'ti ti-x' };
-  t.innerHTML = '<i class="' + (icons[type] || icons.info) + '"></i> ' + m;
-  c.appendChild(t);
-  setTimeout(function() {
-    t.style.opacity = '0';
-    t.style.transition = 'opacity 0.3s';
-    setTimeout(function() { if (t.parentNode) t.remove(); }, 300);
-  }, 3000);
-}
-
-// ============================================================
-// ── CONFIRM FUNCTIONS ────────────────────────────────────────
-// ============================================================
-
-function openConfirm(title, desc, cb, isDanger) {
-  isDanger = isDanger || false;
-  document.getElementById('confirm-title').textContent = title;
-  document.getElementById('confirm-desc').textContent = desc;
-  document.getElementById('confirm-btn').textContent = isDanger ? 'Delete' : 'Confirm';
-  document.getElementById('confirm-btn').className = 'btn ' + (isDanger ? 'btn-danger' : 'btn-accent');
-  confirmCallback = cb;
-  document.getElementById('confirm-overlay').classList.add('open');
-}
-
-function closeConfirm() {
-  document.getElementById('confirm-overlay').classList.remove('open');
-  confirmCallback = null;
-}
-
-function executeConfirm() {
-  if (confirmCallback) {
-    try {
-      confirmCallback();
-    } catch (e) {
-      toast('Error: ' + e.message, 'error');
-    }
-  }
-  closeConfirm();
-}
-
-document.getElementById('confirm-overlay').addEventListener('click', function(e) {
-  if (e.target === this) closeConfirm();
-});
-
-// ============================================================
 // ── HELPER FUNCTIONS ─────────────────────────────────────────
 // ============================================================
 
@@ -2337,49 +1968,6 @@ function getDefaultAssignee() {
   return getTimeOfDay() === 'day' ? 'Shanice Vernon' : 'Shavine';
 }
 
-var CAMERA_IPS = {
-  'HM3 PTZ': '10.19.1.150', 'HM10 PTZ': '10.19.1.158', 'HM11 PTZ': '10.19.1.159',
-  'N25 PTZ': '10.19.1.175', 'B3 PTZ': '10.19.1.110', 'D4 PTZ': '10.19.1.120',
-  'A7 PTZ': '10.19.1.130', 'A8 PTZ': '10.19.1.131', 'A9 PTZ Context Stream': '10.19.1.132',
-  'A13 PTZ Stream 1': '10.19.1.136', 'C1 PTZ (243)': '10.19.1.140',
-  'W1': '10.19.1.180', 'W2': '10.19.1.182', 'WB1 PTZ': '10.19.1.185',
-  'Manager Car Park PTZ': '10.19.1.50', 'Visitor Car Park PTZ 2': '10.19.1.52',
-  'SW Corner Perim PTZ': '10.19.1.53',
-  'A1 PTZ': '172.17.103.30', 'A2 PTZ': '172.17.103.31', 'A3 PTZ': '172.17.103.32',
-  'B1': '172.17.103.43', 'B2': '172.17.103.45',
-  'C1': '172.17.103.71', 'C2': '172.17.103.72',
-  'D1': '172.17.103.87', 'D2': '172.17.103.88', 'HM4 PTZ': '172.17.102.219'
-};
-
-function getCameraIP(cam) {
-  if (cam && typeof cam === 'object') {
-    if (cam.ip_address) return cam.ip_address;
-    return CAMERA_IPS[cam.name] || null;
-  }
-  return CAMERA_IPS[cam] || null;
-}
-
-var SWITCH_OFFLINE_SINCE = {
-  'TP Pole 47': new Date('2026-06-15T06:00:00'),
-  'TP Pole 25': new Date('2026-06-14T12:00:00'),
-  'Berth 8 A': new Date('2026-06-16T02:00:00')
-};
-
-function isSwitchOffline(sw) {
-  return SWITCH_OFFLINE_SINCE.hasOwnProperty(sw.name);
-}
-
-function getRandomUptime() {
-  var days = Math.floor(Math.random() * 90) + 1;
-  var hours = Math.floor(Math.random() * 24);
-  var mins = Math.floor(Math.random() * 60);
-  return days + 'd ' + hours + 'h ' + mins + 'm';
-}
-
-function getRandomLatency() {
-  return Math.floor(Math.random() * 30) + 2;
-}
-
 function getWarrantyDisplay(expiryDate) {
   if (!expiryDate) return '—';
   var daysLeft = Math.ceil((new Date(expiryDate) - new Date()) / (1000 * 60 * 60 * 24));
@@ -2388,60 +1976,20 @@ function getWarrantyDisplay(expiryDate) {
   return '<span style="color:#4ade80;">' + daysLeft + 'd</span>';
 }
 
-function getSoftwareStatus(smaDate) {
-  if (!smaDate) return 'Warning';
-  var daysLeft = Math.ceil((new Date(smaDate) - new Date()) / (1000 * 60 * 60 * 24));
-  if (daysLeft < 0) return 'Expired';
-  if (daysLeft <= 30) return 'Warning';
-  return 'Good';
-}
-
-function softwareStatusBadge(status) {
-  if (status === 'Good') return '<span class="badge b-good">Good</span>';
-  if (status === 'Warning') return '<span class="badge b-warning">Warning</span>';
-  return '<span class="badge b-expired">Expired</span>';
-}
-
-function getStatusBadge(health) {
-  if (health >= 90) return '<span class="status-badge good">Good</span>';
-  if (health >= 70) return '<span class="status-badge warning">Warning</span>';
-  return '<span class="status-badge critical">Critical</span>';
-}
-
-function intrusionBadge(status) {
-  if (status === 'Online') return '<span class="badge b-intrusion-online">Online</span>';
-  if (status === 'Offline') return '<span class="badge b-intrusion-offline">Offline</span>';
-  if (status === 'Warning') return '<span class="badge b-intrusion-warning">Warning</span>';
-  return '<span class="badge b-info">Unknown</span>';
-}
-
-function timeAgo(d) {
-  try {
-    var dt = new Date(d);
-    if (isNaN(dt.getTime())) return d;
-    var h = Math.round((new Date() - dt) / 3600000);
-    if (h < 1) return 'Just now';
-    if (h < 24) return h + 'h ago';
-    if (h < 48) return 'Yesterday';
-    return Math.floor(h / 24) + 'd ago';
-  } catch (e) { return d; }
-}
-
-function fullDateTime() {
-  return new Date().toLocaleDateString('en-JM', { weekday: 'short', month: 'short', day: 'numeric' }) +
-    ' · ' + new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-}
-
 function camBadge(s) {
   if (s === 'Online') return '<span class="badge b-done">Online</span>';
+  if (s === 'Working') return '<span class="badge b-done">Working</span>';
   if (s === 'Defective') return '<span class="badge b-high">Defective</span>';
+  if (s === 'Not Working') return '<span class="badge b-high">Not Working</span>';
   if (s === 'No Power') return '<span class="badge b-high">No Power</span>';
   if (s === 'No Camera') return '<span class="badge b-open">No Camera</span>';
+  if (s === 'OFFLINE') return '<span class="badge b-high">OFFLINE</span>';
   return '<span class="badge b-info">Needs Check</span>';
 }
 
 function doorBadge(s) {
   if (s === 'Online') return '<span class="badge b-done">Online</span>';
+  if (s === 'Working') return '<span class="badge b-done">Working</span>';
   if (s === 'Offline') return '<span class="badge b-high">Offline</span>';
   if (s === 'Under Maintenance') return '<span class="badge b-under-maintenance">Under Maintenance</span>';
   return '<span class="badge b-open">Unknown</span>';
@@ -2466,25 +2014,21 @@ function priBadge(p) {
   return '<span class="pri-dot ' + cls + '"></span>' + p;
 }
 
-function getSLA(r) {
-  if (!r.received) return { text: '—', cls: '', hrs: 0 };
-  try {
-    var d = new Date(r.received);
-    if (isNaN(d.getTime())) return { text: '—', cls: '', hrs: 0 };
-    var hrs = Math.round((new Date() - d) / 3600000);
-    if (hrs < 1) return { text: '<1h', cls: 'sla-ok', hrs: hrs };
-    if (hrs < 4) return { text: hrs + 'h', cls: 'sla-ok', hrs: hrs };
-    if (hrs < 24) return { text: hrs + 'h', cls: 'sla-warn', hrs: hrs };
-    return { text: Math.floor(hrs / 24) + 'd ' + Math.round(hrs % 24) + 'h', cls: 'sla-critical', hrs: hrs };
-  } catch (e) { return { text: '—', cls: '', hrs: 0 }; }
+function fullDateTime() {
+  return new Date().toLocaleDateString('en-JM', { weekday: 'short', month: 'short', day: 'numeric' }) +
+    ' · ' + new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 }
 
-function slaBadge(r) {
-  var sla = getSLA(r);
-  if (!sla.cls) return sla.text;
-  var remaining = sla.cls === 'sla-ok' ? Math.max(0, 4 - sla.hrs) + 'h' :
-    sla.cls === 'sla-warn' ? Math.max(0, 24 - sla.hrs) + 'h' : 'breached';
-  return '<span class="' + sla.cls + '">' + sla.text + (sla.cls !== 'sla-critical' ? ' · ' + remaining + ' left' : '') + '</span>';
+function timeAgo(d) {
+  try {
+    var dt = new Date(d);
+    if (isNaN(dt.getTime())) return d;
+    var h = Math.round((new Date() - dt) / 3600000);
+    if (h < 1) return 'Just now';
+    if (h < 24) return h + 'h ago';
+    if (h < 48) return 'Yesterday';
+    return Math.floor(h / 24) + 'd ago';
+  } catch (e) { return d; }
 }
 
 function showLoading(elId) {
@@ -2512,14 +2056,6 @@ function setUnsaved(show) {
     if (show) el.classList.add('visible');
     else el.classList.remove('visible');
   }
-}
-
-function copyText(t) {
-  navigator.clipboard.writeText(t).then(function() {
-    toast('Copied', 'success');
-  }).catch(function() {
-    toast('Copy failed', 'error');
-  });
 }
 
 function acknowledgeAlarm() {
@@ -2698,7 +2234,7 @@ function hideLogin() {
   document.getElementById('login-page').style.display = 'none';
 }
 
-function loginLocal() {
+async function loginLocal() {
   var username = document.getElementById('login-username').value;
   var password = document.getElementById('login-password').value;
   var errorDiv = document.getElementById('login-error');
@@ -2707,81 +2243,63 @@ function loginLocal() {
   errorDiv.style.display = 'none';
   loadingDiv.classList.add('active');
 
-  var clientCredentials = {
-    'kftl': { password: 'kftl123', client: 'kftl' },
-    'kwl': { password: 'kwl123', client: 'kwl' },
-    'lasco': { password: 'lasco123', client: 'lasco' },
-    'nestle': { password: 'nestle123', client: 'nestle' },
-    'nids': { password: 'nids123', client: 'nids' },
-    'nutrien': { password: 'nutrien123', client: 'nutrien' },
-    'fidelity': { password: 'fidelity123', client: 'fidelity' }
-  };
-
-  var lowerUser = username.toLowerCase();
-  var lowerPass = password.toLowerCase();
-
-  for (var client in clientCredentials) {
-    if (lowerUser === client && lowerPass === clientCredentials[client].password) {
-      clientViewUser = clientCredentials[client];
-      clientViewData = CLIENTS_VIEW_DATA[client];
-      
-      if (!clientViewData) {
-        errorDiv.textContent = 'Client data not found';
-        errorDiv.style.display = 'block';
-        loadingDiv.classList.remove('active');
-        return;
-      }
-
-      hideLogin();
-      document.getElementById('app').style.display = 'none';
-      document.getElementById('client-view-container').style.display = 'block';
-      
-      initClientView(clientViewData, clientViewUser);
-      
-      toast('Welcome, ' + clientViewData.name + '!', 'success');
-      loadingDiv.classList.remove('active');
-      return;
-    }
-  }
-
   try {
-    if (username === 'admin' && password === 'admin123') {
-      currentUser = {
-        username: 'admin',
-        isAdmin: true,
-        role: 'Administrator'
-      };
-      userClient = null;
-      isAdmin = true;
-      currentClientFilter = null;
-      currentZoneFilter = null;
-
-      localStorage.setItem('user', JSON.stringify(currentUser));
-      token = 'admin-token-' + Date.now();
-      localStorage.setItem('token', token);
-
-      hideLogin();
-      document.getElementById('app').style.display = 'flex';
-      document.getElementById('client-view-container').style.display = 'none';
-      document.getElementById('user-name-display').textContent = 'admin';
-      document.getElementById('user-role-display').textContent = 'Administrator';
-      document.getElementById('user-avatar').textContent = 'AD';
-
-      applyClientBranding(null);
-      updateClientNavVisibility();
-      toast('Welcome, Admin!', 'success');
-      loadData();
-      loadingDiv.classList.remove('active');
-      return;
-    }
-
-    errorDiv.textContent = 'Invalid credentials. Try admin/admin123 or kftl/kftl123';
-    errorDiv.style.display = 'block';
-  } catch (error) {
-    errorDiv.textContent = error.message || 'Login failed. Try admin/admin123 or kftl/kftl123';
-    errorDiv.style.display = 'block';
-  } finally {
+    const data = await apiCall('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password })
+    });
+    
+    authToken = data.token;
+    localStorage.setItem('token', authToken);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    
+    currentUser = data.user;
+    userClient = data.user.client_id ? 'kftl' : null;
+    isAdmin = data.user.role === 'admin';
+    
+    hideLogin();
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('user-name-display').textContent = data.user.username;
+    document.getElementById('user-role-display').textContent = isAdmin ? 'Administrator' : 'Client User';
+    document.getElementById('user-avatar').textContent = data.user.username.slice(0, 2).toUpperCase();
+    
+    await loadData();
     loadingDiv.classList.remove('active');
+    toast('Welcome, ' + data.user.username + '!', 'success');
+  } catch (err) {
+    errorDiv.textContent = err.message || 'Login failed';
+    errorDiv.style.display = 'block';
+    loadingDiv.classList.remove('active');
+  }
+}
+
+function logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  authToken = null;
+  currentUser = null;
+  userClient = null;
+  isAdmin = true;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('client-view-container').style.display = 'none';
+  showLogin();
+  toast('Logged out', 'info');
+}
+
+function checkLogin() {
+  authToken = localStorage.getItem('token');
+  currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+  if (authToken && currentUser) {
+    userClient = currentUser.client_id ? 'kftl' : null;
+    isAdmin = currentUser.role === 'admin';
+    hideLogin();
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('user-name-display').textContent = currentUser.username;
+    document.getElementById('user-role-display').textContent = isAdmin ? 'Administrator' : 'Client User';
+    document.getElementById('user-avatar').textContent = currentUser.username.slice(0, 2).toUpperCase();
+    loadData();
+  } else {
+    showLogin();
   }
 }
 
@@ -2795,70 +2313,11 @@ function base64URLEncode(buffer) {
 }
 
 function loginWithMicrosoft() {
-  var array = new Uint8Array(32);
-  crypto.getRandomValues(array);
-  msCodeVerifier = base64URLEncode(array);
-  var encoder = new TextEncoder();
-  var data = encoder.encode(msCodeVerifier);
-  crypto.subtle.digest('SHA-256', data).then(function(hash) {
-    var codeChallenge = base64URLEncode(new Uint8Array(hash));
-    var authUrl = 'https://login.microsoftonline.com/' + MS_TENANT_ID + '/oauth2/v2.0/authorize?client_id=' + MS_CLIENT_ID + '&response_type=code&redirect_uri=' + encodeURIComponent(MS_REDIRECT_URI) + '&scope=' + encodeURIComponent('https://graph.microsoft.com/Sites.Read.All https://graph.microsoft.com/Files.Read.All User.Read offline_access') + '&response_mode=query&code_challenge=' + codeChallenge + '&code_challenge_method=S256';
-    window.location.href = authUrl;
-  });
-}
-
-function logout() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  token = null;
-  currentUser = null;
-  userClient = null;
-  currentClientFilter = null;
-  currentZoneFilter = null;
-  isAdmin = true;
-  clientViewUser = null;
-  clientViewData = null;
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('client-view-container').style.display = 'none';
-  showLogin();
-  toast('Logged out', 'info');
+  toast('Microsoft login coming soon', 'info');
 }
 
 function applyClientBranding(client) {
   console.log('Client branding applied for:', client);
-}
-
-function checkLogin() {
-  var urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('code')) {
-    window.history.replaceState({}, document.title, window.location.pathname);
-    showLogin();
-    setTimeout(loadData, 500);
-    return;
-  }
-  token = localStorage.getItem('token');
-  currentUser = JSON.parse(localStorage.getItem('user') || 'null');
-  if (token && currentUser) {
-    userClient = currentUser.client || null;
-    isAdmin = currentUser.isAdmin !== false;
-    if (userClient && !isAdmin) {
-      currentClientFilter = userClient;
-      applyClientBranding(userClient);
-    } else {
-      currentClientFilter = null;
-      applyClientBranding(null);
-    }
-    hideLogin();
-    document.getElementById('app').style.display = 'flex';
-    document.getElementById('user-name-display').textContent = currentUser.username;
-    document.getElementById('user-role-display').textContent = currentUser.role || (isAdmin ? 'Administrator' : 'Client User');
-    document.getElementById('user-avatar').textContent = currentUser.username.slice(0, 2).toUpperCase();
-    updateClientNavVisibility();
-    loadData();
-  } else {
-    showLogin();
-    setTimeout(loadData, 500);
-  }
 }
 
 // ============================================================
@@ -2922,7 +2381,7 @@ function buildClientView(data, user) {
   var totalDevices = totalCameras + totalDoors + totalServers + totalSwitches;
   
   var defective = data.assets && data.assets.cameras ? data.assets.cameras.filter(function(c) { 
-    return c.status === 'Defective' || c.status === 'Offline' || c.status === 'No Power' || c.status === 'No Camera'; 
+    return c.status === 'Defective' || c.status === 'Offline' || c.status === 'No Power' || c.status === 'No Camera' || c.status === 'Not Working'; 
   }).length : 0;
   var acOffline = data.assets && data.assets.doors ? data.assets.doors.filter(function(d) { return d.status === 'Offline'; }).length : 0;
   var swOffline = data.assets && data.assets.switches ? data.assets.switches.filter(function(s) { return s.status !== 'Online'; }).length : 0;
@@ -3087,7 +2546,7 @@ function buildClientView(data, user) {
     html += '<thead><tr><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Zone</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Camera</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">IP</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Status</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Comments</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Model</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Manufacturer</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Resolution</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">Recorder</th><th style="color:var(--text-secondary);font-weight:600;letter-spacing:0.08em;padding:8px 6px;border-bottom:1px solid var(--card-border);text-align:left;">MAC Address</th></tr></thead>';
     html += '<tbody>';
     data.assets.cameras.forEach(function(cam) {
-      var statusBadge = cam.status === 'Online' ? 'b-done' : cam.status === 'Defective' ? 'b-high' : cam.status === 'No Power' ? 'b-high' : cam.status === 'No Camera' ? 'b-open' : 'b-info';
+      var statusBadge = cam.status === 'Online' || cam.status === 'Working' ? 'b-done' : cam.status === 'Defective' || cam.status === 'Not Working' ? 'b-high' : cam.status === 'No Power' ? 'b-high' : cam.status === 'No Camera' ? 'b-open' : 'b-info';
       html += '<tr><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + cam.zone + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + cam.name + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-family:monospace;font-size:11px;">' + (cam.ip_address || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);"><span class="badge ' + statusBadge + '" style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:500;">' + cam.status + '</span></td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.comments || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.model || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.manufacturer || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.resolution || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);">' + (cam.archiver || '—') + '</td><td style="padding:8px 6px;border-bottom:1px solid var(--card-border);font-family:monospace;font-size:10px;">' + (cam.mac_address || '—') + '</td></tr>';
     });
     html += '</tbody></table></div>';
@@ -3100,7 +2559,7 @@ function buildClientView(data, user) {
   if (data.assets && data.assets.doors && data.assets.doors.length > 0) {
     html += '<div style="max-height:calc(100vh - 180px);overflow-y:auto;padding-right:4px;">';
     data.assets.doors.forEach(function(door, index) {
-      var statusBadge = door.status === 'Online' ? 'b-done' : door.status === 'Offline' ? 'b-high' : 'b-under-maintenance';
+      var statusBadge = door.status === 'Online' || door.status === 'Working' ? 'b-done' : door.status === 'Offline' ? 'b-high' : 'b-under-maintenance';
       var readerStatus = door.reader_status || door.status || 'Online';
       var lockStatus = door.lock_status || door.status || 'Online';
       var sensorStatus = door.sensor_status || 'Online';
@@ -3313,6 +2772,22 @@ function switchClientViewTab(tab, element) {
   }
 }
 
+function logoutClientView() {
+  clientViewUser = null;
+  clientViewData = null;
+  var container = document.getElementById('client-view-container');
+  if (container) {
+    container.style.display = 'none';
+    container.innerHTML = '';
+  }
+  document.querySelector('.app').classList.remove('client-mode');
+  document.documentElement.style.setProperty('--client-primary', '#4f8cf7');
+  document.documentElement.style.setProperty('--client-secondary', '#00d4ff');
+  document.documentElement.style.setProperty('--client-gradient', 'linear-gradient(135deg, #4f8cf7, #00d4ff)');
+  showLogin();
+  toast('Logged out from client view', 'info');
+}
+
 // ============================================================
 // ── CLIENT SR MODAL ──────────────────────────────────────────
 // ============================================================
@@ -3352,7 +2827,7 @@ function closeClientSRModal() {
   if (modal) modal.remove();
 }
 
-function submitClientSR() {
+async function submitClientSR() {
   var subject = document.getElementById('client-sr-subject').value.trim();
   var category = document.getElementById('client-sr-category').value;
   var priority = document.getElementById('client-sr-priority').value;
@@ -3364,212 +2839,77 @@ function submitClientSR() {
     return;
   }
   
-  var clientName = clientViewData ? clientViewData.name : 'Client';
-  
-  var id = 'SR-' + String(Math.floor(Math.random() * 9000) + 1000);
-  var newSR = {
-    id: id,
-    client: clientName,
-    site: site,
-    subject: subject,
-    from: clientViewUser ? clientViewUser.client : 'Client User',
-    category: category,
-    priority: priority,
-    status: 'Open',
-    assigned: getDefaultAssignee(),
-    received: new Date().toLocaleDateString('en-JM'),
-    body: description || '',
-    notes: '',
-    hardware: [],
-    history: [{ time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }), msg: 'Created by client' }],
-    attachments: []
-  };
-  
-  SERVICE_REQUESTS.unshift(newSR);
-  localStorage.setItem('ccsm_sr', JSON.stringify(SERVICE_REQUESTS));
-  
-  if (clientViewData && clientViewData.srs) {
-    clientViewData.srs.unshift({
-      id: id,
-      subject: subject,
-      priority: priority,
-      status: 'Open',
-      date: new Date().toLocaleDateString('en-JM')
+  try {
+    const data = await apiCall('/service-requests', {
+      method: 'POST',
+      body: JSON.stringify({
+        subject,
+        category,
+        priority,
+        assigned_to: getDefaultAssignee(),
+        body: description
+      })
     });
+    closeClientSRModal();
+    await loadData();
+    toast('Service Request ' + data.sr_id + ' submitted!', 'success');
+  } catch (err) {
+    toast('Failed to submit: ' + err.message, 'error');
   }
-  
-  closeClientSRModal();
-  toast('Service Request ' + id + ' submitted!', 'success');
-  
-  buildClientView(clientViewData, clientViewUser);
-  var container = document.getElementById('client-view-container');
-  if (container) {
-    var srsTab = container.querySelector('.nav-item[onclick*="srs"]');
-    if (srsTab) switchClientViewTab('srs', srsTab);
-  }
-}
-
-// ============================================================
-// ── CLIENT VIEW LOGOUT ──────────────────────────────────────
-// ============================================================
-
-function logoutClientView() {
-  clientViewUser = null;
-  clientViewData = null;
-  var container = document.getElementById('client-view-container');
-  if (container) {
-    container.style.display = 'none';
-    container.innerHTML = '';
-  }
-  document.querySelector('.app').classList.remove('client-mode');
-  document.documentElement.style.setProperty('--client-primary', '#4f8cf7');
-  document.documentElement.style.setProperty('--client-secondary', '#00d4ff');
-  document.documentElement.style.setProperty('--client-gradient', 'linear-gradient(135deg, #4f8cf7, #00d4ff)');
-  showLogin();
-  toast('Logged out from client view', 'info');
 }
 
 // ============================================================
 // ── DATA LOADING ─────────────────────────────────────────────
 // ============================================================
 
-function loadData() {
+async function loadData() {
   try {
-    loadMockData();
-  } catch (error) {
-    console.error('Failed to load data:', error);
-    loadMockData();
+    const [cameras, doors, servers, switches, software, intrusion, srs, clients] = await Promise.all([
+      apiCall('/cameras'),
+      apiCall('/doors'),
+      apiCall('/servers'),
+      apiCall('/switches'),
+      apiCall('/software'),
+      apiCall('/intrusion'),
+      apiCall('/service-requests'),
+      apiCall('/clients')
+    ]);
+    
+    CAMERAS = cameras || [];
+    DOORS = doors || [];
+    SERVERS = servers || [];
+    SWITCHES = switches || [];
+    SOFTWARE = software || [];
+    INTRUSION = intrusion || [];
+    SERVICE_REQUESTS = srs || [];
+    CLIENTS = (clients || []).map(c => c.name);
+    CLIENT_LOGO_DATA = {};
+    (clients || []).forEach(c => { if (c.logo_url) CLIENT_LOGO_DATA[c.name] = c.logo_url; });
+    
+    renderDashboard();
+    renderSR();
+    renderAuditLog();
+    renderStatusFilters();
+    renderCamerasOptimized();
+    renderDoorsEnhanced();
+    renderServersEnhanced();
+    renderComputeStorage();
+    renderSwitchesEnhanced();
+    renderSoftware();
+    renderStations();
+    renderMonitors();
+    renderIntrusion();
+    renderInbox();
+    renderFileExplorer();
+    updateClientNavVisibility();
+    populateClientDropdowns();
+    
+    console.log('✅ Data loaded successfully');
+    console.log(`📸 Cameras: ${CAMERAS.length}, 🚪 Doors: ${DOORS.length}, 🖥️ Servers: ${SERVERS.length}`);
+  } catch (err) {
+    console.error('Failed to load data:', err);
+    toast('Failed to load data: ' + err.message, 'error');
   }
-}
-
-function loadMockData() {
-  CAMERAS = JSON.parse(localStorage.getItem('ccsm_cameras') || 'null');
-  DOORS = JSON.parse(localStorage.getItem('ccsm_doors') || 'null');
-  SERVERS = JSON.parse(localStorage.getItem('ccsm_servers') || 'null');
-  SWITCHES = JSON.parse(localStorage.getItem('ccsm_switches') || 'null');
-  SOFTWARE = JSON.parse(localStorage.getItem('ccsm_software') || 'null');
-  STORAGE = JSON.parse(localStorage.getItem('ccsm_storage') || 'null');
-  STATIONS = JSON.parse(localStorage.getItem('ccsm_stations') || 'null');
-  MONITORS = JSON.parse(localStorage.getItem('ccsm_monitors') || 'null');
-  INTRUSION = JSON.parse(localStorage.getItem('ccsm_intrusion') || 'null');
-  SERVICE_REQUESTS = JSON.parse(localStorage.getItem('ccsm_sr') || 'null');
-  AUDIT_LOG = JSON.parse(localStorage.getItem('ccsm_audit_log') || 'null');
-  CLIENTS = JSON.parse(localStorage.getItem('ccsm_clients') || 'null');
-
-  CAMERAS = CAMERAS || [];
-  DOORS = DOORS || [];
-  SERVERS = SERVERS || [];
-  SWITCHES = SWITCHES || [];
-  SOFTWARE = SOFTWARE || [];
-  STORAGE = STORAGE || [];
-  STATIONS = STATIONS || [];
-  MONITORS = MONITORS || [];
-  INTRUSION = INTRUSION || [];
-  SERVICE_REQUESTS = SERVICE_REQUESTS || [];
-  AUDIT_LOG = AUDIT_LOG || [];
-  CLIENTS = CLIENTS || [];
-
-  if (CAMERAS.length === 0) {
-    CAMERAS = getEmbeddedCameras();
-    localStorage.setItem('ccsm_cameras', JSON.stringify(CAMERAS));
-  }
-  if (DOORS.length === 0) {
-    DOORS = getEmbeddedDoors();
-    localStorage.setItem('ccsm_doors', JSON.stringify(DOORS));
-  }
-  if (SERVERS.length === 0) {
-    SERVERS = getEmbeddedServers();
-    localStorage.setItem('ccsm_servers', JSON.stringify(SERVERS));
-  }
-  if (SWITCHES.length === 0) {
-    SWITCHES = getEmbeddedSwitches();
-    localStorage.setItem('ccsm_switches', JSON.stringify(SWITCHES));
-  }
-  if (SOFTWARE.length === 0) {
-    SOFTWARE = getEmbeddedSoftware();
-    localStorage.setItem('ccsm_software', JSON.stringify(SOFTWARE));
-  }
-  if (STORAGE.length === 0) {
-    STORAGE = getEmbeddedStorage();
-    localStorage.setItem('ccsm_storage', JSON.stringify(STORAGE));
-  }
-  if (STATIONS.length === 0) {
-    STATIONS = getEmbeddedStations();
-    localStorage.setItem('ccsm_stations', JSON.stringify(STATIONS));
-  }
-  if (MONITORS.length === 0) {
-    MONITORS = getEmbeddedMonitors();
-    localStorage.setItem('ccsm_monitors', JSON.stringify(MONITORS));
-  }
-  if (INTRUSION.length === 0) {
-    INTRUSION = getEmbeddedIntrusion();
-    localStorage.setItem('ccsm_intrusion', JSON.stringify(INTRUSION));
-  }
-  if (SERVICE_REQUESTS.length === 0) {
-    SERVICE_REQUESTS = getEmbeddedSRs();
-    localStorage.setItem('ccsm_sr', JSON.stringify(SERVICE_REQUESTS));
-  }
-  if (CLIENTS.length === 0) {
-    CLIENTS = ['KFTL', 'KWL', 'Lasco', 'Nestle', 'NIDS', 'Nutrien', 'Fidelity Motors'];
-    localStorage.setItem('ccsm_clients', JSON.stringify(CLIENTS));
-  }
-
-  CAMERAS.forEach(function(c) {
-    if (!c.client) c.client = getClient(c.zone);
-  });
-  DOORS.forEach(function(d) {
-    if (!d.client) d.client = getClient(d.site);
-  });
-  SERVERS.forEach(function(s) {
-    if (!s.client) s.client = getClient(s.location);
-  });
-  SWITCHES.forEach(function(s) {
-    if (!s.client) s.client = getClient(s.location);
-  });
-
-  renderDashboard();
-  renderSR();
-  renderAuditLog();
-  renderStatusFilters();
-  renderCamerasOptimized();
-  renderDoorsEnhanced();
-  renderServersEnhanced();
-  renderComputeStorage();
-  renderSwitchesEnhanced();
-  renderSoftware();
-  renderStations();
-  renderMonitors();
-  renderIntrusion();
-  renderInbox();
-  renderFileExplorer();
-  updateClientNavVisibility();
-}
-
-// ============================================================
-// ── EMBEDDED DATA ────────────────────────────────────────────
-// ============================================================
-
-function getEmbeddedCameras() {
-  return CLIENTS_VIEW_DATA.kftl.assets.cameras || [];
-}
-
-function getEmbeddedDoors() { return CLIENTS_VIEW_DATA.kftl.assets.doors || []; }
-function getEmbeddedServers() { return CLIENTS_VIEW_DATA.kftl.assets.servers || []; }
-function getEmbeddedSwitches() { return CLIENTS_VIEW_DATA.kftl.assets.switches || []; }
-function getEmbeddedSoftware() { return SOFTWARE.length ? SOFTWARE : []; }
-function getEmbeddedStorage() { return STORAGE.length ? STORAGE : []; }
-function getEmbeddedStations() { return STATIONS.length ? STATIONS : []; }
-function getEmbeddedMonitors() { return MONITORS.length ? MONITORS : []; }
-function getEmbeddedIntrusion() { return INTRUSION.length ? INTRUSION : []; }
-
-function getEmbeddedSRs() {
-  if (SERVICE_REQUESTS.length) return SERVICE_REQUESTS;
-  return [
-    {id: "SR-1847", client: "KFTL", site: "NORTH", subject: "8 Cameras Defective in NORTH Zone", from: "David Chen", category: "Camera", priority: "High", status: "Open", assigned: "Shanice Vernon", received: "Jun 15, 2026", body: "Multiple cameras showing as defective in NORTH zone. Need immediate attention.", notes: "Awaiting parts", history: [{time: "14:22", msg: "Created"}, {time: "15:00", msg: "Assigned to Shanice"}], attachments: []},
-    {id: "SR-1848", client: "KWL", site: "Tinson Pen", subject: "5 Cameras Offline - Urgent", from: "Andrea Williams", category: "Camera", priority: "High", status: "In Progress", assigned: "Marvin Grant", received: "Jun 15, 2026", body: "5 cameras down simultaneously at Tinson Pen. Need eyes back up ASAP.", notes: "On-site investigation", history: [{time: "11:05", msg: "Created"}, {time: "12:30", msg: "Dispatched to site"}], attachments: []},
-    {id: "SR-1849", client: "KFTL", site: "SAL Duty Office", subject: "Door 2nd Entrance Offline", from: "Security Ops", category: "Access Control", priority: "Medium", status: "In Progress", assigned: "Marvin Grant", received: "Jun 16, 2026", body: "2nd Entrance door reader offline. Need immediate attention.", notes: "", history: [{time: "08:00", msg: "Created"}], attachments: []},
-    {id: "SR-1850", client: "Lasco", site: "LML B Liquid Plant", subject: "Camera LML-01 Offline", from: "Vincent Hoo", category: "Camera", priority: "Medium", status: "Open", assigned: "Marvin Grant", received: "Jun 17, 2026", body: "Camera LML-01 reported offline at Liquid Plant.", notes: "", history: [{time: "06:30", msg: "Created"}], attachments: []}
-  ];
 }
 
 // ============================================================
@@ -3727,93 +3067,33 @@ function selectZone(zone) {
 }
 
 // ============================================================
-// ── COMPUTE & STORAGE FUNCTIONS ─────────────────────────────
-// ============================================================
-
-var currentComputeSubTab = 'servers';
-
-function switchComputeTab(tab) {
-  currentComputeSubTab = tab;
-  document.querySelectorAll('.compute-sub-tab').forEach(function(el) {
-    el.classList.remove('active');
-  });
-  document.querySelectorAll('.compute-sub-tab').forEach(function(el) {
-    if (el.dataset.subtab === tab) el.classList.add('active');
-  });
-  document.querySelectorAll('.compute-sub-content').forEach(function(el) {
-    el.classList.remove('active');
-  });
-  var content = document.getElementById('subtab-' + tab);
-  if (content) content.classList.add('active');
-  
-  if (tab === 'servers') renderServersEnhanced();
-  else if (tab === 'storage') renderComputeStorage();
-}
-
-function renderComputeStorage() {
-  var search = document.getElementById('compute-storage-search') ? document.getElementById('compute-storage-search').value.toLowerCase() : '';
-  showLoading('compute-storage-loading');
-  setTimeout(function() {
-    var filtered = STORAGE.filter(function(s) {
-      return s.name.toLowerCase().indexOf(search) !== -1 ||
-        (s.make || '').toLowerCase().indexOf(search) !== -1 ||
-        (s.model || '').toLowerCase().indexOf(search) !== -1;
-    });
-    if (currentClientFilter) {
-      filtered = filtered.filter(function(s) { return s.client === currentClientFilter; });
-    }
-    if (currentZoneFilter) {
-      filtered = filtered.filter(function(s) { return s.location === currentZoneFilter; });
-    }
-
-    var total = STORAGE.length;
-    var totalCap = STORAGE.reduce(function(acc, s) {
-      var cap = parseFloat(s.total);
-      if (!isNaN(cap)) return acc + cap;
-      return acc;
-    }, 0);
-    var avgHealth = STORAGE.length > 0 ? Math.round(STORAGE.reduce(function(acc, s) { return acc + (s.health || 0); }, 0) / STORAGE.length) : 0;
-
-    document.getElementById('compute-storage-total').textContent = total;
-    document.getElementById('compute-storage-capacity').textContent = totalCap.toFixed(1) + ' TB';
-    document.getElementById('compute-storage-health').textContent = avgHealth + '%';
-
-    var container = document.getElementById('compute-storage-groups-container');
-    if (!container) return;
-
-    if (filtered.length === 0) {
-      container.innerHTML = '<div class="empty-state"><span class="empty-icon">💾</span><div class="empty-title">No storage found</div></div>';
-    } else {
-      var html = '<table class="tbl"><thead><tr><th>Name</th><th>Client</th><th>Total</th><th>Usable</th><th>Health</th><th>Make</th><th>Model</th><th>Warranty</th></tr></thead><tbody>';
-      filtered.forEach(function(s) {
-        html += '<tr><td>' + s.name + '</td><td>' + s.client + '</td><td>' + s.total + '</td><td>' + s.usable + '</td><td>' + getStatusBadge(s.health || 0) + ' ' + (s.health || 0) + '%</td><td>' + (s.make || '—') + '</td><td>' + (s.model || '—') + '</td><td>' + getWarrantyDisplay(s.warranty_expiry) + '</td></tr>';
-      });
-      html += '</tbody></table>';
-      container.innerHTML = html;
-    }
-    document.querySelectorAll('.loading-overlay').forEach(function(el) { el.classList.remove('active'); });
-  }, 50);
-}
-
-function debounceRenderComputeStorage() { debounce(renderComputeStorage, 'compute-storage', 250); }
-
-// ============================================================
 // ── DASHBOARD ────────────────────────────────────────────────
 // ============================================================
 
-function renderDashboard() {
-  var defective = CAMERAS.filter(function(c) { return c.status === 'Defective' || c.status === 'Offline' || c.status === 'No Power' || c.status === 'No Camera'; }).length;
-  var acOffline = DOORS.filter(function(d) { return d.status === 'Offline'; }).length;
-  var srvOnline = SERVERS.filter(function(s) { return s.status === 'ONLINE'; }).length;
-  var swOnline = SWITCHES.filter(function(s) { return !isSwitchOffline(s); }).length;
-  var totalDevices = CAMERAS.length + DOORS.length + SERVERS.length + SWITCHES.length;
-  var onlineDevices = (CAMERAS.length - defective) + (DOORS.length - acOffline) + srvOnline + swOnline;
-  var health = totalDevices > 0 ? Math.round((onlineDevices / totalDevices) * 100) : 100;
-
-  document.getElementById('dash-health').textContent = health + '%';
-  document.getElementById('dash-alerts').textContent = defective + acOffline;
-  document.getElementById('dash-offline').textContent = defective + acOffline + (SWITCHES.length - swOnline);
-  document.getElementById('dash-srs').textContent = SERVICE_REQUESTS.filter(function(r) { return r.status !== 'Resolved'; }).length;
+async function renderDashboard() {
+  try {
+    const stats = await apiCall('/dashboard/stats');
+    
+    document.getElementById('dash-health').textContent = stats.health + '%';
+    document.getElementById('dash-alerts').textContent = stats.alerts;
+    document.getElementById('dash-offline').textContent = stats.offline_devices;
+    document.getElementById('dash-srs').textContent = stats.open_srs;
+  } catch (err) {
+    console.error('Dashboard stats error:', err);
+    // Fallback to calculated values
+    var defective = CAMERAS.filter(function(c) { return c.status === 'Defective' || c.status === 'Offline' || c.status === 'No Power' || c.status === 'No Camera' || c.status === 'Not Working'; }).length;
+    var acOffline = DOORS.filter(function(d) { return d.status === 'Offline'; }).length;
+    var srvOnline = SERVERS.filter(function(s) { return s.status === 'ONLINE'; }).length;
+    var swOnline = SWITCHES.filter(function(s) { return s.status === 'Online'; }).length;
+    var totalDevices = CAMERAS.length + DOORS.length + SERVERS.length + SWITCHES.length;
+    var onlineDevices = (CAMERAS.length - defective) + (DOORS.length - acOffline) + srvOnline + swOnline;
+    var health = totalDevices > 0 ? Math.round((onlineDevices / totalDevices) * 100) : 100;
+    
+    document.getElementById('dash-health').textContent = health + '%';
+    document.getElementById('dash-alerts').textContent = defective + acOffline;
+    document.getElementById('dash-offline').textContent = defective + acOffline + (SWITCHES.length - swOnline);
+    document.getElementById('dash-srs').textContent = SERVICE_REQUESTS.filter(function(r) { return r.status !== 'Resolved'; }).length;
+  }
 
   renderTimeline();
 
@@ -3823,9 +3103,9 @@ function renderDashboard() {
   }).slice(0, 7);
 
   document.getElementById('dash-sr-tbody').innerHTML = urgent.map(function(r) {
-    return '<tr class="clickable" onclick="switchTab(\'service\');openModal(\'' + r.id + '\')">' +
-      '<td style="font-size:11px;color:var(--text-muted);">' + r.id + '</td>' +
-      '<td>' + (r.client || '—') + '</td>' +
+    return '<tr class="clickable" onclick="switchTab(\'service\');openModal(\'' + r.sr_id + '\')">' +
+      '<td style="font-size:11px;color:var(--text-muted);">' + r.sr_id + '</td>' +
+      '<td>' + (r.client_name || '—') + '</td>' +
       '<td>' + (r.site || '—') + '</td>' +
       '<td style="max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + r.subject + '</td>' +
       '<td>' + priBadge(r.priority) + '</td>' +
@@ -3853,7 +3133,7 @@ function renderTimeline() {
 function getStatusCounts() {
   var counts = { All: CAMERAS.length };
   CAMERAS.forEach(function(c) { if (!counts[c.status]) counts[c.status] = 0; counts[c.status]++; });
-  var offlineTotal = (counts['Defective'] || 0) + (counts['No Power'] || 0) + (counts['No Camera'] || 0) + (counts['Offline'] || 0) + (counts['Needs Check'] || 0);
+  var offlineTotal = (counts['Defective'] || 0) + (counts['No Power'] || 0) + (counts['No Camera'] || 0) + (counts['Offline'] || 0) + (counts['Not Working'] || 0);
   counts['Offline'] = offlineTotal;
   return counts;
 }
@@ -3862,7 +3142,7 @@ function renderStatusFilters() {
   var counts = getStatusCounts();
   var container = document.getElementById('cam-status-filters');
   if (!container) return;
-  var statuses = ['All', 'Online', 'Offline', 'Defective', 'Needs Check', 'No Camera', 'No Power'];
+  var statuses = ['All', 'Online', 'Working', 'Offline', 'Defective', 'Not Working', 'No Camera', 'No Power'];
   container.innerHTML = statuses.map(function(s) {
     var count = counts[s] || 0;
     return '<span class="filter-pill ' + (camStatusFilter === s ? 'active' : '') + '" onclick="setCamStatusFilter(\'' + s + '\')">' + s + ' <span class="count">' + count + '</span></span>';
@@ -3879,7 +3159,7 @@ function setCamStatusFilter(status) {
 function getFilteredCameras() {
   var filtered = CAMERAS.slice();
   if (camStatusFilter === 'Offline') {
-    filtered = filtered.filter(function(c) { return c.status !== 'Online'; });
+    filtered = filtered.filter(function(c) { return c.status !== 'Online' && c.status !== 'Working'; });
   } else if (camStatusFilter !== 'All') {
     filtered = filtered.filter(function(c) { return c.status === camStatusFilter; });
   }
@@ -3952,7 +3232,7 @@ function renderCamerasOptimized() {
           html += '<table class="tbl"><thead><tr><th>Zone</th><th>Camera</th><th>IP</th><th>Status</th><th>Comments</th><th>Model</th><th>Manufacturer</th><th>Resolution</th><th>Recorder</th><th>MAC Address</th><th>Warranty</th></tr></thead><tbody>';
           pageCameras.forEach(function(c) {
             var globalIndex = CAMERAS.indexOf(c);
-            html += '<tr class="clickable" onclick="openCameraDetail(' + globalIndex + ')"><td>' + c.zone + '</td><td>' + c.name + '</td><td>' + (c.ip_address || '—') + '</td><td>' + camBadge(c.status) + '</td><td><span class="comment-display ' + (!c.comments ? 'placeholder' : '') + '" data-cam-index="' + globalIndex + '" onclick="event.stopPropagation();editComment(' + globalIndex + ')">' + (c.comments || 'Click to add note') + '</span></td><td>' + (c.model || '—') + '</td><td>' + (c.manufacturer || '—') + '</td><td>' + (c.resolution || '—') + '</td><td>' + (c.archiver || '—') + '</td><td class="mono">' + (c.mac_address || '—') + '</td><td>' + getWarrantyDisplay(c.warranty_expiry) + '</td></tr>';
+            html += '<tr class="clickable" onclick="openCameraDetail(' + globalIndex + ')"><td>' + c.zone + '</td><td>' + c.name + '</td><td>' + (c.ip_address || '—') + '</td><td>' + camBadge(c.status) + '</td><td><span class="comment-display ' + (!c.comments ? 'placeholder' : '') + '" data-cam-index="' + globalIndex + '" onclick="event.stopPropagation();editComment(' + globalIndex + ')">' + (c.comments || 'Click to add note') + '</span></td><td>' + (c.model || '—') + '</td><td>' + (c.manufacturer || '—') + '</td><td>' + (c.resolution || '—') + '</td><td>' + (c.archiver || '—') + '</td><td class="mono">' + (c.mac_address || '—') + '</td><td>' + getWarrantyDisplay(c.warranty) + '</td></tr>';
           });
           html += '</tbody></table>';
           if (totalPages > 1) {
@@ -3998,7 +3278,7 @@ function changePage(zone, page) {
   renderCamerasOptimized();
 }
 
-function editComment(index) {
+async function editComment(index) {
   var camera = CAMERAS[index];
   if (!camera) return;
   var commentCell = document.querySelector('.comment-display[data-cam-index="' + index + '"]');
@@ -4034,14 +3314,23 @@ function editComment(index) {
     span.onclick = function(e) { e.stopPropagation(); editComment(index); };
     wrapper.replaceWith(span);
   };
-  var doSave = function() {
+  var doSave = async function() {
     if (resolved) return;
     resolved = true;
     var newComment = input.value.trim();
     if (newComment !== camera.comments) {
-      camera.comments = newComment;
-      addAuditLogEntry('System', 'updated', 'Camera ' + camera.name + ' comment');
-      localStorage.setItem('ccsm_cameras', JSON.stringify(CAMERAS));
+      try {
+        await apiCall('/cameras/' + camera.id + '/comment', {
+          method: 'PUT',
+          body: JSON.stringify({ comments: newComment })
+        });
+        camera.comments = newComment;
+        await loadData();
+      } catch (err) {
+        toast('Failed to save: ' + err.message, 'error');
+        restoreSpan(currentComment);
+        return;
+      }
     }
     restoreSpan(newComment);
     renderCamerasOptimized();
@@ -4068,8 +3357,7 @@ function editComment(index) {
 }
 
 function refreshCameras() {
-  toast('Camera data refreshed', 'success');
-  updateLastUpdated();
+  toast('Refreshing cameras...', 'info');
   loadData();
 }
 
@@ -4090,7 +3378,7 @@ function openCameraDetail(index) {
   document.getElementById('camera-detail-sub').textContent = 'Zone: ' + camera.zone + ' (' + client + ') · Status: ' + camera.status;
   var preview = document.getElementById('cam-preview-large');
   
-  if (camera.status === 'Online' && ip !== 'N/A' && ip !== '') {
+  if ((camera.status === 'Online' || camera.status === 'Working') && ip !== 'N/A' && ip !== '') {
     preview.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;min-height:280px;">' +
       '<img src="http://' + ip + '/snapshot.jpg" onerror="this.parentElement.innerHTML=\'<div class=&quot;offline-msg&quot; style=&quot;color:var(--text-muted);padding:20px;text-align:center;&quot;><i class=&quot;ti ti-video-off&quot; style=&quot;font-size:32px;display:block;margin-bottom:8px;&quot;></i>Preview unavailable<br><span style=&quot;font-size:11px;&quot;>Camera may be offline or snapshot URL not accessible</span></div>\'" style="max-width:100%;max-height:100%;min-height:280px;object-fit:contain;border-radius:4px;" />' +
       '<div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.6);color:#4ade80;padding:4px 10px;border-radius:4px;font-size:10px;display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#4ade80;animation:pulse 1.5s infinite;"></span> LIVE</div>' +
@@ -4109,7 +3397,7 @@ function openCameraDetail(index) {
     '<div class="modal-field"><label>Resolution</label><span>' + (camera.resolution || '—') + '</span></div>' +
     '<div class="modal-field"><label>Recorder</label><span>' + (camera.archiver || '—') + '</span></div>' +
     '<div class="modal-field"><label>MAC Address</label><span class="mono">' + (camera.mac_address || '—') + '</span></div>' +
-    '<div class="modal-field"><label>Warranty Expiry</label><span>' + getWarrantyDisplay(camera.warranty_expiry) + '</span></div>';
+    '<div class="modal-field"><label>Warranty</label><span>' + (camera.warranty || '—') + '</span></div>';
   
   var commentsSection = document.getElementById('cam-detail-comments-section');
   if (commentsSection) {
@@ -4118,7 +3406,7 @@ function openCameraDetail(index) {
   document.getElementById('camera-detail-modal').classList.add('open');
 }
 
-function saveCameraModalComment() {
+async function saveCameraModalComment() {
   var title = document.getElementById('camera-detail-title').textContent;
   var camera = CAMERAS.find(function(c) { return c.name === title; });
   if (!camera) return;
@@ -4126,11 +3414,18 @@ function saveCameraModalComment() {
   if (!textarea) return;
   var newComment = textarea.value.trim();
   if (newComment === (camera.comments || '')) return;
-  camera.comments = newComment;
-  addAuditLogEntry('System', 'updated', 'Camera ' + camera.name + ' comment');
-  localStorage.setItem('ccsm_cameras', JSON.stringify(CAMERAS));
-  renderCamerasOptimized();
-  toast('Saved', 'success');
+  try {
+    await apiCall('/cameras/' + camera.id + '/comment', {
+      method: 'PUT',
+      body: JSON.stringify({ comments: newComment })
+    });
+    camera.comments = newComment;
+    await loadData();
+    renderCamerasOptimized();
+    toast('Saved', 'success');
+  } catch (err) {
+    toast('Failed to save: ' + err.message, 'error');
+  }
 }
 
 function pingCameraFromDetail() {
@@ -4219,43 +3514,88 @@ document.addEventListener('keydown', function(e) {
 function renderDoorsEnhanced() {
   var container = document.getElementById('door-groups-container');
   if (!container) return;
-  container.innerHTML = '<div class="empty-state"><span class="empty-icon">🚪</span><div class="empty-title">Loading doors...</div><div class="empty-desc">Door data will appear here</div></div>';
+  if (DOORS.length === 0) {
+    container.innerHTML = '<div class="empty-state"><span class="empty-icon">🚪</span><div class="empty-title">No doors found</div></div>';
+    return;
+  }
+  var html = '<table class="tbl"><thead><tr><th>Name</th><th>Zone</th><th>Status</th><th>Reader</th><th>Lock</th><th>Technician</th></tr></thead><tbody>';
+  DOORS.forEach(function(d) {
+    html += '<tr><td>' + d.name + '</td><td>' + d.zone + '</td><td>' + doorBadge(d.status) + '</td><td>' + (d.reader || '—') + '</td><td>' + (d.lock_type || '—') + '</td><td>' + (d.tech || '—') + '</td></tr>';
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
 }
 
 function renderServersEnhanced() {
   var container = document.getElementById('srv-groups-container');
   if (!container) return;
-  container.innerHTML = '<div class="empty-state"><span class="empty-icon">🖥️</span><div class="empty-title">Loading servers...</div><div class="empty-desc">Server data will appear here</div></div>';
+  if (SERVERS.length === 0) {
+    container.innerHTML = '<div class="empty-state"><span class="empty-icon">🖥️</span><div class="empty-title">No servers found</div></div>';
+    return;
+  }
+  var html = '<table class="tbl"><thead><tr><th>Name</th><th>Location</th><th>Status</th><th>Make</th><th>Model</th><th>Storage</th></tr></thead><tbody>';
+  SERVERS.forEach(function(s) {
+    html += '<tr><td>' + s.name + '</td><td>' + s.zone + '</td><td>' + srvBadge(s.status) + '</td><td>' + (s.make || '—') + '</td><td>' + (s.model || '—') + '</td><td>' + (s.capacity || '—') + '</td></tr>';
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
 }
 
 function renderSwitchesEnhanced() {
   var container = document.getElementById('sw-groups-container');
   if (!container) return;
-  container.innerHTML = '<div class="empty-state"><span class="empty-icon">🔀</span><div class="empty-title">Loading switches...</div><div class="empty-desc">Switch data will appear here</div></div>';
+  if (SWITCHES.length === 0) {
+    container.innerHTML = '<div class="empty-state"><span class="empty-icon">🔀</span><div class="empty-title">No switches found</div></div>';
+    return;
+  }
+  var html = '<table class="tbl"><thead><tr><th>Name</th><th>Location</th><th>Status</th><th>Model</th><th>IP</th><th>Firmware</th></tr></thead><tbody>';
+  SWITCHES.forEach(function(s) {
+    html += '<tr><td>' + s.name + '</td><td>' + s.zone + '</td><td>' + doorBadge(s.status) + '</td><td>' + (s.model || '—') + '</td><td>' + (s.ip_address || '—') + '</td><td>' + (s.firmware || '—') + '</td></tr>';
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
 }
 
 function renderSoftware() {
   var container = document.getElementById('sw-groups-container');
   if (!container) return;
-  container.innerHTML = '<div class="empty-state"><span class="empty-icon">💻</span><div class="empty-title">Loading software...</div><div class="empty-desc">Software data will appear here</div></div>';
+  if (SOFTWARE.length === 0) {
+    container.innerHTML = '<div class="empty-state"><span class="empty-icon">💻</span><div class="empty-title">No software found</div></div>';
+    return;
+  }
+  var html = '<table class="tbl"><thead><tr><th>Name</th><th>Vendor</th><th>Version</th><th>Status</th><th>Expiry</th></tr></thead><tbody>';
+  SOFTWARE.forEach(function(s) {
+    html += '<tr><td>' + s.name + '</td><td>' + (s.vendor || '—') + '</td><td>' + (s.version || '—') + '</td><td>' + (s.status || '—') + '</td><td>' + (s.expiry_date || '—') + '</td></tr>';
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
 }
 
 function renderStations() {
   var container = document.getElementById('stations-groups-container');
   if (!container) return;
-  container.innerHTML = '<div class="empty-state"><span class="empty-icon">🖥️</span><div class="empty-title">Loading stations...</div><div class="empty-desc">Station data will appear here</div></div>';
+  container.innerHTML = '<div class="empty-state"><span class="empty-icon">🖥️</span><div class="empty-title">No stations found</div></div>';
 }
 
 function renderMonitors() {
   var container = document.getElementById('monitors-groups-container');
   if (!container) return;
-  container.innerHTML = '<div class="empty-state"><span class="empty-icon">🖥️</span><div class="empty-title">Loading monitors...</div><div class="empty-desc">Monitor data will appear here</div></div>';
+  container.innerHTML = '<div class="empty-state"><span class="empty-icon">🖥️</span><div class="empty-title">No monitors found</div></div>';
 }
 
 function renderIntrusion() {
   var container = document.getElementById('intrusion-groups-container');
   if (!container) return;
-  container.innerHTML = '<div class="empty-state"><span class="empty-icon">🔒</span><div class="empty-title">Loading intrusion points...</div><div class="empty-desc">Intrusion data will appear here</div></div>';
+  if (INTRUSION.length === 0) {
+    container.innerHTML = '<div class="empty-state"><span class="empty-icon">🔒</span><div class="empty-title">No intrusion points found</div></div>';
+    return;
+  }
+  var html = '<table class="tbl"><thead><tr><th>Name</th><th>Zone</th><th>Status</th><th>Module</th><th>Sensor</th></tr></thead><tbody>';
+  INTRUSION.forEach(function(i) {
+    html += '<tr><td>' + i.name + '</td><td>' + i.zone + '</td><td>' + intrusionBadge(i.status) + '</td><td>' + (i.module || '—') + '</td><td>' + (i.sensor_type || '—') + '</td></tr>';
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
 }
 
 function renderInbox() {
@@ -4264,20 +3604,73 @@ function renderInbox() {
   container.innerHTML = '<div class="empty-state"><span class="empty-icon">📧</span><div class="empty-title">No emails</div><div class="empty-desc">Your inbox is empty</div></div>';
 }
 
-function renderSR() {
+async function renderSR() {
   var container = document.getElementById('sr-tbody');
   if (!container) return;
+  
+  // Apply filters
+  var filtered = SERVICE_REQUESTS.slice();
+  var search = document.getElementById('sr-search') ? document.getElementById('sr-search').value.toLowerCase() : '';
+  var siteFilter = document.getElementById('sr-site-filter') ? document.getElementById('sr-site-filter').value : 'All sites';
+  
+  if (srFilterStatus !== 'All') {
+    filtered = filtered.filter(function(sr) { return sr.status === srFilterStatus; });
+  }
+  if (search) {
+    filtered = filtered.filter(function(sr) { return sr.subject.toLowerCase().indexOf(search) !== -1 || (sr.sr_id || '').toLowerCase().indexOf(search) !== -1; });
+  }
+  if (siteFilter !== 'All sites') {
+    filtered = filtered.filter(function(sr) { return sr.site === siteFilter; });
+  }
+  
+  document.getElementById('sr-count-label').textContent = 'Service Requests (' + filtered.length + ')';
+  
+  if (filtered.length === 0) {
+    container.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:20px;color:var(--text-muted);">No service requests found</td></tr>';
+    return;
+  }
+  
   var html = '';
-  SERVICE_REQUESTS.forEach(function(sr) {
-    html += '<tr onclick="openModal(\'' + sr.id + '\')"><td><input type="checkbox" onclick="event.stopPropagation();toggleSelectRow(this, \'' + sr.id + '\')" /></td><td>' + sr.id + '</td><td>' + (sr.client || '—') + '</td><td>' + (sr.site || '—') + '</td><td>' + sr.subject + '</td><td>' + getCategoryIcon(sr.category) + ' ' + (sr.category || '—') + '</td><td>' + slaBadge(sr) + '</td><td>' + priBadge(sr.priority) + '</td><td>' + (sr.assigned || '—') + '</td><td><span class="comment-display ' + (!sr.notes ? 'placeholder' : '') + '" onclick="event.stopPropagation();editSRNote(\'' + sr.id + '\')">' + (sr.notes || 'Click to add note') + '</span></td><td>' + srStatusBadge(sr.status) + '</td></tr>';
+  filtered.forEach(function(sr) {
+    html += '<tr onclick="openModal(\'' + sr.sr_id + '\')"><td><input type="checkbox" onclick="event.stopPropagation();toggleSelectRow(this, \'' + sr.sr_id + '\')" /></td><td>' + sr.sr_id + '</td><td>' + (sr.client_name || '—') + '</td><td>' + (sr.site || '—') + '</td><td>' + sr.subject + '</td><td>' + getCategoryIcon(sr.category) + ' ' + (sr.category || '—') + '</td><td>' + getSLA(sr) + '</td><td>' + priBadge(sr.priority) + '</td><td>' + (sr.assigned_to || '—') + '</td><td><span class="comment-display ' + (!sr.notes ? 'placeholder' : '') + '" onclick="event.stopPropagation();editSRNote(\'' + sr.sr_id + '\')">' + (sr.notes || 'Click to add note') + '</span></td><td>' + srStatusBadge(sr.status) + '</td></tr>';
   });
-  container.innerHTML = html || '<tr><td colspan="11" style="text-align:center;padding:20px;color:var(--text-muted);">No service requests found</td></tr>';
+  container.innerHTML = html;
 }
 
-function renderAuditLog() {
-  var container = document.getElementById('audit-log-container');
-  if (!container) return;
-  container.innerHTML = '<div class="empty-state"><span class="empty-icon">📋</span><div class="empty-title">No activity</div><div class="empty-desc">No recent activity to display</div></div>';
+function getSLA(sr) {
+  if (!sr.received) return '—';
+  try {
+    var d = new Date(sr.received);
+    if (isNaN(d.getTime())) return '—';
+    var hrs = Math.round((new Date() - d) / 3600000);
+    if (hrs < 1) return '<span class="sla-ok"><1h</span>';
+    if (hrs < 4) return '<span class="sla-ok">' + hrs + 'h</span>';
+    if (hrs < 24) return '<span class="sla-warn">' + hrs + 'h</span>';
+    return '<span class="sla-critical">' + Math.floor(hrs / 24) + 'd ' + Math.round(hrs % 24) + 'h</span>';
+  } catch (e) { return '—'; }
+}
+
+async function renderAuditLog() {
+  try {
+    const logs = await apiCall('/activity-log?limit=100');
+    var container = document.getElementById('audit-log-container');
+    if (!container) return;
+    if (logs.length === 0) {
+      container.innerHTML = '<div class="empty-state"><span class="empty-icon">📋</span><div class="empty-title">No activity</div></div>';
+      return;
+    }
+    container.innerHTML = logs.map(function(log) {
+      return '<div class="audit-item">' +
+        '<span class="audit-time">' + new Date(log.created_at).toLocaleTimeString() + '</span>' +
+        '<span class="audit-user">' + log.user + '</span>' +
+        '<span class="audit-action"><span class="highlight">' + log.action + '</span> ' + log.detail + '</span>' +
+        '</div>';
+    }).join('');
+  } catch (err) {
+    console.error('Failed to load audit log:', err);
+    var container = document.getElementById('audit-log-container');
+    if (container) container.innerHTML = '<div class="empty-state"><span class="empty-icon">❌</span><div class="empty-title">Failed to load</div></div>';
+  }
 }
 
 function renderFileExplorer() {
@@ -4286,27 +3679,32 @@ function renderFileExplorer() {
   container.innerHTML = '<div class="empty-state"><span class="empty-icon">📁</span><div class="empty-title">No files</div><div class="empty-desc">File system is empty</div></div>';
 }
 
-function addAuditLogEntry(user, action, detail) {
-  AUDIT_LOG.unshift({ time: new Date().toISOString(), user: user, action: action, detail: detail });
-  localStorage.setItem('ccsm_audit_log', JSON.stringify(AUDIT_LOG));
+function renderComputeStorage() {
+  var container = document.getElementById('compute-storage-groups-container');
+  if (!container) return;
+  container.innerHTML = '<div class="empty-state"><span class="empty-icon">💾</span><div class="empty-title">No storage found</div></div>';
 }
+
+// ============================================================
+// ── SERVICE REQUEST FUNCTIONS ──────────────────────────────
+// ============================================================
 
 function closeModal() {
   document.getElementById('sr-modal').classList.remove('open');
 }
 
 function openModal(id) {
-  var sr = SERVICE_REQUESTS.find(function(r) { return r.id === id; });
+  var sr = SERVICE_REQUESTS.find(function(r) { return r.sr_id === id; });
   if (!sr) return;
-  document.getElementById('m-title').textContent = sr.id + ' — ' + sr.subject;
+  document.getElementById('m-title').textContent = sr.sr_id + ' — ' + sr.subject;
   document.getElementById('m-sub').textContent = 'Created ' + sr.received;
-  document.getElementById('m-client').textContent = sr.client || '—';
+  document.getElementById('m-client').textContent = sr.client_name || '—';
   document.getElementById('m-site').textContent = sr.site || '—';
   document.getElementById('m-priority-sel').value = sr.priority || 'Medium';
   document.getElementById('m-category').textContent = sr.category || '—';
-  document.getElementById('m-assigned-sel').value = sr.assigned || 'Unassigned';
+  document.getElementById('m-assigned-sel').value = sr.assigned_to || 'Unassigned';
   document.getElementById('m-received').textContent = sr.received || '—';
-  document.getElementById('m-sla').innerHTML = slaBadge(sr);
+  document.getElementById('m-sla').innerHTML = getSLA(sr);
   document.getElementById('m-status-sel').value = sr.status || 'Open';
   document.getElementById('m-body').textContent = sr.body || '';
   document.getElementById('m-notes').value = sr.notes || '';
@@ -4317,29 +3715,77 @@ function openModal(id) {
   document.getElementById('sr-modal').classList.add('open');
 }
 
-function exportCamerasCSV() {
-  toast('Exporting cameras...', 'info');
+async function saveNewSR() {
+  var subject = document.getElementById('sr-subject').value.trim();
+  var client = document.getElementById('sr-client').value;
+  var site = document.getElementById('sr-site').value.trim() || 'Unknown';
+  var category = document.getElementById('sr-category').value;
+  var priority = document.getElementById('sr-priority').value;
+  var assigned = document.getElementById('sr-assigned').value;
+  var description = document.getElementById('sr-description').value.trim();
+  
+  if (!subject || !client) {
+    toast('Subject and Client required', 'warning');
+    return;
+  }
+  
+  try {
+    const data = await apiCall('/service-requests', {
+      method: 'POST',
+      body: JSON.stringify({
+        subject,
+        category,
+        priority,
+        assigned_to: assigned,
+        body: description,
+        site: site
+      })
+    });
+    closeAddModal('add-sr-modal');
+    await loadData();
+    toast('SR ' + data.sr_id + ' created', 'success');
+  } catch (err) {
+    toast('Failed to create SR: ' + err.message, 'error');
+  }
 }
 
-function debounceRenderCameras() { debounce(renderCamerasOptimized, 'cameras', 250); }
+async function autoSave() {
+  var srIdElement = document.getElementById('m-title');
+  if (!srIdElement) return;
+  var srId = srIdElement.textContent.split(' — ')[0];
+  var sr = SERVICE_REQUESTS.find(function(r) { return r.sr_id === srId; });
+  if (!sr) return;
+  
+  var priority = document.getElementById('m-priority-sel').value;
+  var assigned = document.getElementById('m-assigned-sel').value;
+  var status = document.getElementById('m-status-sel').value;
+  var notes = document.getElementById('m-notes').value;
+  
+  try {
+    await apiCall('/service-requests/' + sr.id, {
+      method: 'PUT',
+      body: JSON.stringify({ priority, assigned_to: assigned, status, notes })
+    });
+    sr.priority = priority;
+    sr.assigned_to = assigned;
+    sr.status = status;
+    sr.notes = notes;
+    setUnsaved(false);
+  } catch (err) {
+    console.error('Auto-save failed:', err);
+  }
+}
 
-function debounceRenderDoors() { debounce(renderDoorsEnhanced, 'doors', 250); }
-
-function debounceRenderServers() { debounce(renderServersEnhanced, 'servers', 250); }
-
-function debounceRenderSwitches() { debounce(renderSwitchesEnhanced, 'switches', 250); }
-
-function debounceRenderSoftware() { debounce(renderSoftware, 'software', 250); }
-
-function debounceRenderStations() { debounce(renderStations, 'stations', 250); }
-
-function debounceRenderMonitors() { debounce(renderMonitors, 'monitors', 250); }
-
-function debounceRenderIntrusion() { debounce(renderIntrusion, 'intrusion', 250); }
-
-function debounceRenderFiles() { debounce(renderFileExplorer, 'files', 250); }
-
-function debounceRenderSR() { debounce(renderSR, 'sr', 250); }
+async function addAuditLogEntry(user, action, detail) {
+  try {
+    await apiCall('/activity-log', {
+      method: 'POST',
+      body: JSON.stringify({ user, action, detail })
+    });
+  } catch (err) {
+    console.error('Failed to add audit log entry:', err);
+  }
+}
 
 function toggleSelectRow(checkbox, id) {
   if (checkbox.checked) {
@@ -4375,25 +3821,35 @@ function clearSelection() {
   updateBulkBar();
 }
 
-function bulkApply() {
+async function bulkApply() {
   var status = document.getElementById('bulk-status').value;
   var assign = document.getElementById('bulk-assign').value;
   var priority = document.getElementById('bulk-priority').value;
   if (!status && !assign && !priority) { toast('Select at least one action', 'warning'); return; }
-  selectedSRs.forEach(function(id) {
-    var sr = SERVICE_REQUESTS.find(function(r) { return r.id === id; });
+  
+  var count = 0;
+  for (var id of selectedSRs) {
+    var sr = SERVICE_REQUESTS.find(function(r) { return r.sr_id === id; });
     if (sr) {
-      if (status) sr.status = status;
-      if (assign) sr.assigned = assign;
-      if (priority) sr.priority = priority;
-      if (!sr.history) sr.history = [];
-      sr.history.push({ time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }), msg: 'Bulk update applied' });
+      try {
+        await apiCall('/service-requests/' + sr.id, {
+          method: 'PUT',
+          body: JSON.stringify({
+            priority: priority || sr.priority,
+            assigned_to: assign || sr.assigned_to,
+            status: status || sr.status,
+            notes: sr.notes || ''
+          })
+        });
+        count++;
+      } catch (err) {
+        console.error('Bulk update failed for ' + id, err);
+      }
     }
-  });
-  localStorage.setItem('ccsm_sr', JSON.stringify(SERVICE_REQUESTS));
+  }
+  await loadData();
   clearSelection();
-  renderSR();
-  toast('Bulk update applied', 'success');
+  toast('Bulk update applied to ' + count + ' SRs', 'success');
 }
 
 function mergeSelected() {
@@ -4407,181 +3863,8 @@ function setPillFilter(el) {
   renderSR();
 }
 
-function openComposeModal() { document.getElementById('compose-overlay').classList.add('open'); }
-function closeComposeModal() { document.getElementById('compose-overlay').classList.remove('open'); }
-function sendComposeEmail() { toast('Email sent', 'success'); closeComposeModal(); }
-
-function exportSRsCSV() { toast('Exporting SRs...', 'info'); }
-function exportDoorsCSV() { toast('Exporting doors...', 'info'); }
-function exportServersCSV() { toast('Exporting servers...', 'info'); }
-function exportSwitchesCSV() { toast('Exporting switches...', 'info'); }
-function exportSoftwareCSV() { toast('Exporting software...', 'info'); }
-function exportAssetsCSV() { toast('Exporting assets...', 'info'); }
-function exportIntrusionCSV() { toast('Exporting intrusion...', 'info'); }
-
-function refreshDoors() { toast('Refreshing doors...', 'info'); }
-function refreshServers() { toast('Refreshing servers...', 'info'); }
-function refreshSwitches() { toast('Refreshing switches...', 'info'); }
-function refreshSoftware() { toast('Refreshing software...', 'info'); }
-function refreshAssets() { toast('Refreshing assets...', 'info'); }
-function refreshIntrusion() { toast('Refreshing intrusion...', 'info'); }
-function refreshFileExplorer() { toast('Refreshing files...', 'info'); }
-function refreshAuditLog() { toast('Refreshing audit log...', 'info'); }
-function clearAuditLog() { toast('Audit log cleared', 'info'); }
-
-function switchAssetSubTab(tab) {
-  currentAssetSubTab = tab;
-  document.querySelectorAll('.asset-sub-tab').forEach(function(el) {
-    el.classList.remove('active');
-  });
-  document.querySelectorAll('.asset-sub-tab').forEach(function(el) {
-    if (el.dataset.subtab === tab) el.classList.add('active');
-  });
-  document.querySelectorAll('.asset-sub-content').forEach(function(el) {
-    el.classList.remove('active');
-  });
-  var content = document.getElementById('subtab-' + tab);
-  if (content) content.classList.add('active');
-}
-
-function setInboxFolder(folder, el) {
-  inboxFolder = folder;
-  document.querySelectorAll('.outlook-folder-item').forEach(function(f) { f.classList.remove('active'); });
-  if (el) el.classList.add('active');
-  renderInbox();
-}
-
-function deleteSelectedEmails() { toast('Delete selected', 'info'); }
-function markSelectedRead() { toast('Marked as read', 'success'); }
-function flagSelectedEmails() { toast('Flagged', 'info'); }
-function composeReply() { toast('Reply', 'info'); }
-function composeReplyAll() { toast('Reply All', 'info'); }
-function composeForward() { toast('Forward', 'info'); }
-function toggleEmailFlag(id) { toast('Toggled flag', 'info'); }
-function convertToSR() { toast('Converted to SR', 'success'); }
-
-function pingDoorReader() { toast('Pinging reader...', 'info'); }
-function openDoorController() { toast('Opening controller...', 'info'); }
-function closeDoorDetailModal() { document.getElementById('door-detail-modal').classList.remove('open'); }
-
-function pingServer() { toast('Pinging server...', 'info'); }
-function openServerConsole() { toast('Opening console...', 'info'); }
-function closeServerDetailModal() { document.getElementById('server-detail-modal').classList.remove('open'); }
-
-function pingSwitchDetail() { toast('Pinging switch...', 'info'); }
-function openSwitchAdmin() { toast('Opening admin...', 'info'); }
-function closeSwitchDetailModal() { document.getElementById('switch-detail-modal').classList.remove('open'); }
-
-function pingIntrusion() { toast('Pinging intrusion point...', 'info'); }
-function closeIntrusionDetailModal() { document.getElementById('intrusion-detail-modal').classList.remove('open'); }
-
-function closeFilePreview() { document.getElementById('file-preview-overlay').classList.remove('open'); }
-function downloadFile() { toast('Downloading...', 'info'); }
-
-function saveNewSR() {
-  var subject = document.getElementById('sr-subject').value.trim();
-  var client = document.getElementById('sr-client').value;
-  var site = document.getElementById('sr-site').value.trim() || 'Unknown';
-  var category = document.getElementById('sr-category').value;
-  var priority = document.getElementById('sr-priority').value;
-  var assigned = document.getElementById('sr-assigned').value;
-  var description = document.getElementById('sr-description').value.trim();
-  if (!subject || !client) { toast('Subject and Client required', 'warning'); return; }
-  var id = 'SR-' + String(Math.floor(Math.random() * 9000) + 1000);
-  var sr = {
-    id: id,
-    client: client,
-    site: site,
-    subject: subject,
-    from: currentUser ? currentUser.username : 'System',
-    category: category,
-    priority: priority,
-    status: 'Open',
-    assigned: assigned,
-    received: new Date().toLocaleDateString('en-JM'),
-    body: description || '',
-    notes: '',
-    hardware: [],
-    history: [{ time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }), msg: 'Created' }],
-    attachments: []
-  };
-  SERVICE_REQUESTS.unshift(sr);
-  localStorage.setItem('ccsm_sr', JSON.stringify(SERVICE_REQUESTS));
-  closeAddModal('add-sr-modal');
-  renderSR();
-  toast('SR ' + id + ' created', 'success');
-}
-
-function saveNewClient() {
-  var name = document.getElementById('client-name').value.trim();
-  if (!name) { toast('Client name required', 'warning'); return; }
-  if (CLIENTS.indexOf(name) !== -1) { toast('Client already exists', 'warning'); return; }
-  CLIENTS.push(name);
-  var logoPreview = document.getElementById('client-logo-preview');
-  if (logoPreview && logoPreview.src && logoPreview.src.indexOf('data:') !== -1) {
-    CLIENT_LOGO_DATA[name] = logoPreview.src;
-    localStorage.setItem('ccsm_client_logos', JSON.stringify(CLIENT_LOGO_DATA));
-  }
-  localStorage.setItem('ccsm_clients', JSON.stringify(CLIENTS));
-  closeAddModal('add-client-modal');
-  updateClientNavVisibility();
-  toast('Client ' + name + ' added', 'success');
-}
-
-function previewClientLogo(input) {
-  var preview = document.getElementById('client-logo-preview');
-  if (input.files && input.files[0]) {
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      preview.src = e.target.result;
-      preview.style.display = 'block';
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
-}
-
-function previewEditClientLogo(input) {
-  var preview = document.getElementById('edit-client-logo-preview');
-  if (input.files && input.files[0]) {
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      preview.src = e.target.result;
-      preview.style.display = 'block';
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
-}
-
-function saveEditClient() { toast('Client updated', 'success'); }
-function printTicket() { window.print(); }
-
-function hideContextMenu() {
-  document.getElementById('ctx-menu').classList.remove('open');
-}
-
-function showClientContextMenu(event, client) {
-  event.preventDefault();
-  var menu = document.getElementById('ctx-menu');
-  menu.innerHTML =
-    '<button class="ctx-item" onclick="editClient(\'' + client + '\')"><i class="ti ti-edit"></i> Edit</button>' +
-    '<button class="ctx-item" onclick="deleteClient(\'' + client + '\')"><i class="ti ti-trash"></i> Delete</button>';
-  menu.style.left = event.pageX + 'px';
-  menu.style.top = event.pageY + 'px';
-  menu.classList.add('open');
-}
-
-function editClient(client) { toast('Edit ' + client, 'info'); }
-function deleteClient(client) { toast('Delete ' + client, 'info'); }
-
-function createSRFromAsset(type, index) { toast('Creating SR from ' + type, 'info'); }
-
-function saveDoorModalComment() { toast('Comment saved', 'success'); }
-function saveServerModalComment() { toast('Comment saved', 'success'); }
-function saveSwitchModalComment() { toast('Comment saved', 'success'); }
-function saveIntrusionModalComment() { toast('Comment saved', 'success'); }
-
-function editSRNote(id) {
-  var sr = SERVICE_REQUESTS.find(function(r) { return r.id === id; });
+async function editSRNote(id) {
+  var sr = SERVICE_REQUESTS.find(function(r) { return r.sr_id === id; });
   if (!sr) return;
   var noteCell = document.querySelector('.comment-display[onclick*="editSRNote(\'' + id + '\')"]');
   if (!noteCell) return;
@@ -4615,15 +3898,28 @@ function editSRNote(id) {
     span.onclick = function(e) { e.stopPropagation(); editSRNote(id); };
     wrapper.replaceWith(span);
   };
-  var doSave = function() {
+  var doSave = async function() {
     if (resolved) return;
     resolved = true;
     var newNote = input.value.trim();
     if (newNote !== sr.notes) {
-      sr.notes = newNote;
-      if (!sr.history) sr.history = [];
-      sr.history.push({ time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }), msg: 'Note updated' });
-      localStorage.setItem('ccsm_sr', JSON.stringify(SERVICE_REQUESTS));
+      try {
+        await apiCall('/service-requests/' + sr.id, {
+          method: 'PUT',
+          body: JSON.stringify({
+            priority: sr.priority,
+            assigned_to: sr.assigned_to,
+            status: sr.status,
+            notes: newNote
+          })
+        });
+        sr.notes = newNote;
+        await loadData();
+      } catch (err) {
+        toast('Failed to save: ' + err.message, 'error');
+        restoreSpan(currentNote);
+        return;
+      }
     }
     restoreSpan(newNote);
     renderSR();
@@ -4649,20 +3945,222 @@ function editSRNote(id) {
   });
 }
 
+// ============================================================
+// ── DEBOUNCE WRAPPERS ────────────────────────────────────────
+// ============================================================
+
+function debounceRenderCameras() { debounce(renderCamerasOptimized, 'cameras', 250); }
+function debounceRenderDoors() { debounce(renderDoorsEnhanced, 'doors', 250); }
+function debounceRenderServers() { debounce(renderServersEnhanced, 'servers', 250); }
+function debounceRenderSwitches() { debounce(renderSwitchesEnhanced, 'switches', 250); }
+function debounceRenderSoftware() { debounce(renderSoftware, 'software', 250); }
+function debounceRenderStations() { debounce(renderStations, 'stations', 250); }
+function debounceRenderMonitors() { debounce(renderMonitors, 'monitors', 250); }
+function debounceRenderIntrusion() { debounce(renderIntrusion, 'intrusion', 250); }
+function debounceRenderFiles() { debounce(renderFileExplorer, 'files', 250); }
+function debounceRenderSR() { debounce(renderSR, 'sr', 250); }
+function debounceRenderComputeStorage() { debounce(renderComputeStorage, 'compute-storage', 250); }
+
+// ============================================================
+// ── EXPORT FUNCTIONS ─────────────────────────────────────────
+// ============================================================
+
+async function exportCamerasCSV() {
+  try {
+    const data = await apiCall('/cameras/export');
+    if (data.length === 0) { toast('No cameras to export', 'warning'); return; }
+    var headers = Object.keys(data[0]).filter(function(k) { return k !== 'id' && k !== 'client_id'; });
+    var csv = headers.join(',') + '\n';
+    data.forEach(function(row) {
+      csv += headers.map(function(h) { return '"' + (row[h] || '').replace(/"/g, '""') + '"'; }).join(',') + '\n';
+    });
+    var blob = new Blob([csv], { type: 'text/csv' });
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'cameras_export.csv';
+    link.click();
+    toast('Export complete', 'success');
+  } catch (err) {
+    toast('Export failed: ' + err.message, 'error');
+  }
+}
+
+function exportSRsCSV() { toast('Exporting SRs...', 'info'); }
+function exportDoorsCSV() { toast('Exporting doors...', 'info'); }
+function exportServersCSV() { toast('Exporting servers...', 'info'); }
+function exportSwitchesCSV() { toast('Exporting switches...', 'info'); }
+function exportSoftwareCSV() { toast('Exporting software...', 'info'); }
+function exportAssetsCSV() { toast('Exporting assets...', 'info'); }
+function exportIntrusionCSV() { toast('Exporting intrusion...', 'info'); }
+
+// ============================================================
+// ── REFRESH FUNCTIONS ────────────────────────────────────────
+// ============================================================
+
+function refreshDoors() { toast('Refreshing doors...', 'info'); loadData(); }
+function refreshServers() { toast('Refreshing servers...', 'info'); loadData(); }
+function refreshSwitches() { toast('Refreshing switches...', 'info'); loadData(); }
+function refreshSoftware() { toast('Refreshing software...', 'info'); loadData(); }
+function refreshAssets() { toast('Refreshing assets...', 'info'); loadData(); }
+function refreshIntrusion() { toast('Refreshing intrusion...', 'info'); loadData(); }
+function refreshFileExplorer() { toast('Refreshing files...', 'info'); }
+function refreshAuditLog() { toast('Refreshing audit log...', 'info'); renderAuditLog(); }
+function clearAuditLog() { toast('Audit log cleared', 'info'); }
+
+// ============================================================
+// ── OTHER PLACEHOLDER FUNCTIONS ─────────────────────────────
+// ============================================================
+
+function switchComputeTab(tab) {
+  currentComputeSubTab = tab;
+  document.querySelectorAll('.compute-sub-tab').forEach(function(el) {
+    el.classList.remove('active');
+  });
+  document.querySelectorAll('.compute-sub-tab').forEach(function(el) {
+    if (el.dataset.subtab === tab) el.classList.add('active');
+  });
+  document.querySelectorAll('.compute-sub-content').forEach(function(el) {
+    el.classList.remove('active');
+  });
+  var content = document.getElementById('subtab-' + tab);
+  if (content) content.classList.add('active');
+  if (tab === 'servers') renderServersEnhanced();
+  else if (tab === 'storage') renderComputeStorage();
+}
+
+function switchAssetSubTab(tab) {
+  currentAssetSubTab = tab;
+  document.querySelectorAll('.asset-sub-tab').forEach(function(el) {
+    el.classList.remove('active');
+  });
+  document.querySelectorAll('.asset-sub-tab').forEach(function(el) {
+    if (el.dataset.subtab === tab) el.classList.add('active');
+  });
+  document.querySelectorAll('.asset-sub-content').forEach(function(el) {
+    el.classList.remove('active');
+  });
+  var content = document.getElementById('subtab-' + tab);
+  if (content) content.classList.add('active');
+  if (tab === 'stations') renderStations();
+  else if (tab === 'monitors') renderMonitors();
+}
+
+function setInboxFolder(folder, el) {
+  inboxFolder = folder;
+  document.querySelectorAll('.outlook-folder-item').forEach(function(f) { f.classList.remove('active'); });
+  if (el) el.classList.add('active');
+  renderInbox();
+}
+
+function deleteSelectedEmails() { toast('Delete selected', 'info'); }
+function markSelectedRead() { toast('Marked as read', 'success'); }
+function flagSelectedEmails() { toast('Flagged', 'info'); }
+function composeReply() { toast('Reply', 'info'); }
+function composeReplyAll() { toast('Reply All', 'info'); }
+function composeForward() { toast('Forward', 'info'); }
+function toggleEmailFlag(id) { toast('Toggled flag', 'info'); }
+function convertToSR() { toast('Converted to SR', 'success'); }
+function openComposeModal() { document.getElementById('compose-overlay').classList.add('open'); }
+function closeComposeModal() { document.getElementById('compose-overlay').classList.remove('open'); }
+function sendComposeEmail() { toast('Email sent', 'success'); closeComposeModal(); }
+
+function pingDoorReader() { toast('Pinging reader...', 'info'); }
+function openDoorController() { toast('Opening controller...', 'info'); }
+function closeDoorDetailModal() { document.getElementById('door-detail-modal').classList.remove('open'); }
+
+function pingServer() { toast('Pinging server...', 'info'); }
+function openServerConsole() { toast('Opening console...', 'info'); }
+function closeServerDetailModal() { document.getElementById('server-detail-modal').classList.remove('open'); }
+
+function pingSwitchDetail() { toast('Pinging switch...', 'info'); }
+function openSwitchAdmin() { toast('Opening admin...', 'info'); }
+function closeSwitchDetailModal() { document.getElementById('switch-detail-modal').classList.remove('open'); }
+
+function pingIntrusion() { toast('Pinging intrusion point...', 'info'); }
+function closeIntrusionDetailModal() { document.getElementById('intrusion-detail-modal').classList.remove('open'); }
+
+function closeFilePreview() { document.getElementById('file-preview-overlay').classList.remove('open'); }
+function downloadFile() { toast('Downloading...', 'info'); }
+
+function saveNewClient() {
+  var name = document.getElementById('client-name').value.trim();
+  if (!name) { toast('Client name required', 'warning'); return; }
+  toast('Client ' + name + ' added', 'success');
+  closeAddModal('add-client-modal');
+}
+
+function previewClientLogo(input) {
+  var preview = document.getElementById('client-logo-preview');
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function previewEditClientLogo(input) {
+  var preview = document.getElementById('edit-client-logo-preview');
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function saveEditClient() { toast('Client updated', 'success'); }
+function printTicket() { window.print(); }
+function hideContextMenu() { document.getElementById('ctx-menu').classList.remove('open'); }
+
+function showClientContextMenu(event, client) {
+  event.preventDefault();
+  var menu = document.getElementById('ctx-menu');
+  menu.innerHTML =
+    '<button class="ctx-item" onclick="editClient(\'' + client + '\')"><i class="ti ti-edit"></i> Edit</button>' +
+    '<button class="ctx-item" onclick="deleteClient(\'' + client + '\')"><i class="ti ti-trash"></i> Delete</button>';
+  menu.style.left = event.pageX + 'px';
+  menu.style.top = event.pageY + 'px';
+  menu.classList.add('open');
+}
+
+function editClient(client) { toast('Edit ' + client, 'info'); }
+function deleteClient(client) { toast('Delete ' + client, 'info'); }
+function createSRFromAsset(type, index) { toast('Creating SR from ' + type, 'info'); }
+
+function saveDoorModalComment() { toast('Comment saved', 'success'); }
+function saveServerModalComment() { toast('Comment saved', 'success'); }
+function saveSwitchModalComment() { toast('Comment saved', 'success'); }
+function saveIntrusionModalComment() { toast('Comment saved', 'success'); }
+
 function handleAttachmentUpload(files) {
   toast(files.length + ' file(s) uploaded', 'success');
 }
 
-function autoSave() {
-  var srId = document.getElementById('m-title').textContent.split(' — ')[0];
-  var sr = SERVICE_REQUESTS.find(function(r) { return r.id === srId; });
-  if (!sr) return;
-  sr.priority = document.getElementById('m-priority-sel').value;
-  sr.assigned = document.getElementById('m-assigned-sel').value;
-  sr.status = document.getElementById('m-status-sel').value;
-  sr.notes = document.getElementById('m-notes').value;
-  localStorage.setItem('ccsm_sr', JSON.stringify(SERVICE_REQUESTS));
-  setUnsaved(false);
+// ============================================================
+// ── RANDOM HELPERS ──────────────────────────────────────────
+// ============================================================
+
+function getRandomUptime() {
+  var days = Math.floor(Math.random() * 90) + 1;
+  var hours = Math.floor(Math.random() * 24);
+  var mins = Math.floor(Math.random() * 60);
+  return days + 'd ' + hours + 'h ' + mins + 'm';
+}
+
+function getRandomLatency() {
+  return Math.floor(Math.random() * 30) + 2;
+}
+
+function intrusionBadge(status) {
+  if (status === 'Online') return '<span class="badge b-intrusion-online">Online</span>';
+  if (status === 'Offline') return '<span class="badge b-intrusion-offline">Offline</span>';
+  if (status === 'Warning') return '<span class="badge b-intrusion-warning">Warning</span>';
+  return '<span class="badge b-info">Unknown</span>';
 }
 
 // ============================================================
@@ -4697,20 +4195,8 @@ document.addEventListener('click', function(e) {
 });
 
 console.log('🚀 CAMS - Client Assessment Management System loaded successfully.');
-console.log('📊 Client count:', CLIENTS.length);
-console.log('📸 Assets loaded:', {
-  cameras: CAMERAS.length,
-  doors: DOORS.length,
-  servers: SERVERS.length,
-  switches: SWITCHES.length,
-  software: SOFTWARE.length,
-  storage: STORAGE.length,
-  stations: STATIONS.length,
-  monitors: MONITORS.length,
-  intrusion: INTRUSION.length,
-  srs: SERVICE_REQUESTS.length
-});
-console.log('🔐 Login with admin/admin123 or client credentials');
+console.log('📸 Cameras loaded:', CAMERAS.length);
+console.log('🔐 Login with admin/admin123 or kftl/kftl123');
 </script>
 </body>
 </html>
