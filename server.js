@@ -9,15 +9,23 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // ============================================================
-// DATABASE CONNECTION - USING THE PROXY PORT
+// DATABASE CONNECTION - FIXED
 // ============================================================
+
+// Get password from environment - MUST BE SET
+const password = process.env.POSTGRES_PASSWORD;
+
+if (!password) {
+  console.error('❌ POSTGRES_PASSWORD is not set!');
+  console.error('Go to Railway → Variables → Add POSTGRES_PASSWORD');
+}
 
 const pool = new Pool({
   host: 'hayabusa.proxy.rlwy.net',
   port: 13542,
   database: process.env.PGDATABASE || 'postgres',
   user: process.env.PGUSER || 'postgres',
-  password: process.env.POSTGRES_PASSWORD,
+  password: password,  // THIS MUST BE A STRING
   ssl: { rejectUnauthorized: false },
   connectionTimeoutMillis: 10000,
 });
@@ -40,14 +48,17 @@ pool.connect((err, client, release) => {
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
 
 // ============================================================
 // HEALTH CHECK
 // ============================================================
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', db: dbConnected ? 'connected' : 'disconnected' });
+  res.json({ 
+    status: 'ok', 
+    db: dbConnected ? 'connected' : 'disconnected',
+    hasPassword: !!process.env.POSTGRES_PASSWORD
+  });
 });
 
 // ============================================================
@@ -116,11 +127,15 @@ app.get('/api/activity-log', (req, res) => res.json([]));
 app.get('/api/dashboard/stats', (req, res) => res.json({ health: 100, alerts: 0, offline_devices: 0, open_srs: 0 }));
 
 // ============================================================
-// SERVE HTML
+// SERVE HTML - index.html MUST be in SAME folder as server.js
 // ============================================================
 
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // ============================================================
@@ -130,4 +145,5 @@ app.get('*', (req, res) => {
 app.listen(port, () => {
   console.log(`🚀 Running on port ${port}`);
   console.log(`📊 DB: ${dbConnected ? '✅ Connected' : '❌ Disconnected'}`);
+  console.log(`🔑 Password set: ${!!process.env.POSTGRES_PASSWORD}`);
 });
