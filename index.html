@@ -1643,7 +1643,7 @@ input::placeholder, textarea::placeholder {
       <div class="modal-grid">
         <div class="modal-field"><label>Subject *</label><input type="text" id="sr-subject" placeholder="Brief description of the issue" /></div>
         <div class="modal-field"><label>Client *</label><select id="sr-client"><option value="">Select Client</option></select></div>
-        <div class="modal-field"><label>Site</label><input type="text" id="sr-site" placeholder="Site location" /></div>
+<div class="modal-field"><label>Site/Zone</label><select id="sr-site"><option value="">Select a client first</option></select></div>
         <div class="modal-field"><label>Category</label><select id="sr-category"><option value="Camera">Camera</option><option value="Access Control">Access Control</option><option value="Server">Server</option><option value="Network">Network</option><option value="Power">Power</option><option value="Other">Other</option></select></div>
         <div class="modal-field"><label>Priority</label><select id="sr-priority"><option value="High">🔴 High</option><option value="Medium" selected>🟡 Medium</option><option value="Low">🟢 Low</option></select></div>
         <div class="modal-field"><label>Assigned To</label><select id="sr-assigned"><option value="Shanice Vernon">Shanice Vernon</option><option value="Shavine">Shavine</option><option value="Marvin Grant">Marvin Grant</option><option value="Ackeem">Ackeem</option><option value="Unassigned">Unassigned</option></select></div>
@@ -2254,7 +2254,96 @@ function populateClientDropdowns() {
     if (currentVal && CLIENTS.indexOf(currentVal) !== -1) {
       select.value = currentVal;
     }
+    
+    // Trigger zone update after populating
+    if (select.id === 'sr-client') {
+      updateSiteZones(select.value);
+    }
   });
+}
+// Add event listener for client dropdown change
+document.addEventListener('DOMContentLoaded', function() {
+  var clientSelect = document.getElementById('sr-client');
+  if (clientSelect) {
+    clientSelect.addEventListener('change', function() {
+      updateSiteZones(this.value);
+    });
+  }
+});
+
+// Also add it when the modal opens
+var originalOpenAddModal = openAddModal;
+openAddModal = function(modalId) {
+  originalOpenAddModal(modalId);
+  if (modalId === 'add-sr-modal') {
+    setTimeout(function() {
+      var clientSelect = document.getElementById('sr-client');
+      if (clientSelect) {
+        clientSelect.addEventListener('change', function() {
+          updateSiteZones(this.value);
+        });
+        // Trigger initial update
+        updateSiteZones(clientSelect.value);
+      }
+    }, 100);
+  }
+};
+
+// Add this new function after populateClientDropdowns
+function updateSiteZones(client) {
+  var siteSelect = document.getElementById('sr-site');
+  if (!siteSelect) return;
+  
+  if (!client) {
+    siteSelect.innerHTML = '<option value="">Select a client first</option>';
+    return;
+  }
+  
+  // Get unique zones for this client from cameras
+  var zones = [];
+  CAMERAS.forEach(function(c) {
+    var clientName = getClient(c.zone);
+    if (clientName === client && c.zone && zones.indexOf(c.zone) === -1) {
+      zones.push(c.zone);
+    }
+  });
+  
+  // Also check doors
+  DOORS.forEach(function(d) {
+    var clientName = d.client || getClient(d.site);
+    if (clientName === client && d.site && zones.indexOf(d.site) === -1) {
+      zones.push(d.site);
+    }
+  });
+  
+  // Also check servers
+  SERVERS.forEach(function(s) {
+    var clientName = getClient(s.location);
+    if (clientName === client && s.location && zones.indexOf(s.location) === -1) {
+      zones.push(s.location);
+    }
+  });
+  
+  // Also check switches
+  SWITCHES.forEach(function(s) {
+    var clientName = getClient(s.location);
+    if (clientName === client && s.location && zones.indexOf(s.location) === -1) {
+      zones.push(s.location);
+    }
+  });
+  
+  zones.sort();
+  
+  var html = '<option value="">Select a zone</option>';
+  zones.forEach(function(z) {
+    html += '<option value="' + z + '">' + z + '</option>';
+  });
+  
+  if (zones.length === 0) {
+    html = '<option value="">No zones found for this client</option>';
+  }
+  
+  siteSelect.innerHTML = html;
 }
 
 // ============================================================
@@ -3770,9 +3859,10 @@ async function saveNewSR() {
     const data = await apiCall('/service-requests', {
       method: 'POST',
       body: JSON.stringify({
-        subject,
-        category,
-        priority,
+        subject: subject,
+        client: client,
+        category: category,
+        priority: priority,
         assigned_to: assigned,
         body: description,
         site: site
@@ -3780,7 +3870,7 @@ async function saveNewSR() {
     });
     closeAddModal('add-sr-modal');
     await loadData();
-    toast('SR ' + data.sr_id + ' created', 'success');
+    toast('SR ' + data.sr_id + ' created for ' + client, 'success');
   } catch (err) {
     toast('Failed to create SR: ' + err.message, 'error');
   }
@@ -4167,7 +4257,37 @@ function showClientContextMenu(event, client) {
 
 function editClient(client) { toast('Edit ' + client, 'info'); }
 function deleteClient(client) { toast('Delete ' + client, 'info'); }
-function createSRFromAsset(type, index) { toast('Creating SR from ' + type, 'info'); }
+function createSRFromAsset(type, index) {
+  var asset = null;
+  var assetName = '';
+  var assetZone = '';
+  
+  if (type === 'camera') {
+    asset = CAMERAS[index];
+    if (asset) {
+      assetName = asset.name;
+      assetZone = asset.zone;
+    }
+  }
+  
+  // Open the add SR modal
+  openAddSRModal();
+  
+  // Pre-fill the fields
+  setTimeout(function() {
+    var subjectField = document.getElementById('sr-subject');
+    var siteField = document.getElementById('sr-site');
+    var categoryField = document.getElementById('sr-category');
+    var descField = document.getElementById('sr-description');
+    
+    if (subjectField) subjectField.value = type + ' issue: ' + assetName;
+    if (siteField) siteField.value = assetZone;
+    if (categoryField) categoryField.value = type.charAt(0).toUpperCase() + type.slice(1);
+    if (descField) descField.value = 'Issue with ' + type + ' ' + assetName + ' in zone ' + assetZone;
+    
+    toast('Creating SR for ' + type + ': ' + assetName, 'info');
+  }, 100);
+}
 
 function saveDoorModalComment() { toast('Comment saved', 'success'); }
 function saveServerModalComment() { toast('Comment saved', 'success'); }
