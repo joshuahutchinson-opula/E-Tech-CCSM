@@ -2968,6 +2968,7 @@ async function loadData() {
     renderDashboard();
     renderSR();
     renderAuditLog();
+    renderTimeline();
     renderStatusFilters();
     renderCamerasOptimized();
     renderDoorsEnhanced();
@@ -3193,16 +3194,25 @@ async function renderDashboard() {
 }
 
 function renderTimeline() {
-  var items = [
-    { time: "06:30", msg: "<span style='color:#fca5a5'>SR-1847 SLA warning</span> — 8 cameras defective >4h in NORTH zone" },
-    { time: "08:15", msg: "<span style='color:#fbbf24'>SR-1849 assigned</span> — Marvin dispatched to Second Entrance" },
-    { time: "10:00", msg: "<span style='color:#4ade80'>Server J1013DDX</span> — Health check passed, 178GB in use" },
-    { time: "11:45", msg: "<span style='color:#fbbf24'>Tinson Pen switches</span> — 5 switches on firmware 5.20.15, update recommended" },
-    { time: "14:30", msg: "<span style='color:#fca5a5'>ALARM triggered</span> — Tinson Pen Cam 282 motion detection" }
-  ];
-  document.getElementById('dash-timeline').innerHTML = items.map(function(i) {
-    return '<div class="tl-item"><span class="tl-time">' + i.time + '</span><span class="tl-msg">' + i.msg + '</span></div>';
-  }).join('');
+  var container = document.getElementById('dash-timeline');
+  if (!container) return;
+  
+  // Get the 5 most recent activity logs
+  var logs = AUDIT_LOG.slice(0, 5);
+  
+  if (logs.length === 0) {
+    container.innerHTML = '<div style="color:var(--text-muted);padding:20px;text-align:center;font-size:12px;">No recent activity</div>';
+    return;
+  }
+  
+  var html = '';
+  logs.forEach(function(log) {
+    var time = new Date(log.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    var msg = log.action + ' — ' + log.detail;
+    html += '<div class="tl-item"><span class="tl-time">' + time + '</span><span class="tl-msg">' + msg + '</span></div>';
+  });
+  
+  container.innerHTML = html;
 }
 
 // ============================================================
@@ -3806,6 +3816,7 @@ function renderSR() {
 async function renderAuditLog() {
   try {
     const logs = await apiCall('/activity-log?limit=100');
+    AUDIT_LOG = logs;
     var container = document.getElementById('audit-log-container');
     if (!container) return;
     
