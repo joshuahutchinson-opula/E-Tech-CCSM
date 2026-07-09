@@ -3778,7 +3778,8 @@ function getSLA(sr) {
 
 async function renderAuditLog() {
   try {
-    const logs = await apiCall('/activity-log?limit=100');
+const logs = await apiCall('/activity-log?limit=100');
+// In renderAuditLog(), change log.user to log.username
     var container = document.getElementById('audit-log-container');
     if (!container) return;
     if (logs.length === 0) {
@@ -3788,7 +3789,7 @@ async function renderAuditLog() {
     container.innerHTML = logs.map(function(log) {
       return '<div class="audit-item">' +
         '<span class="audit-time">' + new Date(log.created_at).toLocaleTimeString() + '</span>' +
-        '<span class="audit-user">' + log.user + '</span>' +
+<span class="audit-user">${log.username}</span> +
         '<span class="audit-action"><span class="highlight">' + log.action + '</span> ' + log.detail + '</span>' +
         '</div>';
     }).join('');
