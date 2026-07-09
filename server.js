@@ -1,33 +1,119 @@
 const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
-const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Database connection - Railway injects DATABASE_URL automatically
-const pool = new Pool({
+// ============================================================
+// DATABASE CONNECTION - FIXED FOR RAILWAY
+// ============================================================
+
+// Log the connection attempt (without exposing password)
+console.log('📊 Connecting to database...');
+console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+
+// Parse DATABASE_URL to check if it's valid
+let dbConfig = {
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
-});
+  ssl: false // Start with false, we'll check below
+};
 
-// Test database connection
-pool.query('SELECT NOW()', (err, res) => {
-  if (err) {
-    console.error('Database connection failed:', err.message);
-  } else {
-    console.log('Database connected successfully');
+// Check if we have a DATABASE_URL
+if (!process.env.DATABASE_URL) {
+  console.error('❌ DATABASE_URL environment variable is not set!');
+  console.error('Please add PostgreSQL to your Railway project and link it.');
+} else {
+  // Fix for Railway: use SSL with rejectUnauthorized: false
+  dbConfig.ssl = {
+    rejectUnauthorized: false
+  };
+  console.log('✅ DATABASE_URL found, using SSL with rejectUnauthorized: false');
+}
+
+// Create the pool
+const pool = new Pool(dbConfig);
+
+// Test the connection with better error logging
+async function testConnection() {
+  let attempts = 0;
+  const maxAttempts = 10;
+  
+  while (attempts < maxAttempts) {
+    try {
+      attempts++;
+      console.log(`🔄 Database connection attempt ${attempts}/${maxAttempts}...`);
+      
+      const client = await pool.connect();
+      const result = await client.query('SELECT NOW()');
+      client.release();
+      
+      console.log('✅ Database connected successfully!');
+      console.log(`   Time: ${result.rows[0].now}`);
+      return true;
+    } catch (err) {
+      console.log(`❌ Attempt ${attempts} failed:`, err.message);
+      
+      if (attempts < maxAttempts) {
+        console.log(`⏳ Waiting 3 seconds before retry...`);
+        await new Promise(resolve => setTimeout(resolve, 3000));
+      }
+    }
   }
-});
+  
+  console.error('❌ Failed to connect to database after', maxAttempts, 'attempts');
+  console.error('Please check:');
+  console.error('  1. PostgreSQL service is running in Railway');
+  console.error('  2. DATABASE_URL environment variable is set and linked');
+  console.error('  3. The database has been initialized with the schema');
+  return false;
+}
 
-// Middleware
+// ============================================================
+// MIDDLEWARE
+// ============================================================
+
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
-// Auth middleware
+// Serve static files if public folder exists
+try {
+  app.use(express.static(path.join(__dirname, 'public')));
+} catch (err) {
+  console.log('⚠️ No public folder found, skipping static file serving');
+}
+
+// ============================================================
+// HEALTH CHECK - Shows database status
+// ============================================================
+
+app.get('/api/health', async (req, res) => {
+  let dbStatus = 'unknown';
+  try {
+    const client = await pool.connect();
+    await client.query('SELECT 1');
+    client.release();
+    dbStatus = 'connected';
+  } catch (err) {
+    dbStatus = 'disconnected: ' + err.message;
+  }
+  
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    database: dbStatus,
+    environment: process.env.NODE_ENV || 'production',
+    hasDbUrl: !!process.env.DATABASE_URL
+  });
+});
+
+// ============================================================
+// AUTH MIDDLEWARE
+// ============================================================
+
 const authenticate = async (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) {
@@ -43,12 +129,31 @@ const authenticate = async (req, res, next) => {
 };
 
 // ============================================================
-// AUTH ENDPOINTS
+// AUTH ENDPOINT
 // ============================================================
 
 app.post('/api/auth/login', async (req, res) => {
   const { username, password } = req.body;
+  
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password required' });
+  }
+  
   try {
+    // Check if users table exists
+    const tableCheck = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_name = 'users'
+      );
+    `);
+    
+    if (!tableCheck.rows[0].exists) {
+      return res.status(500).json({ 
+        error: 'Database not initialized. Please run the schema first.' 
+      });
+    }
+    
     const result = await pool.query(
       'SELECT * FROM users WHERE username = $1',
       [username]
@@ -58,8 +163,7 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     
-    // For demo - in production use bcrypt.compare
-    // Since we used placeholder hashes, we'll check against known passwords
+    // Demo: check against known passwords
     const valid = (password === 'admin123' && username === 'admin') || 
                   (password === 'kftl123' && username === 'kftl');
     
@@ -284,7 +388,6 @@ app.get('/api/service-requests', authenticate, async (req, res) => {
       'SELECT * FROM service_requests WHERE client_id = $1 ORDER BY created_at DESC',
       [clientId]
     );
-    // Get history for each SR
     for (const sr of result.rows) {
       const history = await pool.query(
         'SELECT * FROM sr_history WHERE sr_id = $1 ORDER BY created_at',
@@ -453,47 +556,75 @@ app.post('/api/emails', authenticate, async (req, res) => {
 });
 
 // ============================================================
-// DATA IMPORT ENDPOINT (for initial camera data)
+// DATA IMPORT ENDPOINT
 // ============================================================
 
 app.post('/api/import/cameras', authenticate, async (req, res) => {
   const clientId = req.user.client_id;
   const cameras = req.body;
   let imported = 0;
+  let errors = [];
+  
+  if (!Array.isArray(cameras) || cameras.length === 0) {
+    return res.status(400).json({ error: 'No cameras provided' });
+  }
+  
   try {
     for (const cam of cameras) {
-      await pool.query(
-        `INSERT INTO cameras 
-         (client_id, name, zone, status, comments, model, manufacturer, resolution, archiver, ip_address, mac_address, warranty, date_cleaned) 
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
-        [clientId, cam.name, cam.zone, cam.status, cam.comments, cam.model, cam.manufacturer, 
-         cam.resolution, cam.archiver, cam.ip_address, cam.mac_address, cam.warranty, cam.date_cleaned]
-      );
-      imported++;
+      try {
+        await pool.query(
+          `INSERT INTO cameras 
+           (client_id, name, zone, status, comments, model, manufacturer, resolution, archiver, ip_address, mac_address, warranty, date_cleaned) 
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+          [clientId, cam.name || '', cam.zone || '', cam.status || 'Working', cam.comments || '', 
+           cam.model || '', cam.manufacturer || '', cam.resolution || '', cam.archiver || '', 
+           cam.ip_address || '', cam.mac_address || '', cam.warranty || '', cam.date_cleaned || null]
+        );
+        imported++;
+      } catch (err) {
+        errors.push({ name: cam.name || 'unknown', error: err.message });
+      }
     }
+    
     await pool.query(
       'INSERT INTO activity_log (client_id, user, action, detail) VALUES ($1, $2, $3, $4)',
-      [clientId, req.user.username, 'imported', `Imported ${imported} cameras`]
+      [clientId, req.user.username, 'imported', `Imported ${imported} cameras (${errors.length} failed)`]
     );
-    res.json({ success: true, imported: imported });
+    
+    res.json({ 
+      success: true, 
+      imported, 
+      failed: errors.length,
+      errors: errors.slice(0, 10)
+    });
   } catch (err) {
     console.error('Import error:', err);
-    res.status(500).json({ error: err.message, imported: imported });
+    res.status(500).json({ error: err.message, imported });
   }
 });
 
 // ============================================================
-// HEALTH CHECK
+// SERVE FRONTEND
 // ============================================================
 
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+// Serve index.html for all non-API routes
+app.get('*', (req, res) => {
+  try {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  } catch (err) {
+    res.status(404).json({ error: 'Frontend not found. Please add index.html to the public folder.' });
+  }
 });
 
 // ============================================================
 // START SERVER
 // ============================================================
 
-app.listen(port, () => {
-  console.log(`CAMS API running on port ${port}`);
+// Test database connection before starting
+testConnection().then(connected => {
+  app.listen(port, () => {
+    console.log(`🚀 CAMS API running on port ${port}`);
+    console.log(`📊 Database status: ${connected ? '✅ Connected' : '❌ Disconnected'}`);
+    console.log(`🔗 Health check: http://localhost:${port}/api/health`);
+  });
 });
