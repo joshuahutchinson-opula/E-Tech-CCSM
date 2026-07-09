@@ -3808,21 +3808,22 @@ async function renderAuditLog() {
     const logs = await apiCall('/activity-log?limit=100');
     var container = document.getElementById('audit-log-container');
     if (!container) return;
+    
     if (logs.length === 0) {
       container.innerHTML = '<div class="empty-state"><span class="empty-icon">📋</span><div class="empty-title">No activity</div></div>';
       return;
     }
+    
     container.innerHTML = logs.map(function(log) {
+      var time = new Date(log.created_at).toLocaleString();
       return '<div class="audit-item">' +
-        '<span class="audit-time">' + new Date(log.created_at).toLocaleTimeString() + '</span>' +
-        '<span class="audit-user">' + log.username + '</span>' +
+        '<span class="audit-time">' + time + '</span>' +
+        '<span class="audit-user">' + (log.username || 'system') + '</span>' +
         '<span class="audit-action"><span class="highlight">' + log.action + '</span> ' + log.detail + '</span>' +
         '</div>';
     }).join('');
   } catch (err) {
     console.error('Failed to load audit log:', err);
-    var container = document.getElementById('audit-log-container');
-    if (container) container.innerHTML = '<div class="empty-state"><span class="empty-icon">❌</span><div class="empty-title">Failed to load</div></div>';
   }
 }
 
@@ -3961,11 +3962,15 @@ function updateSRDetailModal(sr) {
   if (notesField) notesField.value = sr.notes || '';
 }
 
-async function addAuditLogEntry(user, action, detail) {
+async function addAuditLogEntry(action, detail) {
   try {
     await apiCall('/activity-log', {
       method: 'POST',
-      body: JSON.stringify({ user, action, detail })
+      body: JSON.stringify({ 
+        username: currentUser?.username || 'system',
+        action: action,
+        detail: detail 
+      })
     });
   } catch (err) {
     console.error('Failed to add audit log entry:', err);
