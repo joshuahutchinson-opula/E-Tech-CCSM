@@ -1079,7 +1079,7 @@ input::placeholder, textarea::placeholder {
               <thead>
                 <tr><th style="width:24px"><input type="checkbox" id="sr-select-all" onchange="toggleSelectAll()" /></th>
                 <th>ID</th><th>Client</th><th>Site</th><th>Subject</th>
-                <th>Category</th><th>SLA</th><th>Priority</th>
+<th>Category</th><th>Priority</th>
                 <th>Assigned</th><th>Notes</th><th>Status</th></tr>
               </thead>
               <tbody id="sr-tbody"></tbody>
@@ -3707,7 +3707,7 @@ async function renderSR() {
   
   var html = '';
   filtered.forEach(function(sr) {
-    html += '<tr onclick="openModal(\'' + sr.sr_id + '\')"><td><input type="checkbox" onclick="event.stopPropagation();toggleSelectRow(this, \'' + sr.sr_id + '\')" /></td><td>' + sr.sr_id + '</td><td>' + (sr.client || '—') + '</td><td>' + (sr.site || '—') + '</td><td>' + sr.subject + '</td><td>' + getCategoryIcon(sr.category) + ' ' + (sr.category || '—') + '</td><td>' + priBadge(sr.priority) + '</td><td>' + (sr.assigned_to || '—') + '</td><td><span class="comment-display ' + (!sr.notes ? 'placeholder' : '') + '" onclick="event.stopPropagation();editSRNote(\'' + sr.sr_id + '\')">' + (sr.notes || 'Click to add note') + '</span></td><td>' + srStatusBadge(sr.status) + '</td></tr>';
+html += '<tr onclick="openModal(\'' + sr.sr_id + '\')"><td><input type="checkbox" onclick="event.stopPropagation();toggleSelectRow(this, \'' + sr.sr_id + '\')" /></td><td>' + sr.sr_id + '</td><td>' + (sr.client || '—') + '</td><td>' + (sr.site || '—') + '</td><td>' + sr.subject + '</td><td>' + getCategoryIcon(sr.category) + ' ' + (sr.category || '—') + '</td><td>' + priBadge(sr.priority) + '</td><td>' + (sr.assigned_to || '—') + '</td><td><span class="comment-display ' + (!sr.notes ? 'placeholder' : '') + '" onclick="event.stopPropagation();editSRNote(\'' + sr.sr_id + '\')">' + (sr.notes || 'Click to add note') + '</span></td><td>' + srStatusBadge(sr.status) + '</td></tr>';
   });
   container.innerHTML = html;
 }
@@ -3792,11 +3792,11 @@ async function saveNewSR() {
       body: JSON.stringify({
         subject: subject,
         client: client,
+        site: site,
         category: category,
         priority: priority,
         assigned_to: assigned,
-        body: description,
-        site: site
+        body: description
       })
     });
     closeAddModal('add-sr-modal');
