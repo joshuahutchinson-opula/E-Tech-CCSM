@@ -9,11 +9,11 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // ============================================================
-// DATABASE CONNECTION - USES DATABASE_URL
+// DATABASE CONNECTION - USING YOUR EXACT STRING
 // ============================================================
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: 'postgresql://postgres:UCQFilnOQPdfXfvIKdUeXfMdaGYeCDaU@hayabusa.proxy.rlwy.net:13542/railway',
   ssl: { rejectUnauthorized: false },
   connectionTimeoutMillis: 10000,
 });
@@ -42,11 +42,7 @@ app.use(express.json({ limit: '50mb' }));
 // ============================================================
 
 app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    db: dbConnected ? 'connected' : 'disconnected',
-    hasDbUrl: !!process.env.DATABASE_URL
-  });
+  res.json({ status: 'ok', db: dbConnected ? 'connected' : 'disconnected' });
 });
 
 // ============================================================
@@ -385,5 +381,4 @@ app.get('*', (req, res) => {
 app.listen(port, () => {
   console.log(`🚀 Running on port ${port}`);
   console.log(`📊 DB: ${dbConnected ? '✅ Connected' : '❌ Disconnected'}`);
-  console.log(`🔑 DATABASE_URL exists: ${!!process.env.DATABASE_URL}`);
 });
