@@ -965,7 +965,7 @@ input::placeholder, textarea::placeholder {
       </div>
 
       <!-- Inbox -->
-      <div class="tab" id="tab-inbox" style="height:100%">
+      <div class="tab admin-only" id="tab-inbox" style="height:100%">
         <div class="outlook-container">
           <div class="outlook-folder-pane" id="inbox-folder-pane">
             <div class="outlook-folder-item active" data-folder="inbox" onclick="setInboxFolder('inbox', this)"><i class="ti ti-inbox"></i> Inbox<span class="folder-count unread">5</span></div>
@@ -1396,8 +1396,6 @@ input::placeholder, textarea::placeholder {
   </div>
 </div>
 
-<!-- Client View Container (removed) -->
-
 <!-- ============================================================
     ── MODALS ──────────────────────────────────────────────────
     ============================================================ -->
@@ -1722,7 +1720,6 @@ let authToken = localStorage.getItem('token') || null;
 let currentUser = null;
 let userClient = null;
 let isAdmin = true;
-let currentClientFilter = null;
 
 // ============================================================
 // ── API HELPER FUNCTIONS ─────────────────────────────────────
@@ -1813,15 +1810,110 @@ var CLIENTS = [];
 var CLIENT_LOGO_DATA = {};
 var PINNED_FILES = JSON.parse(localStorage.getItem('ccsm_pinned') || '[]');
 
-// ... (rest of variables remain the same)
+var SENT_EMAILS = [];
+var DRAFT_EMAILS = [];
+var DELETED_EMAILS = [];
+var inboxSelectedEmails = new Set();
+var inboxFolder = 'inbox';
+var inboxCtxEmailId = null;
+var currentClientFilter = null;
+var currentZoneFilter = null;
+var editingClient = null;
+var activeModalId = null;
+var selectedSRs = new Set();
+var srFilterStatus = 'All';
+var currentTab = 'dashboard';
+var currentDoorIndex = null;
+var currentServerIndex = null;
+var currentSwitchIndex = null;
+var currentIntrusionIndex = null;
+var currentCameraIndex = null;
+var activeEmailId = null;
+var previewFileData = null;
+var currentPath = ['CAMS Internal Database'];
+var currentComputeSubTab = 'servers';
+var currentAssetSubTab = 'stations';
+
+var camCurrentPage = {};
+var camPerPage = 10;
+var camStatusFilter = 'All';
+var camSortColumn = null;
+var camSortDirection = 'asc';
+var camSearchQuery = '';
+
+var doorSortColumn = null;
+var doorSortDirection = 'asc';
+var doorStatusFilter = 'All';
+
+var srvSortColumn = null;
+var srvSortDirection = 'asc';
+
+var swSortColumn = null;
+var swSortDirection = 'asc';
+var swModelFilter = 'All';
 
 var confirmCallback = null;
 var debounceTimers = {};
 var sidebarCollapsed = localStorage.getItem('ccsm_sidebar') === '1';
 
 // ============================================================
+// ── THEME FUNCTIONS ──────────────────────────────────────────
+// ============================================================
+
+function toggleThemeDropdown() {
+  var dropdown = document.getElementById('theme-dropdown');
+  if (dropdown) {
+    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+  }
+}
+
+function closeThemeDropdown() {
+  var dropdown = document.getElementById('theme-dropdown');
+  if (dropdown) {
+    dropdown.style.display = 'none';
+  }
+}
+
+function setTheme(theme) {
+  var root = document.documentElement;
+  var btn = document.getElementById('theme-toggle-btn');
+  var logo = document.getElementById('logo-img');
+
+  root.classList.remove('light-theme', 'jet-black-theme');
+
+  if (theme === 'light') {
+    root.classList.add('light-theme');
+    if (btn) btn.innerHTML = '<i class="ti ti-moon"></i> Theme';
+    if (logo) logo.src = 'logo-light.png';
+  } else if (theme === 'jet-black') {
+    root.classList.add('jet-black-theme');
+    if (btn) btn.innerHTML = '<i class="ti ti-moon"></i> Theme';
+    if (logo) logo.src = 'logo-black.png';
+    if (logo) logo.onerror = function() { this.src = 'logo.png'; };
+  } else {
+    if (btn) btn.innerHTML = '<i class="ti ti-sun"></i> Theme';
+    if (logo) logo.src = 'logo.png';
+  }
+
+  localStorage.setItem('ccsm_theme', theme);
+  if (document.getElementById('theme-dropdown')) {
+    document.getElementById('theme-dropdown').style.display = 'none';
+  }
+  toast('Theme: ' + theme.charAt(0).toUpperCase() + theme.slice(1), 'success');
+}
+
+// ============================================================
 // ── HELPER FUNCTIONS ─────────────────────────────────────────
 // ============================================================
+
+function getClientLogo(client) {
+  if (!client) return '';
+  var logoData = CLIENT_LOGO_DATA[client];
+  if (logoData) {
+    return '<img class="page-client-logo" src="' + logoData + '" />';
+  }
+  return '<img class="page-client-logo" src="logo-' + client.toLowerCase() + '.png" onerror="this.style.display=\'none\'" />';
+}
 
 function getClient(site) {
   if (!site) return 'Unknown';
@@ -1880,69 +1972,124 @@ function getClient(site) {
   return 'Unknown';
 }
 
-function isClientAsset(asset) {
-  if (!asset) return false;
-  if (isAdmin) return true;
-  if (!userClient) return false;
-  
-  var clientName = getClient(asset.zone || asset.site || asset.location || '');
-  return clientName === userClient;
+function getCategoryIcon(cat) {
+  var icons = { 'Camera': '📷', 'Access Control': '🚪', 'Server': '🖥', 'Network': '🌐', 'Power': '⚡', 'Other': '📋' };
+  return icons[cat] || '📋';
 }
 
-function getFilteredData(data, zoneField) {
-  if (isAdmin) return data;
-  if (!userClient) return [];
-  zoneField = zoneField || 'zone';
-  return data.filter(function(item) {
-    var clientName = getClient(item[zoneField] || item.site || item.location || '');
-    return clientName === userClient;
-  });
+function getTimeOfDay() {
+  var h = new Date().getHours();
+  return h >= 6 && h < 18 ? 'day' : 'night';
+}
+
+function getDefaultAssignee() {
+  return getTimeOfDay() === 'day' ? 'Shanice Vernon' : 'Shavine';
+}
+
+function getWarrantyDisplay(expiryDate) {
+  if (!expiryDate) return '—';
+  var daysLeft = Math.ceil((new Date(expiryDate) - new Date()) / (1000 * 60 * 60 * 24));
+  if (daysLeft < 0) return '<span style="color:#f87171;">Expired</span>';
+  if (daysLeft <= 30) return '<span style="color:#fbbf24;">' + daysLeft + 'd</span>';
+  return '<span style="color:#4ade80;">' + daysLeft + 'd</span>';
+}
+
+function camBadge(s) {
+  if (s === 'Online') return '<span class="badge b-done">Online</span>';
+  if (s === 'Working') return '<span class="badge b-done">Working</span>';
+  if (s === 'Defective') return '<span class="badge b-high">Defective</span>';
+  if (s === 'Not Working') return '<span class="badge b-high">Not Working</span>';
+  if (s === 'No Power') return '<span class="badge b-high">No Power</span>';
+  if (s === 'No Camera') return '<span class="badge b-open">No Camera</span>';
+  if (s === 'OFFLINE') return '<span class="badge b-high">OFFLINE</span>';
+  return '<span class="badge b-info">Needs Check</span>';
+}
+
+function doorBadge(s) {
+  if (s === 'Online') return '<span class="badge b-done">Online</span>';
+  if (s === 'Working') return '<span class="badge b-done">Working</span>';
+  if (s === 'Offline') return '<span class="badge b-high">Offline</span>';
+  if (s === 'Under Maintenance') return '<span class="badge b-under-maintenance">Under Maintenance</span>';
+  return '<span class="badge b-open">Unknown</span>';
+}
+
+function srvBadge(s) {
+  return s && s.indexOf('ONLINE') !== -1 ? '<span class="badge b-done">Online</span>' : '<span class="badge b-high">Offline</span>';
+}
+
+function srStatusBadge(s) {
+  if (s === 'Open') return '<span class="badge b-open">Open</span>';
+  if (s === 'In Progress') return '<span class="badge b-in-progress">In Progress</span>';
+  if (s === 'On-Site Review') return '<span class="badge b-info">On-Site</span>';
+  if (s === 'Pending') return '<span class="badge b-pending">Pending</span>';
+  if (s === 'Resolved') return '<span class="badge b-done">Resolved</span>';
+  return '<span class="badge b-open">' + s + '</span>';
+}
+
+function priBadge(p) {
+  if (!p) return '—';
+  var cls = p === 'High' ? 'pri-high' : p === 'Medium' ? 'pri-med' : 'pri-low';
+  return '<span class="pri-dot ' + cls + '"></span>' + p;
+}
+
+function fullDateTime() {
+  return new Date().toLocaleDateString('en-JM', { weekday: 'short', month: 'short', day: 'numeric' }) +
+    ' · ' + new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+function timeAgo(d) {
+  try {
+    var dt = new Date(d);
+    if (isNaN(dt.getTime())) return d;
+    var h = Math.round((new Date() - dt) / 3600000);
+    if (h < 1) return 'Just now';
+    if (h < 24) return h + 'h ago';
+    if (h < 48) return 'Yesterday';
+    return Math.floor(h / 24) + 'd ago';
+  } catch (e) { return d; }
+}
+
+function showLoading(elId) {
+  var el = document.getElementById(elId);
+  if (el) el.classList.add('active');
+}
+
+function hideLoading(elId) {
+  var el = document.getElementById(elId);
+  if (el) el.classList.remove('active');
+}
+
+function debounce(fn, key, delay) {
+  delay = delay || 300;
+  if (debounceTimers[key]) clearTimeout(debounceTimers[key]);
+  debounceTimers[key] = setTimeout(function() {
+    fn();
+    delete debounceTimers[key];
+  }, delay);
+}
+
+function setUnsaved(show) {
+  var el = document.getElementById('unsaved-indicator');
+  if (el) {
+    if (show) el.classList.add('visible');
+    else el.classList.remove('visible');
+  }
+}
+
+function acknowledgeAlarm() {
+  document.getElementById('emergency-banner').classList.remove('active');
+  toast('Alarm acknowledged', 'success');
 }
 
 // ============================================================
-// ── THEME FUNCTIONS ──────────────────────────────────────────
+// ── SIDEBAR FUNCTIONS ────────────────────────────────────────
 // ============================================================
 
-function toggleThemeDropdown() {
-  var dropdown = document.getElementById('theme-dropdown');
-  if (dropdown) {
-    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-  }
-}
-
-function closeThemeDropdown() {
-  var dropdown = document.getElementById('theme-dropdown');
-  if (dropdown) {
-    dropdown.style.display = 'none';
-  }
-}
-
-function setTheme(theme) {
-  var root = document.documentElement;
-  var btn = document.getElementById('theme-toggle-btn');
-  var logo = document.getElementById('logo-img');
-
-  root.classList.remove('light-theme', 'jet-black-theme');
-
-  if (theme === 'light') {
-    root.classList.add('light-theme');
-    if (btn) btn.innerHTML = '<i class="ti ti-moon"></i> Theme';
-    if (logo) logo.src = 'logo-light.png';
-  } else if (theme === 'jet-black') {
-    root.classList.add('jet-black-theme');
-    if (btn) btn.innerHTML = '<i class="ti ti-moon"></i> Theme';
-    if (logo) logo.src = 'logo-black.png';
-    if (logo) logo.onerror = function() { this.src = 'logo.png'; };
-  } else {
-    if (btn) btn.innerHTML = '<i class="ti ti-sun"></i> Theme';
-    if (logo) logo.src = 'logo.png';
-  }
-
-  localStorage.setItem('ccsm_theme', theme);
-  if (document.getElementById('theme-dropdown')) {
-    document.getElementById('theme-dropdown').style.display = 'none';
-  }
-  toast('Theme: ' + theme.charAt(0).toUpperCase() + theme.slice(1), 'success');
+function toggleSidebar() {
+  sidebarCollapsed = !sidebarCollapsed;
+  document.getElementById('sidebar').classList.toggle('collapsed', sidebarCollapsed);
+  document.getElementById('collapse-icon').className = 'ti ti-chevron-' + (sidebarCollapsed ? 'right' : 'left');
+  localStorage.setItem('ccsm_sidebar', sidebarCollapsed ? '1' : '0');
 }
 
 // ============================================================
@@ -1959,7 +2106,6 @@ function updateUIVisibility() {
     }
   });
   
-  // Update sidebar client section
   var clientsLabel = document.getElementById('clients-section-label');
   var toolsSection = document.getElementById('tools-section');
   var clientDropdowns = document.getElementById('client-dropdowns-container');
@@ -1968,7 +2114,6 @@ function updateUIVisibility() {
     if (clientsLabel) clientsLabel.textContent = 'Zones';
     if (toolsSection) toolsSection.style.display = 'none';
     if (clientDropdowns) {
-      // Show zones instead of clients
       renderClientZones(userClient || 'KFTL');
     }
   } else {
@@ -1976,6 +2121,208 @@ function updateUIVisibility() {
     if (toolsSection) toolsSection.style.display = '';
     renderAllClients();
   }
+}
+
+// ============================================================
+// ── NAVIGATION ───────────────────────────────────────────────
+// ============================================================
+
+var titles = {
+  dashboard: 'Dashboard',
+  inbox: 'Support Inbox',
+  service: 'Service Requests',
+  cameras: 'Cameras',
+  doors: 'Access Control',
+  compute: 'Compute & Storage',
+  controlcenter: 'Control Center',
+  switches: 'Switches',
+  software: 'Software & Licenses',
+  intrusion: 'Intrusion Detection',
+  files: 'Files & Logs'
+};
+
+function switchTab(id) {
+  currentTab = id;
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.nav-item').forEach(function(n) {
+    if (!n.classList.contains('nav-client-parent')) n.classList.remove('active');
+  });
+  var tabEl = document.getElementById('tab-' + id);
+  if (tabEl) tabEl.classList.add('active');
+
+  var title = titles[id] || id;
+  var titleHTML = title;
+  if (currentClientFilter) {
+    titleHTML = getClientLogo(currentClientFilter) + ' ' + currentClientFilter + ' — ' + title;
+  }
+  document.getElementById('page-title').innerHTML = titleHTML;
+
+  if (id === 'inbox') renderInbox();
+  if (id === 'dashboard') renderDashboard();
+  if (id === 'files') { renderAuditLog(); renderFileExplorer(); }
+  if (id === 'cameras') { renderStatusFilters(); renderCamerasOptimized(); }
+  if (id === 'doors') { renderDoorsEnhanced(); }
+  if (id === 'compute') { renderServersEnhanced(); renderComputeStorage(); }
+  if (id === 'controlcenter') { renderStations(); renderMonitors(); }
+  if (id === 'switches') { renderSwitchesEnhanced(); }
+  if (id === 'software') { renderSoftware(); }
+  if (id === 'intrusion') { renderIntrusion(); }
+}
+
+document.getElementById('nav').addEventListener('click', function(e) {
+  var item = e.target.closest('.nav-item');
+  if (!item) return;
+  if (item.classList.contains('nav-client-parent')) return;
+  var tab = item.dataset.tab;
+  if (tab) {
+    if (userClient && !isAdmin) {
+      currentClientFilter = userClient;
+    } else {
+      currentClientFilter = item.dataset.client || null;
+      if (currentClientFilter) {
+        currentZoneFilter = null;
+        document.querySelectorAll('.nav-zone-item').forEach(function(el) {
+          el.classList.remove('active');
+        });
+      }
+    }
+    document.querySelectorAll('.nav-sub-item').forEach(function(n) { n.classList.remove('active'); });
+    document.querySelectorAll('.nav-item').forEach(function(n) {
+      if (!n.classList.contains('nav-client-parent')) n.classList.remove('active');
+    });
+    item.classList.add('active');
+    switchTab(tab);
+  }
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+    if (e.key === 'Escape') e.target.blur();
+    return;
+  }
+  if (e.key === 'Escape') {
+    closeModal();
+    closeDoorDetailModal();
+    closeServerDetailModal();
+    closeSwitchDetailModal();
+    closeCameraDetailModal();
+    closeIntrusionDetailModal();
+    closeComposeModal();
+    hideContextMenu();
+  }
+  var tabs = ['dashboard', 'inbox', 'service', 'cameras', 'doors', 'compute', 'controlcenter', 'switches', 'software', 'intrusion', 'files'];
+  var num = parseInt(e.key);
+  if (num >= 1 && num <= tabs.length) switchTab(tabs[num - 1]);
+  if (e.key === 'n' || e.key === 'N') switchTab('service');
+});
+
+// ============================================================
+// ── ADD DROPDOWN FUNCTIONS ──────────────────────────────────
+// ============================================================
+
+function toggleAddDropdown() {
+  var dropdown = document.getElementById('add-dropdown');
+  if (dropdown) {
+    dropdown.classList.toggle('open');
+  }
+}
+
+function closeAddDropdown() {
+  var dropdown = document.getElementById('add-dropdown');
+  if (dropdown) {
+    dropdown.classList.remove('open');
+  }
+}
+
+function openAddModal(modalId) {
+  var modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.add('open');
+    populateClientDropdowns();
+  } else {
+    toast('Modal not found: ' + modalId, 'error');
+  }
+}
+
+function openAddSRModal() { openAddModal('add-sr-modal'); }
+function openAddClientModal() { openAddModal('add-client-modal'); }
+
+function closeAddModal(modalId) {
+  var modal = document.getElementById(modalId);
+  if (modal) modal.classList.remove('open');
+}
+
+function populateClientDropdowns() {
+  var selects = document.querySelectorAll('#sr-client');
+  selects.forEach(function(select) {
+    var currentVal = select.value;
+    select.innerHTML = '<option value="">Select Client</option>';
+    CLIENTS.forEach(function(client) {
+      var option = document.createElement('option');
+      option.value = client;
+      option.textContent = client;
+      select.appendChild(option);
+    });
+    if (currentVal && CLIENTS.indexOf(currentVal) !== -1) {
+      select.value = currentVal;
+    }
+    
+    if (select.id === 'sr-client') {
+      updateSiteZones(select.value);
+    }
+  });
+}
+
+function updateSiteZones(client) {
+  var siteSelect = document.getElementById('sr-site');
+  if (!siteSelect) return;
+  
+  if (!client) {
+    siteSelect.innerHTML = '<option value="">Select a client first</option>';
+    return;
+  }
+  
+  var zones = [];
+  CAMERAS.forEach(function(c) {
+    var clientName = getClient(c.zone);
+    if (clientName === client && c.zone && zones.indexOf(c.zone) === -1) {
+      zones.push(c.zone);
+    }
+  });
+  
+  DOORS.forEach(function(d) {
+    var clientName = d.client || getClient(d.site);
+    if (clientName === client && d.site && zones.indexOf(d.site) === -1) {
+      zones.push(d.site);
+    }
+  });
+  
+  SERVERS.forEach(function(s) {
+    var clientName = getClient(s.location);
+    if (clientName === client && s.location && zones.indexOf(s.location) === -1) {
+      zones.push(s.location);
+    }
+  });
+  
+  SWITCHES.forEach(function(s) {
+    var clientName = getClient(s.location);
+    if (clientName === client && s.location && zones.indexOf(s.location) === -1) {
+      zones.push(s.location);
+    }
+  });
+  
+  zones.sort();
+  
+  var html = '<option value="">Select a zone</option>';
+  zones.forEach(function(z) {
+    html += '<option value="' + z + '">' + z + '</option>';
+  });
+  
+  if (zones.length === 0) {
+    html = '<option value="">No zones found for this client</option>';
+  }
+  
+  siteSelect.innerHTML = html;
 }
 
 // ============================================================
@@ -2011,7 +2358,7 @@ async function loginLocal() {
     localStorage.setItem('user', JSON.stringify(data.user));
     
     currentUser = data.user;
-    userClient = data.user.client_id === 1 ? 'KFTL' : null;
+    userClient = data.user.client_id ? 'KFTL' : null;
     isAdmin = data.user.role === 'admin';
     
     hideLogin();
@@ -2020,7 +2367,6 @@ async function loginLocal() {
     document.getElementById('user-role-display').textContent = isAdmin ? 'Administrator' : 'Client User';
     document.getElementById('user-avatar').textContent = data.user.username.slice(0, 2).toUpperCase();
     
-    // Apply client mode if client
     if (!isAdmin && userClient) {
       document.getElementById('app').classList.add('client-mode');
       document.documentElement.style.setProperty('--client-primary', '#e31b23');
@@ -2056,7 +2402,7 @@ function checkLogin() {
   authToken = localStorage.getItem('token');
   currentUser = JSON.parse(localStorage.getItem('user') || 'null');
   if (authToken && currentUser) {
-    userClient = currentUser.client_id === 1 ? 'KFTL' : null;
+    userClient = currentUser.client_id ? 'KFTL' : null;
     isAdmin = currentUser.role === 'admin';
     hideLogin();
     document.getElementById('app').style.display = 'flex';
@@ -2077,12 +2423,25 @@ function checkLogin() {
   }
 }
 
+function base64URLEncode(buffer) {
+  var str = '';
+  var bytes = new Uint8Array(buffer);
+  for (var i = 0; i < bytes.byteLength; i++) {
+    str += String.fromCharCode(bytes[i]);
+  }
+  return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+
 function loginWithMicrosoft() {
   toast('Microsoft login coming soon', 'info');
 }
 
+function applyClientBranding(client) {
+  console.log('Client branding applied for:', client);
+}
+
 // ============================================================
-// ── CLIENT ZONES (for client view) ──────────────────────────
+// ── CLIENT ZONES ─────────────────────────────────────────────
 // ============================================================
 
 function renderClientZones(client) {
@@ -2201,81 +2560,6 @@ function selectZone(zone) {
 }
 
 // ============================================================
-// ── NAVIGATION ───────────────────────────────────────────────
-// ============================================================
-
-var titles = {
-  dashboard: 'Dashboard',
-  inbox: 'Support Inbox',
-  service: 'Service Requests',
-  cameras: 'Cameras',
-  doors: 'Access Control',
-  compute: 'Compute & Storage',
-  controlcenter: 'Control Center',
-  switches: 'Switches',
-  software: 'Software & Licenses',
-  intrusion: 'Intrusion Detection',
-  files: 'Files & Logs'
-};
-
-var currentTab = 'dashboard';
-var currentZoneFilter = null;
-
-function switchTab(id) {
-  currentTab = id;
-  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-  document.querySelectorAll('.nav-item').forEach(function(n) {
-    if (!n.classList.contains('nav-client-parent')) n.classList.remove('active');
-  });
-  var tabEl = document.getElementById('tab-' + id);
-  if (tabEl) tabEl.classList.add('active');
-
-  var title = titles[id] || id;
-  var titleHTML = title;
-  if (currentClientFilter) {
-    titleHTML = getClientLogo(currentClientFilter) + ' ' + currentClientFilter + ' — ' + title;
-  }
-  document.getElementById('page-title').innerHTML = titleHTML;
-
-  if (id === 'inbox') renderInbox();
-  if (id === 'dashboard') renderDashboard();
-  if (id === 'files') { renderAuditLog(); renderFileExplorer(); }
-  if (id === 'cameras') { renderStatusFilters(); renderCamerasOptimized(); }
-  if (id === 'doors') { renderDoorsEnhanced(); }
-  if (id === 'compute') { renderServersEnhanced(); renderComputeStorage(); }
-  if (id === 'controlcenter') { renderStations(); renderMonitors(); }
-  if (id === 'switches') { renderSwitchesEnhanced(); }
-  if (id === 'software') { renderSoftware(); }
-  if (id === 'intrusion') { renderIntrusion(); }
-}
-
-document.getElementById('nav').addEventListener('click', function(e) {
-  var item = e.target.closest('.nav-item');
-  if (!item) return;
-  if (item.classList.contains('nav-client-parent')) return;
-  var tab = item.dataset.tab;
-  if (tab) {
-    if (userClient && !isAdmin) {
-      currentClientFilter = userClient;
-    } else {
-      currentClientFilter = item.dataset.client || null;
-      if (currentClientFilter) {
-        currentZoneFilter = null;
-        document.querySelectorAll('.nav-zone-item').forEach(function(el) {
-          el.classList.remove('active');
-        });
-      }
-    }
-    document.querySelectorAll('.nav-sub-item').forEach(function(n) { n.classList.remove('active'); });
-    document.querySelectorAll('.nav-item').forEach(function(n) {
-      if (!n.classList.contains('nav-client-parent')) n.classList.remove('active');
-    });
-    item.classList.add('active');
-    switchTab(tab);
-  }
-});
-
-// ============================================================
 // ── DATA LOADING ─────────────────────────────────────────────
 // ============================================================
 
@@ -2325,6 +2609,15 @@ async function loadData() {
     populateClientDropdowns();
     updateBadges();
     
+    if (userClient && !isAdmin) {
+      renderClientDashboard();
+      renderClientSRs();
+      renderClientCameras();
+      renderClientDoors();
+      renderClientServers();
+      renderClientSwitches();
+    }
+    
     console.log('✅ Data loaded successfully');
     console.log(`📸 Cameras: ${CAMERAS.length}, 🚪 Doors: ${DOORS.length}, 🖥️ Servers: ${SERVERS.length}`);
   } catch (err) {
@@ -2334,65 +2627,44 @@ async function loadData() {
 }
 
 // ============================================================
-// ── THE REST OF THE FUNCTIONS ──────────────────────────────
-// ── (renderDashboard, renderCamerasOptimized, renderSR, etc.) ──
-// ── These remain the same as before, but now use isAdmin ──
-// ── and getFilteredData() where needed ─────────────────────
+// ── DASHBOARD ────────────────────────────────────────────────
 // ============================================================
 
-// [All the rendering functions from the original code go here]
-// For brevity, I'm including the key ones below.
-// In the actual HTML file, you would keep ALL existing rendering functions.
+async function renderDashboard() {
+  try {
+    const stats = await apiCall('/dashboard/stats');
+    
+    document.getElementById('dash-health').textContent = stats.health + '%';
+    document.getElementById('dash-alerts').textContent = stats.alerts;
+    document.getElementById('dash-offline').textContent = stats.offline_devices;
+    document.getElementById('dash-srs').textContent = stats.open_srs;
+  } catch (err) {
+    console.error('Dashboard stats error:', err);
+    var defective = CAMERAS.filter(function(c) { return c.status === 'Defective' || c.status === 'Offline' || c.status === 'No Power' || c.status === 'No Camera' || c.status === 'Not Working'; }).length;
+    var acOffline = DOORS.filter(function(d) { return d.status === 'Offline'; }).length;
+    var srvOnline = SERVERS.filter(function(s) { return s.status === 'ONLINE'; }).length;
+    var swOnline = SWITCHES.filter(function(s) { return s.status === 'Online'; }).length;
+    var totalDevices = CAMERAS.length + DOORS.length + SERVERS.length + SWITCHES.length;
+    var onlineDevices = (CAMERAS.length - defective) + (DOORS.length - acOffline) + srvOnline + swOnline;
+    var health = totalDevices > 0 ? Math.round((onlineDevices / totalDevices) * 100) : 100;
+    
+    document.getElementById('dash-health').textContent = health + '%';
+    document.getElementById('dash-alerts').textContent = defective + acOffline;
+    document.getElementById('dash-offline').textContent = defective + acOffline + (SWITCHES.length - swOnline);
+    document.getElementById('dash-srs').textContent = SERVICE_REQUESTS.filter(function(r) { return r.status !== 'Resolved'; }).length;
+  }
 
-function renderDashboard() {
-  // Filter data for client view
-  var filteredCameras = getFilteredData(CAMERAS);
-  var filteredDoors = getFilteredData(DOORS);
-  var filteredServers = getFilteredData(SERVERS);
-  var filteredSwitches = getFilteredData(SWITCHES);
-  
-  var totalDevices = filteredCameras.length + filteredDoors.length + filteredServers.length + filteredSwitches.length;
-  var offlineDevices = 0;
-  
-  filteredCameras.forEach(function(c) { if (c.status !== 'Online' && c.status !== 'Working') offlineDevices++; });
-  filteredDoors.forEach(function(d) { if (d.status !== 'Online') offlineDevices++; });
-  filteredServers.forEach(function(s) { if (s.status !== 'ONLINE') offlineDevices++; });
-  filteredSwitches.forEach(function(s) { if (s.status !== 'Online') offlineDevices++; });
-  
-  var onlineDevices = totalDevices - offlineDevices;
-  var health = totalDevices > 0 ? Math.round((onlineDevices / totalDevices) * 100) : 100;
-  
-  document.getElementById('dash-health').textContent = health + '%';
-  document.getElementById('dash-alerts').textContent = offlineDevices;
-  document.getElementById('dash-offline').textContent = offlineDevices;
-  
-  var openSRs = SERVICE_REQUESTS.filter(function(r) { 
-    if (!isAdmin && userClient) {
-      return r.client === userClient && r.status !== 'Resolved';
-    }
-    return r.status !== 'Resolved';
-  });
-  document.getElementById('dash-srs').textContent = openSRs.length;
-  
   renderTimeline();
-  renderUrgentSRs();
-}
 
-function renderUrgentSRs() {
-  var active = SERVICE_REQUESTS.filter(function(r) { 
-    if (!isAdmin && userClient) {
-      return r.client === userClient && r.status !== 'Resolved';
-    }
-    return r.status !== 'Resolved';
-  });
+  var active = SERVICE_REQUESTS.filter(function(r) { return r.status !== 'Resolved'; });
   var urgent = active.slice().sort(function(a, b) {
     return ({ High: 0, Medium: 1, Low: 2 }[a.priority] ?? 3) - ({ High: 0, Medium: 1, Low: 2 }[b.priority] ?? 3);
   }).slice(0, 7);
-  
+
   document.getElementById('dash-sr-tbody').innerHTML = urgent.map(function(r) {
     return '<tr class="clickable" onclick="switchTab(\'service\');openModal(\'' + r.sr_id + '\')">' +
       '<td style="font-size:11px;color:var(--text-muted);">' + r.sr_id + '</td>' +
-      '<td>' + (r.client || '—') + '</td>' +
+      '<td>' + (r.client_name || '—') + '</td>' +
       '<td>' + (r.site || '—') + '</td>' +
       '<td style="max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + r.subject + '</td>' +
       '<td>' + priBadge(r.priority) + '</td>' +
@@ -2421,14 +2693,1163 @@ function renderTimeline() {
   container.innerHTML = html;
 }
 
-// [Other rendering functions: renderCamerasOptimized, renderDoorsEnhanced, 
-//  renderServersEnhanced, renderSwitchesEnhanced, renderSoftware, 
-//  renderStations, renderMonitors, renderIntrusion, renderInbox, 
-//  renderSR, renderAuditLog, renderFileExplorer, renderComputeStorage,
-//  and all modal functions remain the same as original]
+// ============================================================
+// ── CAMERAS ──────────────────────────────────────────────────
+// ============================================================
 
-// Note: In the actual file, all the existing rendering functions from the 
-// original code are kept. Only the login/logout and UI visibility logic changed.
+function getStatusCounts() {
+  var counts = { All: CAMERAS.length };
+  CAMERAS.forEach(function(c) { if (!counts[c.status]) counts[c.status] = 0; counts[c.status]++; });
+  var offlineTotal = (counts['Defective'] || 0) + (counts['No Power'] || 0) + (counts['No Camera'] || 0) + (counts['Offline'] || 0) + (counts['Not Working'] || 0);
+  counts['Offline'] = offlineTotal;
+  return counts;
+}
+
+function renderStatusFilters() {
+  var counts = getStatusCounts();
+  var container = document.getElementById('cam-status-filters');
+  if (!container) return;
+  var statuses = ['All', 'Online', 'Working', 'Offline', 'Defective', 'Not Working', 'No Camera', 'No Power'];
+  container.innerHTML = statuses.map(function(s) {
+    var count = counts[s] || 0;
+    return '<span class="filter-pill ' + (camStatusFilter === s ? 'active' : '') + '" onclick="setCamStatusFilter(\'' + s + '\')">' + s + ' <span class="count">' + count + '</span></span>';
+  }).join('');
+}
+
+function setCamStatusFilter(status) {
+  camStatusFilter = status;
+  camCurrentPage = {};
+  renderStatusFilters();
+  renderCamerasOptimized();
+}
+
+function getFilteredCameras() {
+  var filtered = CAMERAS.slice();
+  if (camStatusFilter === 'Offline') {
+    filtered = filtered.filter(function(c) { return c.status !== 'Online' && c.status !== 'Working'; });
+  } else if (camStatusFilter !== 'All') {
+    filtered = filtered.filter(function(c) { return c.status === camStatusFilter; });
+  }
+  if (camSearchQuery) {
+    var q = camSearchQuery.toLowerCase();
+    filtered = filtered.filter(function(c) {
+      return c.name.toLowerCase().indexOf(q) !== -1 ||
+        (c.ip_address || '').toLowerCase().indexOf(q) !== -1 ||
+        (c.comments || '').toLowerCase().indexOf(q) !== -1;
+    });
+  }
+  return filtered;
+}
+
+function getSortedCameras(filtered) {
+  if (!camSortColumn) return filtered;
+  var sorted = filtered.slice();
+  var col = camSortColumn;
+  sorted.sort(function(a, b) {
+    var valA, valB;
+    if (col === 'ip') { valA = a.ip_address || ''; valB = b.ip_address || ''; }
+    else if (col === 'name') { valA = a.name; valB = b.name; }
+    else if (col === 'zone') { valA = a.zone; valB = b.zone; }
+    else if (col === 'status') { valA = a.status; valB = b.status; }
+    else if (col === 'comments') { valA = a.comments || ''; valB = b.comments || ''; }
+    else if (col === 'model') { valA = a.model || ''; valB = b.model || ''; }
+    else { valA = ''; valB = ''; }
+    if (valA < valB) return camSortDirection === 'asc' ? -1 : 1;
+    if (valA > valB) return camSortDirection === 'asc' ? 1 : -1;
+    return 0;
+  });
+  return sorted;
+}
+
+function renderCamerasOptimized() {
+  var searchInput = document.getElementById('cam-search');
+  camSearchQuery = searchInput ? searchInput.value : '';
+  var perPageEl = document.getElementById('cam-per-page');
+  camPerPage = perPageEl ? parseInt(perPageEl.value) || 10 : 10;
+  showLoading('cam-loading');
+  setTimeout(function() {
+    var filtered = getFilteredCameras();
+    if (currentClientFilter) {
+      filtered = filtered.filter(function(c) { return getClient(c.zone) === currentClientFilter; });
+    }
+    if (currentZoneFilter) {
+      filtered = filtered.filter(function(c) { return c.zone === currentZoneFilter; });
+    }
+    var sorted = getSortedCameras(filtered);
+    var zones = {};
+    sorted.forEach(function(c) { if (!zones[c.zone]) zones[c.zone] = []; zones[c.zone].push(c); });
+    var container = document.getElementById('cam-groups-container');
+    if (!container) return;
+    var html = '';
+    var zoneKeys = Object.keys(zones).sort();
+    if (zoneKeys.length === 0) {
+      html = '<div class="empty-state"><span class="empty-icon">📷</span><div class="empty-title">No cameras found</div></div>';
+    } else {
+      zoneKeys.forEach(function(zone) {
+        var cameras = zones[zone];
+        var client = getClient(zone);
+        var totalInZone = cameras.length;
+        var totalPages = Math.ceil(totalInZone / camPerPage);
+        var zonePage = camCurrentPage[zone] || 1;
+        var start = (zonePage - 1) * camPerPage;
+        var end = Math.min(start + camPerPage, totalInZone);
+        var pageCameras = cameras.slice(start, end);
+        html += '<div class="cam-zone-group"><div class="cam-zone-header" onclick="toggleZone(\'zone-' + zone + '\')"><div><span class="zone-name">' + zone + '</span><span class="zone-client">(' + client + ')</span></div><div><span class="zone-count">' + totalInZone + ' cameras</span> <i class="ti ti-chevron-down zone-toggle" id="zone-toggle-' + zone + '"></i></div></div><div class="cam-zone-body" id="zone-body-' + zone + '">';
+        if (pageCameras.length > 0) {
+          html += '<table class="tbl"><thead><tr><th>Zone</th><th>Camera</th><th>IP</th><th>Status</th><th>Comments</th><th>Model</th><th>Manufacturer</th><th>Resolution</th><th>Recorder</th><th>MAC Address</th><th>Warranty</th></tr></thead><tbody>';
+          pageCameras.forEach(function(c) {
+            var globalIndex = CAMERAS.indexOf(c);
+            html += '<tr class="clickable" onclick="openCameraDetail(' + globalIndex + ')"><td>' + c.zone + '</td><td>' + c.name + '</td><td>' + (c.ip_address || '—') + '</td><td>' + camBadge(c.status) + '</td><td><span class="comment-display ' + (!c.comments ? 'placeholder' : '') + '" data-cam-index="' + globalIndex + '" onclick="event.stopPropagation();editComment(' + globalIndex + ')">' + (c.comments || 'Click to add note') + '</span></td><td>' + (c.model || '—') + '</td><td>' + (c.manufacturer || '—') + '</td><td>' + (c.resolution || '—') + '</td><td>' + (c.archiver || '—') + '</td><td class="mono">' + (c.mac_address || '—') + '</td><td>' + getWarrantyDisplay(c.warranty) + '</td></tr>';
+          });
+          html += '</tbody></table>';
+          if (totalPages > 1) {
+            html += '<div class="cam-pagination"><button onclick="changePage(\'' + zone + '\', ' + (zonePage - 1) + ')" ' + (zonePage <= 1 ? 'disabled' : '') + '>‹</button>';
+            for (var i = 1; i <= totalPages; i++) {
+              html += '<button class="page-btn ' + (i === zonePage ? 'active' : '') + '" onclick="changePage(\'' + zone + '\', ' + i + ')">' + i + '</button>';
+            }
+            html += '<button onclick="changePage(\'' + zone + '\', ' + (zonePage + 1) + ')" ' + (zonePage >= totalPages ? 'disabled' : '') + '>›</button><span class="page-info">' + (start + 1) + '-' + Math.min(end, totalInZone) + ' of ' + totalInZone + '</span></div>';
+          }
+        } else {
+          html += '<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:12px;">No cameras match filters.</div>';
+        }
+        html += '</div></div>';
+      });
+    }
+    container.innerHTML = html;
+    updateLastUpdated();
+    document.querySelectorAll('.loading-overlay').forEach(function(el) { el.classList.remove('active'); });
+  }, 50);
+}
+
+function toggleZone(zoneId) {
+  var body = document.getElementById('zone-body-' + zoneId);
+  var toggle = document.getElementById('zone-toggle-' + zoneId);
+  if (!body || !toggle) return;
+  body.classList.toggle('hidden');
+  toggle.classList.toggle('collapsed');
+}
+
+function changePage(zone, page) {
+  var filtered = getFilteredCameras();
+  if (currentClientFilter) {
+    filtered = filtered.filter(function(c) { return getClient(c.zone) === currentClientFilter; });
+  }
+  if (currentZoneFilter) {
+    filtered = filtered.filter(function(c) { return c.zone === currentZoneFilter; });
+  }
+  var sorted = getSortedCameras(filtered);
+  var inZone = sorted.filter(function(c) { return c.zone === zone; }).length;
+  var totalPages = Math.ceil(inZone / camPerPage);
+  if (page < 1 || page > totalPages) return;
+  camCurrentPage[zone] = page;
+  renderCamerasOptimized();
+}
+
+async function editComment(index) {
+  var camera = CAMERAS[index];
+  if (!camera) return;
+  var commentCell = document.querySelector('.comment-display[data-cam-index="' + index + '"]');
+  if (!commentCell) return;
+  var currentComment = camera.comments || '';
+  var wrapper = document.createElement('div');
+  wrapper.style.display = 'flex';
+  wrapper.style.gap = '4px';
+  wrapper.style.alignItems = 'center';
+  var input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'edit-comment-input';
+  input.value = currentComment;
+  input.style.flex = '1';
+  var saveBtn = document.createElement('button');
+  saveBtn.className = 'btn btn-xs btn-success';
+  saveBtn.innerHTML = '<i class="ti ti-check"></i>';
+  var cancelBtn = document.createElement('button');
+  cancelBtn.className = 'btn btn-xs';
+  cancelBtn.innerHTML = '<i class="ti ti-x"></i>';
+  wrapper.appendChild(input);
+  wrapper.appendChild(saveBtn);
+  wrapper.appendChild(cancelBtn);
+  commentCell.replaceWith(wrapper);
+  input.focus();
+  input.select();
+  var resolved = false;
+  var restoreSpan = function(text) {
+    var span = document.createElement('span');
+    span.className = 'comment-display ' + (!text ? 'placeholder' : '');
+    span.setAttribute('data-cam-index', index);
+    span.textContent = text || 'Click to add note';
+    span.onclick = function(e) { e.stopPropagation(); editComment(index); };
+    wrapper.replaceWith(span);
+  };
+  var doSave = async function() {
+    if (resolved) return;
+    resolved = true;
+    var newComment = input.value.trim();
+    if (newComment !== camera.comments) {
+      try {
+        await apiCall('/cameras/' + camera.id + '/comment', {
+          method: 'PUT',
+          body: JSON.stringify({ comments: newComment })
+        });
+        camera.comments = newComment;
+        await loadData();
+      } catch (err) {
+        toast('Failed to save: ' + err.message, 'error');
+        restoreSpan(currentComment);
+        return;
+      }
+    }
+    restoreSpan(newComment);
+    renderCamerasOptimized();
+  };
+  saveBtn.addEventListener('click', function(e) { e.stopPropagation(); doSave(); });
+  cancelBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (resolved) return;
+    resolved = true;
+    restoreSpan(currentComment);
+  });
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); doSave(); }
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      if (resolved) return;
+      resolved = true;
+      restoreSpan(currentComment);
+    }
+  });
+  input.addEventListener('blur', function() {
+    setTimeout(function() { if (!resolved) doSave(); }, 120);
+  });
+}
+
+function refreshCameras() {
+  toast('Refreshing cameras...', 'info');
+  loadData();
+}
+
+function updateLastUpdated() {
+  var now = new Date();
+  var timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  var el = document.getElementById('cam-last-updated');
+  if (el) el.textContent = 'Last updated: Today ' + timeStr;
+}
+
+function openCameraDetail(index) {
+  currentCameraIndex = index;
+  var camera = CAMERAS[index];
+  if (!camera) return;
+  var ip = camera.ip_address || 'N/A';
+  var client = getClient(camera.zone);
+  document.getElementById('camera-detail-title').textContent = camera.name;
+  document.getElementById('camera-detail-sub').textContent = 'Zone: ' + camera.zone + ' (' + client + ') · Status: ' + camera.status;
+  var preview = document.getElementById('cam-preview-large');
+  
+  if ((camera.status === 'Online' || camera.status === 'Working') && ip !== 'N/A' && ip !== '') {
+    preview.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;min-height:280px;">' +
+      '<img src="http://' + ip + '/snapshot.jpg" onerror="this.parentElement.innerHTML=\'<div class=&quot;offline-msg&quot; style=&quot;color:var(--text-muted);padding:20px;text-align:center;&quot;><i class=&quot;ti ti-video-off&quot; style=&quot;font-size:32px;display:block;margin-bottom:8px;&quot;></i>Preview unavailable<br><span style=&quot;font-size:11px;&quot;>Camera may be offline or snapshot URL not accessible</span></div>\'" style="max-width:100%;max-height:100%;min-height:280px;object-fit:contain;border-radius:4px;" />' +
+      '<div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.6);color:#4ade80;padding:4px 10px;border-radius:4px;font-size:10px;display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#4ade80;animation:pulse 1.5s infinite;"></span> LIVE</div>' +
+      '</div>';
+  } else {
+    preview.innerHTML = '<div class="offline-msg" style="color:var(--text-muted);padding:40px;text-align:center;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;"><i class="ti ti-video-off" style="font-size:48px;display:block;margin-bottom:12px;"></i>Camera ' + camera.status.toLowerCase() + '<br><span style="font-size:11px;opacity:0.6;">Preview unavailable</span></div>';
+  }
+  
+  document.getElementById('camera-detail-grid').innerHTML =
+    '<div class="modal-field"><label>Zone</label><span>' + camera.zone + '</span></div>' +
+    '<div class="modal-field"><label>Client</label><span>' + client + '</span></div>' +
+    '<div class="modal-field"><label>Status</label>' + camBadge(camera.status) + '</div>' +
+    '<div class="modal-field"><label>IP Address</label><span class="mono">' + ip + '</span></div>' +
+    '<div class="modal-field"><label>Model</label><span>' + (camera.model || '—') + '</span></div>' +
+    '<div class="modal-field"><label>Manufacturer</label><span>' + (camera.manufacturer || '—') + '</span></div>' +
+    '<div class="modal-field"><label>Resolution</label><span>' + (camera.resolution || '—') + '</span></div>' +
+    '<div class="modal-field"><label>Recorder</label><span>' + (camera.archiver || '—') + '</span></div>' +
+    '<div class="modal-field"><label>MAC Address</label><span class="mono">' + (camera.mac_address || '—') + '</span></div>' +
+    '<div class="modal-field"><label>Warranty</label><span>' + (camera.warranty || '—') + '</span></div>';
+  
+  var commentsSection = document.getElementById('cam-detail-comments-section');
+  if (commentsSection) {
+    commentsSection.innerHTML = '<div class="modal-section-title">Comments</div><textarea class="notes-area" id="cam-modal-comments">' + (camera.comments || '') + '</textarea><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;"><button class="btn btn-sm btn-success" onclick="saveCameraModalComment()"><i class="ti ti-device-floppy"></i> Save</button><button class="btn btn-sm btn-accent" onclick="createSRFromAsset(\'camera\', ' + index + ')"><i class="ti ti-clipboard-list"></i> Create Support Request</button></div>';
+  }
+  document.getElementById('camera-detail-modal').classList.add('open');
+}
+
+async function saveCameraModalComment() {
+  var title = document.getElementById('camera-detail-title').textContent;
+  var camera = CAMERAS.find(function(c) { return c.name === title; });
+  if (!camera) return;
+  var textarea = document.getElementById('cam-modal-comments');
+  if (!textarea) return;
+  var newComment = textarea.value.trim();
+  if (newComment === (camera.comments || '')) return;
+  try {
+    await apiCall('/cameras/' + camera.id + '/comment', {
+      method: 'PUT',
+      body: JSON.stringify({ comments: newComment })
+    });
+    camera.comments = newComment;
+    await loadData();
+    renderCamerasOptimized();
+    toast('Saved', 'success');
+  } catch (err) {
+    toast('Failed to save: ' + err.message, 'error');
+  }
+}
+
+function pingCameraFromDetail() {
+  var title = document.getElementById('camera-detail-title').textContent;
+  var camera = CAMERAS.find(function(c) { return c.name === title; });
+  if (!camera) return;
+  var ip = camera.ip_address || 'N/A';
+  var resultDiv = document.getElementById('cam-ping-result');
+  if (ip === 'N/A' || ip === '') { resultDiv.innerHTML = '<span class="ping-result fail" style="color:var(--danger);">No IP</span>'; return; }
+  resultDiv.innerHTML = '<span class="ping-result pending" style="color:var(--warning);">Pinging ' + ip + '...</span>';
+  setTimeout(function() {
+    var online = Math.random() > 0.3;
+    resultDiv.innerHTML = online ? '<span class="ping-result success" style="color:var(--success);">✅ ' + ip + ' online</span>' : '<span class="ping-result fail" style="color:var(--danger);">❌ ' + ip + ' unreachable</span>';
+  }, 1500);
+}
+
+function openCameraURL() {
+  var title = document.getElementById('camera-detail-title').textContent;
+  var camera = CAMERAS.find(function(c) { return c.name === title; });
+  if (!camera) return;
+  var ip = camera.ip_address || 'N/A';
+  if (ip !== 'N/A' && ip !== '') window.open('http://' + ip, '_blank');
+  else toast('No IP', 'error');
+}
+
+function closeCameraDetailModal() {
+  document.getElementById('camera-detail-modal').classList.remove('open');
+  currentCameraIndex = null;
+}
+
+function toggleFullscreenPreview() {
+  var preview = document.getElementById('cam-preview-large');
+  if (!preview) return;
+  
+  if (preview.classList.contains('fullscreen')) {
+    preview.classList.remove('fullscreen');
+    preview.style.position = '';
+    preview.style.top = '';
+    preview.style.left = '';
+    preview.style.right = '';
+    preview.style.bottom = '';
+    preview.style.width = '';
+    preview.style.height = '';
+    preview.style.zIndex = '';
+    preview.style.borderRadius = '';
+    document.querySelector('.modal').style.overflow = '';
+    document.querySelector('.modal').style.maxHeight = '';
+    document.querySelector('.modal-overlay').style.alignItems = '';
+    document.querySelector('.modal-overlay').style.justifyContent = '';
+  } else {
+    preview.classList.add('fullscreen');
+    preview.style.position = 'fixed';
+    preview.style.top = '0';
+    preview.style.left = '0';
+    preview.style.right = '0';
+    preview.style.bottom = '0';
+    preview.style.width = '100vw';
+    preview.style.height = '100vh';
+    preview.style.zIndex = '9999';
+    preview.style.borderRadius = '0';
+    preview.style.padding = '20px';
+    preview.style.margin = '0';
+    document.querySelector('.modal').style.overflow = 'hidden';
+    document.querySelector('.modal').style.maxHeight = '100vh';
+    document.querySelector('.modal-overlay').style.alignItems = 'center';
+    document.querySelector('.modal-overlay').style.justifyContent = 'center';
+    
+    var content = preview.innerHTML;
+    preview.innerHTML = content + '<div style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.5);font-size:12px;background:rgba(0,0,0,0.5);padding:8px 16px;border-radius:8px;">Press ESC or click button to exit fullscreen</div>';
+  }
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    var preview = document.getElementById('cam-preview-large');
+    if (preview && preview.classList.contains('fullscreen')) {
+      toggleFullscreenPreview();
+    }
+  }
+});
+
+// ============================================================
+// ── SERVICE REQUEST FUNCTIONS ──────────────────────────────
+// ============================================================
+
+function renderDoorsEnhanced() {
+  var container = document.getElementById('door-groups-container');
+  if (!container) return;
+  if (DOORS.length === 0) {
+    container.innerHTML = '<div class="empty-state"><span class="empty-icon">🚪</span><div class="empty-title">No doors found</div></div>';
+    return;
+  }
+  var html = '<table class="tbl"><thead><tr><th>Name</th><th>Zone</th><th>Status</th><th>Reader</th><th>Lock</th><th>Technician</th></tr></thead><tbody>';
+  DOORS.forEach(function(d) {
+    html += '<tr><td>' + d.name + '</td><td>' + d.zone + '</td><td>' + doorBadge(d.status) + '</td><td>' + (d.reader || '—') + '</td><td>' + (d.lock_type || '—') + '</td><td>' + (d.tech || '—') + '</td></tr>';
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+function renderServersEnhanced() {
+  var container = document.getElementById('srv-groups-container');
+  if (!container) return;
+  if (SERVERS.length === 0) {
+    container.innerHTML = '<div class="empty-state"><span class="empty-icon">🖥️</span><div class="empty-title">No servers found</div></div>';
+    return;
+  }
+  var html = '<table class="tbl"><thead><tr><th>Name</th><th>Location</th><th>Status</th><th>Make</th><th>Model</th><th>Storage</th></tr></thead><tbody>';
+  SERVERS.forEach(function(s) {
+    html += '<tr><td>' + s.name + '</td><td>' + s.zone + '</td><td>' + srvBadge(s.status) + '</td><td>' + (s.make || '—') + '</td><td>' + (s.model || '—') + '</td><td>' + (s.capacity || '—') + '</td></tr>';
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+function renderSwitchesEnhanced() {
+  var container = document.getElementById('sw-groups-container');
+  if (!container) return;
+  if (SWITCHES.length === 0) {
+    container.innerHTML = '<div class="empty-state"><span class="empty-icon">🔀</span><div class="empty-title">No switches found</div></div>';
+    return;
+  }
+  var html = '<table class="tbl"><thead><tr><th>Name</th><th>Location</th><th>Status</th><th>Model</th><th>IP</th><th>Firmware</th></tr></thead><tbody>';
+  SWITCHES.forEach(function(s) {
+    html += '<tr><td>' + s.name + '</td><td>' + s.zone + '</td><td>' + doorBadge(s.status) + '</td><td>' + (s.model || '—') + '</td><td>' + (s.ip_address || '—') + '</td><td>' + (s.firmware || '—') + '</td></tr>';
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+function renderSoftware() {
+  var container = document.getElementById('sw-groups-container');
+  if (!container) return;
+  if (SOFTWARE.length === 0) {
+    container.innerHTML = '<div class="empty-state"><span class="empty-icon">💻</span><div class="empty-title">No software found</div></div>';
+    return;
+  }
+  var html = '<table class="tbl"><thead><tr><th>Name</th><th>Vendor</th><th>Version</th><th>Status</th><th>Expiry</th></tr></thead><tbody>';
+  SOFTWARE.forEach(function(s) {
+    html += '<tr><td>' + s.name + '</td><td>' + (s.vendor || '—') + '</td><td>' + (s.version || '—') + '</td><td>' + (s.status || '—') + '</td><td>' + (s.expiry_date || '—') + '</td></tr>';
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+function renderStations() {
+  var container = document.getElementById('stations-groups-container');
+  if (!container) return;
+  container.innerHTML = '<div class="empty-state"><span class="empty-icon">🖥️</span><div class="empty-title">No stations found</div></div>';
+}
+
+function renderMonitors() {
+  var container = document.getElementById('monitors-groups-container');
+  if (!container) return;
+  container.innerHTML = '<div class="empty-state"><span class="empty-icon">🖥️</span><div class="empty-title">No monitors found</div></div>';
+}
+
+function renderIntrusion() {
+  var container = document.getElementById('intrusion-groups-container');
+  if (!container) return;
+  if (INTRUSION.length === 0) {
+    container.innerHTML = '<div class="empty-state"><span class="empty-icon">🔒</span><div class="empty-title">No intrusion points found</div></div>';
+    return;
+  }
+  var html = '<table class="tbl"><thead><tr><th>Name</th><th>Zone</th><th>Status</th><th>Module</th><th>Sensor</th></tr></thead><tbody>';
+  INTRUSION.forEach(function(i) {
+    html += '<tr><td>' + i.name + '</td><td>' + i.zone + '</td><td>' + intrusionBadge(i.status) + '</td><td>' + (i.module || '—') + '</td><td>' + (i.sensor_type || '—') + '</td></tr>';
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+function renderInbox() {
+  var container = document.getElementById('inbox-email-list');
+  if (!container) return;
+  var search = document.getElementById('inbox-search') ? document.getElementById('inbox-search').value.toLowerCase() : '';
+  var filtered = EMAILS.filter(function(e) { return e.folder === inboxFolder; });
+  if (search) {
+    filtered = filtered.filter(function(e) { return e.subject.toLowerCase().indexOf(search) !== -1 || (e.sender || '').toLowerCase().indexOf(search) !== -1; });
+  }
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="empty-state"><span class="empty-icon">📧</span><div class="empty-title">No emails</div><div class="empty-desc">Your inbox is empty</div></div>';
+    updateBadges();
+    return;
+  }
+  var html = '';
+  filtered.forEach(function(email) {
+    var unreadClass = email.is_read ? '' : 'unread';
+    var flaggedClass = email.is_flagged ? 'flagged' : '';
+    var avatarLetter = (email.sender || '?').charAt(0).toUpperCase();
+    html += '<div class="outlook-email ' + unreadClass + '" onclick="viewEmail(\'' + email.id + '\')">' +
+      '<span class="oe-flag ' + flaggedClass + '" onclick="event.stopPropagation();toggleEmailFlag(\'' + email.id + '\')">' + (email.is_flagged ? '⭐' : '☆') + '</span>' +
+      '<div class="oe-avatar">' + avatarLetter + '</div>' +
+      '<div class="oe-content">' +
+      '<div class="oe-sender">' + (email.sender || 'Unknown') + '</div>' +
+      '<div class="oe-subject">' + (email.subject || '(no subject)') + '</div>' +
+      '<div class="oe-preview">' + (email.body || '').substring(0, 60) + '</div>' +
+      '</div>' +
+      '<div class="oe-meta"><span class="oe-date">' + timeAgo(email.created_at) + '</span></div>' +
+      '</div>';
+  });
+  container.innerHTML = html;
+  updateBadges();
+}
+
+function updateBadges() {
+  updateInboxBadge();
+  updateSRBadge();
+}
+
+function updateInboxBadge() {
+  var badge = document.getElementById('inbox-badge');
+  if (!badge) return;
+  var unread = EMAILS.filter(function(e) { return !e.is_read && e.folder === 'inbox'; }).length;
+  badge.textContent = unread || 0;
+  badge.style.display = unread > 0 ? '' : 'none';
+}
+
+function updateSRBadge() {
+  var badge = document.getElementById('sr-badge');
+  if (!badge) return;
+  var open = SERVICE_REQUESTS.filter(function(r) { return r.status !== 'Resolved'; }).length;
+  badge.textContent = open || 0;
+  badge.style.display = open > 0 ? '' : 'none';
+}
+
+function viewEmail(id) {
+  var email = EMAILS.find(function(e) { return e.id == id; });
+  if (!email) return;
+  if (!email.is_read) {
+    email.is_read = true;
+    updateBadges();
+  }
+  activeEmailId = id;
+  document.getElementById('inbox-empty').style.display = 'none';
+  document.getElementById('inbox-detail-content').classList.add('active');
+  document.getElementById('inbox-detail-subject').textContent = email.subject || '(no subject)';
+  document.getElementById('inbox-detail-from').textContent = email.sender || 'Unknown';
+  document.getElementById('inbox-detail-meta').textContent = 'To: ' + (email.recipient || 'me') + ' · ' + new Date(email.created_at).toLocaleString();
+  document.getElementById('inbox-detail-body').textContent = email.body || 'No content';
+  var avatar = document.getElementById('inbox-sender-avatar');
+  avatar.textContent = (email.sender || '?').charAt(0).toUpperCase();
+  avatar.className = 'ore-sender-avatar';
+  var flagIcon = document.getElementById('inbox-detail-flag-icon');
+  if (flagIcon) {
+    flagIcon.className = email.is_flagged ? 'ti ti-flag' : 'ti ti-flag';
+    flagIcon.style.color = email.is_flagged ? '#fbbf24' : '';
+  }
+}
+
+function toggleEmailFlag(id) {
+  var email = EMAILS.find(function(e) { return e.id == id; });
+  if (!email) return;
+  email.is_flagged = !email.is_flagged;
+  renderInbox();
+  if (activeEmailId == id) {
+    var flagIcon = document.getElementById('inbox-detail-flag-icon');
+    if (flagIcon) {
+      flagIcon.className = email.is_flagged ? 'ti ti-flag' : 'ti ti-flag';
+      flagIcon.style.color = email.is_flagged ? '#fbbf24' : '';
+    }
+  }
+  updateBadges();
+}
+
+function renderSR() {
+  var container = document.getElementById('sr-tbody');
+  if (!container) return;
+  
+  var filtered = SERVICE_REQUESTS.slice();
+  var search = document.getElementById('sr-search') ? document.getElementById('sr-search').value.toLowerCase() : '';
+  var siteFilter = document.getElementById('sr-site-filter') ? document.getElementById('sr-site-filter').value : 'All sites';
+  
+  if (srFilterStatus !== 'All') {
+    filtered = filtered.filter(function(sr) { return sr.status === srFilterStatus; });
+  }
+  if (search) {
+    filtered = filtered.filter(function(sr) { return sr.subject.toLowerCase().indexOf(search) !== -1 || (sr.sr_id || '').toLowerCase().indexOf(search) !== -1; });
+  }
+  if (siteFilter !== 'All sites') {
+    filtered = filtered.filter(function(sr) { return sr.site === siteFilter; });
+  }
+  
+  document.getElementById('sr-count-label').textContent = 'Service Requests (' + filtered.length + ')';
+  
+  if (filtered.length === 0) {
+    container.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:20px;color:var(--text-muted);">No service requests found</td></tr>';
+    return;
+  }
+  
+  var html = '';
+  filtered.forEach(function(sr) {
+    html += '<tr onclick="openModal(\'' + sr.sr_id + '\')"><td><input type="checkbox" onclick="event.stopPropagation();toggleSelectRow(this, \'' + sr.sr_id + '\')" /></td><td>' + sr.sr_id + '</td><td>' + (sr.client || '—') + '</td><td>' + (sr.site || '—') + '</td><td>' + sr.subject + '</td><td>' + getCategoryIcon(sr.category) + ' ' + (sr.category || '—') + '</td><td>' + priBadge(sr.priority) + '</td><td>' + (sr.assigned_to || '—') + '</td><td><span class="comment-display ' + (!sr.notes ? 'placeholder' : '') + '" onclick="event.stopPropagation();editSRNote(\'' + sr.sr_id + '\')">' + (sr.notes || 'Click to add note') + '</span></td><td>' + srStatusBadge(sr.status) + '</td></tr>';
+  });
+  container.innerHTML = html;
+  updateSRBadge();
+}
+
+async function renderAuditLog() {
+  try {
+    const logs = await apiCall('/activity-log?limit=100');
+    AUDIT_LOG = logs;
+    var container = document.getElementById('audit-log-container');
+    if (!container) return;
+    
+    if (logs.length === 0) {
+      container.innerHTML = '<div class="empty-state"><span class="empty-icon">📋</span><div class="empty-title">No activity</div></div>';
+      return;
+    }
+    
+    container.innerHTML = logs.map(function(log) {
+      var time = new Date(log.created_at).toLocaleString();
+      return '<div class="audit-item">' +
+        '<span class="audit-time">' + time + '</span>' +
+        '<span class="audit-user">' + (log.username || 'system') + '</span>' +
+        '<span class="audit-action"><span class="highlight">' + log.action + '</span> ' + log.detail + '</span>' +
+        '</div>';
+    }).join('');
+  } catch (err) {
+    console.error('Failed to load audit log:', err);
+  }
+}
+
+function renderFileExplorer() {
+  var container = document.getElementById('file-explorer-container');
+  if (!container) return;
+  container.innerHTML = '<div class="empty-state"><span class="empty-icon">📁</span><div class="empty-title">No files</div><div class="empty-desc">File system is empty</div></div>';
+}
+
+function renderComputeStorage() {
+  var container = document.getElementById('compute-storage-groups-container');
+  if (!container) return;
+  container.innerHTML = '<div class="empty-state"><span class="empty-icon">💾</span><div class="empty-title">No storage found</div></div>';
+}
+
+function closeModal() {
+  document.getElementById('sr-modal').classList.remove('open');
+}
+
+function openModal(id) {
+  var sr = SERVICE_REQUESTS.find(function(r) { return r.sr_id === id; });
+  if (!sr) return;
+  document.getElementById('m-title').textContent = sr.sr_id + ' — ' + sr.subject;
+  document.getElementById('m-sub').textContent = 'Created ' + sr.received;
+  document.getElementById('m-client').textContent = sr.client || '—';
+  document.getElementById('m-site').textContent = sr.site || '—';
+  document.getElementById('m-priority-sel').value = sr.priority || 'Medium';
+  document.getElementById('m-category').textContent = sr.category || '—';
+  document.getElementById('m-assigned-sel').value = sr.assigned_to || 'Unassigned';
+  document.getElementById('m-received').textContent = sr.received || '—';
+  document.getElementById('m-status-sel').value = sr.status || 'Open';
+  document.getElementById('m-body').textContent = sr.body || '';
+  document.getElementById('m-notes').value = sr.notes || '';
+  var timeline = document.getElementById('m-timeline');
+  timeline.innerHTML = (sr.history || []).map(function(h) {
+    return '<div class="tt-item"><span class="tt-time">' + h.time + '</span><span class="tt-msg">' + h.msg + '</span></div>';
+  }).join('');
+  document.getElementById('sr-modal').classList.add('open');
+}
+
+async function saveNewSR() {
+  var subject = document.getElementById('sr-subject').value.trim();
+  var client = document.getElementById('sr-client').value;
+  var site = document.getElementById('sr-site').value || 'Unknown';
+  var category = document.getElementById('sr-category').value;
+  var priority = document.getElementById('sr-priority').value;
+  var assigned = document.getElementById('sr-assigned').value;
+  var description = document.getElementById('sr-description').value.trim();
+  
+  if (!subject || !client) {
+    toast('Subject and Client required', 'warning');
+    return;
+  }
+  
+  try {
+    const data = await apiCall('/service-requests', {
+      method: 'POST',
+      body: JSON.stringify({
+        subject: subject,
+        client: client,
+        site: site,
+        category: category,
+        priority: priority,
+        assigned_to: assigned,
+        body: description
+      })
+    });
+    closeAddModal('add-sr-modal');
+    await loadData();
+    toast('SR ' + data.sr_id + ' created for ' + client, 'success');
+  } catch (err) {
+    toast('Failed to create SR: ' + err.message, 'error');
+  }
+}
+
+async function autoSave() {
+  var srIdElement = document.getElementById('m-title');
+  if (!srIdElement) return;
+  var srId = srIdElement.textContent.split(' — ')[0];
+  var sr = SERVICE_REQUESTS.find(function(r) { return r.sr_id === srId; });
+  if (!sr) return;
+  
+  var priority = document.getElementById('m-priority-sel').value;
+  var assigned = document.getElementById('m-assigned-sel').value;
+  var status = document.getElementById('m-status-sel').value;
+  var notes = document.getElementById('m-notes').value;
+  
+  try {
+    const result = await apiCall('/service-requests/' + sr.id, {
+      method: 'PUT',
+      body: JSON.stringify({ priority, assigned_to: assigned, status, notes })
+    });
+    
+    sr.priority = priority;
+    sr.assigned_to = assigned;
+    sr.status = status;
+    sr.notes = notes;
+    
+    if (result && result.data) {
+      Object.assign(sr, result.data);
+    }
+    
+    setUnsaved(false);
+    updateSRStatusInTable(sr.sr_id, status);
+    updateSRDetailModal(sr);
+    toast('Updated: ' + status, 'success');
+  } catch (err) {
+    console.error('Auto-save failed:', err);
+    toast('Save failed: ' + err.message, 'error');
+  }
+}
+
+function updateSRStatusInTable(srId, status) {
+  var rows = document.querySelectorAll('#sr-tbody tr');
+  rows.forEach(function(row) {
+    var cells = row.querySelectorAll('td');
+    if (cells.length > 0 && cells[0].textContent === srId) {
+      var statusCell = cells[cells.length - 1];
+      if (statusCell) {
+        statusCell.innerHTML = srStatusBadge(status);
+      }
+    }
+  });
+}
+
+function updateSRDetailModal(sr) {
+  if (!sr) return;
+  var statusSelect = document.getElementById('m-status-sel');
+  var prioritySelect = document.getElementById('m-priority-sel');
+  var assignedSelect = document.getElementById('m-assigned-sel');
+  var notesField = document.getElementById('m-notes');
+  
+  if (statusSelect) statusSelect.value = sr.status || 'Open';
+  if (prioritySelect) prioritySelect.value = sr.priority || 'Medium';
+  if (assignedSelect) assignedSelect.value = sr.assigned_to || 'Unassigned';
+  if (notesField) notesField.value = sr.notes || '';
+}
+
+async function addAuditLogEntry(action, detail) {
+  try {
+    await apiCall('/activity-log', {
+      method: 'POST',
+      body: JSON.stringify({ 
+        username: currentUser?.username || 'system',
+        action: action,
+        detail: detail 
+      })
+    });
+  } catch (err) {
+    console.error('Failed to add audit log entry:', err);
+  }
+}
+
+function toggleSelectRow(checkbox, id) {
+  if (checkbox.checked) {
+    selectedSRs.add(id);
+  } else {
+    selectedSRs.delete(id);
+  }
+  updateBulkBar();
+}
+
+function toggleSelectAll() {
+  var checked = document.getElementById('sr-select-all').checked;
+  document.querySelectorAll('#sr-tbody input[type="checkbox"]').forEach(function(cb) {
+    cb.checked = checked;
+    var id = cb.closest('tr').querySelector('td:nth-child(2)').textContent;
+    if (checked) selectedSRs.add(id);
+    else selectedSRs.delete(id);
+  });
+  updateBulkBar();
+}
+
+function updateBulkBar() {
+  var count = selectedSRs.size;
+  document.getElementById('bulk-count').textContent = count + ' selected';
+  document.getElementById('bulk-bar').classList.toggle('active', count > 0);
+  document.getElementById('merge-btn').style.display = count > 1 ? 'inline-flex' : 'none';
+}
+
+function clearSelection() {
+  selectedSRs.clear();
+  document.querySelectorAll('#sr-tbody input[type="checkbox"]').forEach(function(cb) { cb.checked = false; });
+  document.getElementById('sr-select-all').checked = false;
+  updateBulkBar();
+}
+
+async function bulkApply() {
+  var status = document.getElementById('bulk-status').value;
+  var assign = document.getElementById('bulk-assign').value;
+  var priority = document.getElementById('bulk-priority').value;
+  if (!status && !assign && !priority) { toast('Select at least one action', 'warning'); return; }
+  
+  var count = 0;
+  for (var id of selectedSRs) {
+    var sr = SERVICE_REQUESTS.find(function(r) { return r.sr_id === id; });
+    if (sr) {
+      try {
+        await apiCall('/service-requests/' + sr.id, {
+          method: 'PUT',
+          body: JSON.stringify({
+            priority: priority || sr.priority,
+            assigned_to: assign || sr.assigned_to,
+            status: status || sr.status,
+            notes: sr.notes || ''
+          })
+        });
+        count++;
+      } catch (err) {
+        console.error('Bulk update failed for ' + id, err);
+      }
+    }
+  }
+  await loadData();
+  clearSelection();
+  toast('Bulk update applied to ' + count + ' SRs', 'success');
+}
+
+function mergeSelected() {
+  toast('Merge feature coming soon', 'info');
+}
+
+function setPillFilter(el) {
+  document.querySelectorAll('.filter-pill').forEach(function(p) { p.classList.remove('active'); });
+  el.classList.add('active');
+  srFilterStatus = el.dataset.status;
+  renderSR();
+}
+
+async function editSRNote(id) {
+  var sr = SERVICE_REQUESTS.find(function(r) { return r.sr_id === id; });
+  if (!sr) return;
+  var noteCell = document.querySelector('.comment-display[onclick*="editSRNote(\'' + id + '\')"]');
+  if (!noteCell) return;
+  var currentNote = sr.notes || '';
+  var wrapper = document.createElement('div');
+  wrapper.style.display = 'flex';
+  wrapper.style.gap = '4px';
+  wrapper.style.alignItems = 'center';
+  var input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'edit-comment-input';
+  input.value = currentNote;
+  input.style.flex = '1';
+  var saveBtn = document.createElement('button');
+  saveBtn.className = 'btn btn-xs btn-success';
+  saveBtn.innerHTML = '<i class="ti ti-check"></i>';
+  var cancelBtn = document.createElement('button');
+  cancelBtn.className = 'btn btn-xs';
+  cancelBtn.innerHTML = '<i class="ti ti-x"></i>';
+  wrapper.appendChild(input);
+  wrapper.appendChild(saveBtn);
+  wrapper.appendChild(cancelBtn);
+  noteCell.replaceWith(wrapper);
+  input.focus();
+  input.select();
+  var resolved = false;
+  var restoreSpan = function(text) {
+    var span = document.createElement('span');
+    span.className = 'comment-display ' + (!text ? 'placeholder' : '');
+    span.textContent = text || 'Click to add note';
+    span.onclick = function(e) { e.stopPropagation(); editSRNote(id); };
+    wrapper.replaceWith(span);
+  };
+  var doSave = async function() {
+    if (resolved) return;
+    resolved = true;
+    var newNote = input.value.trim();
+    if (newNote !== sr.notes) {
+      try {
+        await apiCall('/service-requests/' + sr.id, {
+          method: 'PUT',
+          body: JSON.stringify({
+            priority: sr.priority,
+            assigned_to: sr.assigned_to,
+            status: sr.status,
+            notes: newNote
+          })
+        });
+        sr.notes = newNote;
+        await loadData();
+      } catch (err) {
+        toast('Failed to save: ' + err.message, 'error');
+        restoreSpan(currentNote);
+        return;
+      }
+    }
+    restoreSpan(newNote);
+    renderSR();
+  };
+  saveBtn.addEventListener('click', function(e) { e.stopPropagation(); doSave(); });
+  cancelBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (resolved) return;
+    resolved = true;
+    restoreSpan(currentNote);
+  });
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); doSave(); }
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      if (resolved) return;
+      resolved = true;
+      restoreSpan(currentNote);
+    }
+  });
+  input.addEventListener('blur', function() {
+    setTimeout(function() { if (!resolved) doSave(); }, 120);
+  });
+}
+
+function debounceRenderCameras() { debounce(renderCamerasOptimized, 'cameras', 250); }
+function debounceRenderDoors() { debounce(renderDoorsEnhanced, 'doors', 250); }
+function debounceRenderServers() { debounce(renderServersEnhanced, 'servers', 250); }
+function debounceRenderSwitches() { debounce(renderSwitchesEnhanced, 'switches', 250); }
+function debounceRenderSoftware() { debounce(renderSoftware, 'software', 250); }
+function debounceRenderStations() { debounce(renderStations, 'stations', 250); }
+function debounceRenderMonitors() { debounce(renderMonitors, 'monitors', 250); }
+function debounceRenderIntrusion() { debounce(renderIntrusion, 'intrusion', 250); }
+function debounceRenderFiles() { debounce(renderFileExplorer, 'files', 250); }
+function debounceRenderSR() { debounce(renderSR, 'sr', 250); }
+function debounceRenderComputeStorage() { debounce(renderComputeStorage, 'compute-storage', 250); }
+
+function createSRFromAsset(type, index) {
+  var asset = null;
+  var assetName = '';
+  var assetZone = '';
+  
+  if (type === 'camera') {
+    asset = CAMERAS[index];
+    if (asset) {
+      assetName = asset.name;
+      assetZone = asset.zone;
+    }
+  }
+  
+  openAddSRModal();
+  
+  setTimeout(function() {
+    var subjectField = document.getElementById('sr-subject');
+    var siteField = document.getElementById('sr-site');
+    var categoryField = document.getElementById('sr-category');
+    var descField = document.getElementById('sr-description');
+    
+    if (subjectField) subjectField.value = type + ' issue: ' + assetName;
+    if (siteField) siteField.value = assetZone;
+    if (categoryField) categoryField.value = type.charAt(0).toUpperCase() + type.slice(1);
+    if (descField) descField.value = 'Issue with ' + type + ' ' + assetName + ' in zone ' + assetZone;
+    
+    toast('Creating SR for ' + type + ': ' + assetName, 'info');
+  }, 100);
+}
+
+async function exportCamerasCSV() {
+  try {
+    const data = await apiCall('/cameras/export');
+    if (data.length === 0) { toast('No cameras to export', 'warning'); return; }
+    var headers = Object.keys(data[0]).filter(function(k) { return k !== 'id' && k !== 'client_id'; });
+    var csv = headers.join(',') + '\n';
+    data.forEach(function(row) {
+      csv += headers.map(function(h) { return '"' + (row[h] || '').replace(/"/g, '""') + '"'; }).join(',') + '\n';
+    });
+    var blob = new Blob([csv], { type: 'text/csv' });
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'cameras_export.csv';
+    link.click();
+    toast('Export complete', 'success');
+  } catch (err) {
+    toast('Export failed: ' + err.message, 'error');
+  }
+}
+
+function exportSRsCSV() { toast('Exporting SRs...', 'info'); }
+function exportDoorsCSV() { toast('Exporting doors...', 'info'); }
+function exportServersCSV() { toast('Exporting servers...', 'info'); }
+function exportSwitchesCSV() { toast('Exporting switches...', 'info'); }
+function exportSoftwareCSV() { toast('Exporting software...', 'info'); }
+function exportAssetsCSV() { toast('Exporting assets...', 'info'); }
+function exportIntrusionCSV() { toast('Exporting intrusion...', 'info'); }
+
+function refreshDoors() { toast('Refreshing doors...', 'info'); loadData(); }
+function refreshServers() { toast('Refreshing servers...', 'info'); loadData(); }
+function refreshSwitches() { toast('Refreshing switches...', 'info'); loadData(); }
+function refreshSoftware() { toast('Refreshing software...', 'info'); loadData(); }
+function refreshAssets() { toast('Refreshing assets...', 'info'); loadData(); }
+function refreshIntrusion() { toast('Refreshing intrusion...', 'info'); loadData(); }
+function refreshFileExplorer() { toast('Refreshing files...', 'info'); }
+function refreshAuditLog() { toast('Refreshing audit log...', 'info'); renderAuditLog(); }
+function clearAuditLog() { toast('Audit log cleared', 'info'); }
+
+function switchComputeTab(tab) {
+  currentComputeSubTab = tab;
+  document.querySelectorAll('.compute-sub-tab').forEach(function(el) {
+    el.classList.remove('active');
+  });
+  document.querySelectorAll('.compute-sub-tab').forEach(function(el) {
+    if (el.dataset.subtab === tab) el.classList.add('active');
+  });
+  document.querySelectorAll('.compute-sub-content').forEach(function(el) {
+    el.classList.remove('active');
+  });
+  var content = document.getElementById('subtab-' + tab);
+  if (content) content.classList.add('active');
+  if (tab === 'servers') renderServersEnhanced();
+  else if (tab === 'storage') renderComputeStorage();
+}
+
+function switchAssetSubTab(tab) {
+  currentAssetSubTab = tab;
+  document.querySelectorAll('.asset-sub-tab').forEach(function(el) {
+    el.classList.remove('active');
+  });
+  document.querySelectorAll('.asset-sub-tab').forEach(function(el) {
+    if (el.dataset.subtab === tab) el.classList.add('active');
+  });
+  document.querySelectorAll('.asset-sub-content').forEach(function(el) {
+    el.classList.remove('active');
+  });
+  var content = document.getElementById('subtab-' + tab);
+  if (content) content.classList.add('active');
+  if (tab === 'stations') renderStations();
+  else if (tab === 'monitors') renderMonitors();
+}
+
+function setInboxFolder(folder, el) {
+  inboxFolder = folder;
+  document.querySelectorAll('.outlook-folder-item').forEach(function(f) { f.classList.remove('active'); });
+  if (el) el.classList.add('active');
+  renderInbox();
+}
+
+function deleteSelectedEmails() { toast('Delete selected', 'info'); }
+function markSelectedRead() { toast('Marked as read', 'success'); }
+function flagSelectedEmails() { toast('Flagged', 'info'); }
+function composeReply() { toast('Reply', 'info'); }
+function composeReplyAll() { toast('Reply All', 'info'); }
+function composeForward() { toast('Forward', 'info'); }
+function toggleEmailFlag(id) { toast('Toggled flag', 'info'); }
+function convertToSR() { toast('Converted to SR', 'success'); }
+function openComposeModal() { document.getElementById('compose-overlay').classList.add('open'); }
+function closeComposeModal() { document.getElementById('compose-overlay').classList.remove('open'); }
+function sendComposeEmail() { toast('Email sent', 'success'); closeComposeModal(); }
+
+function pingDoorReader() { toast('Pinging reader...', 'info'); }
+function openDoorController() { toast('Opening controller...', 'info'); }
+function closeDoorDetailModal() { document.getElementById('door-detail-modal').classList.remove('open'); }
+
+function pingServer() { toast('Pinging server...', 'info'); }
+function openServerConsole() { toast('Opening console...', 'info'); }
+function closeServerDetailModal() { document.getElementById('server-detail-modal').classList.remove('open'); }
+
+function pingSwitchDetail() { toast('Pinging switch...', 'info'); }
+function openSwitchAdmin() { toast('Opening admin...', 'info'); }
+function closeSwitchDetailModal() { document.getElementById('switch-detail-modal').classList.remove('open'); }
+
+function pingIntrusion() { toast('Pinging intrusion point...', 'info'); }
+function closeIntrusionDetailModal() { document.getElementById('intrusion-detail-modal').classList.remove('open'); }
+
+function closeFilePreview() { document.getElementById('file-preview-overlay').classList.remove('open'); }
+function downloadFile() { toast('Downloading...', 'info'); }
+
+function saveNewClient() {
+  var name = document.getElementById('client-name').value.trim();
+  if (!name) { toast('Client name required', 'warning'); return; }
+  toast('Client ' + name + ' added', 'success');
+  closeAddModal('add-client-modal');
+}
+
+function previewClientLogo(input) {
+  var preview = document.getElementById('client-logo-preview');
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function previewEditClientLogo(input) {
+  var preview = document.getElementById('edit-client-logo-preview');
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function saveEditClient() { toast('Client updated', 'success'); }
+function printTicket() { window.print(); }
+function hideContextMenu() { document.getElementById('ctx-menu').classList.remove('open'); }
+
+function showClientContextMenu(event, client) {
+  event.preventDefault();
+  var menu = document.getElementById('ctx-menu');
+  menu.innerHTML =
+    '<button class="ctx-item" onclick="editClient(\'' + client + '\')"><i class="ti ti-edit"></i> Edit</button>' +
+    '<button class="ctx-item" onclick="deleteClient(\'' + client + '\')"><i class="ti ti-trash"></i> Delete</button>';
+  menu.style.left = event.pageX + 'px';
+  menu.style.top = event.pageY + 'px';
+  menu.classList.add('open');
+}
+
+function editClient(client) { toast('Edit ' + client, 'info'); }
+function deleteClient(client) { toast('Delete ' + client, 'info'); }
+
+function saveDoorModalComment() { toast('Comment saved', 'success'); }
+function saveServerModalComment() { toast('Comment saved', 'success'); }
+function saveSwitchModalComment() { toast('Comment saved', 'success'); }
+function saveIntrusionModalComment() { toast('Comment saved', 'success'); }
+
+function handleAttachmentUpload(files) {
+  toast(files.length + ' file(s) uploaded', 'success');
+}
+
+function getRandomUptime() {
+  var days = Math.floor(Math.random() * 90) + 1;
+  var hours = Math.floor(Math.random() * 24);
+  var mins = Math.floor(Math.random() * 60);
+  return days + 'd ' + hours + 'h ' + mins + 'm';
+}
+
+function getRandomLatency() {
+  return Math.floor(Math.random() * 30) + 2;
+}
+
+function intrusionBadge(status) {
+  if (status === 'Online') return '<span class="badge b-intrusion-online">Online</span>';
+  if (status === 'Offline') return '<span class="badge b-intrusion-offline">Offline</span>';
+  if (status === 'Warning') return '<span class="badge b-intrusion-warning">Warning</span>';
+  return '<span class="badge b-info">Unknown</span>';
+}
 
 // ============================================================
 // ── INIT ──────────────────────────────────────────────────────
