@@ -580,7 +580,6 @@ input::placeholder, textarea::placeholder {
 .asset-sub-content.active, .compute-sub-content.active { display: block; }
 
 .app { display: flex; height: 100vh; width: 100%; max-width: 100%; background: var(--main-bg); overflow: hidden; display: none; }
-.app.client-mode { background: #f5f5f5; }
 
 .sidebar { width: 200px; background: var(--sidebar-bg); display: flex; flex-direction: column; flex-shrink: 0; border-right: 1px solid var(--sidebar-border); transition: width 0.2s; position: relative; overflow: hidden; }
 .sidebar.collapsed { width: 56px; }
@@ -669,14 +668,6 @@ input::placeholder, textarea::placeholder {
 .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
 .panel-title { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
 
-.emergency-banner { background: rgba(255,0,0,0.08); border: 1px solid rgba(255,94,122,0.4); box-shadow: 0 0 40px rgba(255,0,0,0.1), inset 0 0 60px rgba(255,0,0,0.02); border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; display: none; align-items: center; gap: 12px; }
-.emergency-banner.active { display: flex; }
-.emergency-banner .em-icon { font-size: 20px; color: #ef4444; animation: pulse 1.5s infinite; }
-.emergency-banner .em-text { flex: 1; }
-.emergency-banner .em-title { font-size: 13px; font-weight: 600; color: #fca5a5; margin-bottom: 2px; }
-.emergency-banner .em-detail { font-size: 11px; color: #f87171; }
-.emergency-banner .em-time { font-size: 10px; color: rgba(248,113,113,0.6); }
-
 .cam-status-filters { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0 12px; }
 
 #login-page {
@@ -739,27 +730,6 @@ input::placeholder, textarea::placeholder {
 .login-loading i { animation: spin 1s linear infinite; }
 
 .logo-upload-preview { width: 60px; height: 60px; border-radius: 8px; object-fit: contain; border: 1px solid var(--card-border); margin-top: 4px; }
-
-.client-mode .sidebar {
-  background: #ffffff !important;
-  border-right: 1px solid rgba(0,0,0,0.08) !important;
-}
-.client-mode .sidebar .logo-img { content: url('logo-light.png'); }
-.client-mode .topbar { background: #ffffff !important; border-bottom: 1px solid rgba(0,0,0,0.08) !important; }
-.client-mode .topbar .page-title { color: #1a1a2e !important; }
-.client-mode .topbar .topbar-date { color: rgba(0,0,0,0.6) !important; }
-.client-mode .nav-item { color: rgba(0,0,0,0.6) !important; }
-.client-mode .nav-item:hover { background: rgba(0,0,0,0.04) !important; color: #1a1a2e !important; }
-.client-mode .nav-item.active { background: var(--client-primary) !important; color: #fff !important; }
-.client-mode .nav-section { color: rgba(0,0,0,0.35) !important; }
-.client-mode .stat-card { background: #ffffff !important; border: 1px solid rgba(0,0,0,0.08) !important; }
-.client-mode .stat-card .stat-label { color: rgba(0,0,0,0.6) !important; }
-.client-mode .stat-card .stat-val { color: #1a1a2e !important; }
-.client-mode .panel { background: #ffffff !important; border: 1px solid rgba(0,0,0,0.08) !important; }
-.client-mode .panel .panel-title { color: rgba(0,0,0,0.6) !important; }
-.client-mode .sidebar-footer { border-top: 1px solid rgba(0,0,0,0.08) !important; }
-.client-mode .sidebar-footer .user-name { color: #1a1a2e !important; }
-.client-mode .sidebar-footer .user-role { color: rgba(0,0,0,0.35) !important; }
 
 @media (max-width: 1024px) {
   .app { height: 100vh; border-radius: 0; max-width: 100%; }
@@ -873,14 +843,14 @@ input::placeholder, textarea::placeholder {
       <div class="nav-fixed-top">
         <div class="nav-section">Main</div>
         <div class="nav-item active" data-tab="dashboard"><i class="ti ti-layout-dashboard"></i> <span>Dashboard</span></div>
-        <div class="nav-item admin-only" data-tab="inbox"><i class="ti ti-mail"></i> <span>Support Inbox</span> <span class="nav-badge" id="inbox-badge" style="background:#8b5cf6">8</span></div>
+        <div class="nav-item" data-tab="inbox"><i class="ti ti-mail"></i> <span>Support Inbox</span> <span class="nav-badge" id="inbox-badge" style="background:#8b5cf6">8</span></div>
         <div class="nav-item" data-tab="service"><i class="ti ti-clipboard-list"></i> <span>Service Requests</span> <span class="nav-badge" id="sr-badge">4</span></div>
       </div>
       <div class="nav-scroll-bottom" id="nav-clients-section">
-        <div class="nav-section admin-only" id="clients-section-label">Clients</div>
+        <div class="nav-section" id="clients-section-label">Clients</div>
         <div id="client-dropdowns-container"></div>
-        <div class="nav-section admin-only" id="tools-section">Tools</div>
-        <div class="nav-item admin-only" data-tab="files" id="files-nav-item"><i class="ti ti-folders"></i> <span>Files & Logs</span></div>
+        <div class="nav-section" id="tools-section">Tools</div>
+        <div class="nav-item" data-tab="files" id="files-nav-item"><i class="ti ti-folders"></i> <span>Files & Logs</span></div>
       </div>
     </nav>
     <div class="sidebar-footer">
@@ -902,11 +872,11 @@ input::placeholder, textarea::placeholder {
           <button class="theme-option" onclick="setTheme('light');closeThemeDropdown();">☀️ Light</button>
           <button class="theme-option" onclick="setTheme('jet-black');closeThemeDropdown();">⚫ Jet Black</button>
         </div>
-        <button class="add-btn admin-only" onclick="toggleAddDropdown()" id="add-btn"><i class="ti ti-plus"></i></button>
+        <button class="add-btn" onclick="toggleAddDropdown()" id="add-btn"><i class="ti ti-plus"></i></button>
         <div class="add-dropdown" id="add-dropdown">
           <button class="dd-item" onclick="openAddSRModal();closeAddDropdown();"><span class="dd-icon">📋</span> Add Service Request</button>
           <div class="dd-sep"></div>
-          <button class="dd-item admin-only" onclick="openAddClientModal();closeAddDropdown();"><span class="dd-icon">👤</span> Add Client</button>
+          <button class="dd-item" onclick="openAddClientModal();closeAddDropdown();"><span class="dd-icon">👤</span> Add Client</button>
         </div>
         <span class="topbar-date" id="topbar-date"></span>
         <span class="unsaved-indicator" id="unsaved-indicator"><i class="ti ti-alert-circle"></i> Unsaved changes</span>
@@ -917,35 +887,26 @@ input::placeholder, textarea::placeholder {
     <div class="content" id="main-content">
       <!-- Dashboard -->
       <div class="tab active" id="tab-dashboard">
-        <div class="emergency-banner active" id="emergency-banner">
-          <i class="ti ti-alert-triangle em-icon"></i>
-          <div class="em-text">
-            <div class="em-title">🚨 ALARM — Tinson Pen Perimeter Breach</div>
-            <div class="em-detail">Cam 282-TP Pole 21 · Motion detection · 172.16.19.91</div>
-          </div>
-          <span class="em-time">Today, 14:32</span>
-          <button class="btn btn-danger btn-sm" onclick="acknowledgeAlarm()"><i class="ti ti-check"></i> Ack</button>
-        </div>
         <div class="stats-grid">
           <div class="stat-card">
-            <div class="stat-label">System Health <span class="trend-badge" id="trend-health"><i class="ti ti-trending-up"></i> +2%</span></div>
+            <div class="stat-label">System Health</div>
             <div class="stat-val" style="color:var(--success)" id="dash-health">98%</div>
-            <div class="stat-note note-success">Across all assets</div>
+            <div class="stat-note note-success">All systems operational</div>
           </div>
           <div class="stat-card">
-            <div class="stat-label">Active Alerts <span class="trend-badge warn" id="trend-alerts"><i class="ti ti-alert-circle"></i> 2</span></div>
-            <div class="stat-val" style="color:var(--warning)" id="dash-alerts">2</div>
+            <div class="stat-label">Active Alerts</div>
+            <div class="stat-val" style="color:var(--warning)" id="dash-alerts">0</div>
             <div class="stat-note note-warn">Requires attention</div>
           </div>
           <div class="stat-card">
-            <div class="stat-label">Offline Devices <span class="trend-badge down" id="trend-offline"><i class="ti ti-trending-down"></i> -1</span></div>
+            <div class="stat-label">Offline Devices</div>
             <div class="stat-val" style="color:var(--danger)" id="dash-offline">0</div>
             <div class="stat-note note-danger">All devices online</div>
           </div>
           <div class="stat-card">
-            <div class="stat-label">Open SRs <span class="trend-badge" id="trend-srs"><i class="ti ti-trending-up"></i> +1</span></div>
-            <div class="stat-val" style="color:var(--info)" id="dash-srs">3</div>
-            <div class="stat-note note-info">Pending resolution</div>
+            <div class="stat-label">Total Devices</div>
+            <div class="stat-val" style="color:var(--info)" id="dash-total">0</div>
+            <div class="stat-note note-info">Across all assets</div>
           </div>
         </div>
         <div class="panel">
@@ -965,7 +926,7 @@ input::placeholder, textarea::placeholder {
       </div>
 
       <!-- Inbox -->
-      <div class="tab admin-only" id="tab-inbox" style="height:100%">
+      <div class="tab" id="tab-inbox" style="height:100%">
         <div class="outlook-container">
           <div class="outlook-folder-pane" id="inbox-folder-pane">
             <div class="outlook-folder-item active" data-folder="inbox" onclick="setInboxFolder('inbox', this)"><i class="ti ti-inbox"></i> Inbox<span class="folder-count unread">5</span></div>
@@ -1071,7 +1032,7 @@ input::placeholder, textarea::placeholder {
             <div class="panel-header">
               <span class="panel-title" id="sr-count-label">Service Requests</span>
               <div style="display:flex;align-items:center;gap:8px;">
-                <button class="btn btn-sm admin-only" onclick="exportSRsCSV()"><i class="ti ti-download"></i> Export CSV</button>
+                <button class="btn btn-sm" onclick="exportSRsCSV()"><i class="ti ti-download"></i> Export CSV</button>
               </div>
             </div>
             <div class="loading-overlay" id="sr-loading"><div class="loading-spinner"><i class="ti ti-loader"></i><span>Loading tickets...</span></div></div>
@@ -1094,7 +1055,7 @@ input::placeholder, textarea::placeholder {
           <div class="panel-header">
             <span class="panel-title">Cameras</span>
             <div style="display:flex;align-items:center;gap:8px;">
-              <button class="btn btn-sm admin-only" onclick="exportCamerasCSV()"><i class="ti ti-download"></i> Export CSV</button>
+              <button class="btn btn-sm" onclick="exportCamerasCSV()"><i class="ti ti-download"></i> Export CSV</button>
               <span class="last-updated" id="cam-last-updated" style="color:var(--text-secondary);">Last updated: Today</span>
               <button class="btn btn-sm" onclick="refreshCameras()" title="Refresh"><i class="ti ti-refresh"></i></button>
             </div>
@@ -1121,7 +1082,7 @@ input::placeholder, textarea::placeholder {
           <div class="panel-header">
             <span class="panel-title">Access Control — Doors</span>
             <div style="display:flex;align-items:center;gap:8px;">
-              <button class="btn btn-sm admin-only" onclick="exportDoorsCSV()"><i class="ti ti-download"></i> Export CSV</button>
+              <button class="btn btn-sm" onclick="exportDoorsCSV()"><i class="ti ti-download"></i> Export CSV</button>
               <span class="last-updated" style="color:var(--text-secondary);" id="door-last-updated">Last updated: Today</span>
               <button class="btn btn-sm" onclick="refreshDoors()" title="Refresh"><i class="ti ti-refresh"></i></button>
             </div>
@@ -1152,7 +1113,7 @@ input::placeholder, textarea::placeholder {
           <div class="panel-header">
             <span class="panel-title">Compute & Storage</span>
             <div style="display:flex;align-items:center;gap:8px;">
-              <button class="btn btn-sm admin-only" onclick="exportServersCSV()"><i class="ti ti-download"></i> Export CSV</button>
+              <button class="btn btn-sm" onclick="exportServersCSV()"><i class="ti ti-download"></i> Export CSV</button>
               <span class="last-updated" style="color:var(--text-secondary);" id="srv-last-updated">Last updated: Today</span>
               <button class="btn btn-sm" onclick="refreshServers()" title="Refresh"><i class="ti ti-refresh"></i></button>
             </div>
@@ -1199,7 +1160,7 @@ input::placeholder, textarea::placeholder {
           <div class="panel-header">
             <span class="panel-title">Control Center</span>
             <div style="display:flex;align-items:center;gap:8px;">
-              <button class="btn btn-sm admin-only" onclick="exportAssetsCSV()"><i class="ti ti-download"></i> Export CSV</button>
+              <button class="btn btn-sm" onclick="exportAssetsCSV()"><i class="ti ti-download"></i> Export CSV</button>
               <button class="btn btn-sm" onclick="refreshAssets()" title="Refresh"><i class="ti ti-refresh"></i></button>
             </div>
           </div>
@@ -1244,7 +1205,7 @@ input::placeholder, textarea::placeholder {
           <div class="panel-header">
             <span class="panel-title">Network Switches</span>
             <div style="display:flex;align-items:center;gap:8px;">
-              <button class="btn btn-sm admin-only" onclick="exportSwitchesCSV()"><i class="ti ti-download"></i> Export CSV</button>
+              <button class="btn btn-sm" onclick="exportSwitchesCSV()"><i class="ti ti-download"></i> Export CSV</button>
               <span class="last-updated" style="color:var(--text-secondary);" id="sw-last-updated">Last updated: Today</span>
               <button class="btn btn-sm" onclick="refreshSwitches()" title="Refresh"><i class="ti ti-refresh"></i></button>
             </div>
@@ -1281,7 +1242,7 @@ input::placeholder, textarea::placeholder {
           <div class="panel-header">
             <span class="panel-title">Software & Licenses</span>
             <div style="display:flex;align-items:center;gap:8px;">
-              <button class="btn btn-sm admin-only" onclick="exportSoftwareCSV()"><i class="ti ti-download"></i> Export CSV</button>
+              <button class="btn btn-sm" onclick="exportSoftwareCSV()"><i class="ti ti-download"></i> Export CSV</button>
               <button class="btn btn-sm" onclick="refreshSoftware()" title="Refresh"><i class="ti ti-refresh"></i></button>
             </div>
           </div>
@@ -1311,7 +1272,7 @@ input::placeholder, textarea::placeholder {
           <div class="panel-header">
             <span class="panel-title">Intrusion Detection</span>
             <div style="display:flex;align-items:center;gap:8px;">
-              <button class="btn btn-sm admin-only" onclick="exportIntrusionCSV()"><i class="ti ti-download"></i> Export CSV</button>
+              <button class="btn btn-sm" onclick="exportIntrusionCSV()"><i class="ti ti-download"></i> Export CSV</button>
               <button class="btn btn-sm" onclick="refreshIntrusion()" title="Refresh"><i class="ti ti-refresh"></i></button>
             </div>
           </div>
@@ -1329,8 +1290,8 @@ input::placeholder, textarea::placeholder {
         </div>
       </div>
 
-      <!-- Files (Admin Only) -->
-      <div class="tab admin-only" id="tab-files">
+      <!-- Files -->
+      <div class="tab" id="tab-files">
         <div class="panel" style="margin-bottom:14px;">
           <div class="panel-header">
             <span class="panel-title">📁 Internal Database</span>
@@ -1652,8 +1613,8 @@ input::placeholder, textarea::placeholder {
   </div>
 </div>
 
-<!-- Add Client Modal (Admin Only) -->
-<div class="modal-overlay admin-only" id="add-client-modal">
+<!-- Add Client Modal -->
+<div class="modal-overlay" id="add-client-modal">
   <div class="modal">
     <button class="modal-close" onclick="closeAddModal('add-client-modal')"><i class="ti ti-x"></i></button>
     <div class="modal-title">👤 Add Client</div>
@@ -1681,8 +1642,8 @@ input::placeholder, textarea::placeholder {
   </div>
 </div>
 
-<!-- Edit Client Modal (Admin Only) -->
-<div class="modal-overlay admin-only" id="edit-client-modal">
+<!-- Edit Client Modal -->
+<div class="modal-overlay" id="edit-client-modal">
   <div class="modal">
     <button class="modal-close" onclick="closeAddModal('edit-client-modal')"><i class="ti ti-x"></i></button>
     <div class="modal-title">✏️ Edit Client</div>
@@ -2077,8 +2038,7 @@ function setUnsaved(show) {
 }
 
 function acknowledgeAlarm() {
-  document.getElementById('emergency-banner').classList.remove('active');
-  toast('Alarm acknowledged', 'success');
+  // Removed - alarm notification no longer exists
 }
 
 // ============================================================
@@ -2090,37 +2050,6 @@ function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('collapsed', sidebarCollapsed);
   document.getElementById('collapse-icon').className = 'ti ti-chevron-' + (sidebarCollapsed ? 'right' : 'left');
   localStorage.setItem('ccsm_sidebar', sidebarCollapsed ? '1' : '0');
-}
-
-// ============================================================
-// ── UI VISIBILITY ────────────────────────────────────────────
-// ============================================================
-
-function updateUIVisibility() {
-  var adminOnlyElements = document.querySelectorAll('.admin-only');
-  adminOnlyElements.forEach(function(el) {
-    if (isAdmin) {
-      el.style.display = '';
-    } else {
-      el.style.display = 'none';
-    }
-  });
-  
-  var clientsLabel = document.getElementById('clients-section-label');
-  var toolsSection = document.getElementById('tools-section');
-  var clientDropdowns = document.getElementById('client-dropdowns-container');
-  
-  if (!isAdmin) {
-    if (clientsLabel) clientsLabel.textContent = 'Zones';
-    if (toolsSection) toolsSection.style.display = 'none';
-    if (clientDropdowns) {
-      renderClientZones(userClient || 'KFTL');
-    }
-  } else {
-    if (clientsLabel) clientsLabel.textContent = 'Clients';
-    if (toolsSection) toolsSection.style.display = '';
-    renderAllClients();
-  }
 }
 
 // ============================================================
@@ -2175,16 +2104,12 @@ document.getElementById('nav').addEventListener('click', function(e) {
   if (item.classList.contains('nav-client-parent')) return;
   var tab = item.dataset.tab;
   if (tab) {
-    if (userClient && !isAdmin) {
-      currentClientFilter = userClient;
-    } else {
-      currentClientFilter = item.dataset.client || null;
-      if (currentClientFilter) {
-        currentZoneFilter = null;
-        document.querySelectorAll('.nav-zone-item').forEach(function(el) {
-          el.classList.remove('active');
-        });
-      }
+    currentClientFilter = item.dataset.client || null;
+    if (currentClientFilter) {
+      currentZoneFilter = null;
+      document.querySelectorAll('.nav-zone-item').forEach(function(el) {
+        el.classList.remove('active');
+      });
     }
     document.querySelectorAll('.nav-sub-item').forEach(function(n) { n.classList.remove('active'); });
     document.querySelectorAll('.nav-item').forEach(function(n) {
@@ -2367,13 +2292,6 @@ async function loginLocal() {
     document.getElementById('user-role-display').textContent = isAdmin ? 'Administrator' : 'Client User';
     document.getElementById('user-avatar').textContent = data.user.username.slice(0, 2).toUpperCase();
     
-    if (!isAdmin && userClient) {
-      document.getElementById('app').classList.add('client-mode');
-      document.documentElement.style.setProperty('--client-primary', '#e31b23');
-      document.documentElement.style.setProperty('--client-secondary', '#8b0000');
-    }
-    
-    updateUIVisibility();
     await loadData();
     
     loadingDiv.classList.remove('active');
@@ -2393,7 +2311,6 @@ function logout() {
   userClient = null;
   isAdmin = true;
   document.getElementById('app').style.display = 'none';
-  document.getElementById('app').classList.remove('client-mode');
   showLogin();
   toast('Logged out', 'info');
 }
@@ -2410,13 +2327,6 @@ function checkLogin() {
     document.getElementById('user-role-display').textContent = isAdmin ? 'Administrator' : 'Client User';
     document.getElementById('user-avatar').textContent = currentUser.username.slice(0, 2).toUpperCase();
     
-    if (!isAdmin && userClient) {
-      document.getElementById('app').classList.add('client-mode');
-      document.documentElement.style.setProperty('--client-primary', '#e31b23');
-      document.documentElement.style.setProperty('--client-secondary', '#8b0000');
-    }
-    
-    updateUIVisibility();
     loadData();
   } else {
     showLogin();
@@ -2434,129 +2344,6 @@ function base64URLEncode(buffer) {
 
 function loginWithMicrosoft() {
   toast('Microsoft login coming soon', 'info');
-}
-
-function applyClientBranding(client) {
-  console.log('Client branding applied for:', client);
-}
-
-// ============================================================
-// ── CLIENT ZONES ─────────────────────────────────────────────
-// ============================================================
-
-function renderClientZones(client) {
-  var container = document.getElementById('client-dropdowns-container');
-  if (!container) return;
-
-  var zones = [];
-  var siteMap = {};
-
-  CAMERAS.forEach(function(c) {
-    var clientName = getClient(c.zone);
-    if (clientName === client && c.zone && siteMap[c.zone] === undefined) {
-      siteMap[c.zone] = true;
-      zones.push(c.zone);
-    }
-  });
-  DOORS.forEach(function(d) {
-    var clientName = d.client || getClient(d.site);
-    if (clientName === client && d.site && siteMap[d.site] === undefined) {
-      siteMap[d.site] = true;
-      zones.push(d.site);
-    }
-  });
-  SERVERS.forEach(function(s) {
-    var clientName = getClient(s.location);
-    if (clientName === client && s.location && siteMap[s.location] === undefined) {
-      siteMap[s.location] = true;
-      zones.push(s.location);
-    }
-  });
-  SWITCHES.forEach(function(s) {
-    var clientName = getClient(s.location);
-    if (clientName === client && s.location && siteMap[s.location] === undefined) {
-      siteMap[s.location] = true;
-      zones.push(s.location);
-    }
-  });
-
-  zones.sort();
-
-  var html = '';
-  zones.forEach(function(zone) {
-    html += '<div class="nav-item nav-zone-item" data-zone="' + zone + '" onclick="selectZone(\'' + zone + '\')">';
-    html += '<i class="ti ti-map-pin"></i> <span>' + zone + '</span>';
-    html += '</div>';
-  });
-
-  if (zones.length === 0) {
-    html = '<div style="padding:8px 20px;color:var(--text-muted);font-size:11px;">No zones found for this client.</div>';
-  }
-
-  container.innerHTML = html;
-}
-
-function renderAllClients() {
-  var container = document.getElementById('client-dropdowns-container');
-  if (!container) return;
-
-  var html = '';
-  CLIENTS.forEach(function(client) {
-    var logoData = CLIENT_LOGO_DATA[client];
-    var logoHtml = logoData ?
-      '<img class="nav-client-logo" src="' + logoData + '" />' :
-      '<img class="nav-client-logo" src="logo-' + client.toLowerCase() + '.png" onerror="this.style.display=\'none\'" />';
-    html += '<div class="nav-client-group">';
-    html += '<div class="nav-item nav-client-parent" data-client="' + client + '" onclick="toggleClientDropdown(\'' + client + '\')" oncontextmenu="showClientContextMenu(event, \'' + client + '\')">';
-    html += logoHtml;
-    html += '<i class="ti ti-chevron-right" id="client-arrow-' + client + '"></i>';
-    html += ' <span>' + client + '</span>';
-    html += '</div>';
-    html += '<div class="client-dropdown" id="client-dropdown-' + client + '" style="display:none;">';
-    html += '<div class="nav-item nav-sub-item" data-tab="cameras" data-client="' + client + '"><i class="ti ti-video"></i> <span>Cameras</span></div>';
-    html += '<div class="nav-item nav-sub-item" data-tab="doors" data-client="' + client + '"><i class="ti ti-door"></i> <span>Access Control</span></div>';
-    html += '<div class="nav-item nav-sub-item" data-tab="compute" data-client="' + client + '"><i class="ti ti-server"></i> <span>Compute</span></div>';
-    html += '<div class="nav-item nav-sub-item" data-tab="controlcenter" data-client="' + client + '"><i class="ti ti-database"></i> <span>Control Center</span></div>';
-    html += '<div class="nav-item nav-sub-item" data-tab="switches" data-client="' + client + '"><i class="ti ti-router"></i> <span>Switches</span></div>';
-    html += '<div class="nav-item nav-sub-item" data-tab="software" data-client="' + client + '"><i class="ti ti-code"></i> <span>Software</span></div>';
-    html += '<div class="nav-item nav-sub-item" data-tab="intrusion" data-client="' + client + '"><i class="ti ti-shield"></i> <span>Intrusion</span></div>';
-    html += '</div></div>';
-  });
-
-  container.innerHTML = html;
-}
-
-function toggleClientDropdown(client) {
-  var dropdown = document.getElementById('client-dropdown-' + client);
-  var arrow = document.getElementById('client-arrow-' + client);
-  if (!dropdown || !arrow) return;
-  if (dropdown.style.display === 'none') {
-    dropdown.style.display = 'block';
-    arrow.parentElement.classList.add('open');
-  } else {
-    dropdown.style.display = 'none';
-    arrow.parentElement.classList.remove('open');
-  }
-}
-
-function selectZone(zone) {
-  currentZoneFilter = zone;
-  document.querySelectorAll('.nav-zone-item').forEach(function(el) {
-    el.classList.remove('active');
-  });
-  document.querySelectorAll('.nav-zone-item').forEach(function(el) {
-    if (el.dataset.zone === zone) {
-      el.classList.add('active');
-    }
-  });
-  if (currentTab === 'cameras') renderCamerasOptimized();
-  else if (currentTab === 'doors') renderDoorsEnhanced();
-  else if (currentTab === 'compute') { renderServersEnhanced(); renderComputeStorage(); }
-  else if (currentTab === 'switches') renderSwitchesEnhanced();
-  else if (currentTab === 'software') renderSoftware();
-  else if (currentTab === 'controlcenter') { renderStations(); renderMonitors(); }
-  else if (currentTab === 'intrusion') renderIntrusion();
-  toast('Showing: ' + zone, 'info');
 }
 
 // ============================================================
@@ -2605,18 +2392,8 @@ async function loadData() {
     renderIntrusion();
     renderInbox();
     renderFileExplorer();
-    updateUIVisibility();
     populateClientDropdowns();
     updateBadges();
-    
-    if (userClient && !isAdmin) {
-      renderClientDashboard();
-      renderClientSRs();
-      renderClientCameras();
-      renderClientDoors();
-      renderClientServers();
-      renderClientSwitches();
-    }
     
     console.log('✅ Data loaded successfully');
     console.log(`📸 Cameras: ${CAMERAS.length}, 🚪 Doors: ${DOORS.length}, 🖥️ Servers: ${SERVERS.length}`);
@@ -2637,9 +2414,10 @@ async function renderDashboard() {
     document.getElementById('dash-health').textContent = stats.health + '%';
     document.getElementById('dash-alerts').textContent = stats.alerts;
     document.getElementById('dash-offline').textContent = stats.offline_devices;
-    document.getElementById('dash-srs').textContent = stats.open_srs;
+    document.getElementById('dash-total').textContent = stats.total_devices || 0;
   } catch (err) {
     console.error('Dashboard stats error:', err);
+    // Fallback: calculate from local data
     var defective = CAMERAS.filter(function(c) { return c.status === 'Defective' || c.status === 'Offline' || c.status === 'No Power' || c.status === 'No Camera' || c.status === 'Not Working'; }).length;
     var acOffline = DOORS.filter(function(d) { return d.status === 'Offline'; }).length;
     var srvOnline = SERVERS.filter(function(s) { return s.status === 'ONLINE'; }).length;
@@ -2651,7 +2429,7 @@ async function renderDashboard() {
     document.getElementById('dash-health').textContent = health + '%';
     document.getElementById('dash-alerts').textContent = defective + acOffline;
     document.getElementById('dash-offline').textContent = defective + acOffline + (SWITCHES.length - swOnline);
-    document.getElementById('dash-srs').textContent = SERVICE_REQUESTS.filter(function(r) { return r.status !== 'Resolved'; }).length;
+    document.getElementById('dash-total').textContent = totalDevices || 0;
   }
 
   renderTimeline();
@@ -2664,7 +2442,7 @@ async function renderDashboard() {
   document.getElementById('dash-sr-tbody').innerHTML = urgent.map(function(r) {
     return '<tr class="clickable" onclick="switchTab(\'service\');openModal(\'' + r.sr_id + '\')">' +
       '<td style="font-size:11px;color:var(--text-muted);">' + r.sr_id + '</td>' +
-      '<td>' + (r.client_name || '—') + '</td>' +
+      '<td>' + (r.client || '—') + '</td>' +
       '<td>' + (r.site || '—') + '</td>' +
       '<td style="max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + r.subject + '</td>' +
       '<td>' + priBadge(r.priority) + '</td>' +
@@ -3883,7 +3661,7 @@ document.addEventListener('click', function(e) {
 });
 
 console.log('🚀 CAMS - Client Assessment Management System loaded successfully.');
-console.log('🔐 Login with admin/admin123 or kftl/kftl123');
+console.log('🔐 Login with admin/admin123');
 </script>
 </body>
 </html>
