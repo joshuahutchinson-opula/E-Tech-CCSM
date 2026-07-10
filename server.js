@@ -39,6 +39,30 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.static(__dirname));
 
 // ============================================================
+// AUTH MIDDLEWARE
+// ============================================================
+
+function authMiddleware(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+  
+  const token = authHeader.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ error: 'Invalid token format' });
+  }
+  
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid token' });
+  }
+}
+
+// ============================================================
 // HEALTH CHECK
 // ============================================================
 
@@ -54,8 +78,8 @@ app.post('/api/auth/login', (req, res) => {
   const { username, password } = req.body;
 
   if (username === 'admin' && password === 'admin123') {
-    const token = jwt.sign({ id: 1, username: 'admin', client_id: 1, role: 'admin' }, process.env.JWT_SECRET || 'secret', { expiresIn: '24h' });
-    return res.json({ token, user: { id: 1, username: 'admin', client_id: 1, role: 'admin' } });
+    const token = jwt.sign({ id: 1, username: 'admin', client_id: null, role: 'admin' }, process.env.JWT_SECRET || 'secret', { expiresIn: '24h' });
+    return res.json({ token, user: { id: 1, username: 'admin', client_id: null, role: 'admin' } });
   }
 
   if (username === 'kftl' && password === 'kftl123') {
@@ -67,19 +91,24 @@ app.post('/api/auth/login', (req, res) => {
 });
 
 // ============================================================
-// DASHBOARD STATS
+// DASHBOARD STATS (with client filtering)
 // ============================================================
 
-app.get('/api/dashboard/stats', async (req, res) => {
+app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
   if (!dbConnected) {
     return res.json({ health: 100, alerts: 0, offline_devices: 0, open_srs: 0, total_devices: 0, online_devices: 0 });
   }
+  
   try {
-    const cameras = await pool.query('SELECT status FROM cameras WHERE client_id = $1', [1]);
-    const doors = await pool.query('SELECT status FROM doors WHERE client_id = $1', [1]);
-    const servers = await pool.query('SELECT status FROM servers WHERE client_id = $1', [1]);
-    const switches = await pool.query('SELECT status FROM switches WHERE client_id = $1', [1]);
-    const srs = await pool.query("SELECT status FROM service_requests WHERE client_id = $1 AND status != 'Resolved'", [1]);
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const clientCondition = clientId ? `WHERE client_id = $1` : '';
+    const params = clientId ? [clientId] : [];
+    
+    const cameras = await pool.query(`SELECT status FROM cameras ${clientCondition}`, params);
+    const doors = await pool.query(`SELECT status FROM doors ${clientCondition}`, params);
+    const servers = await pool.query(`SELECT status FROM servers ${clientCondition}`, params);
+    const switches = await pool.query(`SELECT status FROM switches ${clientCondition}`, params);
+    const srs = await pool.query(`SELECT status FROM service_requests ${clientCondition} AND status != 'Resolved'`, params);
 
     const totalDevices = cameras.rowCount + doors.rowCount + servers.rowCount + switches.rowCount;
     const offline = cameras.rows.filter(c => c.status !== 'Online' && c.status !== 'Working').length +
@@ -96,43 +125,53 @@ app.get('/api/dashboard/stats', async (req, res) => {
 });
 
 // ============================================================
-// CAMERAS
+// CAMERAS (with client filtering)
 // ============================================================
 
-app.get('/api/cameras', async (req, res) => {
+app.get('/api/cameras', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.json([]);
   try {
-    const result = await pool.query('SELECT * FROM cameras WHERE client_id = $1 ORDER BY zone, name', [1]);
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const query = clientId ? 'SELECT * FROM cameras WHERE client_id = $1 ORDER BY zone, name' : 'SELECT * FROM cameras ORDER BY zone, name';
+    const params = clientId ? [clientId] : [];
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (err) {
     res.json([]);
   }
 });
 
-app.put('/api/cameras/:id/comment', async (req, res) => {
+app.put('/api/cameras/:id/comment', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
   const { comments } = req.body;
   try {
-    await pool.query('UPDATE cameras SET comments = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 AND client_id = $3', [comments, id, 1]);
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const query = clientId ? 'UPDATE cameras SET comments = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 AND client_id = $3' : 'UPDATE cameras SET comments = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2';
+    const params = clientId ? [comments, id, clientId] : [comments, id];
+    await pool.query(query, params);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.get('/api/cameras/export', async (req, res) => {
+app.get('/api/cameras/export', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.json([]);
   try {
-    const result = await pool.query('SELECT * FROM cameras WHERE client_id = $1 ORDER BY zone, name', [1]);
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const query = clientId ? 'SELECT * FROM cameras WHERE client_id = $1 ORDER BY zone, name' : 'SELECT * FROM cameras ORDER BY zone, name';
+    const params = clientId ? [clientId] : [];
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (err) {
     res.json([]);
   }
 });
 
-app.post('/api/import/cameras', async (req, res) => {
+app.post('/api/import/cameras', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
 
   const cameras = req.body;
   let imported = 0;
@@ -142,7 +181,7 @@ app.post('/api/import/cameras', async (req, res) => {
       await pool.query(
         `INSERT INTO cameras (client_id, name, zone, status, comments, model, manufacturer, resolution, archiver, ip_address, mac_address, warranty, date_cleaned) 
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
-        [1, cam.name || '', cam.zone || '', cam.status || 'Working', cam.comments || '', cam.model || '', cam.manufacturer || '', cam.resolution || '', cam.archiver || '', cam.ip_address || '', cam.mac_address || '', cam.warranty || '', cam.date_cleaned || null]
+        [cam.client_id || 1, cam.name || '', cam.zone || '', cam.status || 'Working', cam.comments || '', cam.model || '', cam.manufacturer || '', cam.resolution || '', cam.archiver || '', cam.ip_address || '', cam.mac_address || '', cam.warranty || '', cam.date_cleaned || null]
       );
       imported++;
     }
@@ -153,13 +192,16 @@ app.post('/api/import/cameras', async (req, res) => {
 });
 
 // ============================================================
-// DOORS
+// DOORS (with client filtering)
 // ============================================================
 
-app.get('/api/doors', async (req, res) => {
+app.get('/api/doors', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.json([]);
   try {
-    const result = await pool.query('SELECT * FROM doors WHERE client_id = $1 ORDER BY zone, name', [1]);
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const query = clientId ? 'SELECT * FROM doors WHERE client_id = $1 ORDER BY zone, name' : 'SELECT * FROM doors ORDER BY zone, name';
+    const params = clientId ? [clientId] : [];
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (err) {
     res.json([]);
@@ -167,13 +209,16 @@ app.get('/api/doors', async (req, res) => {
 });
 
 // ============================================================
-// SERVERS
+// SERVERS (with client filtering)
 // ============================================================
 
-app.get('/api/servers', async (req, res) => {
+app.get('/api/servers', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.json([]);
   try {
-    const result = await pool.query('SELECT * FROM servers WHERE client_id = $1 ORDER BY zone, name', [1]);
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const query = clientId ? 'SELECT * FROM servers WHERE client_id = $1 ORDER BY zone, name' : 'SELECT * FROM servers ORDER BY zone, name';
+    const params = clientId ? [clientId] : [];
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (err) {
     res.json([]);
@@ -181,13 +226,16 @@ app.get('/api/servers', async (req, res) => {
 });
 
 // ============================================================
-// SWITCHES
+// SWITCHES (with client filtering)
 // ============================================================
 
-app.get('/api/switches', async (req, res) => {
+app.get('/api/switches', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.json([]);
   try {
-    const result = await pool.query('SELECT * FROM switches WHERE client_id = $1 ORDER BY zone, name', [1]);
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const query = clientId ? 'SELECT * FROM switches WHERE client_id = $1 ORDER BY zone, name' : 'SELECT * FROM switches ORDER BY zone, name';
+    const params = clientId ? [clientId] : [];
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (err) {
     res.json([]);
@@ -195,13 +243,16 @@ app.get('/api/switches', async (req, res) => {
 });
 
 // ============================================================
-// SOFTWARE
+// SOFTWARE (with client filtering)
 // ============================================================
 
-app.get('/api/software', async (req, res) => {
+app.get('/api/software', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.json([]);
   try {
-    const result = await pool.query('SELECT * FROM software WHERE client_id = $1 ORDER BY name', [1]);
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const query = clientId ? 'SELECT * FROM software WHERE client_id = $1 ORDER BY name' : 'SELECT * FROM software ORDER BY name';
+    const params = clientId ? [clientId] : [];
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (err) {
     res.json([]);
@@ -209,13 +260,16 @@ app.get('/api/software', async (req, res) => {
 });
 
 // ============================================================
-// INTRUSION
+// INTRUSION (with client filtering)
 // ============================================================
 
-app.get('/api/intrusion', async (req, res) => {
+app.get('/api/intrusion', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.json([]);
   try {
-    const result = await pool.query('SELECT * FROM intrusion WHERE client_id = $1 ORDER BY zone, name', [1]);
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const query = clientId ? 'SELECT * FROM intrusion WHERE client_id = $1 ORDER BY zone, name' : 'SELECT * FROM intrusion ORDER BY zone, name';
+    const params = clientId ? [clientId] : [];
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (err) {
     res.json([]);
@@ -223,13 +277,16 @@ app.get('/api/intrusion', async (req, res) => {
 });
 
 // ============================================================
-// SERVICE REQUESTS
+// SERVICE REQUESTS (with client filtering)
 // ============================================================
 
-app.get('/api/service-requests', async (req, res) => {
+app.get('/api/service-requests', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.json([]);
   try {
-    const result = await pool.query('SELECT * FROM service_requests WHERE client_id = $1 ORDER BY created_at DESC', [1]);
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const query = clientId ? 'SELECT * FROM service_requests WHERE client_id = $1 ORDER BY created_at DESC' : 'SELECT * FROM service_requests ORDER BY created_at DESC';
+    const params = clientId ? [clientId] : [];
+    const result = await pool.query(query, params);
     for (const sr of result.rows) {
       const history = await pool.query('SELECT * FROM sr_history WHERE sr_id = $1 ORDER BY created_at', [sr.id]);
       sr.history = history.rows;
@@ -240,17 +297,18 @@ app.get('/api/service-requests', async (req, res) => {
   }
 });
 
-app.post('/api/service-requests', async (req, res) => {
+app.post('/api/service-requests', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
 
   const { subject, client, site, category, priority, assigned_to, body } = req.body;
   const srId = `SR-${String(Math.floor(Math.random() * 9000) + 1000)}`;
+  const clientId = req.user.role === 'admin' ? 1 : req.user.client_id;
 
   try {
     const result = await pool.query(
       `INSERT INTO service_requests (client_id, sr_id, subject, client, site, category, priority, assigned_to, body, received, created_by) 
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_DATE, $10) RETURNING *`,
-      [1, srId, subject, client, site, category, priority, assigned_to, body, 'admin']
+      [clientId, srId, subject, client, site, category, priority, assigned_to, body, req.user.username]
     );
     await pool.query('INSERT INTO sr_history (sr_id, time, msg) VALUES ($1, $2, $3)', [result.rows[0].id, new Date().toLocaleTimeString(), 'Created']);
     res.json(result.rows[0]);
@@ -259,21 +317,22 @@ app.post('/api/service-requests', async (req, res) => {
   }
 });
 
-app.put('/api/service-requests/:id', async (req, res) => {
+app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
 
   const { id } = req.params;
   const { priority, assigned_to, status, notes } = req.body;
+  const clientId = req.user.role === 'admin' ? null : req.user.client_id;
 
   try {
-    await pool.query(
-      `UPDATE service_requests SET priority = $1, assigned_to = $2, status = $3, notes = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $5 AND client_id = $6`,
-      [priority, assigned_to, status, notes, id, 1]
-    );
+    const query = clientId ? 
+      `UPDATE service_requests SET priority = $1, assigned_to = $2, status = $3, notes = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $5 AND client_id = $6` :
+      `UPDATE service_requests SET priority = $1, assigned_to = $2, status = $3, notes = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $5`;
+    const params = clientId ? [priority, assigned_to, status, notes, id, clientId] : [priority, assigned_to, status, notes, id];
+    await pool.query(query, params);
     await pool.query('INSERT INTO sr_history (sr_id, time, msg) VALUES ($1, $2, $3)', [id, new Date().toLocaleTimeString(), `Updated: ${status}`]);
     
-    // Return the updated record so frontend can refresh immediately
-    const updated = await pool.query('SELECT * FROM service_requests WHERE id = $1 AND client_id = $2', [id, 1]);
+    const updated = await pool.query('SELECT * FROM service_requests WHERE id = $1', [id]);
     res.json({ success: true, data: updated.rows[0] });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -281,10 +340,11 @@ app.put('/api/service-requests/:id', async (req, res) => {
 });
 
 // ============================================================
-// CLIENTS
+// CLIENTS (Admin only)
 // ============================================================
 
-app.get('/api/clients', async (req, res) => {
+app.get('/api/clients', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
   if (!dbConnected) return res.json([]);
   try {
     const result = await pool.query('SELECT id, name, email, phone, address, logo_url FROM clients');
@@ -294,7 +354,8 @@ app.get('/api/clients', async (req, res) => {
   }
 });
 
-app.post('/api/clients', async (req, res) => {
+app.post('/api/clients', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
 
   const { name, email, phone, address, logo_url } = req.body;
@@ -313,23 +374,29 @@ app.post('/api/clients', async (req, res) => {
 // ACTIVITY LOG
 // ============================================================
 
-app.get('/api/activity-log', async (req, res) => {
+app.get('/api/activity-log', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.json([]);
   try {
     const limit = parseInt(req.query.limit) || 100;
-    const result = await pool.query('SELECT id, client_id, username, action, detail, created_at FROM activity_log WHERE client_id = $1 ORDER BY created_at DESC LIMIT $2', [1, limit]);
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const query = clientId ? 
+      'SELECT id, client_id, username, action, detail, created_at FROM activity_log WHERE client_id = $1 ORDER BY created_at DESC LIMIT $2' :
+      'SELECT id, client_id, username, action, detail, created_at FROM activity_log ORDER BY created_at DESC LIMIT $1';
+    const params = clientId ? [clientId, limit] : [limit];
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (err) {
     res.json([]);
   }
 });
 
-app.post('/api/activity-log', async (req, res) => {
+app.post('/api/activity-log', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
 
-  const { user, action, detail } = req.body;
+  const { action, detail } = req.body;
+  const clientId = req.user.role === 'admin' ? 1 : req.user.client_id;
   try {
-    await pool.query('INSERT INTO activity_log (client_id, username, action, detail) VALUES ($1, $2, $3, $4)', [1, req.user?.username || 'system', action, detail]);
+    await pool.query('INSERT INTO activity_log (client_id, username, action, detail) VALUES ($1, $2, $3, $4)', [clientId, req.user.username, action, detail]);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -337,28 +404,34 @@ app.post('/api/activity-log', async (req, res) => {
 });
 
 // ============================================================
-// EMAILS
+// EMAILS (with client filtering)
 // ============================================================
 
-app.get('/api/emails', async (req, res) => {
+app.get('/api/emails', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.json([]);
   try {
     const folder = req.query.folder || 'inbox';
-    const result = await pool.query('SELECT * FROM emails WHERE client_id = $1 AND folder = $2 ORDER BY created_at DESC', [1, folder]);
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const query = clientId ? 
+      'SELECT * FROM emails WHERE client_id = $1 AND folder = $2 ORDER BY created_at DESC' :
+      'SELECT * FROM emails WHERE folder = $1 ORDER BY created_at DESC';
+    const params = clientId ? [clientId, folder] : [folder];
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (err) {
     res.json([]);
   }
 });
 
-app.post('/api/emails', async (req, res) => {
+app.post('/api/emails', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
 
   const { sender, recipient, subject, body, folder } = req.body;
+  const clientId = req.user.role === 'admin' ? 1 : req.user.client_id;
   try {
     const result = await pool.query(
       'INSERT INTO emails (client_id, sender, recipient, subject, body, folder) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-      [1, sender, recipient, subject, body, folder || 'inbox']
+      [clientId, sender, recipient, subject, body, folder || 'inbox']
     );
     res.json(result.rows[0]);
   } catch (err) {
