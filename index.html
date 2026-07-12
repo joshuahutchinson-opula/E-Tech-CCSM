@@ -827,7 +827,7 @@ input::placeholder, textarea::placeholder {
     </div>
     <div id="login-error"></div>
     <div class="login-loading" id="login-loading"><i class="ti ti-loader"></i> Signing in...</div>
-    <p style="color:var(--text-muted);font-size:11px;margin-top:16px;">Admin: admin / admin123 &bull; Client: kftl / kftl123</p>
+    <p style="color:var(--text-muted);font-size:11px;margin-top:16px;">Admin: admin / admin123</p>
   </div>
 </div>
 
@@ -890,7 +890,7 @@ input::placeholder, textarea::placeholder {
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-label">System Health</div>
-            <div class="stat-val" style="color:var(--success)" id="dash-health">98%</div>
+            <div class="stat-val" style="color:var(--success)" id="dash-health">--%</div>
             <div class="stat-note note-success">All systems operational</div>
           </div>
           <div class="stat-card">
@@ -1356,7 +1356,6 @@ input::placeholder, textarea::placeholder {
     </div>
   </div>
 </div>
-
 <!-- ============================================================
     ── MODALS ──────────────────────────────────────────────────
     ============================================================ -->
@@ -1670,7 +1669,6 @@ input::placeholder, textarea::placeholder {
     </div>
   </div>
 </div>
-
 <script>
 // ============================================================
 // ── API CONFIGURATION ────────────────────────────────────────
@@ -1679,7 +1677,6 @@ input::placeholder, textarea::placeholder {
 const API_URL = window.location.origin;
 let authToken = localStorage.getItem('token') || null;
 let currentUser = null;
-let userClient = null;
 let isAdmin = true;
 
 // ============================================================
@@ -2037,10 +2034,6 @@ function setUnsaved(show) {
   }
 }
 
-function acknowledgeAlarm() {
-  // Removed - alarm notification no longer exists
-}
-
 // ============================================================
 // ── SIDEBAR FUNCTIONS ────────────────────────────────────────
 // ============================================================
@@ -2050,6 +2043,139 @@ function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('collapsed', sidebarCollapsed);
   document.getElementById('collapse-icon').className = 'ti ti-chevron-' + (sidebarCollapsed ? 'right' : 'left');
   localStorage.setItem('ccsm_sidebar', sidebarCollapsed ? '1' : '0');
+}
+
+// ============================================================
+// ── CLIENT DROPDOWN FUNCTIONS ───────────────────────────────
+// ============================================================
+
+function renderAllClients() {
+  var container = document.getElementById('client-dropdowns-container');
+  if (!container) return;
+
+  var html = '';
+  CLIENTS.forEach(function(client) {
+    var logoData = CLIENT_LOGO_DATA[client];
+    var logoHtml = logoData ?
+      '<img class="nav-client-logo" src="' + logoData + '" />' :
+      '<img class="nav-client-logo" src="logo-' + client.toLowerCase() + '.png" onerror="this.style.display=\'none\'" />';
+    html += '<div class="nav-client-group">';
+    html += '<div class="nav-item nav-client-parent" data-client="' + client + '" onclick="toggleClientDropdown(\'' + client + '\')" oncontextmenu="showClientContextMenu(event, \'' + client + '\')">';
+    html += logoHtml;
+    html += '<i class="ti ti-chevron-right" id="client-arrow-' + client + '"></i>';
+    html += ' <span>' + client + '</span>';
+    html += '</div>';
+    html += '<div class="client-dropdown" id="client-dropdown-' + client + '" style="display:none;">';
+    html += '<div class="nav-item nav-sub-item" data-tab="cameras" data-client="' + client + '"><i class="ti ti-video"></i> <span>Cameras</span></div>';
+    html += '<div class="nav-item nav-sub-item" data-tab="doors" data-client="' + client + '"><i class="ti ti-door"></i> <span>Access Control</span></div>';
+    html += '<div class="nav-item nav-sub-item" data-tab="compute" data-client="' + client + '"><i class="ti ti-server"></i> <span>Compute</span></div>';
+    html += '<div class="nav-item nav-sub-item" data-tab="controlcenter" data-client="' + client + '"><i class="ti ti-database"></i> <span>Control Center</span></div>';
+    html += '<div class="nav-item nav-sub-item" data-tab="switches" data-client="' + client + '"><i class="ti ti-router"></i> <span>Switches</span></div>';
+    html += '<div class="nav-item nav-sub-item" data-tab="software" data-client="' + client + '"><i class="ti ti-code"></i> <span>Software</span></div>';
+    html += '<div class="nav-item nav-sub-item" data-tab="intrusion" data-client="' + client + '"><i class="ti ti-shield"></i> <span>Intrusion</span></div>';
+    html += '</div></div>';
+  });
+
+  container.innerHTML = html;
+}
+
+function toggleClientDropdown(client) {
+  var dropdown = document.getElementById('client-dropdown-' + client);
+  var arrow = document.getElementById('client-arrow-' + client);
+  if (!dropdown || !arrow) return;
+  if (dropdown.style.display === 'none') {
+    dropdown.style.display = 'block';
+    arrow.parentElement.classList.add('open');
+  } else {
+    dropdown.style.display = 'none';
+    arrow.parentElement.classList.remove('open');
+  }
+}
+
+function showClientContextMenu(event, client) {
+  event.preventDefault();
+  var menu = document.getElementById('ctx-menu');
+  menu.innerHTML =
+    '<button class="ctx-item" onclick="editClient(\'' + client + '\')"><i class="ti ti-edit"></i> Edit</button>' +
+    '<button class="ctx-item" onclick="deleteClient(\'' + client + '\')"><i class="ti ti-trash"></i> Delete</button>';
+  menu.style.left = event.pageX + 'px';
+  menu.style.top = event.pageY + 'px';
+  menu.classList.add('open');
+}
+
+function editClient(client) { toast('Edit ' + client, 'info'); }
+function deleteClient(client) { toast('Delete ' + client, 'info'); }
+
+function renderClientZones(client) {
+  var container = document.getElementById('client-dropdowns-container');
+  if (!container) return;
+
+  var zones = [];
+  var siteMap = {};
+
+  CAMERAS.forEach(function(c) {
+    var clientName = getClient(c.zone);
+    if (clientName === client && c.zone && siteMap[c.zone] === undefined) {
+      siteMap[c.zone] = true;
+      zones.push(c.zone);
+    }
+  });
+  DOORS.forEach(function(d) {
+    var clientName = d.client || getClient(d.site);
+    if (clientName === client && d.site && siteMap[d.site] === undefined) {
+      siteMap[d.site] = true;
+      zones.push(d.site);
+    }
+  });
+  SERVERS.forEach(function(s) {
+    var clientName = getClient(s.location);
+    if (clientName === client && s.location && siteMap[s.location] === undefined) {
+      siteMap[s.location] = true;
+      zones.push(s.location);
+    }
+  });
+  SWITCHES.forEach(function(s) {
+    var clientName = getClient(s.location);
+    if (clientName === client && s.location && siteMap[s.location] === undefined) {
+      siteMap[s.location] = true;
+      zones.push(s.location);
+    }
+  });
+
+  zones.sort();
+
+  var html = '';
+  zones.forEach(function(zone) {
+    html += '<div class="nav-item nav-zone-item" data-zone="' + zone + '" onclick="selectZone(\'' + zone + '\')">';
+    html += '<i class="ti ti-map-pin"></i> <span>' + zone + '</span>';
+    html += '</div>';
+  });
+
+  if (zones.length === 0) {
+    html = '<div style="padding:8px 20px;color:var(--text-muted);font-size:11px;">No zones found for this client.</div>';
+  }
+
+  container.innerHTML = html;
+}
+
+function selectZone(zone) {
+  currentZoneFilter = zone;
+  document.querySelectorAll('.nav-zone-item').forEach(function(el) {
+    el.classList.remove('active');
+  });
+  document.querySelectorAll('.nav-zone-item').forEach(function(el) {
+    if (el.dataset.zone === zone) {
+      el.classList.add('active');
+    }
+  });
+  if (currentTab === 'cameras') renderCamerasOptimized();
+  else if (currentTab === 'doors') renderDoorsEnhanced();
+  else if (currentTab === 'compute') { renderServersEnhanced(); renderComputeStorage(); }
+  else if (currentTab === 'switches') renderSwitchesEnhanced();
+  else if (currentTab === 'software') renderSoftware();
+  else if (currentTab === 'controlcenter') { renderStations(); renderMonitors(); }
+  else if (currentTab === 'intrusion') renderIntrusion();
+  toast('Showing: ' + zone, 'info');
 }
 
 // ============================================================
@@ -2283,7 +2409,6 @@ async function loginLocal() {
     localStorage.setItem('user', JSON.stringify(data.user));
     
     currentUser = data.user;
-    userClient = data.user.client_id ? 'KFTL' : null;
     isAdmin = data.user.role === 'admin';
     
     hideLogin();
@@ -2308,7 +2433,6 @@ function logout() {
   localStorage.removeItem('user');
   authToken = null;
   currentUser = null;
-  userClient = null;
   isAdmin = true;
   document.getElementById('app').style.display = 'none';
   showLogin();
@@ -2319,7 +2443,6 @@ function checkLogin() {
   authToken = localStorage.getItem('token');
   currentUser = JSON.parse(localStorage.getItem('user') || 'null');
   if (authToken && currentUser) {
-    userClient = currentUser.client_id ? 'KFTL' : null;
     isAdmin = currentUser.role === 'admin';
     hideLogin();
     document.getElementById('app').style.display = 'flex';
@@ -2331,15 +2454,6 @@ function checkLogin() {
   } else {
     showLogin();
   }
-}
-
-function base64URLEncode(buffer) {
-  var str = '';
-  var bytes = new Uint8Array(buffer);
-  for (var i = 0; i < bytes.byteLength; i++) {
-    str += String.fromCharCode(bytes[i]);
-  }
-  return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
 
 function loginWithMicrosoft() {
@@ -2392,6 +2506,7 @@ async function loadData() {
     renderIntrusion();
     renderInbox();
     renderFileExplorer();
+    renderAllClients();
     populateClientDropdowns();
     updateBadges();
     
@@ -2417,7 +2532,6 @@ async function renderDashboard() {
     document.getElementById('dash-total').textContent = stats.total_devices || 0;
   } catch (err) {
     console.error('Dashboard stats error:', err);
-    // Fallback: calculate from local data
     var defective = CAMERAS.filter(function(c) { return c.status === 'Defective' || c.status === 'Offline' || c.status === 'No Power' || c.status === 'No Camera' || c.status === 'Not Working'; }).length;
     var acOffline = DOORS.filter(function(d) { return d.status === 'Offline'; }).length;
     var srvOnline = SERVERS.filter(function(s) { return s.status === 'ONLINE'; }).length;
@@ -3587,20 +3701,6 @@ function previewEditClientLogo(input) {
 function saveEditClient() { toast('Client updated', 'success'); }
 function printTicket() { window.print(); }
 function hideContextMenu() { document.getElementById('ctx-menu').classList.remove('open'); }
-
-function showClientContextMenu(event, client) {
-  event.preventDefault();
-  var menu = document.getElementById('ctx-menu');
-  menu.innerHTML =
-    '<button class="ctx-item" onclick="editClient(\'' + client + '\')"><i class="ti ti-edit"></i> Edit</button>' +
-    '<button class="ctx-item" onclick="deleteClient(\'' + client + '\')"><i class="ti ti-trash"></i> Delete</button>';
-  menu.style.left = event.pageX + 'px';
-  menu.style.top = event.pageY + 'px';
-  menu.classList.add('open');
-}
-
-function editClient(client) { toast('Edit ' + client, 'info'); }
-function deleteClient(client) { toast('Delete ' + client, 'info'); }
 
 function saveDoorModalComment() { toast('Comment saved', 'success'); }
 function saveServerModalComment() { toast('Comment saved', 'success'); }
