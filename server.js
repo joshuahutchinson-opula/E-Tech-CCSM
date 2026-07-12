@@ -39,6 +39,22 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.static(__dirname));
 
 // ============================================================
+// LOGGING HELPER
+// ============================================================
+
+async function logActivity(clientId, username, action, detail) {
+  if (!dbConnected) return;
+  try {
+    await pool.query(
+      'INSERT INTO activity_log (client_id, username, action, detail) VALUES ($1, $2, $3, $4)',
+      [clientId || 1, username || 'system', action, detail]
+    );
+  } catch (err) {
+    console.error('Failed to log activity:', err.message);
+  }
+}
+
+// ============================================================
 // AUTH MIDDLEWARE
 // ============================================================
 
@@ -74,16 +90,24 @@ app.get('/api/health', (req, res) => {
 // AUTH
 // ============================================================
 
-app.post('/api/auth/login', (req, res) => {
+app.post('/api/auth/login', async (req, res) => {
   const { username, password } = req.body;
 
   if (username === 'admin' && password === 'admin123') {
     const token = jwt.sign({ id: 1, username: 'admin', client_id: null, role: 'admin' }, process.env.JWT_SECRET || 'secret', { expiresIn: '24h' });
+    
+    // Log login activity
+    await logActivity(1, 'admin', 'Login', 'Admin logged in');
+    
     return res.json({ token, user: { id: 1, username: 'admin', client_id: null, role: 'admin' } });
   }
 
   if (username === 'kftl' && password === 'kftl123') {
     const token = jwt.sign({ id: 2, username: 'kftl', client_id: 1, role: 'client' }, process.env.JWT_SECRET || 'secret', { expiresIn: '24h' });
+    
+    // Log login activity
+    await logActivity(1, 'kftl', 'Login', 'Client logged in');
+    
     return res.json({ token, user: { id: 2, username: 'kftl', client_id: 1, role: 'client' } });
   }
 
@@ -91,7 +115,7 @@ app.post('/api/auth/login', (req, res) => {
 });
 
 // ============================================================
-// DASHBOARD STATS (with client filtering)
+// DASHBOARD STATS
 // ============================================================
 
 app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
@@ -125,7 +149,7 @@ app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
 });
 
 // ============================================================
-// CAMERAS (with client filtering)
+// CAMERAS
 // ============================================================
 
 app.get('/api/cameras', authMiddleware, async (req, res) => {
@@ -150,6 +174,11 @@ app.put('/api/cameras/:id/comment', authMiddleware, async (req, res) => {
     const query = clientId ? 'UPDATE cameras SET comments = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 AND client_id = $3' : 'UPDATE cameras SET comments = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2';
     const params = clientId ? [comments, id, clientId] : [comments, id];
     await pool.query(query, params);
+    
+    // Log activity
+    const logClientId = clientId || 1;
+    await logActivity(logClientId, req.user.username, 'Updated', 'Camera ' + id + ' comment updated');
+    
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -185,6 +214,8 @@ app.post('/api/import/cameras', authMiddleware, async (req, res) => {
       );
       imported++;
     }
+    
+    await logActivity(1, req.user.username, 'Import', 'Imported ' + imported + ' cameras');
     res.json({ success: true, imported });
   } catch (err) {
     res.status(500).json({ error: err.message, imported });
@@ -192,7 +223,7 @@ app.post('/api/import/cameras', authMiddleware, async (req, res) => {
 });
 
 // ============================================================
-// DOORS (with client filtering)
+// DOORS
 // ============================================================
 
 app.get('/api/doors', authMiddleware, async (req, res) => {
@@ -209,7 +240,7 @@ app.get('/api/doors', authMiddleware, async (req, res) => {
 });
 
 // ============================================================
-// SERVERS (with client filtering)
+// SERVERS
 // ============================================================
 
 app.get('/api/servers', authMiddleware, async (req, res) => {
@@ -226,7 +257,7 @@ app.get('/api/servers', authMiddleware, async (req, res) => {
 });
 
 // ============================================================
-// SWITCHES (with client filtering)
+// SWITCHES
 // ============================================================
 
 app.get('/api/switches', authMiddleware, async (req, res) => {
@@ -243,7 +274,7 @@ app.get('/api/switches', authMiddleware, async (req, res) => {
 });
 
 // ============================================================
-// SOFTWARE (with client filtering)
+// SOFTWARE
 // ============================================================
 
 app.get('/api/software', authMiddleware, async (req, res) => {
@@ -260,7 +291,7 @@ app.get('/api/software', authMiddleware, async (req, res) => {
 });
 
 // ============================================================
-// INTRUSION (with client filtering)
+// INTRUSION
 // ============================================================
 
 app.get('/api/intrusion', authMiddleware, async (req, res) => {
@@ -277,7 +308,7 @@ app.get('/api/intrusion', authMiddleware, async (req, res) => {
 });
 
 // ============================================================
-// SERVICE REQUESTS (with client filtering)
+// SERVICE REQUESTS
 // ============================================================
 
 app.get('/api/service-requests', authMiddleware, async (req, res) => {
@@ -311,6 +342,10 @@ app.post('/api/service-requests', authMiddleware, async (req, res) => {
       [clientId, srId, subject, client, site, category, priority, assigned_to, body, req.user.username]
     );
     await pool.query('INSERT INTO sr_history (sr_id, time, msg) VALUES ($1, $2, $3)', [result.rows[0].id, new Date().toLocaleTimeString(), 'Created']);
+    
+    // Log activity
+    await logActivity(clientId, req.user.username, 'Created', 'SR ' + srId + ' created for ' + client);
+    
     res.json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -332,6 +367,10 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
     await pool.query(query, params);
     await pool.query('INSERT INTO sr_history (sr_id, time, msg) VALUES ($1, $2, $3)', [id, new Date().toLocaleTimeString(), `Updated: ${status}`]);
     
+    // Log activity
+    const logClientId = clientId || 1;
+    await logActivity(logClientId, req.user.username, 'Updated', 'SR ' + id + ' updated to ' + status);
+    
     const updated = await pool.query('SELECT * FROM service_requests WHERE id = $1', [id]);
     res.json({ success: true, data: updated.rows[0] });
   } catch (err) {
@@ -340,7 +379,7 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
 });
 
 // ============================================================
-// CLIENTS (Admin only)
+// CLIENTS
 // ============================================================
 
 app.get('/api/clients', authMiddleware, async (req, res) => {
@@ -364,6 +403,10 @@ app.post('/api/clients', authMiddleware, async (req, res) => {
       'INSERT INTO clients (name, email, phone, address, logo_url) VALUES ($1, $2, $3, $4, $5) RETURNING *',
       [name, email, phone, address, logo_url]
     );
+    
+    // Log activity
+    await logActivity(1, req.user.username, 'Created', 'Client ' + name + ' added');
+    
     res.json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -404,7 +447,7 @@ app.post('/api/activity-log', authMiddleware, async (req, res) => {
 });
 
 // ============================================================
-// EMAILS (with client filtering)
+// EMAILS
 // ============================================================
 
 app.get('/api/emails', authMiddleware, async (req, res) => {
