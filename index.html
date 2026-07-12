@@ -88,6 +88,85 @@ input, select, textarea, button { font-family: var(--font); }
   --option-hover: rgba(0,212,255,0.1);
 }
 
+.client-mode {
+  --sidebar-bg: #ffffff;
+  --sidebar-border: rgba(0, 0, 0, 0.08);
+  --main-bg: #f5f5f5;
+  --card-bg: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.08);
+  --text-primary: #1a1a2e;
+  --text-secondary: rgba(0, 0, 0, 0.6);
+  --text-muted: rgba(0, 0, 0, 0.35);
+  --stat-val-color: #1a1a2e;
+  --client-header-bg: #ffffff;
+  --select-bg: #ffffff;
+  --select-color: #1a1a2e;
+  --select-border: rgba(0,0,0,0.2);
+  --select-arrow: #888;
+  --option-bg: #ffffff;
+  --option-color: #1a1a2e;
+  --option-hover: rgba(79,140,247,0.08);
+}
+
+/* KFTL Light Theme Override */
+.kftl-mode {
+  --sidebar-bg: #ffffff !important;
+  --sidebar-border: rgba(0,0,0,0.08) !important;
+  --main-bg: #f5f5f5 !important;
+  --card-bg: #ffffff !important;
+  --card-border: rgba(0,0,0,0.08) !important;
+  --text-primary: #1a1a2e !important;
+  --text-secondary: rgba(0,0,0,0.6) !important;
+  --text-muted: rgba(0,0,0,0.5) !important;
+  --stat-val-color: #1a1a2e !important;
+  --client-header-bg: #ffffff !important;
+}
+
+.kftl-mode .sidebar {
+  background: #ffffff !important;
+  border-right: 1px solid rgba(0,0,0,0.08) !important;
+}
+.kftl-mode .topbar {
+  background: #ffffff !important;
+  border-bottom: 1px solid rgba(0,0,0,0.08) !important;
+}
+.kftl-mode .topbar .page-title { color: #1a1a2e !important; }
+.kftl-mode .topbar .topbar-date { color: rgba(0,0,0,0.6) !important; }
+.kftl-mode .nav-item { color: rgba(0,0,0,0.6) !important; }
+.kftl-mode .nav-item:hover { background: rgba(0,0,0,0.04) !important; color: #1a1a2e !important; }
+.kftl-mode .nav-item.active { background: #e31b2315 !important; color: #1a1a2e !important; border-left: 2px solid #e31b23 !important; }
+.kftl-mode .nav-section { color: rgba(0,0,0,0.35) !important; }
+.kftl-mode .stat-card { background: #ffffff !important; border: 1px solid rgba(0,0,0,0.08) !important; }
+.kftl-mode .stat-card .stat-label { color: rgba(0,0,0,0.6) !important; }
+.kftl-mode .stat-card .stat-val { color: #1a1a2e !important; }
+.kftl-mode .panel { background: #ffffff !important; border: 1px solid rgba(0,0,0,0.08) !important; }
+.kftl-mode .panel .panel-title { color: rgba(0,0,0,0.6) !important; }
+.kftl-mode .sidebar-footer { border-top: 1px solid rgba(0,0,0,0.08) !important; }
+.kftl-mode .sidebar-footer .user-name { color: #1a1a2e !important; }
+.kftl-mode .sidebar-footer .user-role { color: rgba(0,0,0,0.35) !important; }
+
+/* Darker text for KFTL */
+.kftl-mode .stat-card .stat-val { color: #1a1a2e !important; font-weight: 700 !important; }
+.kftl-mode .stat-card .stat-label { color: rgba(0,0,0,0.7) !important; font-weight: 600 !important; }
+.kftl-mode .panel-title { color: rgba(0,0,0,0.7) !important; }
+.kftl-mode .tbl th { color: rgba(0,0,0,0.7) !important; }
+.kftl-mode .tbl td { color: #1a1a2e !important; }
+.kftl-mode .badge { color: #fff !important; }
+.kftl-mode .btn { color: #1a1a2e !important; }
+.kftl-mode .btn:hover { background: rgba(0,0,0,0.04) !important; }
+
+/* KFTL Top Bar Centered Logo */
+.kftl-topbar-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+.kftl-topbar-logo img {
+  height: 40px;
+  width: auto;
+}
+
 .content::-webkit-scrollbar { width: 5px; }
 .content::-webkit-scrollbar-track { background: transparent; }
 .content::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; }
@@ -823,7 +902,7 @@ input::placeholder, textarea::placeholder {
       <div class="nav-fixed-top">
         <div class="nav-section">Main</div>
         <div class="nav-item active" data-tab="dashboard"><i class="ti ti-layout-dashboard"></i> <span>Dashboard</span></div>
-        <div class="nav-item" data-tab="inbox"><i class="ti ti-mail"></i> <span>Support Inbox</span> <span class="nav-badge" id="inbox-badge" style="background:#8b5cf6">8</span></div>
+        <div class="nav-item" data-tab="inbox"><i class="ti ti-mail"></i> <span>Support Inbox</span> <span class="nav-badge" id="inbox-badge" style="background:#8b5cf6"></span></div>
         <div class="nav-item" data-tab="service"><i class="ti ti-clipboard-list"></i> <span>Service Requests</span> <span class="nav-badge" id="sr-badge">4</span></div>
       </div>
       <div class="nav-scroll-bottom" id="nav-clients-section">
@@ -909,18 +988,18 @@ input::placeholder, textarea::placeholder {
       <div class="tab" id="tab-inbox" style="height:100%">
         <div class="outlook-container">
           <div class="outlook-folder-pane" id="inbox-folder-pane">
-            <div class="outlook-folder-item active" data-folder="inbox" onclick="setInboxFolder('inbox', this)"><i class="ti ti-inbox"></i> Inbox<span class="folder-count unread">5</span></div>
-            <div class="outlook-folder-item" data-folder="sent" onclick="setInboxFolder('sent', this)"><i class="ti ti-send"></i> Sent<span class="folder-count">3</span></div>
-            <div class="outlook-folder-item" data-folder="drafts" onclick="setInboxFolder('drafts', this)"><i class="ti ti-file-text"></i> Drafts<span class="folder-count">2</span></div>
-            <div class="outlook-folder-item" data-folder="deleted" onclick="setInboxFolder('deleted', this)"><i class="ti ti-trash"></i> Deleted<span class="folder-count">4</span></div>
-            <div class="outlook-folder-item" data-folder="flagged" onclick="setInboxFolder('flagged', this)"><i class="ti ti-flag"></i> Flagged<span class="folder-count">2</span></div>
+            <div class="outlook-folder-item active" data-folder="inbox" onclick="setInboxFolder('inbox', this)"><i class="ti ti-inbox"></i> Inbox<span class="folder-count"></span></div>
+            <div class="outlook-folder-item" data-folder="sent" onclick="setInboxFolder('sent', this)"><i class="ti ti-send"></i> Sent<span class="folder-count"></span></div>
+            <div class="outlook-folder-item" data-folder="drafts" onclick="setInboxFolder('drafts', this)"><i class="ti ti-file-text"></i> Drafts<span class="folder-count"></span></div>
+            <div class="outlook-folder-item" data-folder="deleted" onclick="setInboxFolder('deleted', this)"><i class="ti ti-trash"></i> Deleted<span class="folder-count"></span></div>
+            <div class="outlook-folder-item" data-folder="flagged" onclick="setInboxFolder('flagged', this)"><i class="ti ti-flag"></i> Flagged<span class="folder-count"></span></div>
           </div>
           <div class="outlook-main">
             <div class="outlook-toolbar">
               <button class="btn btn-accent btn-sm" onclick="openComposeModal()"><i class="ti ti-pencil"></i> New Email</button>
               <button class="btn btn-sm" onclick="deleteSelectedEmails()"><i class="ti ti-trash"></i> Delete</button>
               <span class="toolbar-sep"></span>
-              <button class="btn btn-sm" onclick="markSelectedRead()"><i class="ti ti-mail-opened"></i> Mark Read</button>
+              <button class="btn btn-sm" onclick="markSelectedRead()"><i class="ti ti-mail-opened"></i> Mark Unread</button>
               <button class="btn btn-sm" onclick="flagSelectedEmails()"><i class="ti ti-flag"></i> Flag</button>
               <span class="toolbar-sep"></span>
               <span id="inbox-selected-count" style="font-size:11px;color:var(--text-muted);display:none;"></span>
@@ -1661,6 +1740,7 @@ let authToken = localStorage.getItem('token') || null;
 let currentUser = null;
 let isAdmin = true;
 let currentClientFilter = null;
+let userClient = null;
 
 // ============================================================
 // ── API HELPER FUNCTIONS ─────────────────────────────────────
@@ -2161,6 +2241,53 @@ function selectZone(zone) {
 }
 
 // ============================================================
+// ── CLIENT UI SETUP ──────────────────────────────────────────
+// ============================================================
+
+function setupClientUI(clientName) {
+  if (!clientName || isAdmin) return;
+  
+  // Add KFTL mode class
+  document.getElementById('app').classList.add('kftl-mode');
+  
+  // Set client name in profile
+  document.getElementById('user-name-display').textContent = clientName.toUpperCase();
+  
+  // Set client logo in avatar
+  var avatar = document.getElementById('user-avatar');
+  avatar.innerHTML = '<img src="logo-' + clientName.toLowerCase() + '.png" style="width:24px;height:24px;object-fit:contain;border-radius:50%;" onerror="this.parentElement.textContent=\'' + clientName.slice(0,2).toUpperCase() + '\'">';
+  
+  // Hide theme switcher
+  document.getElementById('theme-toggle-btn').style.display = 'none';
+  
+  // Hide Add Client from dropdown
+  var addClientBtn = document.querySelector('.dd-item[onclick*="openAddClientModal"]');
+  if (addClientBtn) addClientBtn.style.display = 'none';
+  
+  // Hide Inbox tab
+  var inboxTab = document.querySelector('.nav-item[data-tab="inbox"]');
+  if (inboxTab) inboxTab.style.display = 'none';
+  
+  // Change "Clients" to "Assets"
+  var clientsLabel = document.getElementById('clients-section-label');
+  if (clientsLabel) clientsLabel.textContent = 'Assets';
+  
+  // Hide client dropdowns container (no clients shown)
+  var container = document.getElementById('client-dropdowns-container');
+  if (container) container.style.display = 'none';
+  
+  // Change logo area to centered KFTL logo
+  var logoArea = document.querySelector('.logo-area');
+  if (logoArea) {
+    logoArea.innerHTML = '<div class="kftl-topbar-logo"><img src="logo-kftlfull.png" onerror="this.src=\'logo.png\'"></div>';
+    logoArea.style.padding = '8px 12px';
+    logoArea.style.display = 'flex';
+    logoArea.style.justifyContent = 'center';
+    logoArea.style.alignItems = 'center';
+  }
+}
+
+// ============================================================
 // ── NAVIGATION ───────────────────────────────────────────────
 // ============================================================
 
@@ -2392,12 +2519,25 @@ async function loginLocal() {
     
     currentUser = data.user;
     isAdmin = data.user.role === 'admin';
+    userClient = isAdmin ? null : (data.user.client_id === 1 ? 'KFTL' : null);
     
     hideLogin();
     document.getElementById('app').style.display = 'flex';
-    document.getElementById('user-name-display').textContent = data.user.username;
+    
+    // Setup client UI if not admin
+    if (!isAdmin && userClient) {
+      setupClientUI(userClient);
+    }
+    
+    document.getElementById('user-name-display').textContent = isAdmin ? data.user.username : (userClient || 'User');
     document.getElementById('user-role-display').textContent = isAdmin ? 'Administrator' : 'Client User';
-    document.getElementById('user-avatar').textContent = data.user.username.slice(0, 2).toUpperCase();
+    
+    if (!isAdmin && userClient) {
+      var avatar = document.getElementById('user-avatar');
+      avatar.innerHTML = '<img src="logo-' + userClient.toLowerCase() + '.png" style="width:24px;height:24px;object-fit:contain;border-radius:50%;" onerror="this.parentElement.textContent=\'' + userClient.slice(0,2).toUpperCase() + '\'">';
+    } else {
+      document.getElementById('user-avatar').textContent = data.user.username.slice(0, 2).toUpperCase();
+    }
     
     await loadData();
     
@@ -2416,7 +2556,9 @@ function logout() {
   authToken = null;
   currentUser = null;
   isAdmin = true;
+  userClient = null;
   document.getElementById('app').style.display = 'none';
+  document.getElementById('app').classList.remove('kftl-mode');
   showLogin();
   toast('Logged out', 'info');
 }
@@ -2426,11 +2568,23 @@ function checkLogin() {
   currentUser = JSON.parse(localStorage.getItem('user') || 'null');
   if (authToken && currentUser) {
     isAdmin = currentUser.role === 'admin';
+    userClient = isAdmin ? null : (currentUser.client_id === 1 ? 'KFTL' : null);
     hideLogin();
     document.getElementById('app').style.display = 'flex';
-    document.getElementById('user-name-display').textContent = currentUser.username;
+    
+    if (!isAdmin && userClient) {
+      setupClientUI(userClient);
+    }
+    
+    document.getElementById('user-name-display').textContent = isAdmin ? currentUser.username : (userClient || 'User');
     document.getElementById('user-role-display').textContent = isAdmin ? 'Administrator' : 'Client User';
-    document.getElementById('user-avatar').textContent = currentUser.username.slice(0, 2).toUpperCase();
+    
+    if (!isAdmin && userClient) {
+      var avatar = document.getElementById('user-avatar');
+      avatar.innerHTML = '<img src="logo-' + userClient.toLowerCase() + '.png" style="width:24px;height:24px;object-fit:contain;border-radius:50%;" onerror="this.parentElement.textContent=\'' + userClient.slice(0,2).toUpperCase() + '\'">';
+    } else {
+      document.getElementById('user-avatar').textContent = currentUser.username.slice(0, 2).toUpperCase();
+    }
     
     loadData();
   } else {
@@ -2488,8 +2642,13 @@ async function loadData() {
     renderIntrusion();
     renderInbox();
     renderFileExplorer();
-    renderAllClients();
-    populateClientDropdowns();
+    
+    // Only render clients if admin
+    if (isAdmin) {
+      renderAllClients();
+      populateClientDropdowns();
+    }
+    
     updateBadges();
     
     console.log('✅ Data loaded successfully');
@@ -2528,10 +2687,8 @@ async function renderDashboard() {
     document.getElementById('dash-srs').textContent = SERVICE_REQUESTS.filter(function(r) { return r.status !== 'Resolved'; }).length;
   }
 
-  // Render timeline from AUDIT_LOG
   renderTimeline();
 
-  // Render urgent service requests (High priority only)
   var urgent = SERVICE_REQUESTS.filter(function(r) { 
     return r.priority === 'High' && r.status !== 'Resolved';
   }).slice(0, 7);
@@ -2565,7 +2722,6 @@ function renderTimeline() {
     var action = log.action || '';
     var detail = log.detail || '';
     
-    // Color the action text based on type
     var actionColor = '';
     if (action === 'Created') actionColor = 'color:#34d399;';
     else if (action === 'Updated') actionColor = 'color:#60a5fa;';
@@ -3316,7 +3472,6 @@ async function autoSave() {
     updateSRStatusInTable(sr.sr_id, status);
     updateSRDetailModal(sr);
     
-    // Refresh dashboard and SR table without full page reload
     renderDashboard();
     renderSR();
     renderTimeline();
@@ -3364,7 +3519,6 @@ async function addAuditLogEntry(action, detail) {
         detail: detail 
       })
     });
-    // Refresh timeline
     renderTimeline();
   } catch (err) {
     console.error('Failed to add audit log entry:', err);
