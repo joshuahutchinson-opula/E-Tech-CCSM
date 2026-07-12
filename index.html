@@ -887,28 +887,28 @@ input::placeholder, textarea::placeholder {
     <div class="content" id="main-content">
       <!-- Dashboard -->
       <div class="tab active" id="tab-dashboard">
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-label">System Health</div>
-            <div class="stat-val" style="color:var(--success)" id="dash-health">--%</div>
-            <div class="stat-note note-success">All systems operational</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Active Alerts</div>
-            <div class="stat-val" style="color:var(--warning)" id="dash-alerts">0</div>
-            <div class="stat-note note-warn">Requires attention</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Offline Devices</div>
-            <div class="stat-val" style="color:var(--danger)" id="dash-offline">0</div>
-            <div class="stat-note note-danger">All devices online</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Total Devices</div>
-            <div class="stat-val" style="color:var(--info)" id="dash-total">0</div>
-            <div class="stat-note note-info">Across all assets</div>
-          </div>
-        </div>
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-label">System Health</div>
+    <div class="stat-val" style="color:var(--success)" id="dash-health">--%</div>
+    <div class="stat-note note-success">All systems operational</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Active Alerts</div>
+    <div class="stat-val" style="color:var(--warning)" id="dash-alerts">0</div>
+    <div class="stat-note note-warn">Requires attention</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Offline Devices</div>
+    <div class="stat-val" style="color:var(--danger)" id="dash-offline">0</div>
+    <div class="stat-note note-danger">All devices online</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Open SRs</div>
+    <div class="stat-val" style="color:var(--info)" id="dash-srs">0</div>
+    <div class="stat-note note-info">Pending resolution</div>
+  </div>
+</div>
         <div class="panel">
           <div class="panel-header"><span class="panel-title">Today's Activity</span></div>
           <div class="timeline" id="dash-timeline"></div>
