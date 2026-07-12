@@ -88,26 +88,6 @@ input, select, textarea, button { font-family: var(--font); }
   --option-hover: rgba(0,212,255,0.1);
 }
 
-.client-mode {
-  --sidebar-bg: #ffffff;
-  --sidebar-border: rgba(0, 0, 0, 0.08);
-  --main-bg: #f5f5f5;
-  --card-bg: #ffffff;
-  --card-border: rgba(0, 0, 0, 0.08);
-  --text-primary: #1a1a2e;
-  --text-secondary: rgba(0, 0, 0, 0.6);
-  --text-muted: rgba(0, 0, 0, 0.35);
-  --stat-val-color: #1a1a2e;
-  --client-header-bg: #ffffff;
-  --select-bg: #ffffff;
-  --select-color: #1a1a2e;
-  --select-border: rgba(0,0,0,0.2);
-  --select-arrow: #888;
-  --option-bg: #ffffff;
-  --option-color: #1a1a2e;
-  --option-hover: rgba(79,140,247,0.08);
-}
-
 .content::-webkit-scrollbar { width: 5px; }
 .content::-webkit-scrollbar-track { background: transparent; }
 .content::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; }
@@ -887,35 +867,35 @@ input::placeholder, textarea::placeholder {
     <div class="content" id="main-content">
       <!-- Dashboard -->
       <div class="tab active" id="tab-dashboard">
-<div class="stats-grid">
-  <div class="stat-card">
-    <div class="stat-label">System Health</div>
-    <div class="stat-val" style="color:var(--success)" id="dash-health">--%</div>
-    <div class="stat-note note-success">All systems operational</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-label">Active Alerts</div>
-    <div class="stat-val" style="color:var(--warning)" id="dash-alerts">0</div>
-    <div class="stat-note note-warn">Requires attention</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-label">Offline Devices</div>
-    <div class="stat-val" style="color:var(--danger)" id="dash-offline">0</div>
-    <div class="stat-note note-danger">All devices online</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-label">Open SRs</div>
-    <div class="stat-val" style="color:var(--info)" id="dash-srs">0</div>
-    <div class="stat-note note-info">Pending resolution</div>
-  </div>
-</div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">System Health</div>
+            <div class="stat-val" style="color:var(--success)" id="dash-health">--%</div>
+            <div class="stat-note note-success">All systems operational</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Active Alerts</div>
+            <div class="stat-val" style="color:var(--warning)" id="dash-alerts">0</div>
+            <div class="stat-note note-warn">Requires attention</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Offline Devices</div>
+            <div class="stat-val" style="color:var(--danger)" id="dash-offline">0</div>
+            <div class="stat-note note-danger">All devices online</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Open SRs</div>
+            <div class="stat-val" style="color:var(--info)" id="dash-srs">0</div>
+            <div class="stat-note note-info">Pending resolution</div>
+          </div>
+        </div>
         <div class="panel">
           <div class="panel-header"><span class="panel-title">Today's Activity</span></div>
           <div class="timeline" id="dash-timeline"></div>
         </div>
         <div class="panel">
           <div class="panel-header">
-            <span class="panel-title">Urgent Service Requests</span>
+            <span class="panel-title">Urgent Service Requests <span style="font-size:10px;color:var(--text-muted);font-weight:400;">(High Priority)</span></span>
             <button class="link-btn" onclick="switchTab('service')">View all →</button>
           </div>
           <table class="tbl" id="dash-sr-table">
@@ -1356,6 +1336,7 @@ input::placeholder, textarea::placeholder {
     </div>
   </div>
 </div>
+
 <!-- ============================================================
     ── MODALS ──────────────────────────────────────────────────
     ============================================================ -->
@@ -1669,6 +1650,7 @@ input::placeholder, textarea::placeholder {
     </div>
   </div>
 </div>
+
 <script>
 // ============================================================
 // ── API CONFIGURATION ────────────────────────────────────────
@@ -1678,6 +1660,7 @@ const API_URL = window.location.origin;
 let authToken = localStorage.getItem('token') || null;
 let currentUser = null;
 let isAdmin = true;
+let currentClientFilter = null;
 
 // ============================================================
 // ── API HELPER FUNCTIONS ─────────────────────────────────────
@@ -1774,7 +1757,6 @@ var DELETED_EMAILS = [];
 var inboxSelectedEmails = new Set();
 var inboxFolder = 'inbox';
 var inboxCtxEmailId = null;
-var currentClientFilter = null;
 var currentZoneFilter = null;
 var editingClient = null;
 var activeModalId = null;
@@ -2489,11 +2471,11 @@ async function loadData() {
     CLIENT_LOGO_DATA = {};
     (clients || []).forEach(c => { if (c.logo_url) CLIENT_LOGO_DATA[c.name] = c.logo_url; });
     EMAILS = emails || [];
+    AUDIT_LOG = [];
     
     renderDashboard();
     renderSR();
     renderAuditLog();
-    renderTimeline();
     renderStatusFilters();
     renderCamerasOptimized();
     renderDoorsEnhanced();
@@ -2529,7 +2511,6 @@ async function renderDashboard() {
     document.getElementById('dash-health').textContent = stats.health + '%';
     document.getElementById('dash-alerts').textContent = stats.alerts;
     document.getElementById('dash-offline').textContent = stats.offline_devices;
-    document.getElementById('dash-total').textContent = stats.total_devices || 0;
     document.getElementById('dash-srs').textContent = stats.open_srs || 0;
   } catch (err) {
     console.error('Dashboard stats error:', err);
@@ -2544,14 +2525,15 @@ async function renderDashboard() {
     document.getElementById('dash-health').textContent = health + '%';
     document.getElementById('dash-alerts').textContent = defective + acOffline;
     document.getElementById('dash-offline').textContent = defective + acOffline + (SWITCHES.length - swOnline);
-    document.getElementById('dash-total').textContent = totalDevices || 0;
+    document.getElementById('dash-srs').textContent = SERVICE_REQUESTS.filter(function(r) { return r.status !== 'Resolved'; }).length;
   }
 
+  // Render timeline from AUDIT_LOG
   renderTimeline();
 
-  var active = SERVICE_REQUESTS.filter(function(r) { return r.status !== 'Resolved'; });
-  var urgent = active.slice().sort(function(a, b) {
-    return ({ High: 0, Medium: 1, Low: 2 }[a.priority] ?? 3) - ({ High: 0, Medium: 1, Low: 2 }[b.priority] ?? 3);
+  // Render urgent service requests (High priority only)
+  var urgent = SERVICE_REQUESTS.filter(function(r) { 
+    return r.priority === 'High' && r.status !== 'Resolved';
   }).slice(0, 7);
 
   document.getElementById('dash-sr-tbody').innerHTML = urgent.map(function(r) {
@@ -2560,9 +2542,9 @@ async function renderDashboard() {
       '<td>' + (r.client || '—') + '</td>' +
       '<td>' + (r.site || '—') + '</td>' +
       '<td style="max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + r.subject + '</td>' +
-      '<td>' + priBadge(r.priority) + '</td>' +
+      '<td><span class="pri-dot pri-high"></span> High</td>' +
       '<td>' + srStatusBadge(r.status) + '</td></tr>';
-  }).join('');
+  }).join('') || '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-muted);">No urgent service requests</td></tr>';
 }
 
 function renderTimeline() {
@@ -2579,8 +2561,27 @@ function renderTimeline() {
   var html = '';
   logs.forEach(function(log) {
     var time = new Date(log.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-    var msg = log.action + ' — ' + log.detail;
-    html += '<div class="tl-item"><span class="tl-time">' + time + '</span><span class="tl-msg">' + msg + '</span></div>';
+    var username = log.username || 'system';
+    var action = log.action || '';
+    var detail = log.detail || '';
+    
+    // Color the action text based on type
+    var actionColor = '';
+    if (action === 'Created') actionColor = 'color:#34d399;';
+    else if (action === 'Updated') actionColor = 'color:#60a5fa;';
+    else if (action === 'Assigned') actionColor = 'color:#fbbf24;';
+    else if (action === 'Login') actionColor = 'color:#a78bfa;';
+    else if (action === 'Import') actionColor = 'color:#f472b6;';
+    else if (action === 'Deleted') actionColor = 'color:#f87171;';
+    
+    html += '<div class="tl-item" style="border-bottom:1px solid var(--card-border);padding:6px 0;display:flex;gap:12px;align-items:center;">' +
+      '<span class="tl-time" style="color:var(--text-muted);font-size:11px;min-width:50px;font-weight:500;">' + time + '</span>' +
+      '<span style="font-weight:500;color:var(--text-primary);min-width:80px;font-size:12px;">' + username + '</span>' +
+      '<span style="font-size:12px;color:var(--text-secondary);">' +
+      '<span style="' + actionColor + 'font-weight:500;">' + action + '</span>' +
+      ' — ' + detail +
+      '</span>' +
+      '</div>';
   });
   
   container.innerHTML = html;
@@ -2786,6 +2787,7 @@ async function editComment(index) {
         });
         camera.comments = newComment;
         await loadData();
+        renderTimeline();
       } catch (err) {
         toast('Failed to save: ' + err.message, 'error');
         restoreSpan(currentComment);
@@ -2882,6 +2884,7 @@ async function saveCameraModalComment() {
     camera.comments = newComment;
     await loadData();
     renderCamerasOptimized();
+    renderTimeline();
     toast('Saved', 'success');
   } catch (err) {
     toast('Failed to save: ' + err.message, 'error');
@@ -3187,7 +3190,7 @@ function renderSR() {
 async function renderAuditLog() {
   try {
     const logs = await apiCall('/activity-log?limit=100');
-    AUDIT_LOG = logs;
+    AUDIT_LOG = logs || [];
     var container = document.getElementById('audit-log-container');
     if (!container) return;
     
@@ -3275,6 +3278,7 @@ async function saveNewSR() {
     });
     closeAddModal('add-sr-modal');
     await loadData();
+    renderTimeline();
     toast('SR ' + data.sr_id + ' created for ' + client, 'success');
   } catch (err) {
     toast('Failed to create SR: ' + err.message, 'error');
@@ -3311,6 +3315,12 @@ async function autoSave() {
     setUnsaved(false);
     updateSRStatusInTable(sr.sr_id, status);
     updateSRDetailModal(sr);
+    
+    // Refresh dashboard and SR table without full page reload
+    renderDashboard();
+    renderSR();
+    renderTimeline();
+    
     toast('Updated: ' + status, 'success');
   } catch (err) {
     console.error('Auto-save failed:', err);
@@ -3354,6 +3364,8 @@ async function addAuditLogEntry(action, detail) {
         detail: detail 
       })
     });
+    // Refresh timeline
+    renderTimeline();
   } catch (err) {
     console.error('Failed to add audit log entry:', err);
   }
@@ -3420,6 +3432,7 @@ async function bulkApply() {
     }
   }
   await loadData();
+  renderTimeline();
   clearSelection();
   toast('Bulk update applied to ' + count + ' SRs', 'success');
 }
@@ -3487,6 +3500,7 @@ async function editSRNote(id) {
         });
         sr.notes = newNote;
         await loadData();
+        renderTimeline();
       } catch (err) {
         toast('Failed to save: ' + err.message, 'error');
         restoreSpan(currentNote);
