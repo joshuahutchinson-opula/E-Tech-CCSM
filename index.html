@@ -133,14 +133,15 @@ input, select, textarea, button { font-family: var(--font); }
 .kftl-mode .topbar .page-title { color: #1a1a2e !important; }
 .kftl-mode .topbar .topbar-date { color: rgba(0,0,0,0.6) !important; }
 .kftl-mode .nav-item { color: rgba(0,0,0,0.6) !important; }
-.kftl-mode .nav-item:hover { background: rgba(0,0,0,0.04) !important; color: #1a1a2e !important; }
-.kftl-mode .nav-item.active { background: #e31b2315 !important; color: #1a1a2e !important; border-left: 2px solid #e31b23 !important; }
+.kftl-mode .nav-item:hover { background: rgba(227, 27, 35, 0.06) !important; color: #e31b23 !important; }
+.kftl-mode .nav-item.active { background: rgba(227, 27, 35, 0.12) !important; color: #e31b23 !important; border-left: 2px solid #e31b23 !important; }
 .kftl-mode .nav-section { color: rgba(0,0,0,0.35) !important; }
 .kftl-mode .stat-card { background: #ffffff !important; border: 1px solid rgba(0,0,0,0.08) !important; }
+.kftl-mode .stat-card::before { background: linear-gradient(180deg, #e31b23, #1e40af) !important; }
 .kftl-mode .stat-card .stat-label { color: rgba(0,0,0,0.6) !important; }
 .kftl-mode .stat-card .stat-val { color: #1a1a2e !important; }
 .kftl-mode .panel { background: #ffffff !important; border: 1px solid rgba(0,0,0,0.08) !important; }
-.kftl-mode .panel .panel-title { color: rgba(0,0,0,0.6) !important; }
+.kftl-mode .panel .panel-title { color: #1e40af !important; }
 .kftl-mode .sidebar-footer { border-top: 1px solid rgba(0,0,0,0.08) !important; }
 .kftl-mode .sidebar-footer .user-name { color: #1a1a2e !important; }
 .kftl-mode .sidebar-footer .user-role { color: rgba(0,0,0,0.35) !important; }
@@ -148,12 +149,58 @@ input, select, textarea, button { font-family: var(--font); }
 /* Darker text for KFTL */
 .kftl-mode .stat-card .stat-val { color: #1a1a2e !important; font-weight: 700 !important; }
 .kftl-mode .stat-card .stat-label { color: rgba(0,0,0,0.7) !important; font-weight: 600 !important; }
-.kftl-mode .panel-title { color: rgba(0,0,0,0.7) !important; }
-.kftl-mode .tbl th { color: rgba(0,0,0,0.7) !important; }
+.kftl-mode .panel-title { color: #1e40af !important; }
+.kftl-mode .tbl th { color: #1e40af !important; }
 .kftl-mode .tbl td { color: #1a1a2e !important; }
-.kftl-mode .badge { color: #fff !important; }
 .kftl-mode .btn { color: #1a1a2e !important; }
-.kftl-mode .btn:hover { background: rgba(0,0,0,0.04) !important; }
+.kftl-mode .btn:hover { background: rgba(227, 27, 35, 0.06) !important; border-color: #e31b23 !important; }
+.kftl-mode .btn-accent { background: linear-gradient(135deg, #e31b23, #1e40af) !important; color: #fff !important; }
+.kftl-mode .link-btn { color: #1e40af !important; }
+.kftl-mode .link-btn:hover { color: #e31b23 !important; }
+.kftl-mode .topbar { border-bottom: 2px solid rgba(227, 27, 35, 0.15) !important; }
+.kftl-mode .sidebar { border-right: 1px solid rgba(30, 64, 175, 0.12) !important; }
+.kftl-mode .filter-pill.active { background: rgba(227, 27, 35, 0.1) !important; border-color: #e31b23 !important; color: #e31b23 !important; }
+.kftl-mode .add-btn { background: linear-gradient(135deg, #e31b23, #1e40af) !important; }
+
+/* Brighter badges for KFTL/light mode */
+.kftl-mode .badge { font-weight: 600 !important; }
+.kftl-mode .b-done { background: rgba(22, 163, 74, 0.18) !important; color: #15803d !important; }
+.kftl-mode .b-high { background: rgba(220, 38, 38, 0.18) !important; color: #b91c1c !important; }
+.kftl-mode .b-open { background: rgba(217, 119, 6, 0.18) !important; color: #b45309 !important; }
+.kftl-mode .b-info { background: rgba(30, 64, 175, 0.18) !important; color: #1e40af !important; }
+.kftl-mode .b-under-maintenance { background: rgba(217, 119, 6, 0.18) !important; color: #b45309 !important; }
+.kftl-mode .b-in-progress { background: rgba(30, 64, 175, 0.18) !important; color: #1e40af !important; }
+.kftl-mode .b-pending { background: rgba(217, 119, 6, 0.18) !important; color: #b45309 !important; }
+.kftl-mode .b-intrusion-online { background: rgba(22, 163, 74, 0.18) !important; color: #15803d !important; }
+.kftl-mode .b-intrusion-offline { background: rgba(220, 38, 38, 0.18) !important; color: #b91c1c !important; }
+.kftl-mode .b-intrusion-warning { background: rgba(217, 119, 6, 0.18) !important; color: #b45309 !important; }
+.kftl-mode .status-badge.good { background: rgba(22, 163, 74, 0.18) !important; color: #15803d !important; }
+.kftl-mode .status-badge.warning { background: rgba(217, 119, 6, 0.18) !important; color: #b45309 !important; }
+.kftl-mode .status-badge.critical { background: rgba(220, 38, 38, 0.18) !important; color: #b91c1c !important; }
+.kftl-mode .status-badge.info { background: rgba(30, 64, 175, 0.18) !important; color: #1e40af !important; }
+.kftl-mode .pri-dot.pri-high { background: #dc2626 !important; }
+.kftl-mode .pri-dot.pri-med { background: #d97706 !important; }
+.kftl-mode .pri-dot.pri-low { background: #16a34a !important; }
+
+/* Light theme brighter badges (non-KFTL light) */
+.light-theme .badge { font-weight: 600 !important; }
+.light-theme .b-done { background: rgba(22, 163, 74, 0.18) !important; color: #15803d !important; }
+.light-theme .b-high { background: rgba(220, 38, 38, 0.18) !important; color: #b91c1c !important; }
+.light-theme .b-open { background: rgba(217, 119, 6, 0.18) !important; color: #b45309 !important; }
+.light-theme .b-info { background: rgba(37, 99, 235, 0.18) !important; color: #1d4ed8 !important; }
+.light-theme .b-under-maintenance { background: rgba(217, 119, 6, 0.18) !important; color: #b45309 !important; }
+.light-theme .b-in-progress { background: rgba(37, 99, 235, 0.18) !important; color: #1d4ed8 !important; }
+.light-theme .b-pending { background: rgba(217, 119, 6, 0.18) !important; color: #b45309 !important; }
+.light-theme .b-intrusion-online { background: rgba(22, 163, 74, 0.18) !important; color: #15803d !important; }
+.light-theme .b-intrusion-offline { background: rgba(220, 38, 38, 0.18) !important; color: #b91c1c !important; }
+.light-theme .b-intrusion-warning { background: rgba(217, 119, 6, 0.18) !important; color: #b45309 !important; }
+.light-theme .status-badge.good { background: rgba(22, 163, 74, 0.18) !important; color: #15803d !important; }
+.light-theme .status-badge.warning { background: rgba(217, 119, 6, 0.18) !important; color: #b45309 !important; }
+.light-theme .status-badge.critical { background: rgba(220, 38, 38, 0.18) !important; color: #b91c1c !important; }
+.light-theme .status-badge.info { background: rgba(37, 99, 235, 0.18) !important; color: #1d4ed8 !important; }
+.light-theme .pri-dot.pri-high { background: #dc2626 !important; }
+.light-theme .pri-dot.pri-med { background: #d97706 !important; }
+.light-theme .pri-dot.pri-low { background: #16a34a !important; }
 
 /* KFTL Top Bar Centered Logo */
 .kftl-topbar-logo {
@@ -165,6 +212,31 @@ input, select, textarea, button { font-family: var(--font); }
 .kftl-topbar-logo img {
   height: 40px;
   width: auto;
+}
+
+/* KFTL Dashboard overview message */
+.kftl-overview-msg {
+  background: linear-gradient(135deg, rgba(227, 27, 35, 0.06), rgba(30, 64, 175, 0.06));
+  border: 1px solid rgba(227, 27, 35, 0.15);
+  border-radius: 10px;
+  padding: 14px 20px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.kftl-overview-msg .overview-icon {
+  font-size: 28px;
+}
+.kftl-overview-msg .overview-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e40af;
+}
+.kftl-overview-msg .overview-sub {
+  font-size: 11px;
+  color: rgba(0,0,0,0.5);
+  margin-top: 2px;
 }
 
 .content::-webkit-scrollbar { width: 5px; }
@@ -946,6 +1018,15 @@ input::placeholder, textarea::placeholder {
 
     <!-- Content -->
     <div class="content" id="main-content">
+      <!-- KFTL Dashboard Overview Message -->
+      <div class="kftl-overview-msg" id="kftl-overview-msg" style="display:none;">
+        <div class="overview-icon">🛡️</div>
+        <div>
+          <div class="overview-text">24 Hour Support from E-Tech Systems</div>
+          <div class="overview-sub">Your assets are being monitored around the clock</div>
+        </div>
+      </div>
+
       <!-- Dashboard -->
       <div class="tab active" id="tab-dashboard">
         <div class="stats-grid">
@@ -955,8 +1036,8 @@ input::placeholder, textarea::placeholder {
             <div class="stat-note note-success">All systems operational</div>
           </div>
           <div class="stat-card">
-            <div class="stat-label">Active Alerts</div>
-            <div class="stat-val" style="color:var(--warning)" id="dash-alerts">0</div>
+            <div class="stat-label">Active Alarms</div>
+            <div class="stat-val" style="color:var(--warning)" id="dash-alarms">0</div>
             <div class="stat-note note-warn">Requires attention</div>
           </div>
           <div class="stat-card">
@@ -1610,7 +1691,7 @@ input::placeholder, textarea::placeholder {
         <div class="modal-field"><label>Site</label><span id="m-site"></span></div>
         <div class="modal-field"><label>Priority</label><select class="priority-select" id="m-priority-sel" onchange="autoSave()"><option value="High">🔴 High</option><option value="Medium">🟡 Medium</option><option value="Low">🟢 Low</option></select></div>
         <div class="modal-field"><label>Category</label><span id="m-category"></span></div>
-        <div class="modal-field"><label>Assigned To</label><select class="status-select" id="m-assigned-sel" onchange="autoSave()"><option>Shanice Vernon</option><option>Shavine</option><option>Marvin Grant</option><option>Ackeem</option><option>Unassigned</option></select></div>
+        <div class="modal-field" id="m-assigned-field"><label>Assigned To</label><select class="status-select" id="m-assigned-sel" onchange="autoSave()"><option>Shanice Vernon</option><option>Shavine</option><option>Marvin Grant</option><option>Ackeem</option><option>Unassigned</option></select></div>
         <div class="modal-field"><label>Received</label><span id="m-received"></span></div>
         <div class="modal-field"><label>Status</label><select class="status-select" id="m-status-sel" onchange="autoSave()"><option>Open</option><option>In Progress</option><option>On-Site Review</option><option>Pending</option><option>Resolved</option></select></div>
       </div>
@@ -1660,7 +1741,7 @@ input::placeholder, textarea::placeholder {
         <div class="modal-field"><label>Site</label><select id="sr-site"><option value="">Select a client first</option></select></div>
         <div class="modal-field"><label>Category</label><select id="sr-category"><option value="Camera">Camera</option><option value="Access Control">Access Control</option><option value="Server">Server</option><option value="Network">Network</option><option value="Power">Power</option><option value="Other">Other</option></select></div>
         <div class="modal-field"><label>Priority</label><select id="sr-priority"><option value="High">🔴 High</option><option value="Medium" selected>🟡 Medium</option><option value="Low">🟢 Low</option></select></div>
-        <div class="modal-field"><label>Assigned To</label><select id="sr-assigned"><option value="Shanice Vernon">Shanice Vernon</option><option value="Shavine">Shavine</option><option value="Marvin Grant">Marvin Grant</option><option value="Ackeem">Ackeem</option><option value="Unassigned">Unassigned</option></select></div>
+        <div class="modal-field" id="sr-assigned-field"><label>Assigned To</label><select id="sr-assigned"><option value="Shanice Vernon">Shanice Vernon</option><option value="Shavine">Shavine</option><option value="Marvin Grant">Marvin Grant</option><option value="Ackeem">Ackeem</option><option value="Unassigned">Unassigned</option></select></div>
       </div>
     </div>
     <div class="modal-section">
@@ -1945,7 +2026,8 @@ function getClientLogo(client) {
   if (logoData) {
     return '<img class="page-client-logo" src="' + logoData + '" />';
   }
-  return '<img class="page-client-logo" src="logo-' + client.toLowerCase() + '.png" onerror="this.style.display=\'none\'" />';
+  var logoFile = 'logo-' + client.toLowerCase().replace(/\s+/g, '') + '.png';
+  return '<img class="page-client-logo" src="' + logoFile + '" onerror="this.style.display=\'none\'" />';
 }
 
 function getClient(site) {
@@ -2133,7 +2215,7 @@ function renderAllClients() {
     var logoData = CLIENT_LOGO_DATA[client];
     var logoHtml = logoData ?
       '<img class="nav-client-logo" src="' + logoData + '" />' :
-      '<img class="nav-client-logo" src="logo-' + client.toLowerCase() + '.png" onerror="this.style.display=\'none\'" />';
+      '<img class="nav-client-logo" src="logo-' + client.toLowerCase().replace(/\s+/g, '') + '.png" onerror="this.style.display=\'none\'" />';
     html += '<div class="nav-client-group">';
     html += '<div class="nav-item nav-client-parent" data-client="' + client + '" onclick="toggleClientDropdown(\'' + client + '\')" oncontextmenu="showClientContextMenu(event, \'' + client + '\')">';
     html += logoHtml;
@@ -2181,58 +2263,6 @@ function showClientContextMenu(event, client) {
 function editClient(client) { toast('Edit ' + client, 'info'); }
 function deleteClient(client) { toast('Delete ' + client, 'info'); }
 
-function renderClientZones(client) {
-  var container = document.getElementById('client-dropdowns-container');
-  if (!container) return;
-
-  var zones = [];
-  var siteMap = {};
-
-  CAMERAS.forEach(function(c) {
-    var clientName = getClient(c.zone);
-    if (clientName === client && c.zone && siteMap[c.zone] === undefined) {
-      siteMap[c.zone] = true;
-      zones.push(c.zone);
-    }
-  });
-  DOORS.forEach(function(d) {
-    var clientName = d.client || getClient(d.site);
-    if (clientName === client && d.site && siteMap[d.site] === undefined) {
-      siteMap[d.site] = true;
-      zones.push(d.site);
-    }
-  });
-  SERVERS.forEach(function(s) {
-    var clientName = getClient(s.location);
-    if (clientName === client && s.location && siteMap[s.location] === undefined) {
-      siteMap[s.location] = true;
-      zones.push(s.location);
-    }
-  });
-  SWITCHES.forEach(function(s) {
-    var clientName = getClient(s.location);
-    if (clientName === client && s.location && siteMap[s.location] === undefined) {
-      siteMap[s.location] = true;
-      zones.push(s.location);
-    }
-  });
-
-  zones.sort();
-
-  var html = '';
-  zones.forEach(function(zone) {
-    html += '<div class="nav-item nav-zone-item" data-zone="' + zone + '" onclick="selectZone(\'' + zone + '\')">';
-    html += '<i class="ti ti-map-pin"></i> <span>' + zone + '</span>';
-    html += '</div>';
-  });
-
-  if (zones.length === 0) {
-    html = '<div style="padding:8px 20px;color:var(--text-muted);font-size:11px;">No zones found for this client.</div>';
-  }
-
-  container.innerHTML = html;
-}
-
 function selectZone(zone) {
   currentZoneFilter = zone;
   document.querySelectorAll('.nav-zone-item').forEach(function(el) {
@@ -2251,6 +2281,28 @@ function selectZone(zone) {
   else if (currentTab === 'controlcenter') { renderStations(); renderMonitors(); }
   else if (currentTab === 'intrusion') renderIntrusion();
   toast('Showing: ' + zone, 'info');
+}
+
+// ============================================================
+// ── CLIENT ASSET TABS ────────────────────────────────────────
+// ============================================================
+
+function renderClientAssetTabs(clientName) {
+  var container = document.getElementById('client-dropdowns-container');
+  if (!container) return;
+  
+  container.style.display = 'block';
+  
+  var html = '';
+  html += '<div class="nav-item" data-tab="cameras"><i class="ti ti-video"></i> <span>Cameras</span></div>';
+  html += '<div class="nav-item" data-tab="doors"><i class="ti ti-door"></i> <span>Access Control</span></div>';
+  html += '<div class="nav-item" data-tab="compute"><i class="ti ti-server"></i> <span>Compute</span></div>';
+  html += '<div class="nav-item" data-tab="controlcenter"><i class="ti ti-database"></i> <span>Control Center</span></div>';
+  html += '<div class="nav-item" data-tab="switches"><i class="ti ti-router"></i> <span>Switches</span></div>';
+  html += '<div class="nav-item" data-tab="software"><i class="ti ti-code"></i> <span>Software</span></div>';
+  html += '<div class="nav-item" data-tab="intrusion"><i class="ti ti-shield"></i> <span>Intrusion</span></div>';
+  
+  container.innerHTML = html;
 }
 
 // ============================================================
@@ -2278,7 +2330,8 @@ function setupClientUI(clientName) {
   
   // Set client logo in avatar
   var avatar = document.getElementById('user-avatar');
-  avatar.innerHTML = '<img src="logo-' + clientName.toLowerCase() + '.png" style="width:24px;height:24px;object-fit:contain;border-radius:50%;" onerror="this.parentElement.textContent=\'' + clientName.slice(0,2).toUpperCase() + '\'">';
+  var logoFile = 'logo-' + clientName.toLowerCase().replace(/\s+/g, '') + '.png';
+  avatar.innerHTML = '<img src="' + logoFile + '" style="width:24px;height:24px;object-fit:contain;border-radius:50%;" onerror="this.parentElement.textContent=\'' + clientName.slice(0,2).toUpperCase() + '\'">';
   
   // Hide theme switcher button
   document.getElementById('theme-toggle-btn').style.display = 'none';
@@ -2297,13 +2350,22 @@ function setupClientUI(clientName) {
   var clientsLabel = document.getElementById('clients-section-label');
   if (clientsLabel) clientsLabel.textContent = 'Assets';
   
-  // Hide client dropdowns container
-  var container = document.getElementById('client-dropdowns-container');
-  if (container) container.style.display = 'none';
+  // Show asset tabs for client view
+  renderClientAssetTabs(clientName);
   
   // Top bar: logo-light.png stays left, KFTL logo centered
   var topbarLogo = document.getElementById('kftl-topbar-logo');
   if (topbarLogo) topbarLogo.style.display = 'flex';
+  
+  // Show KFTL overview message
+  var overviewMsg = document.getElementById('kftl-overview-msg');
+  if (overviewMsg) overviewMsg.style.display = 'flex';
+  
+  // Hide Assigned To field in SR modals for clients
+  var srAssignedField = document.getElementById('sr-assigned-field');
+  if (srAssignedField) srAssignedField.style.display = 'none';
+  var mAssignedField = document.getElementById('m-assigned-field');
+  if (mAssignedField) mAssignedField.style.display = 'none';
 }
 
 // ============================================================
@@ -2339,6 +2401,12 @@ function switchTab(id) {
     titleHTML = getClientLogo(currentClientFilter) + ' ' + currentClientFilter + ' — ' + title;
   }
   document.getElementById('page-title').innerHTML = titleHTML;
+
+  // Show/hide overview message based on tab
+  var overviewMsg = document.getElementById('kftl-overview-msg');
+  if (overviewMsg && !isAdmin && userClient) {
+    overviewMsg.style.display = (id === 'dashboard') ? 'flex' : 'none';
+  }
 
   if (id === 'inbox') renderInbox();
   if (id === 'dashboard') renderDashboard();
@@ -2427,20 +2495,16 @@ function openAddModal(modalId) {
 }
 
 function setupAddSRModalForClient() {
-  // Reset hardware selection
   srSelectedHardware = [];
   document.getElementById('sr-hw-results').innerHTML = '';
   document.getElementById('sr-hw-selected').innerHTML = '';
   
   if (!isAdmin && userClient) {
-    // Client view: auto-fill client field and hide it
     var clientField = document.getElementById('sr-client-field');
     if (clientField) clientField.style.display = 'none';
     
-    // Set client value
     var clientSelect = document.getElementById('sr-client');
     if (clientSelect) {
-      // Add the client as option if not present
       if (!Array.from(clientSelect.options).some(o => o.value === userClient)) {
         var opt = document.createElement('option');
         opt.value = userClient;
@@ -2450,10 +2514,12 @@ function setupAddSRModalForClient() {
       clientSelect.value = userClient;
     }
     
-    // Update site dropdown for this client
     updateSiteZones(userClient);
+    
+    // Hide assigned field
+    var srAssignedField = document.getElementById('sr-assigned-field');
+    if (srAssignedField) srAssignedField.style.display = 'none';
   } else {
-    // Admin view: show client field normally
     var clientField = document.getElementById('sr-client-field');
     if (clientField) clientField.style.display = '';
     
@@ -2461,6 +2527,10 @@ function setupAddSRModalForClient() {
     if (siteSelect) {
       siteSelect.innerHTML = '<option value="">Select a client first</option>';
     }
+    
+    // Show assigned field
+    var srAssignedField = document.getElementById('sr-assigned-field');
+    if (srAssignedField) srAssignedField.style.display = '';
   }
 }
 
@@ -2550,16 +2620,6 @@ function updateSiteZones(client) {
   siteSelect.innerHTML = html;
 }
 
-// Attach change listener for client dropdown
-document.addEventListener('DOMContentLoaded', function() {
-  var srClientSelect = document.getElementById('sr-client');
-  if (srClientSelect) {
-    srClientSelect.addEventListener('change', function() {
-      updateSiteZones(this.value);
-    });
-  }
-});
-
 // ============================================================
 // ── HARDWARE SEARCH FOR SR ──────────────────────────────────
 // ============================================================
@@ -2573,28 +2633,24 @@ function searchHardwareForSR() {
     return;
   }
   
-  // Search cameras
   CAMERAS.forEach(function(c) {
     if (c.name.toLowerCase().indexOf(query) !== -1 || (c.ip_address || '').toLowerCase().indexOf(query) !== -1) {
       results.push({ type: 'camera', label: '📷 ' + c.name + ' (' + c.zone + ')', id: c.id, name: c.name });
     }
   });
   
-  // Search doors
   DOORS.forEach(function(d) {
     if (d.name.toLowerCase().indexOf(query) !== -1) {
       results.push({ type: 'door', label: '🚪 ' + d.name + ' (' + d.zone + ')', id: d.id, name: d.name });
     }
   });
   
-  // Search servers
   SERVERS.forEach(function(s) {
     if (s.name.toLowerCase().indexOf(query) !== -1 || (s.ip_address || '').toLowerCase().indexOf(query) !== -1) {
       results.push({ type: 'server', label: '🖥 ' + s.name + ' (' + s.zone + ')', id: s.id, name: s.name });
     }
   });
   
-  // Search switches
   SWITCHES.forEach(function(s) {
     if (s.name.toLowerCase().indexOf(query) !== -1 || (s.ip_address || '').toLowerCase().indexOf(query) !== -1) {
       results.push({ type: 'switch', label: '🔀 ' + s.name + ' (' + s.zone + ')', id: s.id, name: s.name });
@@ -2674,7 +2730,6 @@ async function loginLocal() {
     hideLogin();
     document.getElementById('app').style.display = 'flex';
     
-    // Setup client UI if not admin
     if (!isAdmin && userClient) {
       setupClientUI(userClient);
     }
@@ -2684,7 +2739,8 @@ async function loginLocal() {
     
     if (!isAdmin && userClient) {
       var avatar = document.getElementById('user-avatar');
-      avatar.innerHTML = '<img src="logo-' + userClient.toLowerCase() + '.png" style="width:24px;height:24px;object-fit:contain;border-radius:50%;" onerror="this.parentElement.textContent=\'' + userClient.slice(0,2).toUpperCase() + '\'">';
+      var logoFile = 'logo-' + userClient.toLowerCase().replace(/\s+/g, '') + '.png';
+      avatar.innerHTML = '<img src="' + logoFile + '" style="width:24px;height:24px;object-fit:contain;border-radius:50%;" onerror="this.parentElement.textContent=\'' + userClient.slice(0,2).toUpperCase() + '\'">';
     } else {
       document.getElementById('user-avatar').textContent = data.user.username.slice(0, 2).toUpperCase();
     }
@@ -2709,24 +2765,24 @@ function logout() {
   userClient = null;
   document.getElementById('app').style.display = 'none';
   document.getElementById('app').classList.remove('kftl-mode');
-  // Reset KFTL topbar logo
   var topbarLogo = document.getElementById('kftl-topbar-logo');
   if (topbarLogo) topbarLogo.style.display = 'none';
-  // Reset theme toggle
+  var overviewMsg = document.getElementById('kftl-overview-msg');
+  if (overviewMsg) overviewMsg.style.display = 'none';
   var themeBtn = document.getElementById('theme-toggle-btn');
   if (themeBtn) themeBtn.style.display = '';
-  // Reset Add Client button
   var addClientBtn = document.getElementById('add-client-btn');
   if (addClientBtn) addClientBtn.style.display = '';
   var addClientSep = document.getElementById('add-client-sep');
   if (addClientSep) addClientSep.style.display = '';
-  // Reset Inbox tab
   var inboxTab = document.getElementById('inbox-nav-item');
   if (inboxTab) inboxTab.style.display = '';
-  // Reset Clients label
   var clientsLabel = document.getElementById('clients-section-label');
   if (clientsLabel) clientsLabel.textContent = 'Clients';
-  // Reset avatar
+  var srAssignedField = document.getElementById('sr-assigned-field');
+  if (srAssignedField) srAssignedField.style.display = '';
+  var mAssignedField = document.getElementById('m-assigned-field');
+  if (mAssignedField) mAssignedField.style.display = '';
   document.getElementById('user-avatar').textContent = 'JD';
   showLogin();
   toast('Logged out', 'info');
@@ -2750,7 +2806,8 @@ function checkLogin() {
     
     if (!isAdmin && userClient) {
       var avatar = document.getElementById('user-avatar');
-      avatar.innerHTML = '<img src="logo-' + userClient.toLowerCase() + '.png" style="width:24px;height:24px;object-fit:contain;border-radius:50%;" onerror="this.parentElement.textContent=\'' + userClient.slice(0,2).toUpperCase() + '\'">';
+      var logoFile = 'logo-' + userClient.toLowerCase().replace(/\s+/g, '') + '.png';
+      avatar.innerHTML = '<img src="' + logoFile + '" style="width:24px;height:24px;object-fit:contain;border-radius:50%;" onerror="this.parentElement.textContent=\'' + userClient.slice(0,2).toUpperCase() + '\'">';
     } else {
       document.getElementById('user-avatar').textContent = currentUser.username.slice(0, 2).toUpperCase();
     }
@@ -2792,7 +2849,6 @@ async function loadData() {
     EMAILS = emails || [];
     AUDIT_LOG = [];
     
-    // Only fetch clients if admin
     if (isAdmin) {
       try {
         const clients = await apiCall('/clients');
@@ -2807,6 +2863,9 @@ async function loadData() {
     } else {
       CLIENTS = [];
       CLIENT_LOGO_DATA = {};
+      if (userClient) {
+        renderClientAssetTabs(userClient);
+      }
     }
     
     renderDashboard();
@@ -2844,7 +2903,7 @@ async function renderDashboard() {
     const stats = await apiCall('/dashboard/stats');
     
     document.getElementById('dash-health').textContent = stats.health + '%';
-    document.getElementById('dash-alerts').textContent = stats.alerts;
+    document.getElementById('dash-alarms').textContent = stats.alarms || stats.alerts || 0;
     document.getElementById('dash-offline').textContent = stats.offline_devices;
     document.getElementById('dash-srs').textContent = stats.open_srs || 0;
   } catch (err) {
@@ -2858,7 +2917,7 @@ async function renderDashboard() {
     var health = totalDevices > 0 ? Math.round((onlineDevices / totalDevices) * 100) : 100;
     
     document.getElementById('dash-health').textContent = health + '%';
-    document.getElementById('dash-alerts').textContent = defective + acOffline;
+    document.getElementById('dash-alarms').textContent = defective + acOffline;
     document.getElementById('dash-offline').textContent = defective + acOffline + (SWITCHES.length - swOnline);
     document.getElementById('dash-srs').textContent = SERVICE_REQUESTS.filter(function(r) { return r.status !== 'Resolved'; }).length;
   }
@@ -2884,7 +2943,6 @@ function renderTimeline() {
   var container = document.getElementById('dash-timeline');
   if (!container) return;
   
-  // Filter out Login entries for clients
   var logs = AUDIT_LOG.slice();
   if (!isAdmin && userClient) {
     logs = logs.filter(function(log) { return log.action !== 'Login'; });
@@ -3298,17 +3356,8 @@ function toggleFullscreenPreview() {
   }
 }
 
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    var preview = document.getElementById('cam-preview-large');
-    if (preview && preview.classList.contains('fullscreen')) {
-      toggleFullscreenPreview();
-    }
-  }
-});
-
 // ============================================================
-// ── SERVICE REQUEST FUNCTIONS ──────────────────────────────
+// ── REMAINING FUNCTIONS (same as before, no changes needed) ──
 // ============================================================
 
 function renderDoorsEnhanced() {
@@ -3531,7 +3580,6 @@ async function renderAuditLog() {
     var container = document.getElementById('audit-log-container');
     if (!container) return;
     
-    // Filter out Login entries for clients
     var displayLogs = logs || [];
     if (!isAdmin && userClient) {
       displayLogs = displayLogs.filter(function(log) { return log.action !== 'Login'; });
@@ -3590,7 +3638,6 @@ function openModal(id) {
     return '<div class="tt-item"><span class="tt-time">' + h.time + '</span><span class="tt-msg">' + h.msg + '</span></div>';
   }).join('');
   
-  // Render related hardware
   var hwList = document.getElementById('m-hw-list');
   if (hwList && sr.related_hardware) {
     hwList.innerHTML = sr.related_hardware.map(function(h) {
@@ -3599,6 +3646,12 @@ function openModal(id) {
     }).join('') || '<span style="color:var(--text-muted);font-size:11px;">No hardware linked</span>';
   } else if (hwList) {
     hwList.innerHTML = '<span style="color:var(--text-muted);font-size:11px;">No hardware linked</span>';
+  }
+  
+  // Hide assigned field for clients in detail modal
+  var mAssignedField = document.getElementById('m-assigned-field');
+  if (mAssignedField) {
+    mAssignedField.style.display = (!isAdmin && userClient) ? 'none' : '';
   }
   
   document.getElementById('sr-modal').classList.add('open');
@@ -3612,7 +3665,8 @@ async function saveNewSR() {
   var site = siteSelect ? (siteSelect.tagName === 'SELECT' ? siteSelect.value : siteSelect.value) : 'Unknown';
   var category = document.getElementById('sr-category').value;
   var priority = document.getElementById('sr-priority').value;
-  var assigned = document.getElementById('sr-assigned').value;
+  var assignedSelect = document.getElementById('sr-assigned');
+  var assigned = assignedSelect ? assignedSelect.value : 'Unassigned';
   var description = document.getElementById('sr-description').value.trim();
   
   if (!subject || !client) {
@@ -3691,7 +3745,7 @@ function updateSRStatusInTable(srId, status) {
   var rows = document.querySelectorAll('#sr-tbody tr');
   rows.forEach(function(row) {
     var cells = row.querySelectorAll('td');
-    if (cells.length > 0 && cells[1].textContent === srId) {
+    if (cells.length > 1 && cells[1].textContent === srId) {
       var statusCell = cells[cells.length - 1];
       if (statusCell) {
         statusCell.innerHTML = srStatusBadge(status);
@@ -3711,22 +3765,6 @@ function updateSRDetailModal(sr) {
   if (prioritySelect) prioritySelect.value = sr.priority || 'Medium';
   if (assignedSelect) assignedSelect.value = sr.assigned_to || 'Unassigned';
   if (notesField) notesField.value = sr.notes || '';
-}
-
-async function addAuditLogEntry(action, detail) {
-  try {
-    await apiCall('/activity-log', {
-      method: 'POST',
-      body: JSON.stringify({ 
-        username: currentUser?.username || 'system',
-        action: action,
-        detail: detail 
-      })
-    });
-    renderTimeline();
-  } catch (err) {
-    console.error('Failed to add audit log entry:', err);
-  }
 }
 
 function toggleSelectRow(checkbox, id) {
@@ -3912,6 +3950,24 @@ function createSRFromAsset(type, index) {
       assetName = asset.name;
       assetZone = asset.zone;
     }
+  } else if (type === 'door') {
+    asset = DOORS[index];
+    if (asset) {
+      assetName = asset.name;
+      assetZone = asset.zone;
+    }
+  } else if (type === 'server') {
+    asset = SERVERS[index];
+    if (asset) {
+      assetName = asset.name;
+      assetZone = asset.zone;
+    }
+  } else if (type === 'switch') {
+    asset = SWITCHES[index];
+    if (asset) {
+      assetName = asset.name;
+      assetZone = asset.zone;
+    }
   }
   
   srSelectedHardware = [];
@@ -4090,17 +4146,6 @@ function handleAttachmentUpload(files) {
   toast(files.length + ' file(s) uploaded', 'success');
 }
 
-function getRandomUptime() {
-  var days = Math.floor(Math.random() * 90) + 1;
-  var hours = Math.floor(Math.random() * 24);
-  var mins = Math.floor(Math.random() * 60);
-  return days + 'd ' + hours + 'h ' + mins + 'm';
-}
-
-function getRandomLatency() {
-  return Math.floor(Math.random() * 30) + 2;
-}
-
 function intrusionBadge(status) {
   if (status === 'Online') return '<span class="badge b-intrusion-online">Online</span>';
   if (status === 'Offline') return '<span class="badge b-intrusion-offline">Offline</span>';
@@ -4124,16 +4169,6 @@ checkLogin();
 
 if (localStorage.getItem('ccsm_sidebar') === '1') toggleSidebar();
 PINNED_FILES = JSON.parse(localStorage.getItem('ccsm_pinned') || '[]');
-
-// Add change listener for SR client dropdown
-document.addEventListener('DOMContentLoaded', function() {
-  var srClientSelect = document.getElementById('sr-client');
-  if (srClientSelect) {
-    srClientSelect.addEventListener('change', function() {
-      updateSiteZones(this.value);
-    });
-  }
-});
 
 document.addEventListener('click', function(e) {
   var addDropdown = document.getElementById('add-dropdown');
