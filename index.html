@@ -2530,6 +2530,7 @@ async function renderDashboard() {
     document.getElementById('dash-alerts').textContent = stats.alerts;
     document.getElementById('dash-offline').textContent = stats.offline_devices;
     document.getElementById('dash-total').textContent = stats.total_devices || 0;
+    document.getElementById('dash-srs').textContent = stats.open_srs || 0;
   } catch (err) {
     console.error('Dashboard stats error:', err);
     var defective = CAMERAS.filter(function(c) { return c.status === 'Defective' || c.status === 'Offline' || c.status === 'No Power' || c.status === 'No Camera' || c.status === 'Not Working'; }).length;
