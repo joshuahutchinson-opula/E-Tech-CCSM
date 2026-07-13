@@ -93,13 +93,13 @@ app.get('/api/health', (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
   const { username, password } = req.body;
 
-  if (username === 'admin' && password === 'admin123') {
+if (username === 'Admin' && password === 'Ad@E-Tech07') {
     const token = jwt.sign({ id: 1, username: 'admin', client_id: null, role: 'admin' }, process.env.JWT_SECRET || 'secret', { expiresIn: '24h' });
     await logActivity(1, 'admin', 'Login', 'Admin logged in');
     return res.json({ token, user: { id: 1, username: 'admin', client_id: null, role: 'admin' } });
   }
 
-  if (username === 'kftl' && password === 'kftl123') {
+if (username === 'KFTL' && password === 'KFTL@E-Tech0151') {
     const token = jwt.sign({ id: 2, username: 'kftl', client_id: 1, role: 'client' }, process.env.JWT_SECRET || 'secret', { expiresIn: '24h' });
     await logActivity(1, 'kftl', 'Login', 'Client logged in');
     return res.json({ token, user: { id: 2, username: 'kftl', client_id: 1, role: 'client' } });
