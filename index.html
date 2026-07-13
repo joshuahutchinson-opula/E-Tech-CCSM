@@ -393,22 +393,23 @@ input::placeholder,textarea::placeholder { color:var(--text-muted); }
 .switch-uptime.offline { color:var(--danger); }
 
 .outlook-container { display:flex;height:100%;background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;overflow:hidden;min-height:500px; }
-.outlook-folder-pane { width:180px;border-right:1px solid var(--card-border);padding:8px 0;flex-shrink:0;overflow-y:auto; }
-.outlook-folder-item { padding:8px 16px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-secondary);transition:all 0.15s; }
+.outlook-folder-pane { width:56px;min-width:56px;max-width:56px;border-right:1px solid var(--card-border);padding:8px 0;flex-shrink:0;overflow:hidden; }
+.outlook-folder-item { padding:12px 8px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:0;color:var(--text-secondary);transition:all 0.15s; }
 .outlook-folder-item:hover { background:rgba(255,255,255,0.03);color:var(--text-primary); }
 .outlook-folder-item.active { background:rgba(79,140,247,0.08);color:var(--text-primary);border-left:2px solid var(--accent); }
-.outlook-folder-item .folder-count { margin-left:auto;background:rgba(255,255,255,0.05);padding:0 6px;border-radius:8px;font-size:10px; }
-.outlook-folder-item .folder-count.unread { background:var(--accent);color:#fff; }
-.outlook-main { flex:1;display:flex;flex-direction:column;min-width:0; }
+.outlook-folder-item i { font-size:20px;margin:0; }
+.outlook-folder-item .folder-count { display:none; }
+.outlook-main { flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden; }
 .outlook-toolbar { padding:8px 12px;border-bottom:1px solid var(--card-border);display:flex;gap:6px;align-items:center;flex-wrap:wrap; }
 .toolbar-sep { width:1px;height:20px;background:var(--card-border); }
 .outlook-search { padding:8px 12px;border-bottom:1px solid var(--card-border); }
-.outlook-search input { width:100%;background:var(--select-bg);border:1px solid var(--select-border);color:var(--select-color);padding:6px 10px;border-radius:4px;font-size:12px;font-family:var(--font); }
+.outlook-search input { width:100%;background:var(--select-bg);border:1px solid var(--select-border);color:var(--select-color);padding:6px 10px;border-radius:4px;font-size:12px;font-family:var(--font);overflow:hidden; }
 .outlook-search input:focus { outline:none;border-color:var(--accent); }
-.outlook-content { display:flex;flex:1;min-height:0; }
-.outlook-list-pane { width:40%;border-right:1px solid var(--card-border);overflow-y:auto;min-width:200px; }
+.outlook-content { display:flex;flex:1;min-height:0;overflow:hidden; }
+.outlook-list-pane { width:35%;min-width:250px;max-width:400px;border-right:1px solid var(--card-border);overflow-y:auto;overflow-x:hidden; }
 .outlook-list { padding:4px 0; }
-.outlook-reading-pane { flex:1;padding:16px;overflow-y:auto; }
+.outlook-reading-pane { flex:1;padding:20px;overflow-y:auto;overflow-x:hidden;background:#1a1a2e; }
+.outlook-reading-pane * { max-width:100%;word-wrap:break-word;overflow-wrap:break-word; }
 
 .outlook-email { padding:8px 12px;cursor:pointer;display:flex;align-items:flex-start;gap:8px;border-bottom:1px solid var(--card-border);transition:background 0.15s; }
 .outlook-email:hover { background:rgba(255,255,255,0.02); }
@@ -422,30 +423,31 @@ input::placeholder,textarea::placeholder { color:var(--text-muted); }
 .oe-avatar.etech { background:#059669; }
 .oe-content { flex:1;min-width:0; }
 .oe-sender { font-size:12px;font-weight:500;color:var(--text-primary); }
-.oe-subject { font-size:11px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-.oe-preview { font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.oe-subject { font-size:11px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px; }
+.oe-preview { font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px; }
 .oe-meta { display:flex;align-items:center;gap:6px;flex-shrink:0; }
 .oe-date { font-size:10px;color:var(--text-muted);white-space:nowrap; }
 
-.outlook-reading-empty { display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-muted);gap:8px; }
+.outlook-reading-empty { display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,0.3);gap:8px; }
 .outlook-reading-empty i { font-size:48px;opacity:0.2; }
 .outlook-reading-content { display:none;height:100%;flex-direction:column; }
 .outlook-reading-content.active { display:flex; }
-.ore-header { border-bottom:1px solid var(--card-border);padding-bottom:12px;margin-bottom:12px; }
-.ore-subject { font-size:16px;font-weight:600;color:var(--text-primary);margin-bottom:8px; }
+.ore-header { border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:12px;margin-bottom:12px; }
+.ore-subject { font-size:18px;font-weight:600;color:#ffffff;margin-bottom:8px; }
 .ore-sender-row { display:flex;align-items:center;gap:12px;flex-wrap:wrap; }
 .ore-sender-avatar { width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0;background:var(--accent); }
 .ore-sender-avatar.kftl { background:#3b82f6; }
 .ore-sender-avatar.kwl { background:#8b5cf6; }
 .ore-sender-avatar.etech { background:#059669; }
 .ore-sender-info { flex:1; }
-.ore-sender-name { font-size:13px;font-weight:500;color:var(--text-primary); }
-.ore-sender-meta { font-size:11px;color:var(--text-muted); }
+.ore-sender-name { font-size:13px;font-weight:500;color:#ffffff; }
+.ore-sender-meta { font-size:11px;color:rgba(255,255,255,0.5); }
 .ore-actions { display:flex;gap:4px;flex-wrap:wrap; }
-.ore-body { flex:1;font-size:13px;color:var(--text-secondary);line-height:1.6;white-space:pre-wrap;padding:8px 0; }
-.ore-attachments { border-top:1px solid var(--card-border);padding-top:12px;margin-top:12px; }
-.ore-att-label { font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px; }
-.att-chip { display:inline-block;padding:4px 10px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:4px;font-size:11px;color:var(--text-secondary);margin-right:4px; }
+.ore-body { flex:1;font-size:14px;color:#ffffff;line-height:1.8;white-space:pre-wrap;padding:8px 0;background:transparent; }
+.ore-body * { color:#ffffff;background:transparent;max-width:100%; }
+.ore-attachments { border-top:1px solid rgba(255,255,255,0.1);padding-top:12px;margin-top:12px; }
+.ore-att-label { font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px; }
+.att-chip { display:inline-block;padding:4px 10px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:4px;font-size:11px;color:#ffffff;margin-right:4px; }
 
 .ore-compose-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:none;align-items:center;justify-content:center; }
 .ore-compose-overlay.open { display:flex; }
@@ -456,6 +458,10 @@ input::placeholder,textarea::placeholder { color:var(--text-muted); }
 .ore-compose-body input:focus,.ore-compose-body textarea:focus { outline:none;border-color:var(--accent); }
 .ore-compose-body textarea { min-height:150px;resize:vertical; }
 .ore-compose-footer { padding:12px 20px;border-top:1px solid var(--card-border);display:flex;justify-content:flex-end;gap:8px; }
+
+#inbox-detail-content { overflow-y:auto;overflow-x:hidden;height:100%; }
+#inbox-detail-body { color:#ffffff; }
+#inbox-detail-body * { color:#ffffff;max-width:100%; }
 
 .sr-toolbar { display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center; }
 .sr-toolbar input,.sr-toolbar select { background:var(--select-bg);border:1px solid var(--select-border);color:var(--select-color);padding:6px 10px;border-radius:4px;font-size:12px;font-family:var(--font);transition:all 0.2s; }
@@ -660,7 +666,7 @@ input::placeholder,textarea::placeholder { color:var(--text-muted); }
   .modal-grid{grid-template-columns:1fr;}.modal-close{top:10px;right:10px;font-size:16px;}
   .search-bar{flex-direction:column;}.search-bar input,.search-bar select{width:100%;}
   .tbl{font-size:10px;}.tbl th,.tbl td{padding:5px 4px;}.btn{font-size:10px;padding:5px 10px;}
-  .outlook-folder-pane{width:120px;}.outlook-list-pane{width:35%;}
+  .outlook-list-pane{width:35%;min-width:200px;max-width:350px;}
   .door-stats,.server-stats-grid,.switch-stats-grid,.assets-stats-grid,.intrusion-stats-grid{grid-template-columns:repeat(2,1fr);}
   .file-item{grid-template-columns:30px 1fr 60px 60px;}.file-item .file-modified{display:none;}
 }
@@ -668,34 +674,16 @@ input::placeholder,textarea::placeholder { color:var(--text-muted); }
   .stats-grid{grid-template-columns:1fr;}.topbar{height:44px;padding:0 8px;}
   .page-title{font-size:12px;}.content{padding:8px 6px;}.panel{padding:12px 10px;}
   .modal{padding:12px;}.modal-title{font-size:13px;}
-  .outlook-container{flex-direction:column;min-height:400px;}
-  .outlook-folder-pane{width:100%;border-right:none;border-bottom:1px solid var(--card-border);max-height:120px;}
-  .outlook-content{flex-direction:column;}.outlook-list-pane{width:100%;border-right:none;border-bottom:1px solid var(--card-border);max-height:200px;}
+  .outlook-container{flex-direction:column;min-height:500px;}
+  .outlook-folder-pane{width:100%;min-width:100%;max-width:100%;border-right:none;border-bottom:1px solid var(--card-border);display:flex;flex-direction:row;padding:0;max-height:48px;overflow-x:auto;}
+  .outlook-folder-item{flex:0 0 auto;padding:12px 16px;font-size:0;}
+  .outlook-folder-item i{font-size:18px;}
+  .outlook-content{flex-direction:column;}
+  .outlook-list-pane{width:100%;min-width:100%;max-width:100%;border-right:none;border-bottom:1px solid var(--card-border);max-height:200px;}
+  .outlook-reading-pane{background:#1a1a2e;}
   .door-stats,.server-stats-grid,.switch-stats-grid,.assets-stats-grid,.intrusion-stats-grid{grid-template-columns:1fr 1fr;}
   .file-item{grid-template-columns:30px 1fr;gap:4px;}.file-item .file-type,.file-item .file-size,.file-item .file-modified{display:none;}
   .ore-actions{flex-wrap:wrap;}
-.outlook-container { min-height: 500px !important; overflow: hidden !important; }
-.outlook-folder-pane { width: 56px !important; min-width: 56px !important; max-width: 56px !important; flex-shrink: 0 !important; }
-.outlook-folder-item { padding: 12px 8px !important; justify-content: center !important; font-size: 0 !important; }
-.outlook-folder-item i { font-size: 20px !important; margin: 0 !important; }
-.outlook-folder-item .folder-count { display: none !important; }
-.outlook-list-pane { width: 35% !important; min-width: 250px !important; max-width: 400px !important; overflow-y: auto !important; overflow-x: hidden !important; }
-.outlook-reading-pane { flex: 1 !important; background: #1a1a2e !important; overflow-y: auto !important; overflow-x: hidden !important; padding: 20px !important; }
-.outlook-reading-pane * { max-width: 100% !important; word-wrap: break-word !important; }
-.outlook-reading-empty { color: rgba(255,255,255,0.3) !important; }
-.ore-subject { color: #ffffff !important; font-size: 18px !important; }
-.ore-sender-name { color: #ffffff !important; }
-.ore-sender-meta { color: rgba(255,255,255,0.5) !important; }
-.ore-body { color: #ffffff !important; font-size: 14px !important; line-height: 1.8 !important; background: transparent !important; }
-.ore-body * { color: #ffffff !important; background: transparent !important; }
-.ore-header { border-bottom: 1px solid rgba(255,255,255,0.1) !important; }
-.outlook-email { border-bottom: 1px solid var(--card-border) !important; }
-.outlook-email:hover { background: rgba(255,255,255,0.03) !important; }
-.oe-subject { max-width: 180px !important; }
-.oe-preview { max-width: 180px !important; }
-#inbox-detail-content { overflow-y: auto !important; overflow-x: hidden !important; height: 100% !important; }
-.outlook-content { overflow: hidden !important; }
-.outlook-main { overflow: hidden !important; }
 }
 </style>
 </head>
@@ -742,9 +730,9 @@ input::placeholder,textarea::placeholder { color:var(--text-muted); }
 <div class="tab" id="tab-inbox" style="height:100%">
 <div class="outlook-container">
 <div class="outlook-folder-pane" id="inbox-folder-pane">
-<div class="outlook-folder-item active" data-folder="inbox" onclick="setInboxFolder('inbox', this)"><i class="ti ti-inbox"></i> Inbox</div>
-<div class="outlook-folder-item" data-folder="sent" onclick="setInboxFolder('sent', this)"><i class="ti ti-send"></i> Sent</div>
-<div class="outlook-folder-item" data-folder="flagged" onclick="setInboxFolder('flagged', this)"><i class="ti ti-flag"></i> Flagged</div>
+<div class="outlook-folder-item active" data-folder="inbox" onclick="setInboxFolder('inbox', this)" title="Inbox"><i class="ti ti-inbox"></i></div>
+<div class="outlook-folder-item" data-folder="sent" onclick="setInboxFolder('sent', this)" title="Sent"><i class="ti ti-send"></i></div>
+<div class="outlook-folder-item" data-folder="flagged" onclick="setInboxFolder('flagged', this)" title="Flagged"><i class="ti ti-flag"></i></div>
 </div>
 <div class="outlook-main">
 <div class="outlook-toolbar">
@@ -867,7 +855,6 @@ async function handleMicrosoftCallback(code) {
   var v = sessionStorage.getItem('msCodeVerifier') || '';
   sessionStorage.removeItem('msCodeVerifier');
   try {
-    // Exchange code for token directly from browser
     const tokenResponse = await fetch(
       `https://login.microsoftonline.com/${MS_TENANT_ID}/oauth2/v2.0/token`,
       {
@@ -885,13 +872,11 @@ async function handleMicrosoftCallback(code) {
     const tokenData = await tokenResponse.json();
     const accessToken = tokenData.access_token;
 
-    // Get user info from Microsoft Graph from browser
     const userResponse = await fetch('https://graph.microsoft.com/v1.0/me', {
       headers: { Authorization: `Bearer ${accessToken}` }
     });
     const msUser = await userResponse.json();
 
-    // Send to our backend to create session
     const data = await apiCall('/auth/microsoft-callback', {
       method: 'POST',
       body: JSON.stringify({
@@ -1036,7 +1021,10 @@ function viewEmail(id) {
   document.getElementById('inbox-detail-subject').textContent = e.subject || '(no subject)';
   document.getElementById('inbox-detail-from').textContent = e.sender || 'Unknown';
   document.getElementById('inbox-detail-meta').textContent = 'To: ' + (e.recipient || 'support@e-techsystemsja.com') + ' · ' + new Date(e.created_at).toLocaleString();
-  document.getElementById('inbox-detail-body').innerHTML = (e.fullBody || e.body || 'No content').replace(/\n/g, '<br>');
+  var bodyContent = (e.fullBody || e.body || 'No content');
+  bodyContent = bodyContent.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+  bodyContent = bodyContent.replace(/<[^>]*>/g, '');
+  document.getElementById('inbox-detail-body').textContent = bodyContent;
   var av = document.getElementById('inbox-sender-avatar');
   av.textContent = (e.sender || '?').charAt(0).toUpperCase();
   av.className = 'ore-sender-avatar';
