@@ -147,52 +147,77 @@ app.post('/api/auth/login', async (req, res) => {
 
 const MS_CLIENT_ID = process.env.MS_CLIENT_ID || 'e87a6592-aaa5-4a13-9c85-8dbc8e9cd7b2';
 const MS_TENANT_ID = process.env.MS_TENANT_ID || '799ae988-9d3d-40d3-bf5c-93197f5d8d44';
-const MS_REDIRECT_URI = process.env.MS_REDIRECT_URI || 'https://e-tech-ccsm-production.up.railway.app/';
+const MS_CLIENT_SECRET = process.env.MS_CLIENT_SECRET || '';
 
 app.post('/api/auth/microsoft', async (req, res) => {
   const { code, code_verifier } = req.body;
   
+  if (!code) {
+    return res.status(400).json({ error: 'No authorization code provided' });
+  }
+
   try {
-    // Exchange code for token
     const tokenResponse = await axios.post(
       `https://login.microsoftonline.com/${MS_TENANT_ID}/oauth2/v2.0/token`,
       new URLSearchParams({
         client_id: MS_CLIENT_ID,
+        client_secret: MS_CLIENT_SECRET,
         grant_type: 'authorization_code',
         code: code,
-        redirect_uri: MS_REDIRECT_URI,
-        code_verifier: code_verifier
+        redirect_uri: 'https://e-tech-ccsm-production.up.railway.app/',
+        code_verifier: code_verifier || ''
       }),
       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
     );
 
     const accessToken = tokenResponse.data.access_token;
 
-    // Get user info from Microsoft Graph
     const userResponse = await axios.get('https://graph.microsoft.com/v1.0/me', {
       headers: { Authorization: `Bearer ${accessToken}` }
     });
 
     const msUser = userResponse.data;
-    const email = msUser.mail || msUser.userPrincipalName;
-    const displayName = msUser.displayName;
+    const email = msUser.mail || msUser.userPrincipalName || '';
+    const displayName = msUser.displayName || 'User';
+    
+    const emailName = email.split('@')[0] || '';
+    const username = emailName.charAt(0).toUpperCase() + emailName.slice(1);
 
-    // Check if user exists in our system or create session
+    const isETechUser = email.toLowerCase().endsWith('@e-techsystemsja.com');
+    const role = isETechUser ? 'admin' : 'client';
+    const clientId = isETechUser ? null : 1;
+
     const jwtToken = jwt.sign(
-      { id: msUser.id, username: displayName, email: email, client_id: null, role: 'admin', msToken: accessToken },
+      { 
+        id: msUser.id, 
+        username: username, 
+        email: email, 
+        client_id: clientId, 
+        role: role,
+        msToken: accessToken 
+      },
       process.env.JWT_SECRET || 'secret',
       { expiresIn: '24h' }
     );
 
-    await logActivity(1, displayName, 'Login', 'Microsoft login — ' + email);
+    const logClientId = clientId || 1;
+    await logActivity(logClientId, username, 'Login', `Microsoft login — ${email} (${role})`);
 
     res.json({
       token: jwtToken,
-      user: { id: msUser.id, username: displayName, email: email, client_id: null, role: 'admin' }
+      user: { 
+        id: msUser.id, 
+        username: username, 
+        email: email, 
+        client_id: clientId, 
+        role: role 
+      }
     });
+
+    console.log(`✅ Microsoft login: ${username} (${email}) — Role: ${role}`);
   } catch (err) {
-    console.error('Microsoft auth error:', err.message);
-    res.status(401).json({ error: 'Microsoft authentication failed' });
+    console.error('Microsoft auth error:', err.response?.data || err.message);
+    res.status(401).json({ error: 'Microsoft authentication failed. ' + (err.response?.data?.error_description || err.message) });
   }
 });
 
@@ -265,14 +290,35 @@ app.get('/api/cameras', authMiddleware, async (req, res) => {
 app.put('/api/cameras/:id', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
-  const { status, comments } = req.body;
+  const { status, comments, name, zone, model, manufacturer, resolution, archiver, ip_address, mac_address, warranty, purchase_date } = req.body;
   try {
     const clientId = req.user.role === 'admin' ? null : req.user.client_id;
-    const query = clientId ? 
-      'UPDATE cameras SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3 AND client_id = $4' :
-      'UPDATE cameras SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3';
-    const params = clientId ? [status, comments, id, clientId] : [status, comments, id];
-    await pool.query(query, params);
+    
+    // For admins, allow editing all fields. For clients, only status and comments.
+    if (req.user.role === 'admin') {
+      const query = clientId ? 
+        `UPDATE cameras SET name = COALESCE($1, name), zone = COALESCE($2, zone), status = COALESCE($3, status), 
+         model = COALESCE($4, model), manufacturer = COALESCE($5, manufacturer), resolution = COALESCE($6, resolution),
+         archiver = COALESCE($7, archiver), ip_address = COALESCE($8, ip_address), mac_address = COALESCE($9, mac_address),
+         warranty = COALESCE($10, warranty), purchase_date = COALESCE($11, purchase_date), comments = COALESCE($12, comments),
+         updated_at = CURRENT_TIMESTAMP WHERE id = $13 AND client_id = $14` :
+        `UPDATE cameras SET name = COALESCE($1, name), zone = COALESCE($2, zone), status = COALESCE($3, status), 
+         model = COALESCE($4, model), manufacturer = COALESCE($5, manufacturer), resolution = COALESCE($6, resolution),
+         archiver = COALESCE($7, archiver), ip_address = COALESCE($8, ip_address), mac_address = COALESCE($9, mac_address),
+         warranty = COALESCE($10, warranty), purchase_date = COALESCE($11, purchase_date), comments = COALESCE($12, comments),
+         updated_at = CURRENT_TIMESTAMP WHERE id = $13`;
+      const params = clientId ? 
+        [name, zone, status, model, manufacturer, resolution, archiver, ip_address, mac_address, warranty, purchase_date, comments, id, clientId] :
+        [name, zone, status, model, manufacturer, resolution, archiver, ip_address, mac_address, warranty, purchase_date, comments, id];
+      await pool.query(query, params);
+    } else {
+      const query = clientId ? 
+        'UPDATE cameras SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3 AND client_id = $4' :
+        'UPDATE cameras SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3';
+      const params = clientId ? [status, comments, id, clientId] : [status, comments, id];
+      await pool.query(query, params);
+    }
+    
     const logClientId = clientId || 1;
     await logActivity(logClientId, req.user.username, 'Updated', 'Camera ' + id + ' updated');
     res.json({ success: true });
@@ -319,9 +365,9 @@ app.post('/api/import/cameras', authMiddleware, async (req, res) => {
   try {
     for (const cam of cameras) {
       await pool.query(
-        `INSERT INTO cameras (client_id, name, zone, status, comments, model, manufacturer, resolution, archiver, ip_address, mac_address, warranty, date_cleaned) 
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
-        [cam.client_id || 1, cam.name || '', cam.zone || '', cam.status || 'Working', cam.comments || '', cam.model || '', cam.manufacturer || '', cam.resolution || '', cam.archiver || '', cam.ip_address || '', cam.mac_address || '', cam.warranty || '', cam.date_cleaned || null]
+        `INSERT INTO cameras (client_id, name, zone, status, comments, model, manufacturer, resolution, archiver, ip_address, mac_address, warranty, purchase_date, date_cleaned) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
+        [cam.client_id || 1, cam.name || '', cam.zone || '', cam.status || 'Working', cam.comments || '', cam.model || '', cam.manufacturer || '', cam.resolution || '', cam.archiver || '', cam.ip_address || '', cam.mac_address || '', cam.warranty || '', cam.purchase_date || null, cam.date_cleaned || null]
       );
       imported++;
     }
@@ -419,14 +465,36 @@ app.get('/api/doors', authMiddleware, async (req, res) => {
 app.put('/api/doors/:id', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
-  const { status, comments } = req.body;
+  const { status, comments, name, zone, tech, reader, lock_type, ip, controllerType, doorSwing, accessType, antiPassback, powered, purchase_date, warranty_expiry } = req.body;
   try {
     const clientId = req.user.role === 'admin' ? null : req.user.client_id;
-    const query = clientId ? 
-      'UPDATE doors SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3 AND client_id = $4' :
-      'UPDATE doors SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3';
-    const params = clientId ? [status, comments, id, clientId] : [status, comments, id];
-    await pool.query(query, params);
+    
+    if (req.user.role === 'admin') {
+      const query = clientId ? 
+        `UPDATE doors SET name = COALESCE($1, name), zone = COALESCE($2, zone), status = COALESCE($3, status),
+         tech = COALESCE($4, tech), reader = COALESCE($5, reader), lock_type = COALESCE($6, lock_type),
+         ip = COALESCE($7, ip), controllerType = COALESCE($8, controllerType), doorSwing = COALESCE($9, doorSwing),
+         accessType = COALESCE($10, accessType), antiPassback = COALESCE($11, antiPassback), powered = COALESCE($12, powered),
+         purchase_date = COALESCE($13, purchase_date), warranty_expiry = COALESCE($14, warranty_expiry),
+         comments = COALESCE($15, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $16 AND client_id = $17` :
+        `UPDATE doors SET name = COALESCE($1, name), zone = COALESCE($2, zone), status = COALESCE($3, status),
+         tech = COALESCE($4, tech), reader = COALESCE($5, reader), lock_type = COALESCE($6, lock_type),
+         ip = COALESCE($7, ip), controllerType = COALESCE($8, controllerType), doorSwing = COALESCE($9, doorSwing),
+         accessType = COALESCE($10, accessType), antiPassback = COALESCE($11, antiPassback), powered = COALESCE($12, powered),
+         purchase_date = COALESCE($13, purchase_date), warranty_expiry = COALESCE($14, warranty_expiry),
+         comments = COALESCE($15, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $16`;
+      const params = clientId ? 
+        [name, zone, status, tech, reader, lock_type, ip, controllerType, doorSwing, accessType, antiPassback, powered, purchase_date, warranty_expiry, comments, id, clientId] :
+        [name, zone, status, tech, reader, lock_type, ip, controllerType, doorSwing, accessType, antiPassback, powered, purchase_date, warranty_expiry, comments, id];
+      await pool.query(query, params);
+    } else {
+      const query = clientId ? 
+        'UPDATE doors SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3 AND client_id = $4' :
+        'UPDATE doors SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3';
+      const params = clientId ? [status, comments, id, clientId] : [status, comments, id];
+      await pool.query(query, params);
+    }
+    
     const logClientId = clientId || 1;
     await logActivity(logClientId, req.user.username, 'Updated', 'Door ' + id + ' updated');
     res.json({ success: true });
@@ -455,14 +523,36 @@ app.get('/api/servers', authMiddleware, async (req, res) => {
 app.put('/api/servers/:id', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
-  const { status, comments } = req.body;
+  const { status, comments, name, zone, make, model, capacity, used, health, apps, ip_address, serial, purchase_date, warranty_expiry } = req.body;
   try {
     const clientId = req.user.role === 'admin' ? null : req.user.client_id;
-    const query = clientId ? 
-      'UPDATE servers SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3 AND client_id = $4' :
-      'UPDATE servers SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3';
-    const params = clientId ? [status, comments, id, clientId] : [status, comments, id];
-    await pool.query(query, params);
+    
+    if (req.user.role === 'admin') {
+      const query = clientId ? 
+        `UPDATE servers SET name = COALESCE($1, name), zone = COALESCE($2, zone), status = COALESCE($3, status),
+         make = COALESCE($4, make), model = COALESCE($5, model), capacity = COALESCE($6, capacity),
+         used = COALESCE($7, used), health = COALESCE($8, health), apps = COALESCE($9, apps),
+         ip_address = COALESCE($10, ip_address), serial = COALESCE($11, serial),
+         purchase_date = COALESCE($12, purchase_date), warranty_expiry = COALESCE($13, warranty_expiry),
+         comments = COALESCE($14, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $15 AND client_id = $16` :
+        `UPDATE servers SET name = COALESCE($1, name), zone = COALESCE($2, zone), status = COALESCE($3, status),
+         make = COALESCE($4, make), model = COALESCE($5, model), capacity = COALESCE($6, capacity),
+         used = COALESCE($7, used), health = COALESCE($8, health), apps = COALESCE($9, apps),
+         ip_address = COALESCE($10, ip_address), serial = COALESCE($11, serial),
+         purchase_date = COALESCE($12, purchase_date), warranty_expiry = COALESCE($13, warranty_expiry),
+         comments = COALESCE($14, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $15`;
+      const params = clientId ? 
+        [name, zone, status, make, model, capacity, used, health, apps, ip_address, serial, purchase_date, warranty_expiry, comments, id, clientId] :
+        [name, zone, status, make, model, capacity, used, health, apps, ip_address, serial, purchase_date, warranty_expiry, comments, id];
+      await pool.query(query, params);
+    } else {
+      const query = clientId ? 
+        'UPDATE servers SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3 AND client_id = $4' :
+        'UPDATE servers SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3';
+      const params = clientId ? [status, comments, id, clientId] : [status, comments, id];
+      await pool.query(query, params);
+    }
+    
     const logClientId = clientId || 1;
     await logActivity(logClientId, req.user.username, 'Updated', 'Server ' + id + ' updated');
     res.json({ success: true });
@@ -491,14 +581,32 @@ app.get('/api/switches', authMiddleware, async (req, res) => {
 app.put('/api/switches/:id', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
-  const { status, comments } = req.body;
+  const { status, comments, name, zone, model, firmware, ip_address, mac, purchase_date, warranty_expiry } = req.body;
   try {
     const clientId = req.user.role === 'admin' ? null : req.user.client_id;
-    const query = clientId ? 
-      'UPDATE switches SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3 AND client_id = $4' :
-      'UPDATE switches SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3';
-    const params = clientId ? [status, comments, id, clientId] : [status, comments, id];
-    await pool.query(query, params);
+    
+    if (req.user.role === 'admin') {
+      const query = clientId ? 
+        `UPDATE switches SET name = COALESCE($1, name), zone = COALESCE($2, zone), status = COALESCE($3, status),
+         model = COALESCE($4, model), firmware = COALESCE($5, firmware), ip_address = COALESCE($6, ip_address),
+         mac = COALESCE($7, mac), purchase_date = COALESCE($8, purchase_date), warranty_expiry = COALESCE($9, warranty_expiry),
+         comments = COALESCE($10, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $11 AND client_id = $12` :
+        `UPDATE switches SET name = COALESCE($1, name), zone = COALESCE($2, zone), status = COALESCE($3, status),
+         model = COALESCE($4, model), firmware = COALESCE($5, firmware), ip_address = COALESCE($6, ip_address),
+         mac = COALESCE($7, mac), purchase_date = COALESCE($8, purchase_date), warranty_expiry = COALESCE($9, warranty_expiry),
+         comments = COALESCE($10, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $11`;
+      const params = clientId ? 
+        [name, zone, status, model, firmware, ip_address, mac, purchase_date, warranty_expiry, comments, id, clientId] :
+        [name, zone, status, model, firmware, ip_address, mac, purchase_date, warranty_expiry, comments, id];
+      await pool.query(query, params);
+    } else {
+      const query = clientId ? 
+        'UPDATE switches SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3 AND client_id = $4' :
+        'UPDATE switches SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3';
+      const params = clientId ? [status, comments, id, clientId] : [status, comments, id];
+      await pool.query(query, params);
+    }
+    
     const logClientId = clientId || 1;
     await logActivity(logClientId, req.user.username, 'Updated', 'Switch ' + id + ' updated');
     res.json({ success: true });
@@ -561,7 +669,7 @@ app.put('/api/intrusion/:id', authMiddleware, async (req, res) => {
 });
 
 // ============================================================
-// SERVICE REQUESTS — WITH NOTIFICATION & TRANSFER
+// SERVICE REQUESTS — WITH RELATED HARDWARE
 // ============================================================
 
 app.get('/api/service-requests', authMiddleware, async (req, res) => {
@@ -574,6 +682,11 @@ app.get('/api/service-requests', authMiddleware, async (req, res) => {
     for (const sr of result.rows) {
       const history = await pool.query('SELECT * FROM sr_history WHERE sr_id = $1 ORDER BY created_at', [sr.id]);
       sr.history = history.rows;
+      // Parse related_hardware JSON
+      if (sr.related_hardware && typeof sr.related_hardware === 'string') {
+        try { sr.related_hardware = JSON.parse(sr.related_hardware); } catch (e) { sr.related_hardware = []; }
+      }
+      if (!sr.related_hardware) sr.related_hardware = [];
     }
     res.json(result.rows);
   } catch (err) {
@@ -583,33 +696,21 @@ app.get('/api/service-requests', authMiddleware, async (req, res) => {
 
 app.post('/api/service-requests', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
-  const { subject, client, site, category, priority, assigned_to, body } = req.body;
+  const { subject, client, site, category, priority, assigned_to, body, related_hardware } = req.body;
   const srId = `SR-${String(Math.floor(Math.random() * 9000) + 1000)}`;
   const clientId = req.user.role === 'admin' ? 1 : req.user.client_id;
   try {
     const result = await pool.query(
-      `INSERT INTO service_requests (client_id, sr_id, subject, client, site, category, priority, assigned_to, body, received, created_by) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_DATE, $10) RETURNING *`,
-      [clientId, srId, subject, client, site, category, priority, assigned_to, body, req.user.username]
+      `INSERT INTO service_requests (client_id, sr_id, subject, client, site, category, priority, assigned_to, body, received, created_by, related_hardware) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_DATE, $10, $11) RETURNING *`,
+      [clientId, srId, subject, client, site, category, priority, assigned_to, body, req.user.username, JSON.stringify(related_hardware || [])]
     );
     await pool.query('INSERT INTO sr_history (sr_id, time, msg) VALUES ($1, $2, $3)', [result.rows[0].id, new Date().toLocaleTimeString(), 'Created by ' + req.user.username]);
-    await logActivity(clientId, req.user.username, 'Created', 'SR ' + srId + ' created for ' + client + ' — assigned to ' + assigned_to);
+    await logActivity(clientId, req.user.username, 'Created', 'SR ' + srId + ' created for ' + client);
 
-    // Send email notification for new SR
-    const emailBody = `
-      <h2>New Service Request: ${srId}</h2>
-      <p><strong>Client:</strong> ${client}</p>
-      <p><strong>Site:</strong> ${site}</p>
-      <p><strong>Category:</strong> ${category}</p>
-      <p><strong>Priority:</strong> ${priority}</p>
-      <p><strong>Assigned To:</strong> ${assigned_to}</p>
-      <p><strong>Subject:</strong> ${subject}</p>
-      <p><strong>Description:</strong> ${body || 'No description'}</p>
-      <p><strong>Created By:</strong> ${req.user.username}</p>
-      <hr>
-      <p>View in CAMS: <a href="${req.headers.origin || 'https://e-tech-ccsm-production.up.railway.app'}">Open Dashboard</a></p>
-    `;
-    await sendEmailNotification('support@e-techsystems.com', `[CAMS] New SR: ${srId} — ${subject}`, emailBody, req.headers.authorization);
+    // Send email notification
+    const emailBody = `<h2>New Service Request: ${srId}</h2><p><strong>Client:</strong> ${client}</p><p><strong>Site:</strong> ${site}</p><p><strong>Category:</strong> ${category}</p><p><strong>Priority:</strong> ${priority}</p><p><strong>Assigned To:</strong> ${assigned_to}</p><p><strong>Subject:</strong> ${subject}</p><p><strong>Description:</strong> ${body || 'No description'}</p><hr><p>View in CAMS: <a href="https://e-tech-ccsm-production.up.railway.app">Open Dashboard</a></p>`;
+    await sendEmailNotification('support@e-techsystemsja.com', `[CAMS] New SR: ${srId} — ${subject}`, emailBody, req.headers.authorization);
 
     res.json(result.rows[0]);
   } catch (err) {
@@ -623,7 +724,6 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
   const { priority, assigned_to, status, notes } = req.body;
   const clientId = req.user.role === 'admin' ? null : req.user.client_id;
   try {
-    // Get current SR for comparison
     const current = await pool.query('SELECT * FROM service_requests WHERE id = $1', [id]);
     const oldSr = current.rows[0];
     const oldAssigned = oldSr?.assigned_to;
@@ -635,7 +735,6 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
     const params = clientId ? [priority, assigned_to, status, notes, id, clientId] : [priority, assigned_to, status, notes, id];
     await pool.query(query, params);
 
-    // Track assignment changes
     if (assigned_to && assigned_to !== oldAssigned) {
       await pool.query('INSERT INTO sr_history (sr_id, time, msg) VALUES ($1, $2, $3)', 
         [id, new Date().toLocaleTimeString(), `Transferred from ${oldAssigned || 'Unassigned'} to ${assigned_to} by ${req.user.username}`]);
@@ -647,31 +746,13 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
     const logClientId = clientId || 1;
     await logActivity(logClientId, req.user.username, 'Updated', 'SR ' + id + ' updated to ' + status);
 
-    // Send resolution report when resolved
     if (status === 'Resolved' && oldStatus !== 'Resolved') {
       const updated = await pool.query('SELECT * FROM service_requests WHERE id = $1', [id]);
       const sr = updated.rows[0];
       const history = await pool.query('SELECT * FROM sr_history WHERE sr_id = $1 ORDER BY created_at', [id]);
       
-      const reportBody = `
-        <h2>Service Request Resolved: ${sr.sr_id}</h2>
-        <p><strong>Client:</strong> ${sr.client}</p>
-        <p><strong>Site:</strong> ${sr.site}</p>
-        <p><strong>Category:</strong> ${sr.category}</p>
-        <p><strong>Priority:</strong> ${sr.priority}</p>
-        <p><strong>Subject:</strong> ${sr.subject}</p>
-        <p><strong>Created By:</strong> ${sr.created_by}</p>
-        <p><strong>Resolved By:</strong> ${req.user.username}</p>
-        <p><strong>Resolution Notes:</strong> ${notes || 'No notes'}</p>
-        <hr>
-        <h3>Timeline</h3>
-        <ul>
-          ${history.rows.map(h => `<li>${h.time} — ${h.msg}</li>`).join('')}
-        </ul>
-        <hr>
-        <p>View in CAMS: <a href="${req.headers.origin || 'https://e-tech-ccsm-production.up.railway.app'}">Open Dashboard</a></p>
-      `;
-      await sendEmailNotification('support@e-techsystems.com', `[CAMS] RESOLVED: ${sr.sr_id} — ${sr.subject}`, reportBody, req.headers.authorization);
+      const reportBody = `<h2>Service Request Resolved: ${sr.sr_id}</h2><p><strong>Client:</strong> ${sr.client}</p><p><strong>Site:</strong> ${sr.site}</p><p><strong>Category:</strong> ${sr.category}</p><p><strong>Priority:</strong> ${sr.priority}</p><p><strong>Subject:</strong> ${sr.subject}</p><p><strong>Created By:</strong> ${sr.created_by}</p><p><strong>Resolved By:</strong> ${req.user.username}</p><p><strong>Resolution Notes:</strong> ${notes || 'No notes'}</p><hr><h3>Timeline</h3><ul>${history.rows.map(h => `<li>${h.time} — ${h.msg}</li>`).join('')}</ul><hr><p>View in CAMS: <a href="https://e-tech-ccsm-production.up.railway.app">Open Dashboard</a></p>`;
+      await sendEmailNotification('support@e-techsystemsja.com', `[CAMS] RESOLVED: ${sr.sr_id} — ${sr.subject}`, reportBody, req.headers.authorization);
     }
 
     const updated = await pool.query('SELECT * FROM service_requests WHERE id = $1', [id]);
@@ -680,10 +761,6 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-// ============================================================
-// SR TRANSFER ENDPOINT
-// ============================================================
 
 app.post('/api/service-requests/:id/transfer', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
@@ -879,7 +956,6 @@ app.post('/api/outlook/delete/:id', authMiddleware, async (req, res) => {
   catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Convert email to SR
 app.post('/api/outlook/convert-to-sr/:id', authMiddleware, async (req, res) => {
   try {
     const response = await axios.get(`https://graph.microsoft.com/v1.0/me/messages/${req.params.id}`, {
