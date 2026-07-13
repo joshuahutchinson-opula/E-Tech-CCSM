@@ -687,7 +687,7 @@ app.get('/api/outlook/emails', authMiddleware, async (req, res) => {
       default: endpoint = `https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/mailFolders/inbox/messages`;
     }
     const response = await axios.get(endpoint, {
-      headers: { Authorization: req.headers.authorization },
+      headers: { Authorization: `Bearer ${req.user.msToken}` },
       params: { $top: 100, $orderby: 'receivedDateTime desc', $select: 'id,subject,from,toRecipients,receivedDateTime,bodyPreview,body,isRead,flag,hasAttachments,webLink' }
     });
     const emails = response.data.value.map(msg => ({
@@ -746,7 +746,7 @@ app.post('/api/outlook/delete/:id', authMiddleware, async (req, res) => {
 
 app.post('/api/outlook/convert-to-sr/:id', authMiddleware, async (req, res) => {
   try {
-    const response = await axios.get(`https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/messages/${req.params.id}`, { headers: { Authorization: req.headers.authorization } });
+    const response = await axios.get(`https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/messages/${req.params.id}`, { headers: { Authorization: `Bearer ${req.user.msToken}` } });
     const msg = response.data;
     const srId = `SR-${String(Math.floor(Math.random() * 9000) + 1000)}`;
     const subject = msg.subject || 'Converted from email';
@@ -767,14 +767,14 @@ app.get('/api/files/graph', authMiddleware, async (req, res) => {
   try {
     const folder = req.query.folder || '';
     const endpoint = folder ? `https://graph.microsoft.com/v1.0/me/drive/root:/${folder}:/children` : 'https://graph.microsoft.com/v1.0/me/drive/root/children';
-    const response = await axios.get(endpoint, { headers: { Authorization: req.headers.authorization } });
+    const response = await axios.get(endpoint, { headers: { Authorization: `Bearer ${req.user.msToken}` } });
     const files = response.data.value.map(item => ({ id: item.id, name: item.name, type: item.folder ? 'folder' : (item.file?.mimeType||'file'), size: item.size, modified: item.lastModifiedDateTime, webUrl: item.webUrl, downloadUrl: item['@microsoft.graph.downloadUrl'], isFolder: !!item.folder }));
     res.json(files);
   } catch (err) { console.error('Files fetch error:', err.message); res.json([]); }
 });
 
 app.get('/api/files/download/:id', authMiddleware, async (req, res) => {
-  try { const response = await axios.get(`https://graph.microsoft.com/v1.0/me/drive/items/${req.params.id}`, { headers: { Authorization: req.headers.authorization } }); res.redirect(response.data['@microsoft.graph.downloadUrl']); }
+  try { const response = await axios.get(`https://graph.microsoft.com/v1.0/me/drive/items/${req.params.id}`, { headers: { Authorization: `Bearer ${req.user.msToken}` } }); res.redirect(response.data['@microsoft.graph.downloadUrl']); }
   catch (err) { res.status(500).json({ error: err.message }); }
 });
 
