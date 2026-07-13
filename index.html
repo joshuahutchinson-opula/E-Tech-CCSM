@@ -674,32 +674,28 @@ input::placeholder,textarea::placeholder { color:var(--text-muted); }
   .door-stats,.server-stats-grid,.switch-stats-grid,.assets-stats-grid,.intrusion-stats-grid{grid-template-columns:1fr 1fr;}
   .file-item{grid-template-columns:30px 1fr;gap:4px;}.file-item .file-type,.file-item .file-size,.file-item .file-modified{display:none;}
   .ore-actions{flex-wrap:wrap;}
-  /* Inbox fixes */
-.outlook-container { min-height: 500px; overflow: hidden; }
-.outlook-folder-pane { width: 56px !important; min-width: 56px !important; flex-shrink: 0; }
-.outlook-folder-item { padding: 12px 8px; justify-content: center; font-size: 0; }
-.outlook-folder-item i { font-size: 20px; margin: 0; }
-.outlook-folder-item .folder-count { display: none; }
-.outlook-list-pane { width: 35% !important; min-width: 250px; overflow-y: auto; overflow-x: hidden; }
-.outlook-reading-pane { flex: 1; background: #1a1a2e; overflow-y: auto; overflow-x: hidden; padding: 20px; }
-.outlook-reading-pane * { max-width: 100%; word-wrap: break-word; }
-.outlook-reading-empty { color: rgba(255,255,255,0.3); }
-.outlook-reading-empty i { font-size: 48px; opacity: 0.2; }
-.ore-subject { color: #ffffff !important; font-size: 18px; }
+.outlook-container { min-height: 500px !important; overflow: hidden !important; }
+.outlook-folder-pane { width: 56px !important; min-width: 56px !important; max-width: 56px !important; flex-shrink: 0 !important; }
+.outlook-folder-item { padding: 12px 8px !important; justify-content: center !important; font-size: 0 !important; }
+.outlook-folder-item i { font-size: 20px !important; margin: 0 !important; }
+.outlook-folder-item .folder-count { display: none !important; }
+.outlook-list-pane { width: 35% !important; min-width: 250px !important; max-width: 400px !important; overflow-y: auto !important; overflow-x: hidden !important; }
+.outlook-reading-pane { flex: 1 !important; background: #1a1a2e !important; overflow-y: auto !important; overflow-x: hidden !important; padding: 20px !important; }
+.outlook-reading-pane * { max-width: 100% !important; word-wrap: break-word !important; }
+.outlook-reading-empty { color: rgba(255,255,255,0.3) !important; }
+.ore-subject { color: #ffffff !important; font-size: 18px !important; }
 .ore-sender-name { color: #ffffff !important; }
 .ore-sender-meta { color: rgba(255,255,255,0.5) !important; }
-.ore-body { color: #ffffff !important; font-size: 14px; line-height: 1.8; }
-.ore-body * { color: #ffffff !important; }
-.ore-header { border-bottom: 1px solid rgba(255,255,255,0.1); }
-.outlook-email { border-bottom: 1px solid var(--card-border); }
-.outlook-email:hover { background: rgba(255,255,255,0.03); }
-.oe-subject { max-width: 180px; }
-.oe-preview { max-width: 180px; }
-#inbox-detail-content { overflow-y: auto; overflow-x: hidden; height: 100%; }
-.ore-actions { flex-shrink: 0; }
-.outlook-content { overflow: hidden; }
-.outlook-toolbar { padding: 6px 12px; }
-.outlook-search { padding: 6px 12px; }
+.ore-body { color: #ffffff !important; font-size: 14px !important; line-height: 1.8 !important; background: transparent !important; }
+.ore-body * { color: #ffffff !important; background: transparent !important; }
+.ore-header { border-bottom: 1px solid rgba(255,255,255,0.1) !important; }
+.outlook-email { border-bottom: 1px solid var(--card-border) !important; }
+.outlook-email:hover { background: rgba(255,255,255,0.03) !important; }
+.oe-subject { max-width: 180px !important; }
+.oe-preview { max-width: 180px !important; }
+#inbox-detail-content { overflow-y: auto !important; overflow-x: hidden !important; height: 100% !important; }
+.outlook-content { overflow: hidden !important; }
+.outlook-main { overflow: hidden !important; }
 }
 </style>
 </head>
