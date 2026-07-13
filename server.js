@@ -106,6 +106,12 @@ app.post('/api/auth/login', async (req, res) => {
     return res.json({ token, user: { id: 2, username: 'KFTL', client_id: 1, role: 'client' } });
   }
 
+  if (username === 'tech' && password === 'tech123') {
+    const token = jwt.sign({ id: 3, username: 'tech', client_id: null, role: 'technician' }, process.env.JWT_SECRET || 'secret', { expiresIn: '24h' });
+    await logActivity(1, 'tech', 'Login', 'Technician logged in');
+    return res.json({ token, user: { id: 3, username: 'tech', client_id: null, role: 'technician' } });
+  }
+
   res.status(401).json({ error: 'Invalid credentials' });
 });
 
@@ -115,7 +121,7 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
   if (!dbConnected) {
-    return res.json({ health: 100, alerts: 0, offline_devices: 0, open_srs: 0, total_devices: 0, online_devices: 0 });
+    return res.json({ health: 100, alarms: 0, offline_devices: 0, open_srs: 0, total_devices: 0, online_devices: 0 });
   }
   
   try {
@@ -146,7 +152,7 @@ app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
 
     res.json({ 
       health, 
-      alerts: offline, 
+      alarms: offline, 
       offline_devices: offline, 
       open_srs: srs.rowCount, 
       total_devices: totalDevices, 
@@ -154,7 +160,7 @@ app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
     });
   } catch (err) {
     console.error('Dashboard stats error:', err);
-    res.json({ health: 100, alerts: 0, offline_devices: 0, open_srs: 0, total_devices: 0, online_devices: 0 });
+    res.json({ health: 100, alarms: 0, offline_devices: 0, open_srs: 0, total_devices: 0, online_devices: 0 });
   }
 });
 
@@ -570,224 +576,102 @@ app.post('/api/activity-log', authMiddleware, async (req, res) => {
 // OUTLOOK / MICROSOFT GRAPH INBOX INTEGRATION
 // ============================================================
 
-// Fetch emails from Outlook inbox
 app.get('/api/outlook/emails', authMiddleware, async (req, res) => {
   try {
     const folder = req.query.folder || 'inbox';
     let endpoint;
-    
     switch(folder) {
-      case 'sent':
-        endpoint = 'https://graph.microsoft.com/v1.0/me/mailFolders/sentitems/messages';
-        break;
-      case 'drafts':
-        endpoint = 'https://graph.microsoft.com/v1.0/me/mailFolders/drafts/messages';
-        break;
-      case 'deleted':
-        endpoint = 'https://graph.microsoft.com/v1.0/me/mailFolders/deleteditems/messages';
-        break;
-      default:
-        endpoint = 'https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages';
+      case 'sent': endpoint = 'https://graph.microsoft.com/v1.0/me/mailFolders/sentitems/messages'; break;
+      case 'drafts': endpoint = 'https://graph.microsoft.com/v1.0/me/mailFolders/drafts/messages'; break;
+      case 'deleted': endpoint = 'https://graph.microsoft.com/v1.0/me/mailFolders/deleteditems/messages'; break;
+      default: endpoint = 'https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages';
     }
-    
     const response = await axios.get(endpoint, {
       headers: { Authorization: req.headers.authorization },
-      params: {
-        $top: 100,
-        $orderby: 'receivedDateTime desc',
-        $select: 'id,subject,from,toRecipients,receivedDateTime,bodyPreview,body,isRead,flag,hasAttachments,webLink'
-      }
+      params: { $top: 100, $orderby: 'receivedDateTime desc', $select: 'id,subject,from,toRecipients,receivedDateTime,bodyPreview,body,isRead,flag,hasAttachments,webLink' }
     });
-    
     const emails = response.data.value.map(msg => ({
-      id: msg.id,
-      sender: msg.from?.emailAddress?.name || 'Unknown',
-      sender_email: msg.from?.emailAddress?.address || '',
-      recipient: msg.toRecipients?.map(r => r.emailAddress?.name).join(', ') || '',
-      subject: msg.subject || '(no subject)',
-      body: msg.bodyPreview || '',
-      fullBody: msg.body?.content || '',
-      is_read: msg.isRead,
-      is_flagged: !!msg.flag?.flagStatus,
-      folder: folder,
-      created_at: msg.receivedDateTime,
-      has_attachments: msg.hasAttachments,
-      webLink: msg.webLink
+      id: msg.id, sender: msg.from?.emailAddress?.name || 'Unknown', sender_email: msg.from?.emailAddress?.address || '',
+      recipient: msg.toRecipients?.map(r => r.emailAddress?.name).join(', ') || '', subject: msg.subject || '(no subject)',
+      body: msg.bodyPreview || '', fullBody: msg.body?.content || '', is_read: msg.isRead, is_flagged: !!msg.flag?.flagStatus,
+      folder: folder, created_at: msg.receivedDateTime, has_attachments: msg.hasAttachments, webLink: msg.webLink
     }));
-    
     res.json(emails);
   } catch (err) {
     console.error('Outlook fetch error:', err.message);
-    // Fallback to database emails if Outlook fails
     try {
       const folder = req.query.folder || 'inbox';
       const result = await pool.query('SELECT * FROM emails WHERE folder = $1 ORDER BY created_at DESC LIMIT 100', [folder]);
       return res.json(result.rows);
-    } catch (dbErr) {
-      res.json([]);
-    }
+    } catch (dbErr) { res.json([]); }
   }
 });
 
-// Send email via Outlook
 app.post('/api/outlook/send', authMiddleware, async (req, res) => {
   const { to, cc, subject, body } = req.body;
-  
   try {
-    const emailData = {
-      message: {
-        subject: subject,
-        body: { contentType: 'HTML', content: body },
-        toRecipients: to.split(',').map(email => ({ emailAddress: { address: email.trim() } }))
-      }
-    };
-    
-    if (cc) {
-      emailData.message.ccRecipients = cc.split(',').map(email => ({ emailAddress: { address: email.trim() } }));
-    }
-    
+    const emailData = { message: { subject, body: { contentType: 'HTML', content: body }, toRecipients: to.split(',').map(email => ({ emailAddress: { address: email.trim() } })) } };
+    if (cc) { emailData.message.ccRecipients = cc.split(',').map(email => ({ emailAddress: { address: email.trim() } })); }
     await axios.post('https://graph.microsoft.com/v1.0/me/sendMail', emailData, {
-      headers: { 
-        Authorization: req.headers.authorization,
-        'Content-Type': 'application/json'
-      }
+      headers: { Authorization: req.headers.authorization, 'Content-Type': 'application/json' }
     });
-    
-    // Also save to local database
     try {
-      await pool.query(
-        'INSERT INTO emails (client_id, sender, recipient, subject, body, folder) VALUES ($1, $2, $3, $4, $5, $6)',
-        [req.user.client_id || 1, req.user.username, to, subject, body, 'sent']
-      );
-    } catch (dbErr) {
-      console.error('Failed to save sent email locally:', dbErr.message);
-    }
-    
+      await pool.query('INSERT INTO emails (client_id, sender, recipient, subject, body, folder) VALUES ($1, $2, $3, $4, $5, $6)',
+        [req.user.client_id || 1, req.user.username, to, subject, body, 'sent']);
+    } catch (dbErr) { console.error('Failed to save sent email locally:', dbErr.message); }
     res.json({ success: true });
   } catch (err) {
     console.error('Outlook send error:', err.message);
-    // Fallback: save to local database only
     try {
-      await pool.query(
-        'INSERT INTO emails (client_id, sender, recipient, subject, body, folder) VALUES ($1, $2, $3, $4, $5, $6)',
-        [req.user.client_id || 1, req.user.username, to, subject, body, 'sent']
-      );
+      await pool.query('INSERT INTO emails (client_id, sender, recipient, subject, body, folder) VALUES ($1, $2, $3, $4, $5, $6)',
+        [req.user.client_id || 1, req.user.username, to, subject, body, 'sent']);
       res.json({ success: true, local_only: true });
-    } catch (dbErr) {
-      res.status(500).json({ error: 'Failed to send email' });
-    }
+    } catch (dbErr) { res.status(500).json({ error: 'Failed to send email' }); }
   }
 });
 
-// Mark email as read
 app.post('/api/outlook/read/:id', authMiddleware, async (req, res) => {
-  try {
-    await axios.patch(`https://graph.microsoft.com/v1.0/me/messages/${req.params.id}`, 
-      { isRead: true },
-      { headers: { Authorization: req.headers.authorization, 'Content-Type': 'application/json' } }
-    );
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  try { await axios.patch(`https://graph.microsoft.com/v1.0/me/messages/${req.params.id}`, { isRead: true }, { headers: { Authorization: req.headers.authorization, 'Content-Type': 'application/json' } }); res.json({ success: true }); }
+  catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Flag/unflag email
 app.post('/api/outlook/flag/:id', authMiddleware, async (req, res) => {
   const { flagged } = req.body;
-  try {
-    await axios.patch(`https://graph.microsoft.com/v1.0/me/messages/${req.params.id}`, 
-      { flag: flagged ? { flagStatus: 'flagged' } : { flagStatus: 'notFlagged' } },
-      { headers: { Authorization: req.headers.authorization, 'Content-Type': 'application/json' } }
-    );
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  try { await axios.patch(`https://graph.microsoft.com/v1.0/me/messages/${req.params.id}`, { flag: flagged ? { flagStatus: 'flagged' } : { flagStatus: 'notFlagged' } }, { headers: { Authorization: req.headers.authorization, 'Content-Type': 'application/json' } }); res.json({ success: true }); }
+  catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Delete email (move to deleted items)
 app.post('/api/outlook/delete/:id', authMiddleware, async (req, res) => {
-  try {
-    await axios.post(`https://graph.microsoft.com/v1.0/me/messages/${req.params.id}/move`, 
-      { destinationId: 'deleteditems' },
-      { headers: { Authorization: req.headers.authorization, 'Content-Type': 'application/json' } }
-    );
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  try { await axios.post(`https://graph.microsoft.com/v1.0/me/messages/${req.params.id}/move`, { destinationId: 'deleteditems' }, { headers: { Authorization: req.headers.authorization, 'Content-Type': 'application/json' } }); res.json({ success: true }); }
+  catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // ============================================================
 // FILES — MICROSOFT GRAPH SHAREPOINT / ONEDRIVE
 // ============================================================
 
-// Get files from SharePoint/OneDrive
 app.get('/api/files/graph', authMiddleware, async (req, res) => {
   try {
     const folder = req.query.folder || '';
-    let endpoint;
-    
-    if (folder) {
-      endpoint = `https://graph.microsoft.com/v1.0/me/drive/root:/${folder}:/children`;
-    } else {
-      endpoint = 'https://graph.microsoft.com/v1.0/me/drive/root/children';
-    }
-    
-    const response = await axios.get(endpoint, {
-      headers: { Authorization: req.headers.authorization }
-    });
-    
-    const files = response.data.value.map(item => ({
-      id: item.id,
-      name: item.name,
-      type: item.folder ? 'folder' : (item.file?.mimeType || 'file'),
-      size: item.size,
-      modified: item.lastModifiedDateTime,
-      webUrl: item.webUrl,
-      downloadUrl: item['@microsoft.graph.downloadUrl'],
-      isFolder: !!item.folder
-    }));
-    
+    const endpoint = folder ? `https://graph.microsoft.com/v1.0/me/drive/root:/${folder}:/children` : 'https://graph.microsoft.com/v1.0/me/drive/root/children';
+    const response = await axios.get(endpoint, { headers: { Authorization: req.headers.authorization } });
+    const files = response.data.value.map(item => ({ id: item.id, name: item.name, type: item.folder ? 'folder' : (item.file?.mimeType || 'file'), size: item.size, modified: item.lastModifiedDateTime, webUrl: item.webUrl, downloadUrl: item['@microsoft.graph.downloadUrl'], isFolder: !!item.folder }));
     res.json(files);
-  } catch (err) {
-    console.error('Files fetch error:', err.message);
-    res.json([]);
-  }
+  } catch (err) { console.error('Files fetch error:', err.message); res.json([]); }
 });
 
-// Download file from OneDrive
 app.get('/api/files/download/:id', authMiddleware, async (req, res) => {
-  try {
-    const response = await axios.get(`https://graph.microsoft.com/v1.0/me/drive/items/${req.params.id}`, {
-      headers: { Authorization: req.headers.authorization }
-    });
-    res.redirect(response.data['@microsoft.graph.downloadUrl']);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  try { const response = await axios.get(`https://graph.microsoft.com/v1.0/me/drive/items/${req.params.id}`, { headers: { Authorization: req.headers.authorization } }); res.redirect(response.data['@microsoft.graph.downloadUrl']); }
+  catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Upload file to OneDrive
 app.post('/api/files/upload', authMiddleware, async (req, res) => {
   try {
     const { name, content, folder } = req.body;
-    const endpoint = folder 
-      ? `https://graph.microsoft.com/v1.0/me/drive/root:/${folder}/${name}:/content`
-      : `https://graph.microsoft.com/v1.0/me/drive/root:/${name}:/content`;
-    
-    await axios.put(endpoint, content, {
-      headers: { 
-        Authorization: req.headers.authorization,
-        'Content-Type': 'application/octet-stream'
-      }
-    });
-    
+    const endpoint = folder ? `https://graph.microsoft.com/v1.0/me/drive/root:/${folder}/${name}:/content` : `https://graph.microsoft.com/v1.0/me/drive/root:/${name}:/content`;
+    await axios.put(endpoint, content, { headers: { Authorization: req.headers.authorization, 'Content-Type': 'application/octet-stream' } });
     res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // ============================================================
@@ -799,15 +683,11 @@ app.get('/api/emails', authMiddleware, async (req, res) => {
   try {
     const folder = req.query.folder || 'inbox';
     const clientId = req.user.role === 'admin' ? null : req.user.client_id;
-    const query = clientId ? 
-      'SELECT * FROM emails WHERE client_id = $1 AND folder = $2 ORDER BY created_at DESC' :
-      'SELECT * FROM emails WHERE folder = $1 ORDER BY created_at DESC';
+    const query = clientId ? 'SELECT * FROM emails WHERE client_id = $1 AND folder = $2 ORDER BY created_at DESC' : 'SELECT * FROM emails WHERE folder = $1 ORDER BY created_at DESC';
     const params = clientId ? [clientId, folder] : [folder];
     const result = await pool.query(query, params);
     res.json(result.rows);
-  } catch (err) {
-    res.json([]);
-  }
+  } catch (err) { res.json([]); }
 });
 
 app.post('/api/emails', authMiddleware, async (req, res) => {
@@ -815,14 +695,10 @@ app.post('/api/emails', authMiddleware, async (req, res) => {
   const { sender, recipient, subject, body, folder } = req.body;
   const clientId = req.user.role === 'admin' ? 1 : req.user.client_id;
   try {
-    const result = await pool.query(
-      'INSERT INTO emails (client_id, sender, recipient, subject, body, folder) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-      [clientId, sender, recipient, subject, body, folder || 'inbox']
-    );
+    const result = await pool.query('INSERT INTO emails (client_id, sender, recipient, subject, body, folder) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [clientId, sender, recipient, subject, body, folder || 'inbox']);
     res.json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // ============================================================
@@ -831,6 +707,10 @@ app.post('/api/emails', authMiddleware, async (req, res) => {
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/mobile', (req, res) => {
+  res.sendFile(path.join(__dirname, 'field-app.html'));
 });
 
 app.get('*', (req, res) => {
