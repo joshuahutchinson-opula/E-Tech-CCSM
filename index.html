@@ -827,8 +827,32 @@ function showLogin(){document.getElementById('login-page').style.display='flex';
 function hideLogin(){document.getElementById('login-page').style.display='none';}
 
 // MS LOGIN
-function loginWithMicrosoft(){var a=new Uint8Array(32);crypto.getRandomValues(a);msCodeVerifier=base64URLEncode(a);var e=new TextEncoder(),d=e.encode(msCodeVerifier);crypto.subtle.digest('SHA-256',d).then(function(h){var c=base64URLEncode(new Uint8Array(h)),u='https://login.microsoftonline.com/'+MS_TENANT_ID+'/oauth2/v2.0/authorize?client_id='+MS_CLIENT_ID+'&response_type=code&redirect_uri='+encodeURIComponent(MS_REDIRECT_URI)+'&scope='+encodeURIComponent('https://graph.microsoft.com/Mail.Read https://graph.microsoft.com/Mail.ReadWrite https://graph.microsoft.com/Files.Read.All https://graph.microsoft.com/Sites.Read.All User.Read offline_access')+'&response_mode=query&code_challenge='+c+'&code_challenge_method=S256';window.location.href=u;});}
-async function handleMicrosoftCallback(code){try{const d=await apiCall('/auth/microsoft',{method:'POST',body:JSON.stringify({code:code,code_verifier:msCodeVerifier})});authToken=d.token;localStorage.setItem('token',authToken);localStorage.setItem('user',JSON.stringify(d.user));currentUser=d.user;isAdmin=d.user.role==='admin';userClient=isAdmin?null:(d.user.client_id===1?'KFTL':null);hideLogin();document.getElementById('app').style.display='flex';if(!isAdmin&&userClient)setupClientUI(userClient);else if(isAdmin){var r=document.documentElement;r.classList.remove('light-theme','jet-black-theme');localStorage.setItem('ccsm_theme','dark');var l=document.getElementById('logo-img');if(l)l.src='logo.png';var tb=document.getElementById('theme-toggle-btn');if(tb)tb.innerHTML='<i class="ti ti-sun"></i> Theme';}document.getElementById('user-name-display').textContent=isAdmin?d.user.username:(userClient||'User');document.getElementById('user-role-display').textContent=isAdmin?'Administrator':'Client User';var av=document.getElementById('user-avatar');if(isAdmin){av.innerHTML='<img src="favicon.png" style="width:100%;height:100%;object-fit:contain;border-radius:0;" onerror="this.innerHTML=\'AD\'">';}else if(userClient){var lf='logo-'+userClient.toLowerCase().replace(/\s+/g,'')+'.png';av.innerHTML='<img src="'+lf+'" style="width:100%;height:100%;object-fit:contain;border-radius:0;" onerror="this.innerHTML=\''+userClient.slice(0,2).toUpperCase()+'\'">';}await loadData();updateTicker();toast('Welcome, '+d.user.username+'!','success');}catch(err){toast('Microsoft login failed: '+err.message,'error');}}
+function loginWithMicrosoft() {
+  var array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  var verifier = base64URLEncode(array);
+  sessionStorage.setItem('msCodeVerifier', verifier);
+  var encoder = new TextEncoder();
+  var data = encoder.encode(verifier);
+  crypto.subtle.digest('SHA-256', data).then(function(hash) {
+    var codeChallenge = base64URLEncode(new Uint8Array(hash));
+    var authUrl = 'https://login.microsoftonline.com/' + MS_TENANT_ID + '/oauth2/v2.0/authorize?' +
+      'client_id=' + MS_CLIENT_ID +
+      '&response_type=code' +
+      '&redirect_uri=' + encodeURIComponent(MS_REDIRECT_URI) +
+      '&scope=' + encodeURIComponent('https://graph.microsoft.com/Mail.Read https://graph.microsoft.com/Mail.ReadWrite https://graph.microsoft.com/Files.Read.All https://graph.microsoft.com/Sites.Read.All User.Read offline_access') +
+      '&response_mode=query' +
+      '&code_challenge=' + codeChallenge +
+      '&code_challenge_method=S256';
+    window.location.href = authUrl;
+  });
+}
+async function handleMicrosoftCallback(code) {
+  var verifier = sessionStorage.getItem('msCodeVerifier') || '';
+  sessionStorage.removeItem('msCodeVerifier');
+  try {
+    const data = await apiCall('/auth/microsoft', { method: 'POST', body: JSON.stringify({ code: code, code_verifier: verifier }) });
+    // ... rest of the function stays the same ...
 
 // LOCAL AUTH
 async function loginLocal(){var u=document.getElementById('login-username').value,p=document.getElementById('login-password').value,ed=document.getElementById('login-error'),ld=document.getElementById('login-loading');ed.style.display='none';ld.classList.add('active');try{const d=await apiCall('/auth/login',{method:'POST',body:JSON.stringify({username:u,password:p})});authToken=d.token;localStorage.setItem('token',authToken);localStorage.setItem('user',JSON.stringify(d.user));currentUser=d.user;isAdmin=d.user.role==='admin';userClient=isAdmin?null:(d.user.client_id===1?'KFTL':null);hideLogin();document.getElementById('app').style.display='flex';if(!isAdmin&&userClient)setupClientUI(userClient);else if(isAdmin){var r=document.documentElement;r.classList.remove('light-theme','jet-black-theme');localStorage.setItem('ccsm_theme','dark');var l=document.getElementById('logo-img');if(l)l.src='logo.png';var tb=document.getElementById('theme-toggle-btn');if(tb)tb.innerHTML='<i class="ti ti-sun"></i> Theme';}document.getElementById('user-name-display').textContent=isAdmin?d.user.username:(userClient||'User');document.getElementById('user-role-display').textContent=isAdmin?'Administrator':'Client User';var av=document.getElementById('user-avatar');if(isAdmin){av.innerHTML='<img src="favicon.png" style="width:100%;height:100%;object-fit:contain;border-radius:0;" onerror="this.innerHTML=\'AD\'">';}else if(userClient){var lf='logo-'+userClient.toLowerCase().replace(/\s+/g,'')+'.png';av.innerHTML='<img src="'+lf+'" style="width:100%;height:100%;object-fit:contain;border-radius:0;" onerror="this.innerHTML=\''+userClient.slice(0,2).toUpperCase()+'\'">';}await loadData();updateTicker();ld.classList.remove('active');toast('Welcome, '+d.user.username+'!','success');}catch(err){ed.textContent=err.message||'Login failed';ed.style.display='block';ld.classList.remove('active');}}
