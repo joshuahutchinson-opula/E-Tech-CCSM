@@ -4,6 +4,9 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const axios = require('axios');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
+const fs = require('fs');
 require('dotenv').config();
 
 const app = express();
@@ -52,6 +55,29 @@ async function logActivity(clientId, username, action, detail) {
     );
   } catch (err) {
     console.error('Failed to log activity:', err.message);
+  }
+}
+
+// ============================================================
+// EMAIL NOTIFICATION HELPER
+// ============================================================
+
+async function sendEmailNotification(to, subject, body, authHeader) {
+  try {
+    const emailData = {
+      message: {
+        subject: subject,
+        body: { contentType: 'HTML', content: body },
+        toRecipients: to.split(',').map(email => ({ emailAddress: { address: email.trim() } }))
+      }
+    };
+    await axios.post('https://graph.microsoft.com/v1.0/me/sendMail', emailData, {
+      headers: { Authorization: authHeader, 'Content-Type': 'application/json' }
+    });
+    return true;
+  } catch (err) {
+    console.error('Email notification failed:', err.message);
+    return false;
   }
 }
 
@@ -113,6 +139,61 @@ app.post('/api/auth/login', async (req, res) => {
   }
 
   res.status(401).json({ error: 'Invalid credentials' });
+});
+
+// ============================================================
+// MICROSOFT LOGIN — AZURE AD
+// ============================================================
+
+const MS_CLIENT_ID = process.env.MS_CLIENT_ID || 'e87a6592-aaa5-4a13-9c85-8dbc8e9cd7b2';
+const MS_TENANT_ID = process.env.MS_TENANT_ID || '799ae988-9d3d-40d3-bf5c-93197f5d8d44';
+const MS_REDIRECT_URI = process.env.MS_REDIRECT_URI || 'https://e-tech-ccsm-production.up.railway.app/';
+
+app.post('/api/auth/microsoft', async (req, res) => {
+  const { code, code_verifier } = req.body;
+  
+  try {
+    // Exchange code for token
+    const tokenResponse = await axios.post(
+      `https://login.microsoftonline.com/${MS_TENANT_ID}/oauth2/v2.0/token`,
+      new URLSearchParams({
+        client_id: MS_CLIENT_ID,
+        grant_type: 'authorization_code',
+        code: code,
+        redirect_uri: MS_REDIRECT_URI,
+        code_verifier: code_verifier
+      }),
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
+
+    const accessToken = tokenResponse.data.access_token;
+
+    // Get user info from Microsoft Graph
+    const userResponse = await axios.get('https://graph.microsoft.com/v1.0/me', {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+
+    const msUser = userResponse.data;
+    const email = msUser.mail || msUser.userPrincipalName;
+    const displayName = msUser.displayName;
+
+    // Check if user exists in our system or create session
+    const jwtToken = jwt.sign(
+      { id: msUser.id, username: displayName, email: email, client_id: null, role: 'admin', msToken: accessToken },
+      process.env.JWT_SECRET || 'secret',
+      { expiresIn: '24h' }
+    );
+
+    await logActivity(1, displayName, 'Login', 'Microsoft login — ' + email);
+
+    res.json({
+      token: jwtToken,
+      user: { id: msUser.id, username: displayName, email: email, client_id: null, role: 'admin' }
+    });
+  } catch (err) {
+    console.error('Microsoft auth error:', err.message);
+    res.status(401).json({ error: 'Microsoft authentication failed' });
+  }
 });
 
 // ============================================================
@@ -245,6 +326,73 @@ app.post('/api/import/cameras', authMiddleware, async (req, res) => {
       imported++;
     }
     await logActivity(1, req.user.username, 'Import', 'Imported ' + imported + ' cameras');
+    res.json({ success: true, imported });
+  } catch (err) {
+    res.status(500).json({ error: err.message, imported });
+  }
+});
+
+// ============================================================
+// CSV IMPORT — DOORS, SERVERS, SWITCHES
+// ============================================================
+
+app.post('/api/import/doors', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  const doors = req.body;
+  let imported = 0;
+  try {
+    for (const door of doors) {
+      await pool.query(
+        `INSERT INTO doors (client_id, name, zone, status, tech, reader, lock_type, ip, controllerType, doorSwing, accessType, antiPassback, powered, purchase_date, warranty_expiry, comments) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
+        [door.client_id || 1, door.name || '', door.zone || door.site || '', door.status || 'Online', door.tech || '', door.reader || '', door.lock_type || '', door.ip || '', door.controllerType || '', door.doorSwing || '', door.accessType || '', door.antiPassback || '', door.powered || '', door.purchase_date || null, door.warranty_expiry || null, door.comments || '']
+      );
+      imported++;
+    }
+    await logActivity(1, req.user.username, 'Import', 'Imported ' + imported + ' doors');
+    res.json({ success: true, imported });
+  } catch (err) {
+    res.status(500).json({ error: err.message, imported });
+  }
+});
+
+app.post('/api/import/servers', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  const servers = req.body;
+  let imported = 0;
+  try {
+    for (const srv of servers) {
+      await pool.query(
+        `INSERT INTO servers (client_id, name, zone, status, make, model, capacity, used, health, apps, ip_address, serial, purchase_date, warranty_expiry, comments) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`,
+        [srv.client_id || 1, srv.name || srv.serial || '', srv.zone || srv.location || '', srv.status || 'ONLINE', srv.make || '', srv.model || '', srv.capacity || '', srv.used || '', srv.health || '', srv.apps || '', srv.ip_address || '', srv.serial || '', srv.purchase_date || null, srv.warranty_expiry || null, srv.comments || '']
+      );
+      imported++;
+    }
+    await logActivity(1, req.user.username, 'Import', 'Imported ' + imported + ' servers');
+    res.json({ success: true, imported });
+  } catch (err) {
+    res.status(500).json({ error: err.message, imported });
+  }
+});
+
+app.post('/api/import/switches', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  const switches = req.body;
+  let imported = 0;
+  try {
+    for (const sw of switches) {
+      await pool.query(
+        `INSERT INTO switches (client_id, name, zone, status, model, firmware, ip_address, mac, purchase_date, warranty_expiry, comments) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+        [sw.client_id || 1, sw.name || '', sw.zone || sw.location || '', sw.status || 'Online', sw.model || '', sw.firmware || '', sw.ip_address || '', sw.mac || '', sw.purchase_date || null, sw.warranty_expiry || null, sw.comments || '']
+      );
+      imported++;
+    }
+    await logActivity(1, req.user.username, 'Import', 'Imported ' + imported + ' switches');
     res.json({ success: true, imported });
   } catch (err) {
     res.status(500).json({ error: err.message, imported });
@@ -413,7 +561,7 @@ app.put('/api/intrusion/:id', authMiddleware, async (req, res) => {
 });
 
 // ============================================================
-// SERVICE REQUESTS
+// SERVICE REQUESTS — WITH NOTIFICATION & TRANSFER
 // ============================================================
 
 app.get('/api/service-requests', authMiddleware, async (req, res) => {
@@ -444,8 +592,25 @@ app.post('/api/service-requests', authMiddleware, async (req, res) => {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_DATE, $10) RETURNING *`,
       [clientId, srId, subject, client, site, category, priority, assigned_to, body, req.user.username]
     );
-    await pool.query('INSERT INTO sr_history (sr_id, time, msg) VALUES ($1, $2, $3)', [result.rows[0].id, new Date().toLocaleTimeString(), 'Created']);
-    await logActivity(clientId, req.user.username, 'Created', 'SR ' + srId + ' created for ' + client);
+    await pool.query('INSERT INTO sr_history (sr_id, time, msg) VALUES ($1, $2, $3)', [result.rows[0].id, new Date().toLocaleTimeString(), 'Created by ' + req.user.username]);
+    await logActivity(clientId, req.user.username, 'Created', 'SR ' + srId + ' created for ' + client + ' — assigned to ' + assigned_to);
+
+    // Send email notification for new SR
+    const emailBody = `
+      <h2>New Service Request: ${srId}</h2>
+      <p><strong>Client:</strong> ${client}</p>
+      <p><strong>Site:</strong> ${site}</p>
+      <p><strong>Category:</strong> ${category}</p>
+      <p><strong>Priority:</strong> ${priority}</p>
+      <p><strong>Assigned To:</strong> ${assigned_to}</p>
+      <p><strong>Subject:</strong> ${subject}</p>
+      <p><strong>Description:</strong> ${body || 'No description'}</p>
+      <p><strong>Created By:</strong> ${req.user.username}</p>
+      <hr>
+      <p>View in CAMS: <a href="${req.headers.origin || 'https://e-tech-ccsm-production.up.railway.app'}">Open Dashboard</a></p>
+    `;
+    await sendEmailNotification('support@e-techsystems.com', `[CAMS] New SR: ${srId} — ${subject}`, emailBody, req.headers.authorization);
+
     res.json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -458,14 +623,82 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
   const { priority, assigned_to, status, notes } = req.body;
   const clientId = req.user.role === 'admin' ? null : req.user.client_id;
   try {
+    // Get current SR for comparison
+    const current = await pool.query('SELECT * FROM service_requests WHERE id = $1', [id]);
+    const oldSr = current.rows[0];
+    const oldAssigned = oldSr?.assigned_to;
+    const oldStatus = oldSr?.status;
+
     const query = clientId ? 
       `UPDATE service_requests SET priority = $1, assigned_to = $2, status = $3, notes = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $5 AND client_id = $6` :
       `UPDATE service_requests SET priority = $1, assigned_to = $2, status = $3, notes = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $5`;
     const params = clientId ? [priority, assigned_to, status, notes, id, clientId] : [priority, assigned_to, status, notes, id];
     await pool.query(query, params);
-    await pool.query('INSERT INTO sr_history (sr_id, time, msg) VALUES ($1, $2, $3)', [id, new Date().toLocaleTimeString(), `Updated: ${status}`]);
+
+    // Track assignment changes
+    if (assigned_to && assigned_to !== oldAssigned) {
+      await pool.query('INSERT INTO sr_history (sr_id, time, msg) VALUES ($1, $2, $3)', 
+        [id, new Date().toLocaleTimeString(), `Transferred from ${oldAssigned || 'Unassigned'} to ${assigned_to} by ${req.user.username}`]);
+    }
+
+    await pool.query('INSERT INTO sr_history (sr_id, time, msg) VALUES ($1, $2, $3)', 
+      [id, new Date().toLocaleTimeString(), `Updated: ${status} by ${req.user.username}`]);
+
     const logClientId = clientId || 1;
     await logActivity(logClientId, req.user.username, 'Updated', 'SR ' + id + ' updated to ' + status);
+
+    // Send resolution report when resolved
+    if (status === 'Resolved' && oldStatus !== 'Resolved') {
+      const updated = await pool.query('SELECT * FROM service_requests WHERE id = $1', [id]);
+      const sr = updated.rows[0];
+      const history = await pool.query('SELECT * FROM sr_history WHERE sr_id = $1 ORDER BY created_at', [id]);
+      
+      const reportBody = `
+        <h2>Service Request Resolved: ${sr.sr_id}</h2>
+        <p><strong>Client:</strong> ${sr.client}</p>
+        <p><strong>Site:</strong> ${sr.site}</p>
+        <p><strong>Category:</strong> ${sr.category}</p>
+        <p><strong>Priority:</strong> ${sr.priority}</p>
+        <p><strong>Subject:</strong> ${sr.subject}</p>
+        <p><strong>Created By:</strong> ${sr.created_by}</p>
+        <p><strong>Resolved By:</strong> ${req.user.username}</p>
+        <p><strong>Resolution Notes:</strong> ${notes || 'No notes'}</p>
+        <hr>
+        <h3>Timeline</h3>
+        <ul>
+          ${history.rows.map(h => `<li>${h.time} — ${h.msg}</li>`).join('')}
+        </ul>
+        <hr>
+        <p>View in CAMS: <a href="${req.headers.origin || 'https://e-tech-ccsm-production.up.railway.app'}">Open Dashboard</a></p>
+      `;
+      await sendEmailNotification('support@e-techsystems.com', `[CAMS] RESOLVED: ${sr.sr_id} — ${sr.subject}`, reportBody, req.headers.authorization);
+    }
+
+    const updated = await pool.query('SELECT * FROM service_requests WHERE id = $1', [id]);
+    res.json({ success: true, data: updated.rows[0] });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ============================================================
+// SR TRANSFER ENDPOINT
+// ============================================================
+
+app.post('/api/service-requests/:id/transfer', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  const { id } = req.params;
+  const { assigned_to } = req.body;
+  try {
+    const current = await pool.query('SELECT * FROM service_requests WHERE id = $1', [id]);
+    const oldAssigned = current.rows[0]?.assigned_to;
+
+    await pool.query('UPDATE service_requests SET assigned_to = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2', [assigned_to, id]);
+    await pool.query('INSERT INTO sr_history (sr_id, time, msg) VALUES ($1, $2, $3)', 
+      [id, new Date().toLocaleTimeString(), `Transferred from ${oldAssigned || 'Unassigned'} to ${assigned_to} by ${req.user.username}`]);
+
+    await logActivity(1, req.user.username, 'Assigned', 'SR ' + id + ' transferred to ' + assigned_to);
+
     const updated = await pool.query('SELECT * FROM service_requests WHERE id = $1', [id]);
     res.json({ success: true, data: updated.rows[0] });
   } catch (err) {
@@ -646,6 +879,30 @@ app.post('/api/outlook/delete/:id', authMiddleware, async (req, res) => {
   catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// Convert email to SR
+app.post('/api/outlook/convert-to-sr/:id', authMiddleware, async (req, res) => {
+  try {
+    const response = await axios.get(`https://graph.microsoft.com/v1.0/me/messages/${req.params.id}`, {
+      headers: { Authorization: req.headers.authorization }
+    });
+    const msg = response.data;
+    const srId = `SR-${String(Math.floor(Math.random() * 9000) + 1000)}`;
+    const subject = msg.subject || 'Converted from email';
+    const body = msg.bodyPreview || msg.body?.content || '';
+    const sender = msg.from?.emailAddress?.name || 'Unknown';
+
+    await pool.query(
+      `INSERT INTO service_requests (client_id, sr_id, subject, client, site, category, priority, assigned_to, body, received, created_by) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, CURRENT_DATE, $10)`,
+      [req.user.client_id || 1, srId, subject, 'KFTL', 'Unknown', 'Other', 'Medium', 'Unassigned', `From: ${sender}\n\n${body}`, req.user.username]
+    );
+    await logActivity(1, req.user.username, 'Converted', 'Email converted to SR ' + srId);
+    res.json({ success: true, sr_id: srId });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ============================================================
 // FILES — MICROSOFT GRAPH SHAREPOINT / ONEDRIVE
 // ============================================================
@@ -655,22 +912,19 @@ app.get('/api/files/graph', authMiddleware, async (req, res) => {
     const folder = req.query.folder || '';
     const endpoint = folder ? `https://graph.microsoft.com/v1.0/me/drive/root:/${folder}:/children` : 'https://graph.microsoft.com/v1.0/me/drive/root/children';
     const response = await axios.get(endpoint, { headers: { Authorization: req.headers.authorization } });
-    const files = response.data.value.map(item => ({ id: item.id, name: item.name, type: item.folder ? 'folder' : (item.file?.mimeType || 'file'), size: item.size, modified: item.lastModifiedDateTime, webUrl: item.webUrl, downloadUrl: item['@microsoft.graph.downloadUrl'], isFolder: !!item.folder }));
+    const files = response.data.value.map(item => ({ 
+      id: item.id, name: item.name, type: item.folder ? 'folder' : (item.file?.mimeType || 'file'), 
+      size: item.size, modified: item.lastModifiedDateTime, webUrl: item.webUrl, 
+      downloadUrl: item['@microsoft.graph.downloadUrl'], isFolder: !!item.folder 
+    }));
     res.json(files);
   } catch (err) { console.error('Files fetch error:', err.message); res.json([]); }
 });
 
 app.get('/api/files/download/:id', authMiddleware, async (req, res) => {
-  try { const response = await axios.get(`https://graph.microsoft.com/v1.0/me/drive/items/${req.params.id}`, { headers: { Authorization: req.headers.authorization } }); res.redirect(response.data['@microsoft.graph.downloadUrl']); }
-  catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-app.post('/api/files/upload', authMiddleware, async (req, res) => {
-  try {
-    const { name, content, folder } = req.body;
-    const endpoint = folder ? `https://graph.microsoft.com/v1.0/me/drive/root:/${folder}/${name}:/content` : `https://graph.microsoft.com/v1.0/me/drive/root:/${name}:/content`;
-    await axios.put(endpoint, content, { headers: { Authorization: req.headers.authorization, 'Content-Type': 'application/octet-stream' } });
-    res.json({ success: true });
+  try { 
+    const response = await axios.get(`https://graph.microsoft.com/v1.0/me/drive/items/${req.params.id}`, { headers: { Authorization: req.headers.authorization } }); 
+    res.redirect(response.data['@microsoft.graph.downloadUrl']); 
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
