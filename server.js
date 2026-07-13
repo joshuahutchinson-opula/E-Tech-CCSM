@@ -3,6 +3,7 @@ const { Pool } = require('pg');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const path = require('path');
+const axios = require('axios');
 require('dotenv').config();
 
 const app = express();
@@ -93,16 +94,16 @@ app.get('/api/health', (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
   const { username, password } = req.body;
 
-if (username === 'Admin' && password === 'Ad@E-Tech07') {
-    const token = jwt.sign({ id: 1, username: 'admin', client_id: null, role: 'admin' }, process.env.JWT_SECRET || 'secret', { expiresIn: '24h' });
-    await logActivity(1, 'admin', 'Login', 'Admin logged in');
-    return res.json({ token, user: { id: 1, username: 'admin', client_id: null, role: 'admin' } });
+  if (username === 'Admin' && password === 'Ad@E-Tech07') {
+    const token = jwt.sign({ id: 1, username: 'Admin', client_id: null, role: 'admin' }, process.env.JWT_SECRET || 'secret', { expiresIn: '24h' });
+    await logActivity(1, 'Admin', 'Login', 'Admin logged in');
+    return res.json({ token, user: { id: 1, username: 'Admin', client_id: null, role: 'admin' } });
   }
 
-if (username === 'KFTL' && password === 'KFTL@E-Tech0151') {
-    const token = jwt.sign({ id: 2, username: 'kftl', client_id: 1, role: 'client' }, process.env.JWT_SECRET || 'secret', { expiresIn: '24h' });
-    await logActivity(1, 'kftl', 'Login', 'Client logged in');
-    return res.json({ token, user: { id: 2, username: 'kftl', client_id: 1, role: 'client' } });
+  if (username === 'KFTL' && password === 'KFTL@E-Tech0151') {
+    const token = jwt.sign({ id: 2, username: 'KFTL', client_id: 1, role: 'client' }, process.env.JWT_SECRET || 'secret', { expiresIn: '24h' });
+    await logActivity(1, 'KFTL', 'Login', 'Client logged in');
+    return res.json({ token, user: { id: 2, username: 'KFTL', client_id: 1, role: 'client' } });
   }
 
   res.status(401).json({ error: 'Invalid credentials' });
@@ -185,10 +186,8 @@ app.put('/api/cameras/:id', authMiddleware, async (req, res) => {
       'UPDATE cameras SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3';
     const params = clientId ? [status, comments, id, clientId] : [status, comments, id];
     await pool.query(query, params);
-    
     const logClientId = clientId || 1;
     await logActivity(logClientId, req.user.username, 'Updated', 'Camera ' + id + ' updated');
-    
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -204,10 +203,8 @@ app.put('/api/cameras/:id/comment', authMiddleware, async (req, res) => {
     const query = clientId ? 'UPDATE cameras SET comments = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 AND client_id = $3' : 'UPDATE cameras SET comments = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2';
     const params = clientId ? [comments, id, clientId] : [comments, id];
     await pool.query(query, params);
-    
     const logClientId = clientId || 1;
     await logActivity(logClientId, req.user.username, 'Updated', 'Camera ' + id + ' comment updated');
-    
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -230,10 +227,8 @@ app.get('/api/cameras/export', authMiddleware, async (req, res) => {
 app.post('/api/import/cameras', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
-
   const cameras = req.body;
   let imported = 0;
-
   try {
     for (const cam of cameras) {
       await pool.query(
@@ -243,7 +238,6 @@ app.post('/api/import/cameras', authMiddleware, async (req, res) => {
       );
       imported++;
     }
-    
     await logActivity(1, req.user.username, 'Import', 'Imported ' + imported + ' cameras');
     res.json({ success: true, imported });
   } catch (err) {
@@ -279,10 +273,8 @@ app.put('/api/doors/:id', authMiddleware, async (req, res) => {
       'UPDATE doors SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3';
     const params = clientId ? [status, comments, id, clientId] : [status, comments, id];
     await pool.query(query, params);
-    
     const logClientId = clientId || 1;
     await logActivity(logClientId, req.user.username, 'Updated', 'Door ' + id + ' updated');
-    
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -317,10 +309,8 @@ app.put('/api/servers/:id', authMiddleware, async (req, res) => {
       'UPDATE servers SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3';
     const params = clientId ? [status, comments, id, clientId] : [status, comments, id];
     await pool.query(query, params);
-    
     const logClientId = clientId || 1;
     await logActivity(logClientId, req.user.username, 'Updated', 'Server ' + id + ' updated');
-    
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -355,10 +345,8 @@ app.put('/api/switches/:id', authMiddleware, async (req, res) => {
       'UPDATE switches SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3';
     const params = clientId ? [status, comments, id, clientId] : [status, comments, id];
     await pool.query(query, params);
-    
     const logClientId = clientId || 1;
     await logActivity(logClientId, req.user.username, 'Updated', 'Switch ' + id + ' updated');
-    
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -410,10 +398,8 @@ app.put('/api/intrusion/:id', authMiddleware, async (req, res) => {
       'UPDATE intrusion SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3';
     const params = clientId ? [status, comments, id, clientId] : [status, comments, id];
     await pool.query(query, params);
-    
     const logClientId = clientId || 1;
     await logActivity(logClientId, req.user.username, 'Updated', 'Intrusion point ' + id + ' updated');
-    
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -443,11 +429,9 @@ app.get('/api/service-requests', authMiddleware, async (req, res) => {
 
 app.post('/api/service-requests', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
-
   const { subject, client, site, category, priority, assigned_to, body } = req.body;
   const srId = `SR-${String(Math.floor(Math.random() * 9000) + 1000)}`;
   const clientId = req.user.role === 'admin' ? 1 : req.user.client_id;
-
   try {
     const result = await pool.query(
       `INSERT INTO service_requests (client_id, sr_id, subject, client, site, category, priority, assigned_to, body, received, created_by) 
@@ -455,9 +439,7 @@ app.post('/api/service-requests', authMiddleware, async (req, res) => {
       [clientId, srId, subject, client, site, category, priority, assigned_to, body, req.user.username]
     );
     await pool.query('INSERT INTO sr_history (sr_id, time, msg) VALUES ($1, $2, $3)', [result.rows[0].id, new Date().toLocaleTimeString(), 'Created']);
-    
     await logActivity(clientId, req.user.username, 'Created', 'SR ' + srId + ' created for ' + client);
-    
     res.json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -466,11 +448,9 @@ app.post('/api/service-requests', authMiddleware, async (req, res) => {
 
 app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
-
   const { id } = req.params;
   const { priority, assigned_to, status, notes } = req.body;
   const clientId = req.user.role === 'admin' ? null : req.user.client_id;
-
   try {
     const query = clientId ? 
       `UPDATE service_requests SET priority = $1, assigned_to = $2, status = $3, notes = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $5 AND client_id = $6` :
@@ -478,10 +458,8 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
     const params = clientId ? [priority, assigned_to, status, notes, id, clientId] : [priority, assigned_to, status, notes, id];
     await pool.query(query, params);
     await pool.query('INSERT INTO sr_history (sr_id, time, msg) VALUES ($1, $2, $3)', [id, new Date().toLocaleTimeString(), `Updated: ${status}`]);
-    
     const logClientId = clientId || 1;
     await logActivity(logClientId, req.user.username, 'Updated', 'SR ' + id + ' updated to ' + status);
-    
     const updated = await pool.query('SELECT * FROM service_requests WHERE id = $1', [id]);
     res.json({ success: true, data: updated.rows[0] });
   } catch (err) {
@@ -507,40 +485,32 @@ app.get('/api/clients', authMiddleware, async (req, res) => {
 app.post('/api/clients', authMiddleware, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
-
   const { name, email, phone, address, logo_url } = req.body;
   try {
     const result = await pool.query(
       'INSERT INTO clients (name, email, phone, address, logo_url) VALUES ($1, $2, $3, $4, $5) RETURNING *',
       [name, email, phone, address, logo_url]
     );
-    
     await logActivity(1, req.user.username, 'Created', 'Client ' + name + ' added');
-    
     res.json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// UPDATE CLIENT
 app.put('/api/clients/:name', authMiddleware, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
-
   const { name } = req.params;
   const { email, phone, address, logo_url } = req.body;
-  
   try {
     const result = await pool.query(
       'UPDATE clients SET email = $1, phone = $2, address = $3, logo_url = $4, updated_at = CURRENT_TIMESTAMP WHERE name = $5 RETURNING *',
       [email || '', phone || '', address || '', logo_url || '', name]
     );
-    
     if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Client not found' });
     }
-    
     await logActivity(1, req.user.username, 'Updated', 'Client ' + name + ' updated');
     res.json(result.rows[0]);
   } catch (err) {
@@ -548,20 +518,15 @@ app.put('/api/clients/:name', authMiddleware, async (req, res) => {
   }
 });
 
-// DELETE CLIENT
 app.delete('/api/clients/:name', authMiddleware, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
-
   const { name } = req.params;
-  
   try {
     const result = await pool.query('DELETE FROM clients WHERE name = $1', [name]);
-    
     if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Client not found' });
     }
-    
     await logActivity(1, req.user.username, 'Deleted', 'Client ' + name + ' deleted');
     res.json({ success: true });
   } catch (err) {
@@ -591,7 +556,6 @@ app.get('/api/activity-log', authMiddleware, async (req, res) => {
 
 app.post('/api/activity-log', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
-
   const { action, detail } = req.body;
   const clientId = req.user.role === 'admin' ? 1 : req.user.client_id;
   try {
@@ -603,7 +567,231 @@ app.post('/api/activity-log', authMiddleware, async (req, res) => {
 });
 
 // ============================================================
-// EMAILS
+// OUTLOOK / MICROSOFT GRAPH INBOX INTEGRATION
+// ============================================================
+
+// Fetch emails from Outlook inbox
+app.get('/api/outlook/emails', authMiddleware, async (req, res) => {
+  try {
+    const folder = req.query.folder || 'inbox';
+    let endpoint;
+    
+    switch(folder) {
+      case 'sent':
+        endpoint = 'https://graph.microsoft.com/v1.0/me/mailFolders/sentitems/messages';
+        break;
+      case 'drafts':
+        endpoint = 'https://graph.microsoft.com/v1.0/me/mailFolders/drafts/messages';
+        break;
+      case 'deleted':
+        endpoint = 'https://graph.microsoft.com/v1.0/me/mailFolders/deleteditems/messages';
+        break;
+      default:
+        endpoint = 'https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages';
+    }
+    
+    const response = await axios.get(endpoint, {
+      headers: { Authorization: req.headers.authorization },
+      params: {
+        $top: 100,
+        $orderby: 'receivedDateTime desc',
+        $select: 'id,subject,from,toRecipients,receivedDateTime,bodyPreview,body,isRead,flag,hasAttachments,webLink'
+      }
+    });
+    
+    const emails = response.data.value.map(msg => ({
+      id: msg.id,
+      sender: msg.from?.emailAddress?.name || 'Unknown',
+      sender_email: msg.from?.emailAddress?.address || '',
+      recipient: msg.toRecipients?.map(r => r.emailAddress?.name).join(', ') || '',
+      subject: msg.subject || '(no subject)',
+      body: msg.bodyPreview || '',
+      fullBody: msg.body?.content || '',
+      is_read: msg.isRead,
+      is_flagged: !!msg.flag?.flagStatus,
+      folder: folder,
+      created_at: msg.receivedDateTime,
+      has_attachments: msg.hasAttachments,
+      webLink: msg.webLink
+    }));
+    
+    res.json(emails);
+  } catch (err) {
+    console.error('Outlook fetch error:', err.message);
+    // Fallback to database emails if Outlook fails
+    try {
+      const folder = req.query.folder || 'inbox';
+      const result = await pool.query('SELECT * FROM emails WHERE folder = $1 ORDER BY created_at DESC LIMIT 100', [folder]);
+      return res.json(result.rows);
+    } catch (dbErr) {
+      res.json([]);
+    }
+  }
+});
+
+// Send email via Outlook
+app.post('/api/outlook/send', authMiddleware, async (req, res) => {
+  const { to, cc, subject, body } = req.body;
+  
+  try {
+    const emailData = {
+      message: {
+        subject: subject,
+        body: { contentType: 'HTML', content: body },
+        toRecipients: to.split(',').map(email => ({ emailAddress: { address: email.trim() } }))
+      }
+    };
+    
+    if (cc) {
+      emailData.message.ccRecipients = cc.split(',').map(email => ({ emailAddress: { address: email.trim() } }));
+    }
+    
+    await axios.post('https://graph.microsoft.com/v1.0/me/sendMail', emailData, {
+      headers: { 
+        Authorization: req.headers.authorization,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    // Also save to local database
+    try {
+      await pool.query(
+        'INSERT INTO emails (client_id, sender, recipient, subject, body, folder) VALUES ($1, $2, $3, $4, $5, $6)',
+        [req.user.client_id || 1, req.user.username, to, subject, body, 'sent']
+      );
+    } catch (dbErr) {
+      console.error('Failed to save sent email locally:', dbErr.message);
+    }
+    
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Outlook send error:', err.message);
+    // Fallback: save to local database only
+    try {
+      await pool.query(
+        'INSERT INTO emails (client_id, sender, recipient, subject, body, folder) VALUES ($1, $2, $3, $4, $5, $6)',
+        [req.user.client_id || 1, req.user.username, to, subject, body, 'sent']
+      );
+      res.json({ success: true, local_only: true });
+    } catch (dbErr) {
+      res.status(500).json({ error: 'Failed to send email' });
+    }
+  }
+});
+
+// Mark email as read
+app.post('/api/outlook/read/:id', authMiddleware, async (req, res) => {
+  try {
+    await axios.patch(`https://graph.microsoft.com/v1.0/me/messages/${req.params.id}`, 
+      { isRead: true },
+      { headers: { Authorization: req.headers.authorization, 'Content-Type': 'application/json' } }
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Flag/unflag email
+app.post('/api/outlook/flag/:id', authMiddleware, async (req, res) => {
+  const { flagged } = req.body;
+  try {
+    await axios.patch(`https://graph.microsoft.com/v1.0/me/messages/${req.params.id}`, 
+      { flag: flagged ? { flagStatus: 'flagged' } : { flagStatus: 'notFlagged' } },
+      { headers: { Authorization: req.headers.authorization, 'Content-Type': 'application/json' } }
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Delete email (move to deleted items)
+app.post('/api/outlook/delete/:id', authMiddleware, async (req, res) => {
+  try {
+    await axios.post(`https://graph.microsoft.com/v1.0/me/messages/${req.params.id}/move`, 
+      { destinationId: 'deleteditems' },
+      { headers: { Authorization: req.headers.authorization, 'Content-Type': 'application/json' } }
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ============================================================
+// FILES — MICROSOFT GRAPH SHAREPOINT / ONEDRIVE
+// ============================================================
+
+// Get files from SharePoint/OneDrive
+app.get('/api/files/graph', authMiddleware, async (req, res) => {
+  try {
+    const folder = req.query.folder || '';
+    let endpoint;
+    
+    if (folder) {
+      endpoint = `https://graph.microsoft.com/v1.0/me/drive/root:/${folder}:/children`;
+    } else {
+      endpoint = 'https://graph.microsoft.com/v1.0/me/drive/root/children';
+    }
+    
+    const response = await axios.get(endpoint, {
+      headers: { Authorization: req.headers.authorization }
+    });
+    
+    const files = response.data.value.map(item => ({
+      id: item.id,
+      name: item.name,
+      type: item.folder ? 'folder' : (item.file?.mimeType || 'file'),
+      size: item.size,
+      modified: item.lastModifiedDateTime,
+      webUrl: item.webUrl,
+      downloadUrl: item['@microsoft.graph.downloadUrl'],
+      isFolder: !!item.folder
+    }));
+    
+    res.json(files);
+  } catch (err) {
+    console.error('Files fetch error:', err.message);
+    res.json([]);
+  }
+});
+
+// Download file from OneDrive
+app.get('/api/files/download/:id', authMiddleware, async (req, res) => {
+  try {
+    const response = await axios.get(`https://graph.microsoft.com/v1.0/me/drive/items/${req.params.id}`, {
+      headers: { Authorization: req.headers.authorization }
+    });
+    res.redirect(response.data['@microsoft.graph.downloadUrl']);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Upload file to OneDrive
+app.post('/api/files/upload', authMiddleware, async (req, res) => {
+  try {
+    const { name, content, folder } = req.body;
+    const endpoint = folder 
+      ? `https://graph.microsoft.com/v1.0/me/drive/root:/${folder}/${name}:/content`
+      : `https://graph.microsoft.com/v1.0/me/drive/root:/${name}:/content`;
+    
+    await axios.put(endpoint, content, {
+      headers: { 
+        Authorization: req.headers.authorization,
+        'Content-Type': 'application/octet-stream'
+      }
+    });
+    
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ============================================================
+// DATABASE EMAILS (local fallback)
 // ============================================================
 
 app.get('/api/emails', authMiddleware, async (req, res) => {
@@ -624,7 +812,6 @@ app.get('/api/emails', authMiddleware, async (req, res) => {
 
 app.post('/api/emails', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
-
   const { sender, recipient, subject, body, folder } = req.body;
   const clientId = req.user.role === 'admin' ? 1 : req.user.client_id;
   try {
