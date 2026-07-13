@@ -152,7 +152,7 @@ app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
 
     res.json({ 
       health, 
-      alarms: offline, 
+      alarms: 0, 
       offline_devices: offline, 
       open_srs: srs.rowCount, 
       total_devices: totalDevices, 
