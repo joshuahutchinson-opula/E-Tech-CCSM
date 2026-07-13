@@ -109,7 +109,7 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // ============================================================
-// DASHBOARD STATS (FIXED)
+// DASHBOARD STATS
 // ============================================================
 
 app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
@@ -171,6 +171,27 @@ app.get('/api/cameras', authMiddleware, async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     res.json([]);
+  }
+});
+
+app.put('/api/cameras/:id', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  const { id } = req.params;
+  const { status, comments } = req.body;
+  try {
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const query = clientId ? 
+      'UPDATE cameras SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3 AND client_id = $4' :
+      'UPDATE cameras SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3';
+    const params = clientId ? [status, comments, id, clientId] : [status, comments, id];
+    await pool.query(query, params);
+    
+    const logClientId = clientId || 1;
+    await logActivity(logClientId, req.user.username, 'Updated', 'Camera ' + id + ' updated');
+    
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -247,6 +268,27 @@ app.get('/api/doors', authMiddleware, async (req, res) => {
   }
 });
 
+app.put('/api/doors/:id', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  const { id } = req.params;
+  const { status, comments } = req.body;
+  try {
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const query = clientId ? 
+      'UPDATE doors SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3 AND client_id = $4' :
+      'UPDATE doors SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3';
+    const params = clientId ? [status, comments, id, clientId] : [status, comments, id];
+    await pool.query(query, params);
+    
+    const logClientId = clientId || 1;
+    await logActivity(logClientId, req.user.username, 'Updated', 'Door ' + id + ' updated');
+    
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ============================================================
 // SERVERS
 // ============================================================
@@ -264,6 +306,27 @@ app.get('/api/servers', authMiddleware, async (req, res) => {
   }
 });
 
+app.put('/api/servers/:id', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  const { id } = req.params;
+  const { status, comments } = req.body;
+  try {
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const query = clientId ? 
+      'UPDATE servers SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3 AND client_id = $4' :
+      'UPDATE servers SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3';
+    const params = clientId ? [status, comments, id, clientId] : [status, comments, id];
+    await pool.query(query, params);
+    
+    const logClientId = clientId || 1;
+    await logActivity(logClientId, req.user.username, 'Updated', 'Server ' + id + ' updated');
+    
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ============================================================
 // SWITCHES
 // ============================================================
@@ -278,6 +341,27 @@ app.get('/api/switches', authMiddleware, async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     res.json([]);
+  }
+});
+
+app.put('/api/switches/:id', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  const { id } = req.params;
+  const { status, comments } = req.body;
+  try {
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const query = clientId ? 
+      'UPDATE switches SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3 AND client_id = $4' :
+      'UPDATE switches SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3';
+    const params = clientId ? [status, comments, id, clientId] : [status, comments, id];
+    await pool.query(query, params);
+    
+    const logClientId = clientId || 1;
+    await logActivity(logClientId, req.user.username, 'Updated', 'Switch ' + id + ' updated');
+    
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -312,6 +396,27 @@ app.get('/api/intrusion', authMiddleware, async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     res.json([]);
+  }
+});
+
+app.put('/api/intrusion/:id', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  const { id } = req.params;
+  const { status, comments } = req.body;
+  try {
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const query = clientId ? 
+      'UPDATE intrusion SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3 AND client_id = $4' :
+      'UPDATE intrusion SET status = COALESCE($1, status), comments = COALESCE($2, comments), updated_at = CURRENT_TIMESTAMP WHERE id = $3';
+    const params = clientId ? [status, comments, id, clientId] : [status, comments, id];
+    await pool.query(query, params);
+    
+    const logClientId = clientId || 1;
+    await logActivity(logClientId, req.user.username, 'Updated', 'Intrusion point ' + id + ' updated');
+    
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -413,6 +518,52 @@ app.post('/api/clients', authMiddleware, async (req, res) => {
     await logActivity(1, req.user.username, 'Created', 'Client ' + name + ' added');
     
     res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// UPDATE CLIENT
+app.put('/api/clients/:name', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+
+  const { name } = req.params;
+  const { email, phone, address, logo_url } = req.body;
+  
+  try {
+    const result = await pool.query(
+      'UPDATE clients SET email = $1, phone = $2, address = $3, logo_url = $4, updated_at = CURRENT_TIMESTAMP WHERE name = $5 RETURNING *',
+      [email || '', phone || '', address || '', logo_url || '', name]
+    );
+    
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Client not found' });
+    }
+    
+    await logActivity(1, req.user.username, 'Updated', 'Client ' + name + ' updated');
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE CLIENT
+app.delete('/api/clients/:name', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+
+  const { name } = req.params;
+  
+  try {
+    const result = await pool.query('DELETE FROM clients WHERE name = $1', [name]);
+    
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Client not found' });
+    }
+    
+    await logActivity(1, req.user.username, 'Deleted', 'Client ' + name + ' deleted');
+    res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
