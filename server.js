@@ -142,82 +142,37 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // ============================================================
-// MICROSOFT LOGIN — AZURE AD
+// MICROSOFT LOGIN CALLBACK (SPA — token exchange happens in browser)
 // ============================================================
 
-const MS_CLIENT_ID = process.env.MS_CLIENT_ID || 'e87a6592-aaa5-4a13-9c85-8dbc8e9cd7b2';
-const MS_TENANT_ID = process.env.MS_TENANT_ID || '799ae988-9d3d-40d3-bf5c-93197f5d8d44';
-const MS_CLIENT_SECRET = process.env.MS_CLIENT_SECRET || '';
-
-app.post('/api/auth/microsoft', async (req, res) => {
-  const { code, code_verifier } = req.body;
+app.post('/api/auth/microsoft-callback', async (req, res) => {
+  const { msId, displayName, email, msToken } = req.body;
   
-  if (!code) {
-    return res.status(400).json({ error: 'No authorization code provided' });
+  if (!email) {
+    return res.status(400).json({ error: 'No email provided' });
   }
 
-  try {
-const tokenResponse = await axios.post(
-  `https://login.microsoftonline.com/${MS_TENANT_ID}/oauth2/v2.0/token`,
-  new URLSearchParams({
-    client_id: MS_CLIENT_ID,
-    grant_type: 'authorization_code',
-    code: code,
-    redirect_uri: 'https://e-tech-ccsm-production.up.railway.app/',
-    code_verifier: code_verifier || ''
-  }),
-  { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
-);
+  const emailName = email.split('@')[0] || '';
+  const username = emailName.charAt(0).toUpperCase() + emailName.slice(1);
+  const isETechUser = email.toLowerCase().endsWith('@e-techsystemsja.com');
+  const role = isETechUser ? 'admin' : 'client';
+  const clientId = isETechUser ? null : 1;
 
-    const accessToken = tokenResponse.data.access_token;
+  const jwtToken = jwt.sign(
+    { id: msId, username: username, email: email, client_id: clientId, role: role, msToken: msToken },
+    process.env.JWT_SECRET || 'secret',
+    { expiresIn: '24h' }
+  );
 
-    const userResponse = await axios.get('https://graph.microsoft.com/v1.0/me', {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
+  const logClientId = clientId || 1;
+  await logActivity(logClientId, username, 'Login', `Microsoft login — ${email} (${role})`);
 
-    const msUser = userResponse.data;
-    const email = msUser.mail || msUser.userPrincipalName || '';
-    const displayName = msUser.displayName || 'User';
-    
-    const emailName = email.split('@')[0] || '';
-    const username = emailName.charAt(0).toUpperCase() + emailName.slice(1);
+  res.json({
+    token: jwtToken,
+    user: { id: msId, username: username, email: email, client_id: clientId, role: role }
+  });
 
-    const isETechUser = email.toLowerCase().endsWith('@e-techsystemsja.com');
-    const role = isETechUser ? 'admin' : 'client';
-    const clientId = isETechUser ? null : 1;
-
-    const jwtToken = jwt.sign(
-      { 
-        id: msUser.id, 
-        username: username, 
-        email: email, 
-        client_id: clientId, 
-        role: role,
-        msToken: accessToken 
-      },
-      process.env.JWT_SECRET || 'secret',
-      { expiresIn: '24h' }
-    );
-
-    const logClientId = clientId || 1;
-    await logActivity(logClientId, username, 'Login', `Microsoft login — ${email} (${role})`);
-
-    res.json({
-      token: jwtToken,
-      user: { 
-        id: msUser.id, 
-        username: username, 
-        email: email, 
-        client_id: clientId, 
-        role: role 
-      }
-    });
-
-    console.log(`✅ Microsoft login: ${username} (${email}) — Role: ${role}`);
-  } catch (err) {
-    console.error('Microsoft auth error:', err.response?.data || err.message);
-    res.status(401).json({ error: 'Microsoft authentication failed. ' + (err.response?.data?.error_description || err.message) });
-  }
+  console.log(`✅ Microsoft login: ${username} (${email}) — Role: ${role}`);
 });
 
 // ============================================================
@@ -293,7 +248,6 @@ app.put('/api/cameras/:id', authMiddleware, async (req, res) => {
   try {
     const clientId = req.user.role === 'admin' ? null : req.user.client_id;
     
-    // For admins, allow editing all fields. For clients, only status and comments.
     if (req.user.role === 'admin') {
       const query = clientId ? 
         `UPDATE cameras SET name = COALESCE($1, name), zone = COALESCE($2, zone), status = COALESCE($3, status), 
@@ -681,7 +635,6 @@ app.get('/api/service-requests', authMiddleware, async (req, res) => {
     for (const sr of result.rows) {
       const history = await pool.query('SELECT * FROM sr_history WHERE sr_id = $1 ORDER BY created_at', [sr.id]);
       sr.history = history.rows;
-      // Parse related_hardware JSON
       if (sr.related_hardware && typeof sr.related_hardware === 'string') {
         try { sr.related_hardware = JSON.parse(sr.related_hardware); } catch (e) { sr.related_hardware = []; }
       }
@@ -707,7 +660,6 @@ app.post('/api/service-requests', authMiddleware, async (req, res) => {
     await pool.query('INSERT INTO sr_history (sr_id, time, msg) VALUES ($1, $2, $3)', [result.rows[0].id, new Date().toLocaleTimeString(), 'Created by ' + req.user.username]);
     await logActivity(clientId, req.user.username, 'Created', 'SR ' + srId + ' created for ' + client);
 
-    // Send email notification
     const emailBody = `<h2>New Service Request: ${srId}</h2><p><strong>Client:</strong> ${client}</p><p><strong>Site:</strong> ${site}</p><p><strong>Category:</strong> ${category}</p><p><strong>Priority:</strong> ${priority}</p><p><strong>Assigned To:</strong> ${assigned_to}</p><p><strong>Subject:</strong> ${subject}</p><p><strong>Description:</strong> ${body || 'No description'}</p><hr><p>View in CAMS: <a href="https://e-tech-ccsm-production.up.railway.app">Open Dashboard</a></p>`;
     await sendEmailNotification('support@e-techsystemsja.com', `[CAMS] New SR: ${srId} — ${subject}`, emailBody, req.headers.authorization);
 
