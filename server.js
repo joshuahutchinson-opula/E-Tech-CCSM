@@ -159,14 +159,13 @@ app.post('/api/auth/microsoft', async (req, res) => {
   try {
     const tokenResponse = await axios.post(
       `https://login.microsoftonline.com/${MS_TENANT_ID}/oauth2/v2.0/token`,
-      new URLSearchParams({
-        client_id: MS_CLIENT_ID,
-        client_secret: MS_CLIENT_SECRET,
-        grant_type: 'authorization_code',
-        code: code,
-        redirect_uri: 'https://e-tech-ccsm-production.up.railway.app/',
-        code_verifier: code_verifier || ''
-      }),
+new URLSearchParams({
+  client_id: MS_CLIENT_ID,
+  grant_type: 'authorization_code',
+  code: code,
+  redirect_uri: 'https://e-tech-ccsm-production.up.railway.app/',
+  code_verifier: code_verifier || ''
+})
       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
     );
 
