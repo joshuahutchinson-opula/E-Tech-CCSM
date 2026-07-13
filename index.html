@@ -845,6 +845,7 @@ async function handleMicrosoftCallback(code) {
     authToken = data.token;
     localStorage.setItem('token', authToken);
     localStorage.setItem('user', JSON.stringify(data.user));
+    localStorage.setItem('msToken', accessToken);
     currentUser = data.user;
     isAdmin = data.user.role === 'admin';
     userClient = isAdmin ? null : (data.user.client_id === 1 ? 'KFTL' : null);
