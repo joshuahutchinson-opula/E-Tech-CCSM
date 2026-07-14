@@ -545,8 +545,11 @@ app.post('/api/service-requests', authMiddleware, async (req, res) => {
     );
     await pool.query('INSERT INTO sr_history (sr_id,time,msg) VALUES ($1,$2,$3)', [result.rows[0].id, new Date().toLocaleTimeString(), 'Created by ' + req.user.username]);
     await logActivity(clientId, req.user.username, 'Created', 'SR ' + srId + ' created for ' + client);
-    const emailBody = `<h2>New Service Request: ${srId}</h2><p><strong>Client:</strong> ${client}</p><p><strong>Site:</strong> ${site}</p><p><strong>Category:</strong> ${category}</p><p><strong>Priority:</strong> ${priority}</p><p><strong>Assigned To:</strong> ${assigned_to}</p><p><strong>Subject:</strong> ${subject}</p><p><strong>Description:</strong> ${body || 'No description'}</p><hr><p>View in CAMS: <a href="https://e-tech-ccsm-production.up.railway.app">Open Dashboard</a></p>`;
-    await sendEmailNotification('support@e-techsystemsja.com', `[CAMS] New SR: ${srId} — ${subject}`, emailBody, req.headers.authorization);
+    const msToken = req.user.msToken;
+    if (msToken) {
+      const emailBody = `<h2>New Service Request: ${srId}</h2><p><strong>Client:</strong> ${client}</p><p><strong>Site:</strong> ${site}</p><p><strong>Category:</strong> ${category}</p><p><strong>Priority:</strong> ${priority}</p><p><strong>Assigned To:</strong> ${assigned_to}</p><p><strong>Subject:</strong> ${subject}</p><p><strong>Description:</strong> ${body || 'No description'}</p><hr><p>View in CAMS: <a href="https://e-tech-ccsm-production.up.railway.app">Open Dashboard</a></p>`;
+      await sendEmailNotification('support@e-techsystemsja.com', `[CAMS] New SR: ${srId} — ${subject}`, emailBody, `Bearer ${msToken}`);
+    }
     res.json(result.rows[0]);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -574,8 +577,11 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
       const updated = await pool.query('SELECT * FROM service_requests WHERE id=$1', [id]);
       const sr = updated.rows[0];
       const history = await pool.query('SELECT * FROM sr_history WHERE sr_id=$1 ORDER BY created_at', [id]);
-      const reportBody = `<h2>Service Request Resolved: ${sr.sr_id}</h2><p><strong>Client:</strong> ${sr.client}</p><p><strong>Site:</strong> ${sr.site}</p><p><strong>Category:</strong> ${sr.category}</p><p><strong>Priority:</strong> ${sr.priority}</p><p><strong>Subject:</strong> ${sr.subject}</p><p><strong>Created By:</strong> ${sr.created_by}</p><p><strong>Resolved By:</strong> ${req.user.username}</p><p><strong>Resolution Notes:</strong> ${notes||'No notes'}</p><hr><h3>Timeline</h3><ul>${history.rows.map(h=>`<li>${h.time} — ${h.msg}</li>`).join('')}</ul><hr><p>View in CAMS: <a href="https://e-tech-ccsm-production.up.railway.app">Open Dashboard</a></p>`;
-      await sendEmailNotification('support@e-techsystemsja.com', `[CAMS] RESOLVED: ${sr.sr_id} — ${sr.subject}`, reportBody, req.headers.authorization);
+      const msToken = req.user.msToken;
+      if (msToken) {
+        const reportBody = `<h2>Service Request Resolved: ${sr.sr_id}</h2><p><strong>Client:</strong> ${sr.client}</p><p><strong>Site:</strong> ${sr.site}</p><p><strong>Category:</strong> ${sr.category}</p><p><strong>Priority:</strong> ${sr.priority}</p><p><strong>Subject:</strong> ${sr.subject}</p><p><strong>Created By:</strong> ${sr.created_by}</p><p><strong>Resolved By:</strong> ${req.user.username}</p><p><strong>Resolution Notes:</strong> ${notes||'No notes'}</p><hr><h3>Timeline</h3><ul>${history.rows.map(h=>`<li>${h.time} — ${h.msg}</li>`).join('')}</ul><hr><p>View in CAMS: <a href="https://e-tech-ccsm-production.up.railway.app">Open Dashboard</a></p>`;
+        await sendEmailNotification('support@e-techsystemsja.com', `[CAMS] RESOLVED: ${sr.sr_id} — ${sr.subject}`, reportBody, `Bearer ${msToken}`);
+      }
     }
     const updated = await pool.query('SELECT * FROM service_requests WHERE id=$1', [id]);
     res.json({ success: true, data: updated.rows[0] });
@@ -773,11 +779,30 @@ app.get('/api/files/graph', authMiddleware, async (req, res) => {
   } catch (err) { console.error('Files fetch error:', err.message); res.json([]); }
 });
 
+// ============================================================
+// DEBUG — FIND TRAINING GROUP ID
+// ============================================================
+
+app.get('/api/debug/groups', authMiddleware, async (req, res) => {
+  try {
+    const response = await axios.get('https://graph.microsoft.com/v1.0/groups?$filter=startswith(displayName,\'Training\')', {
+      headers: { Authorization: `Bearer ${req.user.msToken}` }
+    });
+    res.json(response.data);
+  } catch (err) { res.json({ error: err.message }); }
+});
+
+// ============================================================
+// TRAINING FILES — Replace GROUP_ID_HERE after debug
+// ============================================================
+
 app.get('/api/files/graph/training', authMiddleware, async (req, res) => {
   try {
     const folder = req.query.folder || '';
-    const basePath = 'groups/e-techsystemsja.com/Training/files';
-    const endpoint = folder ? `https://graph.microsoft.com/v1.0/${basePath}/${folder}:/children` : `https://graph.microsoft.com/v1.0/${basePath}/children`;
+    // Run /api/debug/groups to find the actual group ID, then replace GROUP_ID_HERE
+    const groupId = 'GROUP_ID_HERE';
+    const basePath = `groups/${groupId}/drive/root`;
+    const endpoint = folder ? `https://graph.microsoft.com/v1.0/${basePath}:/${folder}:/children` : `https://graph.microsoft.com/v1.0/${basePath}/children`;
     const response = await axios.get(endpoint, { headers: { Authorization: `Bearer ${req.user.msToken}` } });
     const files = response.data.value.map(item => ({ id: item.id, name: item.name, type: item.folder ? 'folder' : (item.file?.mimeType||'file'), size: item.size, modified: item.lastModifiedDateTime, webUrl: item.webUrl, downloadUrl: item['@microsoft.graph.downloadUrl'], isFolder: !!item.folder }));
     res.json(files);
@@ -813,6 +838,26 @@ app.post('/api/emails', authMiddleware, async (req, res) => {
     const result = await pool.query('INSERT INTO emails (client_id,sender,recipient,subject,body,folder) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *', [clientId,sender,recipient,subject,body,folder||'inbox']);
     res.json(result.rows[0]);
   } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ============================================================
+// STATIONS & MONITORS
+// ============================================================
+
+app.get('/api/stations', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.json([]);
+  try {
+    const result = await pool.query('SELECT * FROM stations ORDER BY zone,name');
+    res.json(result.rows);
+  } catch (err) { res.json([]); }
+});
+
+app.get('/api/monitors', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.json([]);
+  try {
+    const result = await pool.query('SELECT * FROM monitors ORDER BY zone,name');
+    res.json(result.rows);
+  } catch (err) { res.json([]); }
 });
 
 // ============================================================
