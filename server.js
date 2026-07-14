@@ -316,8 +316,8 @@ app.post('/api/import/doors', authMiddleware, async (req, res) => {
   let imported = 0;
   try {
     for (const door of doors) {
-      await pool.query(`INSERT INTO doors (client_id,name,zone,status,tech,reader,lock_type,ip,controllerType,doorSwing,accessType,antiPassback,powered,purchase_date,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`,
-        [door.client_id||1,door.name||'',door.zone||door.site||'',door.status||'Online',door.tech||'',door.reader||'',door.lock_type||'',door.ip||'',door.controllerType||'',door.doorSwing||'',door.accessType||'',door.antiPassback||'',door.powered||'',door.purchase_date||null,door.warranty_expiry||null,door.comments||'']);
+      await pool.query(`INSERT INTO doors (client_id,name,zone,status,tech,reader,lock_type,ip_address,controller_type,door_swing,access_type,anti_passback,install_date,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
+        [door.client_id||1,door.name||'',door.zone||door.site||'',door.status||'Online',door.tech||'',door.reader||'',door.lock_type||'',door.ip_address||'',door.controller_type||'',door.door_swing||'',door.access_type||'',door.anti_passback||'',door.install_date||null,door.comments||'']);
       imported++;
     }
     await logActivity(1, req.user.username, 'Import', 'Imported ' + imported + ' doors');
@@ -375,12 +375,12 @@ app.get('/api/doors', authMiddleware, async (req, res) => {
 app.put('/api/doors/:id', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
-  const { status, comments, name, zone, tech, reader, lock_type, ip, controllerType, doorSwing, accessType, antiPassback, powered, purchase_date, warranty_expiry } = req.body;
+  const { status, comments, name, zone, tech, reader, lock_type, ip_address, controller_type, door_swing, access_type, anti_passback, install_date } = req.body;
   try {
     const clientId = req.user.role === 'admin' ? null : req.user.client_id;
     if (req.user.role === 'admin') {
-      const query = clientId ? `UPDATE doors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),tech=COALESCE($4,tech),reader=COALESCE($5,reader),lock_type=COALESCE($6,lock_type),ip=COALESCE($7,ip),controllerType=COALESCE($8,controllerType),doorSwing=COALESCE($9,doorSwing),accessType=COALESCE($10,accessType),antiPassback=COALESCE($11,antiPassback),powered=COALESCE($12,powered),purchase_date=COALESCE($13,purchase_date),warranty_expiry=COALESCE($14,warranty_expiry),comments=COALESCE($15,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$16 AND client_id=$17` : `UPDATE doors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),tech=COALESCE($4,tech),reader=COALESCE($5,reader),lock_type=COALESCE($6,lock_type),ip=COALESCE($7,ip),controllerType=COALESCE($8,controllerType),doorSwing=COALESCE($9,doorSwing),accessType=COALESCE($10,accessType),antiPassback=COALESCE($11,antiPassback),powered=COALESCE($12,powered),purchase_date=COALESCE($13,purchase_date),warranty_expiry=COALESCE($14,warranty_expiry),comments=COALESCE($15,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$16`;
-      const params = clientId ? [name,zone,status,tech,reader,lock_type,ip,controllerType,doorSwing,accessType,antiPassback,powered,purchase_date,warranty_expiry,comments,id,clientId] : [name,zone,status,tech,reader,lock_type,ip,controllerType,doorSwing,accessType,antiPassback,powered,purchase_date,warranty_expiry,comments,id];
+      const query = clientId ? `UPDATE doors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),tech=COALESCE($4,tech),reader=COALESCE($5,reader),lock_type=COALESCE($6,lock_type),ip_address=COALESCE($7,ip_address),controller_type=COALESCE($8,controller_type),door_swing=COALESCE($9,door_swing),access_type=COALESCE($10,access_type),anti_passback=COALESCE($11,anti_passback),install_date=COALESCE($12,install_date),comments=COALESCE($13,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$14 AND client_id=$15` : `UPDATE doors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),tech=COALESCE($4,tech),reader=COALESCE($5,reader),lock_type=COALESCE($6,lock_type),ip_address=COALESCE($7,ip_address),controller_type=COALESCE($8,controller_type),door_swing=COALESCE($9,door_swing),access_type=COALESCE($10,access_type),anti_passback=COALESCE($11,anti_passback),install_date=COALESCE($12,install_date),comments=COALESCE($13,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$14`;
+      const params = clientId ? [name,zone,status,tech,reader,lock_type,ip_address,controller_type,door_swing,access_type,anti_passback,install_date,comments,id,clientId] : [name,zone,status,tech,reader,lock_type,ip_address,controller_type,door_swing,access_type,anti_passback,install_date,comments,id];
       await pool.query(query, params);
     } else {
       const query = clientId ? 'UPDATE doors SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3 AND client_id=$4' : 'UPDATE doors SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3';
