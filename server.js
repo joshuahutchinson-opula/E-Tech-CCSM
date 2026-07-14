@@ -317,7 +317,7 @@ app.post('/api/import/doors', authMiddleware, async (req, res) => {
   try {
     for (const door of doors) {
       await pool.query(`INSERT INTO doors (client_id,name,zone,status,tech,reader,lock_type,ip_address,controller_type,door_swing,access_type,anti_passback,install_date,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
-        [door.client_id||1,door.name||'',door.zone||door.site||'',door.status||'Online',door.tech||'',door.reader||'',door.lock_type||'',door.ip_address||'',door.controller_type||'',door.door_swing||'',door.access_type||'',door.anti_passback||'',door.install_date||null,door.comments||'']);
+        [door.client_id||1, door.name||'', door.zone||door.site||'', door.status||'Online', door.tech||'', door.reader||'', door.lock_type||'', door.ip_address||'', door.controller_type||'', door.door_swing||'', door.access_type||'', door.anti_passback||'', door.install_date||null, door.comments||'']);
       imported++;
     }
     await logActivity(1, req.user.username, 'Import', 'Imported ' + imported + ' doors');
@@ -771,6 +771,17 @@ app.get('/api/files/graph', authMiddleware, async (req, res) => {
     const files = response.data.value.map(item => ({ id: item.id, name: item.name, type: item.folder ? 'folder' : (item.file?.mimeType||'file'), size: item.size, modified: item.lastModifiedDateTime, webUrl: item.webUrl, downloadUrl: item['@microsoft.graph.downloadUrl'], isFolder: !!item.folder }));
     res.json(files);
   } catch (err) { console.error('Files fetch error:', err.message); res.json([]); }
+});
+
+app.get('/api/files/graph/training', authMiddleware, async (req, res) => {
+  try {
+    const folder = req.query.folder || '';
+    const basePath = 'groups/e-techsystemsja.com/Training/files';
+    const endpoint = folder ? `https://graph.microsoft.com/v1.0/${basePath}/${folder}:/children` : `https://graph.microsoft.com/v1.0/${basePath}/children`;
+    const response = await axios.get(endpoint, { headers: { Authorization: `Bearer ${req.user.msToken}` } });
+    const files = response.data.value.map(item => ({ id: item.id, name: item.name, type: item.folder ? 'folder' : (item.file?.mimeType||'file'), size: item.size, modified: item.lastModifiedDateTime, webUrl: item.webUrl, downloadUrl: item['@microsoft.graph.downloadUrl'], isFolder: !!item.folder }));
+    res.json(files);
+  } catch (err) { console.error('Training files fetch error:', err.message); res.json([]); }
 });
 
 app.get('/api/files/download/:id', authMiddleware, async (req, res) => {
