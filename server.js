@@ -692,9 +692,15 @@ app.get('/api/outlook/emails', authMiddleware, async (req, res) => {
       case 'deleted': endpoint = `https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/mailFolders/deleteditems/messages`; break;
       default: endpoint = `https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/mailFolders/inbox/messages`;
     }
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
     const response = await axios.get(endpoint, {
       headers: { Authorization: `Bearer ${req.user.msToken}` },
-      params: { $top: 100, $orderby: 'receivedDateTime desc', $select: 'id,subject,from,toRecipients,receivedDateTime,bodyPreview,body,isRead,flag,hasAttachments,webLink' }
+      params: { 
+        $top: 500, 
+        $orderby: 'receivedDateTime desc', 
+        $filter: `receivedDateTime ge ${thirtyDaysAgo}`,
+        $select: 'id,subject,from,toRecipients,receivedDateTime,bodyPreview,body,isRead,flag,hasAttachments,webLink' 
+      }
     });
     const emails = response.data.value.map(msg => ({
       id: msg.id, sender: msg.from?.emailAddress?.name || 'Unknown', sender_email: msg.from?.emailAddress?.address || '',
@@ -779,10 +785,6 @@ app.get('/api/files/graph', authMiddleware, async (req, res) => {
   } catch (err) { console.error('Files fetch error:', err.message); res.json([]); }
 });
 
-// ============================================================
-// DEBUG — FIND TRAINING GROUP ID
-// ============================================================
-
 app.get('/api/debug/groups', authMiddleware, async (req, res) => {
   try {
     const response = await axios.get('https://graph.microsoft.com/v1.0/groups?$filter=startswith(displayName,\'Training\')', {
@@ -792,14 +794,9 @@ app.get('/api/debug/groups', authMiddleware, async (req, res) => {
   } catch (err) { res.json({ error: err.message }); }
 });
 
-// ============================================================
-// TRAINING FILES — Replace GROUP_ID_HERE after debug
-// ============================================================
-
 app.get('/api/files/graph/training', authMiddleware, async (req, res) => {
   try {
     const folder = req.query.folder || '';
-    // Run /api/debug/groups to find the actual group ID, then replace GROUP_ID_HERE
     const groupId = 'GROUP_ID_HERE';
     const basePath = `groups/${groupId}/drive/root`;
     const endpoint = folder ? `https://graph.microsoft.com/v1.0/${basePath}:/${folder}:/children` : `https://graph.microsoft.com/v1.0/${basePath}/children`;
