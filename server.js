@@ -7,6 +7,7 @@ const axios = require('axios');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 const fs = require('fs');
+const cron = require('node-cron');
 require('dotenv').config();
 
 const app = express();
@@ -14,6 +15,21 @@ const port = process.env.PORT || 3000;
 
 // Shared mailbox
 const SHARED_MAILBOX = 'support@e-techsystemsja.com';
+
+// Technician email mapping
+const TECH_EMAILS = {
+  'Shanice': 'shanice@e-techsystemsja.com',
+  'Roger': 'roger@e-techsystemsja.com',
+  'Joshua': 'joshua@e-techsystemsja.com',
+  'Rochelle': 'rochelle@e-techsystemsja.com',
+  'Akeem': 'akeem@e-techsystemsja.com',
+  'Marvin': 'marvin@e-techsystemsja.com',
+  'Shavene': 'shavene@e-techsystemsja.com',
+  'Venessa': 'venessa@e-techsystemsja.com'
+};
+
+// Admin email for reports
+const ADMIN_EMAIL = 'support@e-techsystemsja.com';
 
 // ============================================================
 // DATABASE CONNECTION
@@ -131,8 +147,14 @@ app.post('/api/auth/login', async (req, res) => {
 
   if (username === 'KFTL' && password === 'KFTL@E-Tech0151') {
     const token = jwt.sign({ id: 2, username: 'KFTL', client_id: 1, role: 'client' }, process.env.JWT_SECRET || 'secret', { expiresIn: '24h' });
-    await logActivity(1, 'KFTL', 'Login', 'Client logged in');
+    await logActivity(1, 'KFTL', 'Login', 'KFTL client logged in');
     return res.json({ token, user: { id: 2, username: 'KFTL', client_id: 1, role: 'client' } });
+  }
+
+  if (username === 'KWL' && password === 'KWL@E-Tech0630') {
+    const token = jwt.sign({ id: 4, username: 'KWL', client_id: 2, role: 'client' }, process.env.JWT_SECRET || 'secret', { expiresIn: '24h' });
+    await logActivity(2, 'KWL', 'Login', 'KWL client logged in');
+    return res.json({ token, user: { id: 4, username: 'KWL', client_id: 2, role: 'client' } });
   }
 
   if (username === 'tech' && password === 'tech123') {
@@ -159,7 +181,22 @@ app.post('/api/auth/microsoft-callback', async (req, res) => {
   const username = emailName.charAt(0).toUpperCase() + emailName.slice(1);
   const isETechUser = email.toLowerCase().endsWith('@e-techsystemsja.com');
   const role = isETechUser ? 'admin' : 'client';
-  const clientId = isETechUser ? null : 1;
+  
+  // Determine client_id based on email domain or lookup
+  let clientId = null;
+  if (!isETechUser) {
+    // Check if this is a known client email
+    try {
+      const clientResult = await pool.query('SELECT id FROM clients WHERE LOWER(email) = LOWER($1)', [email]);
+      if (clientResult.rows.length > 0) {
+        clientId = clientResult.rows[0].id;
+      } else {
+        clientId = 1; // Default to KFTL for unknown clients
+      }
+    } catch (err) {
+      clientId = 1; // Default fallback
+    }
+  }
 
   const jwtToken = jwt.sign(
     { id: msId, username: username, email: email, client_id: clientId, role: role, msToken: msToken },
@@ -175,7 +212,7 @@ app.post('/api/auth/microsoft-callback', async (req, res) => {
     user: { id: msId, username: username, email: email, client_id: clientId, role: role }
   });
 
-  console.log(`✅ Microsoft login: ${username} (${email}) — Role: ${role}`);
+  console.log(`✅ Microsoft login: ${username} (${email}) — Role: ${role}, Client ID: ${clientId}`);
 });
 
 // ============================================================
@@ -316,8 +353,8 @@ app.post('/api/import/doors', authMiddleware, async (req, res) => {
   let imported = 0;
   try {
     for (const door of doors) {
-      await pool.query(`INSERT INTO doors (client_id,name,zone,status,tech,reader,lock_type,ip_address,controller_type,door_swing,access_type,anti_passback,install_date,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
-        [door.client_id||1, door.name||'', door.zone||door.site||'', door.status||'Online', door.tech||'', door.reader||'', door.lock_type||'', door.ip_address||'', door.controller_type||'', door.door_swing||'', door.access_type||'', door.anti_passback||'', door.install_date||null, door.comments||'']);
+      await pool.query(`INSERT INTO doors (client_id,name,zone,status,tech,reader,lock_type,ip_address,controller_type,door_swing,access_type,anti_passback,install_date,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`,
+        [door.client_id||1, door.name||'', door.zone||door.site||'', door.status||'Online', door.tech||'', door.reader||'', door.lock_type||'', door.ip_address||'', door.controller_type||'', door.door_swing||'', door.access_type||'', door.anti_passback||'', door.install_date||null, door.warranty_expiry||null, door.comments||'']);
       imported++;
     }
     await logActivity(1, req.user.username, 'Import', 'Imported ' + imported + ' doors');
@@ -375,12 +412,12 @@ app.get('/api/doors', authMiddleware, async (req, res) => {
 app.put('/api/doors/:id', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
-  const { status, comments, name, zone, tech, reader, lock_type, ip_address, controller_type, door_swing, access_type, anti_passback, install_date } = req.body;
+  const { status, comments, name, zone, tech, reader, lock_type, ip_address, controller_type, door_swing, access_type, anti_passback, install_date, warranty_expiry } = req.body;
   try {
     const clientId = req.user.role === 'admin' ? null : req.user.client_id;
     if (req.user.role === 'admin') {
-      const query = clientId ? `UPDATE doors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),tech=COALESCE($4,tech),reader=COALESCE($5,reader),lock_type=COALESCE($6,lock_type),ip_address=COALESCE($7,ip_address),controller_type=COALESCE($8,controller_type),door_swing=COALESCE($9,door_swing),access_type=COALESCE($10,access_type),anti_passback=COALESCE($11,anti_passback),install_date=COALESCE($12,install_date),comments=COALESCE($13,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$14 AND client_id=$15` : `UPDATE doors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),tech=COALESCE($4,tech),reader=COALESCE($5,reader),lock_type=COALESCE($6,lock_type),ip_address=COALESCE($7,ip_address),controller_type=COALESCE($8,controller_type),door_swing=COALESCE($9,door_swing),access_type=COALESCE($10,access_type),anti_passback=COALESCE($11,anti_passback),install_date=COALESCE($12,install_date),comments=COALESCE($13,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$14`;
-      const params = clientId ? [name,zone,status,tech,reader,lock_type,ip_address,controller_type,door_swing,access_type,anti_passback,install_date,comments,id,clientId] : [name,zone,status,tech,reader,lock_type,ip_address,controller_type,door_swing,access_type,anti_passback,install_date,comments,id];
+      const query = clientId ? `UPDATE doors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),tech=COALESCE($4,tech),reader=COALESCE($5,reader),lock_type=COALESCE($6,lock_type),ip_address=COALESCE($7,ip_address),controller_type=COALESCE($8,controller_type),door_swing=COALESCE($9,door_swing),access_type=COALESCE($10,access_type),anti_passback=COALESCE($11,anti_passback),install_date=COALESCE($12,install_date),warranty_expiry=COALESCE($13,warranty_expiry),comments=COALESCE($14,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$15 AND client_id=$16` : `UPDATE doors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),tech=COALESCE($4,tech),reader=COALESCE($5,reader),lock_type=COALESCE($6,lock_type),ip_address=COALESCE($7,ip_address),controller_type=COALESCE($8,controller_type),door_swing=COALESCE($9,door_swing),access_type=COALESCE($10,access_type),anti_passback=COALESCE($11,anti_passback),install_date=COALESCE($12,install_date),warranty_expiry=COALESCE($13,warranty_expiry),comments=COALESCE($14,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$15`;
+      const params = clientId ? [name,zone,status,tech,reader,lock_type,ip_address,controller_type,door_swing,access_type,anti_passback,install_date,warranty_expiry,comments,id,clientId] : [name,zone,status,tech,reader,lock_type,ip_address,controller_type,door_swing,access_type,anti_passback,install_date,warranty_expiry,comments,id];
       await pool.query(query, params);
     } else {
       const query = clientId ? 'UPDATE doors SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3 AND client_id=$4' : 'UPDATE doors SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3';
@@ -545,11 +582,20 @@ app.post('/api/service-requests', authMiddleware, async (req, res) => {
     );
     await pool.query('INSERT INTO sr_history (sr_id,time,msg) VALUES ($1,$2,$3)', [result.rows[0].id, new Date().toLocaleTimeString(), 'Created by ' + req.user.username]);
     await logActivity(clientId, req.user.username, 'Created', 'SR ' + srId + ' created for ' + client);
+    
     const msToken = req.user.msToken;
     if (msToken) {
+      // Send email to support mailbox
       const emailBody = `<h2>New Service Request: ${srId}</h2><p><strong>Client:</strong> ${client}</p><p><strong>Site:</strong> ${site}</p><p><strong>Category:</strong> ${category}</p><p><strong>Priority:</strong> ${priority}</p><p><strong>Assigned To:</strong> ${assigned_to}</p><p><strong>Subject:</strong> ${subject}</p><p><strong>Description:</strong> ${body || 'No description'}</p><hr><p>View in CAMS: <a href="https://e-tech-ccsm-production.up.railway.app">Open Dashboard</a></p>`;
       await sendEmailNotification('support@e-techsystemsja.com', `[CAMS] New SR: ${srId} — ${subject}`, emailBody, `Bearer ${msToken}`);
+      
+      // Send assignment notification to technician if assigned
+      if (assigned_to && assigned_to !== 'Unassigned' && TECH_EMAILS[assigned_to]) {
+        const techEmailBody = `<h2>You've been assigned a Service Request</h2><p><strong>SR ID:</strong> ${srId}</p><p><strong>Subject:</strong> ${subject}</p><p><strong>Client:</strong> ${client}</p><p><strong>Site:</strong> ${site}</p><p><strong>Priority:</strong> ${priority}</p><hr><p>View in CAMS: <a href="https://e-tech-ccsm-production.up.railway.app">Open Dashboard</a></p>`;
+        await sendEmailNotification(TECH_EMAILS[assigned_to], `[CAMS] Assigned: ${srId} — ${subject}`, techEmailBody, `Bearer ${msToken}`);
+      }
     }
+    
     res.json(result.rows[0]);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -567,12 +613,22 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
     const query = clientId ? `UPDATE service_requests SET priority=$1,assigned_to=$2,status=$3,notes=$4,updated_at=CURRENT_TIMESTAMP WHERE id=$5 AND client_id=$6` : `UPDATE service_requests SET priority=$1,assigned_to=$2,status=$3,notes=$4,updated_at=CURRENT_TIMESTAMP WHERE id=$5`;
     const params = clientId ? [priority,assigned_to,status,notes,id,clientId] : [priority,assigned_to,status,notes,id];
     await pool.query(query, params);
+    
     if (assigned_to && assigned_to !== oldAssigned) {
       await pool.query('INSERT INTO sr_history (sr_id,time,msg) VALUES ($1,$2,$3)', [id, new Date().toLocaleTimeString(), `Transferred from ${oldAssigned||'Unassigned'} to ${assigned_to} by ${req.user.username}`]);
+      
+      // Send email to newly assigned technician
+      const msToken = req.user.msToken;
+      if (msToken && assigned_to !== 'Unassigned' && TECH_EMAILS[assigned_to]) {
+        const techEmailBody = `<h2>You've been assigned a Service Request</h2><p><strong>SR ID:</strong> ${oldSr.sr_id}</p><p><strong>Subject:</strong> ${oldSr.subject}</p><p><strong>Client:</strong> ${oldSr.client}</p><p><strong>Site:</strong> ${oldSr.site}</p><p><strong>Priority:</strong> ${priority || oldSr.priority}</p><hr><p>View in CAMS: <a href="https://e-tech-ccsm-production.up.railway.app">Open Dashboard</a></p>`;
+        await sendEmailNotification(TECH_EMAILS[assigned_to], `[CAMS] Assigned: ${oldSr.sr_id} — ${oldSr.subject}`, techEmailBody, `Bearer ${msToken}`);
+      }
     }
+    
     await pool.query('INSERT INTO sr_history (sr_id,time,msg) VALUES ($1,$2,$3)', [id, new Date().toLocaleTimeString(), `Updated: ${status} by ${req.user.username}`]);
     const logClientId = clientId || 1;
     await logActivity(logClientId, req.user.username, 'Updated', 'SR ' + id + ' updated to ' + status);
+    
     if (status === 'Resolved' && oldStatus !== 'Resolved') {
       const updated = await pool.query('SELECT * FROM service_requests WHERE id=$1', [id]);
       const sr = updated.rows[0];
@@ -583,6 +639,7 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
         await sendEmailNotification('support@e-techsystemsja.com', `[CAMS] RESOLVED: ${sr.sr_id} — ${sr.subject}`, reportBody, `Bearer ${msToken}`);
       }
     }
+    
     const updated = await pool.query('SELECT * FROM service_requests WHERE id=$1', [id]);
     res.json({ success: true, data: updated.rows[0] });
   } catch (err) { res.status(500).json({ error: err.message }); }
@@ -598,6 +655,15 @@ app.post('/api/service-requests/:id/transfer', authMiddleware, async (req, res) 
     await pool.query('UPDATE service_requests SET assigned_to=$1,updated_at=CURRENT_TIMESTAMP WHERE id=$2', [assigned_to, id]);
     await pool.query('INSERT INTO sr_history (sr_id,time,msg) VALUES ($1,$2,$3)', [id, new Date().toLocaleTimeString(), `Transferred from ${oldAssigned||'Unassigned'} to ${assigned_to} by ${req.user.username}`]);
     await logActivity(1, req.user.username, 'Assigned', 'SR ' + id + ' transferred to ' + assigned_to);
+    
+    // Send email to newly assigned technician
+    const msToken = req.user.msToken;
+    if (msToken && assigned_to !== 'Unassigned' && TECH_EMAILS[assigned_to]) {
+      const sr = current.rows[0];
+      const techEmailBody = `<h2>You've been assigned a Service Request</h2><p><strong>SR ID:</strong> ${sr.sr_id}</p><p><strong>Subject:</strong> ${sr.subject}</p><p><strong>Client:</strong> ${sr.client}</p><p><strong>Site:</strong> ${sr.site}</p><p><strong>Priority:</strong> ${sr.priority}</p><hr><p>View in CAMS: <a href="https://e-tech-ccsm-production.up.railway.app">Open Dashboard</a></p>`;
+      await sendEmailNotification(TECH_EMAILS[assigned_to], `[CAMS] Assigned: ${sr.sr_id} — ${sr.subject}`, techEmailBody, `Bearer ${msToken}`);
+    }
+    
     const updated = await pool.query('SELECT * FROM service_requests WHERE id=$1', [id]);
     res.json({ success: true, data: updated.rows[0] });
   } catch (err) { res.status(500).json({ error: err.message }); }
@@ -661,8 +727,12 @@ app.get('/api/activity-log', authMiddleware, async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 100;
     const clientId = req.user.role === 'admin' ? null : req.user.client_id;
-    const query = clientId ? 'SELECT id,client_id,username,action,detail,created_at FROM activity_log WHERE client_id=$1 ORDER BY created_at DESC LIMIT $2' : 'SELECT id,client_id,username,action,detail,created_at FROM activity_log ORDER BY created_at DESC LIMIT $1';
-    const params = clientId ? [clientId,limit] : [limit];
+    // Only return logs from the last 24 hours
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const query = clientId ? 
+      'SELECT id,client_id,username,action,detail,created_at FROM activity_log WHERE client_id=$1 AND created_at >= $2 ORDER BY created_at DESC LIMIT $3' : 
+      'SELECT id,client_id,username,action,detail,created_at FROM activity_log WHERE created_at >= $1 ORDER BY created_at DESC LIMIT $2';
+    const params = clientId ? [clientId, twentyFourHoursAgo, limit] : [twentyFourHoursAgo, limit];
     const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (err) { res.json([]); }
@@ -844,17 +914,377 @@ app.post('/api/emails', authMiddleware, async (req, res) => {
 app.get('/api/stations', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.json([]);
   try {
-    const result = await pool.query('SELECT * FROM stations ORDER BY zone,name');
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const query = clientId ? 'SELECT * FROM stations WHERE client_id=$1 ORDER BY zone,name' : 'SELECT * FROM stations ORDER BY zone,name';
+    const params = clientId ? [clientId] : [];
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (err) { res.json([]); }
+});
+
+app.put('/api/stations/:id', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  const { id } = req.params;
+  const { status, name, zone, make, model, apps, install_date, purchase_date, warranty_expiry } = req.body;
+  try {
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const query = clientId ? 
+      'UPDATE stations SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),apps=COALESCE($6,apps),install_date=COALESCE($7,install_date),purchase_date=COALESCE($8,purchase_date),warranty_expiry=COALESCE($9,warranty_expiry),updated_at=CURRENT_TIMESTAMP WHERE id=$10 AND client_id=$11' :
+      'UPDATE stations SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),apps=COALESCE($6,apps),install_date=COALESCE($7,install_date),purchase_date=COALESCE($8,purchase_date),warranty_expiry=COALESCE($9,warranty_expiry),updated_at=CURRENT_TIMESTAMP WHERE id=$10';
+    const params = clientId ? [name,zone,status,make,model,apps,install_date,purchase_date,warranty_expiry,id,clientId] : [name,zone,status,make,model,apps,install_date,purchase_date,warranty_expiry,id];
+    await pool.query(query, params);
+    const logClientId = clientId || 1;
+    await logActivity(logClientId, req.user.username, 'Updated', 'Station ' + id + ' updated');
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.get('/api/monitors', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.json([]);
   try {
-    const result = await pool.query('SELECT * FROM monitors ORDER BY zone,name');
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const query = clientId ? 'SELECT * FROM monitors WHERE client_id=$1 ORDER BY zone,name' : 'SELECT * FROM monitors ORDER BY zone,name';
+    const params = clientId ? [clientId] : [];
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (err) { res.json([]); }
+});
+
+app.put('/api/monitors/:id', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  const { id } = req.params;
+  const { status, name, zone, make, model, size, install_date, purchase_date, warranty_expiry } = req.body;
+  try {
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const query = clientId ?
+      'UPDATE monitors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),size=COALESCE($6,size),install_date=COALESCE($7,install_date),purchase_date=COALESCE($8,purchase_date),warranty_expiry=COALESCE($9,warranty_expiry),updated_at=CURRENT_TIMESTAMP WHERE id=$10 AND client_id=$11' :
+      'UPDATE monitors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),size=COALESCE($6,size),install_date=COALESCE($7,install_date),purchase_date=COALESCE($8,purchase_date),warranty_expiry=COALESCE($9,warranty_expiry),updated_at=CURRENT_TIMESTAMP WHERE id=$10';
+    const params = clientId ? [name,zone,status,make,model,size,install_date,purchase_date,warranty_expiry,id,clientId] : [name,zone,status,make,model,size,install_date,purchase_date,warranty_expiry,id];
+    await pool.query(query, params);
+    const logClientId = clientId || 1;
+    await logActivity(logClientId, req.user.username, 'Updated', 'Monitor ' + id + ' updated');
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ============================================================
+// BI-WEEKLY REPORTS
+// ============================================================
+
+function getWeekRange() {
+  const now = new Date();
+  const dayOfWeek = now.getDay(); // 0 = Sunday
+  const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - daysToMonday - 14); // Two Mondays ago
+  monday.setHours(0, 0, 0, 0);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 13); // Sunday of last week
+  sunday.setHours(23, 59, 59, 999);
+  return { start: monday, end: sunday };
+}
+
+function formatDateRange(start, end) {
+  const options = { day: 'numeric', month: 'long', year: 'numeric' };
+  return `${start.toLocaleDateString('en-GB', options)} — ${end.toLocaleDateString('en-GB', options)}`;
+}
+
+async function generateClientReport(clientId, clientName, clientEmail, msToken) {
+  const { start, end } = getWeekRange();
+  const dateRangeStr = formatDateRange(start, end);
+
+  // Get asset stats
+  const cameras = await pool.query('SELECT status FROM cameras WHERE client_id=$1', [clientId]);
+  const doors = await pool.query('SELECT status FROM doors WHERE client_id=$1', [clientId]);
+  const servers = await pool.query('SELECT status FROM servers WHERE client_id=$1', [clientId]);
+  const switches = await pool.query('SELECT status FROM switches WHERE client_id=$1', [clientId]);
+  
+  const totalAssets = cameras.rowCount + doors.rowCount + servers.rowCount + switches.rowCount;
+  const onlineAssets = cameras.rows.filter(c => c.status === 'Online' || c.status === 'Working').length +
+                       doors.rows.filter(d => d.status === 'Online' || d.status === 'Working').length +
+                       servers.rows.filter(s => s.status === 'ONLINE').length +
+                       switches.rows.filter(s => s.status === 'Online').length;
+  const offlineAssets = totalAssets - onlineAssets;
+  const healthPct = totalAssets > 0 ? ((onlineAssets / totalAssets) * 100).toFixed(1) : '100.0';
+
+  // Get SR stats for the period
+  const srsPeriod = await pool.query(
+    'SELECT * FROM service_requests WHERE client_id=$1 AND created_at >= $2 AND created_at <= $3 ORDER BY created_at DESC',
+    [clientId, start.toISOString(), end.toISOString()]
+  );
+  
+  const srsCreated = srsPeriod.rows.length;
+  const srsResolved = srsPeriod.rows.filter(sr => sr.status === 'Resolved').length;
+  
+  const openSRs = await pool.query(
+    "SELECT * FROM service_requests WHERE client_id=$1 AND status != 'Resolved' ORDER BY created_at DESC",
+    [clientId]
+  );
+  
+  const highPriorityOpen = openSRs.rows.filter(sr => sr.priority === 'High').length;
+
+  // Build SR table
+  let srTable = '';
+  if (srsPeriod.rows.length > 0) {
+    srTable = `<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;margin-top:12px;">
+      <tr style="background:#f0f0f0;"><th>SR ID</th><th>Subject</th><th>Priority</th><th>Status</th><th>Assigned</th><th>Created</th></tr>`;
+    srsPeriod.rows.forEach(sr => {
+      const createdDate = new Date(sr.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
+      srTable += `<tr><td>${sr.sr_id}</td><td>${sr.subject}</td><td>${sr.priority}</td><td>${sr.status}</td><td>${sr.assigned_to || 'Unassigned'}</td><td>${createdDate}</td></tr>`;
+    });
+    srTable += '</table>';
+  } else {
+    srTable = '<p>No service requests were created or updated during this period.</p>';
+  }
+
+  const emailBody = `
+    <div style="font-family:Arial,sans-serif;max-width:650px;margin:0 auto;">
+      <h2 style="color:#1a3a5c;">CAMS Bi-Weekly Report</h2>
+      <p><strong>Client:</strong> ${clientName}</p>
+      <p><strong>Period:</strong> ${dateRangeStr}</p>
+      <hr>
+      
+      <p>Dear ${clientName} Team,</p>
+      <p>Here is your bi-weekly asset management summary from E-Tech Systems.</p>
+      
+      <h3 style="color:#1a3a5c;">Overview</h3>
+      <p>Over the past two weeks, <strong>${srsCreated} service requests</strong> were raised for your sites and <strong>${srsResolved} were resolved</strong>. You currently have <strong>${openSRs.rows.length} open requests</strong>, <strong>${highPriorityOpen} of which ${highPriorityOpen === 1 ? 'is' : 'are'} high priority</strong>${highPriorityOpen > 0 ? ' and require immediate attention' : ''}.</p>
+      <p>Your asset health stands at <strong>${healthPct}%</strong> with <strong>${onlineAssets} of ${totalAssets} assets</strong> online and healthy. <strong>${offlineAssets} assets</strong> are currently offline or defective and may need servicing.</p>
+      
+      <h3 style="color:#1a3a5c;">Key Figures</h3>
+      <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;">
+        <tr style="background:#f0f0f0;"><td><strong>Service Requests Created</strong></td><td>${srsCreated}</td></tr>
+        <tr><td><strong>Service Requests Resolved</strong></td><td>${srsResolved}</td></tr>
+        <tr style="background:#f0f0f0;"><td><strong>Currently Open SRs</strong></td><td>${openSRs.rows.length}</td></tr>
+        <tr><td><strong>High Priority Open SRs</strong></td><td>${highPriorityOpen}</td></tr>
+        <tr style="background:#f0f0f0;"><td><strong>Total Assets</strong></td><td>${totalAssets}</td></tr>
+        <tr><td><strong>Online / Healthy</strong></td><td>${onlineAssets} (${healthPct}%)</td></tr>
+        <tr style="background:#f0f0f0;"><td><strong>Offline / Defective</strong></td><td>${offlineAssets}</td></tr>
+      </table>
+      
+      <h3 style="color:#1a3a5c;">Service Requests This Period</h3>
+      ${srTable}
+      
+      ${highPriorityOpen > 0 ? `<h3 style="color:#cc0000;">What Needs Your Attention</h3><p><strong>${highPriorityOpen} high priority SR${highPriorityOpen > 1 ? 's' : ''} remain${highPriorityOpen === 1 ? 's' : ''} open.</strong> We recommend reviewing ${highPriorityOpen === 1 ? 'this request' : 'these requests'} as soon as possible.</p>` : ''}
+      ${offlineAssets > 0 ? `<p><strong>${offlineAssets} assets are currently offline or defective.</strong> While not listed here, your account manager can provide a full breakdown on request.</p>` : ''}
+      
+      <p>If you have any questions or need to escalate an issue, please reply to this email or submit a new request through the CAMS portal.</p>
+      
+      <p>View full dashboard: <a href="https://e-tech-ccsm-production.up.railway.app">Open CAMS</a></p>
+      <p style="color:#666;font-size:12px;">— E-Tech Systems Support</p>
+    </div>`;
+
+  if (clientEmail) {
+    await sendEmailNotification(clientEmail, `[CAMS] Bi-Weekly Report — ${clientName} — ${dateRangeStr}`, emailBody, `Bearer ${msToken}`);
+    console.log(`✅ Client report sent to ${clientName} (${clientEmail})`);
+  }
+}
+
+async function generateAdminReport(msToken) {
+  const { start, end } = getWeekRange();
+  const dateRangeStr = formatDateRange(start, end);
+
+  // Get all clients
+  const clientsResult = await pool.query('SELECT id,name,email FROM clients');
+  const clients = clientsResult.rows;
+
+  // Overall stats
+  const totalCameras = await pool.query('SELECT status FROM cameras');
+  const totalDoors = await pool.query('SELECT status FROM doors');
+  const totalServers = await pool.query('SELECT status FROM servers');
+  const totalSwitches = await pool.query('SELECT status FROM switches');
+  
+  const totalAssets = totalCameras.rowCount + totalDoors.rowCount + totalServers.rowCount + totalSwitches.rowCount;
+  const onlineAssets = totalCameras.rows.filter(c => c.status === 'Online' || c.status === 'Working').length +
+                       totalDoors.rows.filter(d => d.status === 'Online' || d.status === 'Working').length +
+                       totalServers.rows.filter(s => s.status === 'ONLINE').length +
+                       totalSwitches.rows.filter(s => s.status === 'Online').length;
+  const offlineAssets = totalAssets - onlineAssets;
+  const healthPct = totalAssets > 0 ? ((onlineAssets / totalAssets) * 100).toFixed(1) : '100.0';
+
+  // SR stats
+  const allSRsPeriod = await pool.query(
+    'SELECT * FROM service_requests WHERE created_at >= $1 AND created_at <= $2',
+    [start.toISOString(), end.toISOString()]
+  );
+  const srsCreated = allSRsPeriod.rows.length;
+  const srsResolved = allSRsPeriod.rows.filter(sr => sr.status === 'Resolved').length;
+  
+  const openSRs = await pool.query("SELECT * FROM service_requests WHERE status != 'Resolved' ORDER BY created_at DESC");
+  const highPriorityOpen = openSRs.rows.filter(sr => sr.priority === 'High');
+
+  // Build client breakdown table
+  let clientTable = '';
+  for (const client of clients) {
+    const cCameras = await pool.query('SELECT status FROM cameras WHERE client_id=$1', [client.id]);
+    const cDoors = await pool.query('SELECT status FROM doors WHERE client_id=$1', [client.id]);
+    const cServers = await pool.query('SELECT status FROM servers WHERE client_id=$1', [client.id]);
+    const cSwitches = await pool.query('SELECT status FROM switches WHERE client_id=$1', [client.id]);
+    
+    const cTotal = cCameras.rowCount + cDoors.rowCount + cServers.rowCount + cSwitches.rowCount;
+    const cOnline = cCameras.rows.filter(c => c.status === 'Online' || c.status === 'Working').length +
+                    cDoors.rows.filter(d => d.status === 'Online' || d.status === 'Working').length +
+                    cServers.rows.filter(s => s.status === 'ONLINE').length +
+                    cSwitches.rows.filter(s => s.status === 'Online').length;
+    const cOffline = cTotal - cOnline;
+    const cHealth = cTotal > 0 ? ((cOnline / cTotal) * 100).toFixed(1) : '100.0';
+    
+    const cSRsCreated = allSRsPeriod.rows.filter(sr => sr.client_id === client.id).length;
+    const cSRsResolved = allSRsPeriod.rows.filter(sr => sr.client_id === client.id && sr.status === 'Resolved').length;
+    const cOpen = openSRs.rows.filter(sr => sr.client_id === client.id).length;
+    
+    clientTable += `<tr><td>${client.name}</td><td>${cTotal}</td><td>${cOnline}</td><td>${cOffline}</td><td>${cHealth}%</td><td>${cSRsCreated}</td><td>${cSRsResolved}</td><td>${cOpen}</td></tr>`;
+  }
+
+  // Build high priority SR table
+  let hpTable = '';
+  if (highPriorityOpen.length > 0) {
+    hpTable = `<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;margin-top:12px;">
+      <tr style="background:#f0f0f0;"><th>SR ID</th><th>Client</th><th>Subject</th><th>Assigned</th><th>Created</th></tr>`;
+    highPriorityOpen.forEach(sr => {
+      const createdDate = new Date(sr.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
+      hpTable += `<tr><td>${sr.sr_id}</td><td>${sr.client}</td><td>${sr.subject}</td><td>${sr.assigned_to || 'Unassigned'}</td><td>${createdDate}</td></tr>`;
+    });
+    hpTable += '</table>';
+  }
+
+  // Activity log
+  const activityLog = await pool.query(
+    'SELECT * FROM activity_log WHERE created_at >= $1 AND created_at <= $2 ORDER BY created_at DESC LIMIT 20',
+    [start.toISOString(), end.toISOString()]
+  );
+  
+  let activityTable = '';
+  if (activityLog.rows.length > 0) {
+    activityTable = `<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;margin-top:12px;">
+      <tr style="background:#f0f0f0;"><th>Date</th><th>User</th><th>Action</th><th>Detail</th></tr>`;
+    activityLog.rows.forEach(log => {
+      const logDate = new Date(log.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
+      activityTable += `<tr><td>${logDate}</td><td>${log.username}</td><td>${log.action}</td><td>${log.detail}</td></tr>`;
+    });
+    activityTable += '</table>';
+  }
+
+  // Find lowest health client
+  let lowestHealthClient = null;
+  let lowestHealth = 100;
+  for (const client of clients) {
+    const cCameras = await pool.query('SELECT status FROM cameras WHERE client_id=$1', [client.id]);
+    const cDoors = await pool.query('SELECT status FROM doors WHERE client_id=$1', [client.id]);
+    const cServers = await pool.query('SELECT status FROM servers WHERE client_id=$1', [client.id]);
+    const cSwitches = await pool.query('SELECT status FROM switches WHERE client_id=$1', [client.id]);
+    const cTotal = cCameras.rowCount + cDoors.rowCount + cServers.rowCount + cSwitches.rowCount;
+    const cOnline = cCameras.rows.filter(c => c.status === 'Online' || c.status === 'Working').length +
+                    cDoors.rows.filter(d => d.status === 'Online' || d.status === 'Working').length +
+                    cServers.rows.filter(s => s.status === 'ONLINE').length +
+                    cSwitches.rows.filter(s => s.status === 'Online').length;
+    const cHealth = cTotal > 0 ? parseFloat(((cOnline / cTotal) * 100).toFixed(1)) : 100;
+    if (cHealth < lowestHealth) {
+      lowestHealth = cHealth;
+      lowestHealthClient = client.name;
+    }
+  }
+
+  const emailBody = `
+    <div style="font-family:Arial,sans-serif;max-width:650px;margin:0 auto;">
+      <h2 style="color:#1a3a5c;">CAMS Bi-Weekly Admin Report</h2>
+      <p><strong>Period:</strong> ${dateRangeStr}</p>
+      <hr>
+      
+      <h3 style="color:#1a3a5c;">Executive Summary</h3>
+      <p>Across all <strong>${clients.length} clients</strong>, <strong>${srsCreated} service requests</strong> were created in the last two weeks and <strong>${srsResolved} were resolved</strong>. There are currently <strong>${openSRs.rows.length} open requests</strong>, of which <strong>${highPriorityOpen.length} ${highPriorityOpen.length === 1 ? 'is' : 'are'} high priority</strong> and require immediate action.</p>
+      <p>Overall asset health across all clients is <strong>${healthPct}%</strong> — <strong>${onlineAssets} of ${totalAssets} assets</strong> are online and healthy. <strong>${offlineAssets} assets</strong> are currently offline or defective.</p>
+      
+      <h3 style="color:#1a3a5c;">Overall Figures</h3>
+      <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;">
+        <tr style="background:#f0f0f0;"><td><strong>Total Clients</strong></td><td>${clients.length}</td></tr>
+        <tr><td><strong>Service Requests Created</strong></td><td>${srsCreated}</td></tr>
+        <tr style="background:#f0f0f0;"><td><strong>Service Requests Resolved</strong></td><td>${srsResolved}</td></tr>
+        <tr><td><strong>Currently Open SRs</strong></td><td>${openSRs.rows.length}</td></tr>
+        <tr style="background:#f0f0f0;"><td><strong>High Priority Open SRs</strong></td><td>${highPriorityOpen.length}</td></tr>
+        <tr><td><strong>Total Assets (all clients)</strong></td><td>${totalAssets}</td></tr>
+        <tr style="background:#f0f0f0;"><td><strong>Online / Healthy</strong></td><td>${onlineAssets} (${healthPct}%)</td></tr>
+        <tr><td><strong>Offline / Defective</strong></td><td>${offlineAssets}</td></tr>
+      </table>
+      
+      <h3 style="color:#1a3a5c;">Breakdown by Client</h3>
+      <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;">
+        <tr style="background:#f0f0f0;"><th>Client</th><th>Assets</th><th>Online</th><th>Offline</th><th>Health</th><th>SRs Created</th><th>Resolved</th><th>Open</th></tr>
+        ${clientTable}
+      </table>
+      ${lowestHealthClient && lowestHealth < 95 ? `<p><strong>${lowestHealthClient}</strong> has the lowest asset health at <strong>${lowestHealth}%</strong> and may need additional attention.</p>` : ''}
+      
+      ${highPriorityOpen.length > 0 ? `<h3 style="color:#cc0000;">Open High Priority SRs</h3><p>These require immediate action:</p>${hpTable}` : '<p>No high priority SRs are currently open.</p>'}
+      
+      ${activityLog.rows.length > 0 ? `<h3 style="color:#1a3a5c;">Notable Activity (Last 14 Days)</h3>${activityTable}` : ''}
+      
+      <p>View full dashboard: <a href="https://e-tech-ccsm-production.up.railway.app">Open CAMS</a></p>
+    </div>`;
+
+  await sendEmailNotification(ADMIN_EMAIL, `[CAMS] Bi-Weekly Admin Report — ${dateRangeStr}`, emailBody, `Bearer ${msToken}`);
+  console.log(`✅ Admin report sent to ${ADMIN_EMAIL}`);
+}
+
+async function runBiWeeklyReports() {
+  if (!dbConnected) {
+    console.log('⚠️ Reports skipped: DB not connected');
+    return;
+  }
+  
+  console.log('📊 Running bi-weekly reports...');
+  
+  try {
+    // Get admin MS token (use a system token or the first admin token available)
+    // For scheduled reports, we need a valid msToken. This will be stored or fetched.
+    const msToken = process.env.MS_GRAPH_TOKEN;
+    
+    if (!msToken) {
+      console.log('⚠️ No MS Graph token available for reports. Skipping.');
+      return;
+    }
+    
+    // Generate admin report
+    await generateAdminReport(msToken);
+    
+    // Generate client reports
+    const clients = await pool.query('SELECT id,name,email FROM clients WHERE email IS NOT NULL AND email != \'\'');
+    for (const client of clients.rows) {
+      await generateClientReport(client.id, client.name, client.email, msToken);
+    }
+    
+    console.log('✅ Bi-weekly reports completed');
+  } catch (err) {
+    console.error('❌ Report generation failed:', err.message);
+  }
+}
+
+// Schedule: Every other Friday at 5:00 PM
+// Cron: 0 17 * * 5 (every Friday at 5PM)
+// We'll check if it's an even week
+let reportWeekCounter = 0;
+cron.schedule('0 17 * * 5', () => {
+  reportWeekCounter++;
+  if (reportWeekCounter % 2 === 0) {
+    runBiWeeklyReports();
+  }
+}, {
+  timezone: "America/Jamaica"
+});
+
+console.log('📅 Bi-weekly reports scheduled: Every other Friday at 5:00 PM Jamaica time');
+
+// ============================================================
+// MANUAL REPORT TRIGGER (for testing)
+// ============================================================
+
+app.post('/api/reports/run', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  try {
+    await runBiWeeklyReports();
+    res.json({ success: true, message: 'Reports generated and sent' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ============================================================
