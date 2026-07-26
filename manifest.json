@@ -1,22 +1,42 @@
 {
   "name": "CAMS — Client Asset Management System",
   "short_name": "CAMS",
-  "description": "E-Tech Systems Client Asset Management System",
+  "description": "E-Tech Systems — Manage client security assets, service requests, and system health from one dashboard.",
+  "id": "/",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0b0d15",
   "theme_color": "#4f8cf7",
   "orientation": "any",
+  "categories": ["business", "productivity", "utilities"],
   "icons": [
     {
-      "src": "/logo.png",
+      "src": "/192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/logo.png",
+      "src": "/512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Dashboard view"
+    },
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mobile field app"
     }
   ]
 }
