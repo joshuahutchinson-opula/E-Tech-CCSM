@@ -142,25 +142,25 @@ app.post('/api/auth/login', async (req, res) => {
   if (username === 'Admin' && password === 'Ad@E-Tech07') {
     const token = jwt.sign({ id: 1, username: 'Admin', client_id: null, role: 'admin' }, process.env.JWT_SECRET || 'secret', { expiresIn: '24h' });
     await logActivity(1, 'Admin', 'Login', 'Admin logged in');
-    return res.json({ token, user: { id: 1, username: 'Admin', client_id: null, role: 'admin' } });
+    return res.json({ token, user: { id: 1, username: 'Admin', client_id: null, role: 'admin', photo_url: null } });
   }
 
   if (username === 'KFTL' && password === 'KFTL@E-Tech0151') {
     const token = jwt.sign({ id: 2, username: 'KFTL', client_id: 1, role: 'client' }, process.env.JWT_SECRET || 'secret', { expiresIn: '24h' });
     await logActivity(1, 'KFTL', 'Login', 'KFTL client logged in');
-    return res.json({ token, user: { id: 2, username: 'KFTL', client_id: 1, role: 'client' } });
+    return res.json({ token, user: { id: 2, username: 'KFTL', client_id: 1, role: 'client', photo_url: null } });
   }
 
   if (username === 'KWL' && password === 'KWL@E-Tech0630') {
     const token = jwt.sign({ id: 4, username: 'KWL', client_id: 2, role: 'client' }, process.env.JWT_SECRET || 'secret', { expiresIn: '24h' });
     await logActivity(2, 'KWL', 'Login', 'KWL client logged in');
-    return res.json({ token, user: { id: 4, username: 'KWL', client_id: 2, role: 'client' } });
+    return res.json({ token, user: { id: 4, username: 'KWL', client_id: 2, role: 'client', photo_url: null } });
   }
 
   if (username === 'tech' && password === 'tech123') {
     const token = jwt.sign({ id: 3, username: 'tech', client_id: null, role: 'technician' }, process.env.JWT_SECRET || 'secret', { expiresIn: '24h' });
     await logActivity(1, 'tech', 'Login', 'Technician logged in');
-    return res.json({ token, user: { id: 3, username: 'tech', client_id: null, role: 'technician' } });
+    return res.json({ token, user: { id: 3, username: 'tech', client_id: null, role: 'technician', photo_url: null } });
   }
 
   res.status(401).json({ error: 'Invalid credentials' });
@@ -182,20 +182,31 @@ app.post('/api/auth/microsoft-callback', async (req, res) => {
   const isETechUser = email.toLowerCase().endsWith('@e-techsystemsja.com');
   const role = isETechUser ? 'admin' : 'client';
   
-  // Determine client_id based on email domain or lookup
   let clientId = null;
   if (!isETechUser) {
-    // Check if this is a known client email
     try {
       const clientResult = await pool.query('SELECT id FROM clients WHERE LOWER(email) = LOWER($1)', [email]);
       if (clientResult.rows.length > 0) {
         clientId = clientResult.rows[0].id;
       } else {
-        clientId = 1; // Default to KFTL for unknown clients
+        clientId = 1;
       }
     } catch (err) {
-      clientId = 1; // Default fallback
+      clientId = 1;
     }
+  }
+
+  let photoUrl = null;
+  try {
+    const photoResponse = await axios.get('https://graph.microsoft.com/v1.0/me/photo/$value', {
+      headers: { Authorization: `Bearer ${msToken}` },
+      responseType: 'arraybuffer'
+    });
+    const base64 = Buffer.from(photoResponse.data, 'binary').toString('base64');
+    const contentType = photoResponse.headers['content-type'] || 'image/jpeg';
+    photoUrl = `data:${contentType};base64,${base64}`;
+  } catch (photoErr) {
+    console.log('No profile photo available for ' + email);
   }
 
   const jwtToken = jwt.sign(
@@ -209,7 +220,7 @@ app.post('/api/auth/microsoft-callback', async (req, res) => {
 
   res.json({
     token: jwtToken,
-    user: { id: msId, username: username, email: email, client_id: clientId, role: role }
+    user: { id: msId, username: username, email: email, client_id: clientId, role: role, photo_url: photoUrl }
   });
 
   console.log(`✅ Microsoft login: ${username} (${email}) — Role: ${role}, Client ID: ${clientId}`);
@@ -585,11 +596,9 @@ app.post('/api/service-requests', authMiddleware, async (req, res) => {
     
     const msToken = req.user.msToken;
     if (msToken) {
-      // Send email to support mailbox
       const emailBody = `<h2>New Service Request: ${srId}</h2><p><strong>Client:</strong> ${client}</p><p><strong>Site:</strong> ${site}</p><p><strong>Category:</strong> ${category}</p><p><strong>Priority:</strong> ${priority}</p><p><strong>Assigned To:</strong> ${assigned_to}</p><p><strong>Subject:</strong> ${subject}</p><p><strong>Description:</strong> ${body || 'No description'}</p><hr><p>View in CAMS: <a href="https://e-tech-ccsm-production.up.railway.app">Open Dashboard</a></p>`;
       await sendEmailNotification('support@e-techsystemsja.com', `[CAMS] New SR: ${srId} — ${subject}`, emailBody, `Bearer ${msToken}`);
       
-      // Send assignment notification to technician if assigned
       if (assigned_to && assigned_to !== 'Unassigned' && TECH_EMAILS[assigned_to]) {
         const techEmailBody = `<h2>You've been assigned a Service Request</h2><p><strong>SR ID:</strong> ${srId}</p><p><strong>Subject:</strong> ${subject}</p><p><strong>Client:</strong> ${client}</p><p><strong>Site:</strong> ${site}</p><p><strong>Priority:</strong> ${priority}</p><hr><p>View in CAMS: <a href="https://e-tech-ccsm-production.up.railway.app">Open Dashboard</a></p>`;
         await sendEmailNotification(TECH_EMAILS[assigned_to], `[CAMS] Assigned: ${srId} — ${subject}`, techEmailBody, `Bearer ${msToken}`);
@@ -617,7 +626,6 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
     if (assigned_to && assigned_to !== oldAssigned) {
       await pool.query('INSERT INTO sr_history (sr_id,time,msg) VALUES ($1,$2,$3)', [id, new Date().toLocaleTimeString(), `Transferred from ${oldAssigned||'Unassigned'} to ${assigned_to} by ${req.user.username}`]);
       
-      // Send email to newly assigned technician
       const msToken = req.user.msToken;
       if (msToken && assigned_to !== 'Unassigned' && TECH_EMAILS[assigned_to]) {
         const techEmailBody = `<h2>You've been assigned a Service Request</h2><p><strong>SR ID:</strong> ${oldSr.sr_id}</p><p><strong>Subject:</strong> ${oldSr.subject}</p><p><strong>Client:</strong> ${oldSr.client}</p><p><strong>Site:</strong> ${oldSr.site}</p><p><strong>Priority:</strong> ${priority || oldSr.priority}</p><hr><p>View in CAMS: <a href="https://e-tech-ccsm-production.up.railway.app">Open Dashboard</a></p>`;
@@ -656,7 +664,6 @@ app.post('/api/service-requests/:id/transfer', authMiddleware, async (req, res) 
     await pool.query('INSERT INTO sr_history (sr_id,time,msg) VALUES ($1,$2,$3)', [id, new Date().toLocaleTimeString(), `Transferred from ${oldAssigned||'Unassigned'} to ${assigned_to} by ${req.user.username}`]);
     await logActivity(1, req.user.username, 'Assigned', 'SR ' + id + ' transferred to ' + assigned_to);
     
-    // Send email to newly assigned technician
     const msToken = req.user.msToken;
     if (msToken && assigned_to !== 'Unassigned' && TECH_EMAILS[assigned_to]) {
       const sr = current.rows[0];
@@ -727,7 +734,6 @@ app.get('/api/activity-log', authMiddleware, async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 100;
     const clientId = req.user.role === 'admin' ? null : req.user.client_id;
-    // Only return logs from the last 24 hours
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const query = clientId ? 
       'SELECT id,client_id,username,action,detail,created_at FROM activity_log WHERE client_id=$1 AND created_at >= $2 ORDER BY created_at DESC LIMIT $3' : 
@@ -842,10 +848,11 @@ app.post('/api/outlook/convert-to-sr/:id', authMiddleware, async (req, res) => {
 });
 
 // ============================================================
-// FILES — MICROSOFT GRAPH SHAREPOINT / ONEDRIVE
+// FILES — MICROSOFT GRAPH ONEDRIVE
 // ============================================================
 
 app.get('/api/files/graph', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
   try {
     const folder = req.query.folder || '';
     const endpoint = folder ? `https://graph.microsoft.com/v1.0/me/drive/root:/${folder}:/children` : 'https://graph.microsoft.com/v1.0/me/drive/root/children';
@@ -853,27 +860,6 @@ app.get('/api/files/graph', authMiddleware, async (req, res) => {
     const files = response.data.value.map(item => ({ id: item.id, name: item.name, type: item.folder ? 'folder' : (item.file?.mimeType||'file'), size: item.size, modified: item.lastModifiedDateTime, webUrl: item.webUrl, downloadUrl: item['@microsoft.graph.downloadUrl'], isFolder: !!item.folder }));
     res.json(files);
   } catch (err) { console.error('Files fetch error:', err.message); res.json([]); }
-});
-
-app.get('/api/debug/groups', authMiddleware, async (req, res) => {
-  try {
-    const response = await axios.get('https://graph.microsoft.com/v1.0/groups?$filter=startswith(displayName,\'Training\')', {
-      headers: { Authorization: `Bearer ${req.user.msToken}` }
-    });
-    res.json(response.data);
-  } catch (err) { res.json({ error: err.message }); }
-});
-
-app.get('/api/files/graph/training', authMiddleware, async (req, res) => {
-  try {
-    const folder = req.query.folder || '';
-    const groupId = 'GROUP_ID_HERE';
-    const basePath = `groups/${groupId}/drive/root`;
-    const endpoint = folder ? `https://graph.microsoft.com/v1.0/${basePath}:/${folder}:/children` : `https://graph.microsoft.com/v1.0/${basePath}/children`;
-    const response = await axios.get(endpoint, { headers: { Authorization: `Bearer ${req.user.msToken}` } });
-    const files = response.data.value.map(item => ({ id: item.id, name: item.name, type: item.folder ? 'folder' : (item.file?.mimeType||'file'), size: item.size, modified: item.lastModifiedDateTime, webUrl: item.webUrl, downloadUrl: item['@microsoft.graph.downloadUrl'], isFolder: !!item.folder }));
-    res.json(files);
-  } catch (err) { console.error('Training files fetch error:', err.message); res.json([]); }
 });
 
 app.get('/api/files/download/:id', authMiddleware, async (req, res) => {
@@ -973,13 +959,13 @@ app.put('/api/monitors/:id', authMiddleware, async (req, res) => {
 
 function getWeekRange() {
   const now = new Date();
-  const dayOfWeek = now.getDay(); // 0 = Sunday
+  const dayOfWeek = now.getDay();
   const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
   const monday = new Date(now);
-  monday.setDate(now.getDate() - daysToMonday - 14); // Two Mondays ago
+  monday.setDate(now.getDate() - daysToMonday - 14);
   monday.setHours(0, 0, 0, 0);
   const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 13); // Sunday of last week
+  sunday.setDate(monday.getDate() + 13);
   sunday.setHours(23, 59, 59, 999);
   return { start: monday, end: sunday };
 }
@@ -993,7 +979,6 @@ async function generateClientReport(clientId, clientName, clientEmail, msToken) 
   const { start, end } = getWeekRange();
   const dateRangeStr = formatDateRange(start, end);
 
-  // Get asset stats
   const cameras = await pool.query('SELECT status FROM cameras WHERE client_id=$1', [clientId]);
   const doors = await pool.query('SELECT status FROM doors WHERE client_id=$1', [clientId]);
   const servers = await pool.query('SELECT status FROM servers WHERE client_id=$1', [clientId]);
@@ -1007,7 +992,6 @@ async function generateClientReport(clientId, clientName, clientEmail, msToken) 
   const offlineAssets = totalAssets - onlineAssets;
   const healthPct = totalAssets > 0 ? ((onlineAssets / totalAssets) * 100).toFixed(1) : '100.0';
 
-  // Get SR stats for the period
   const srsPeriod = await pool.query(
     'SELECT * FROM service_requests WHERE client_id=$1 AND created_at >= $2 AND created_at <= $3 ORDER BY created_at DESC',
     [clientId, start.toISOString(), end.toISOString()]
@@ -1023,7 +1007,6 @@ async function generateClientReport(clientId, clientName, clientEmail, msToken) 
   
   const highPriorityOpen = openSRs.rows.filter(sr => sr.priority === 'High').length;
 
-  // Build SR table
   let srTable = '';
   if (srsPeriod.rows.length > 0) {
     srTable = `<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;margin-top:12px;">
@@ -1043,14 +1026,11 @@ async function generateClientReport(clientId, clientName, clientEmail, msToken) 
       <p><strong>Client:</strong> ${clientName}</p>
       <p><strong>Period:</strong> ${dateRangeStr}</p>
       <hr>
-      
       <p>Dear ${clientName} Team,</p>
       <p>Here is your bi-weekly asset management summary from E-Tech Systems.</p>
-      
       <h3 style="color:#1a3a5c;">Overview</h3>
       <p>Over the past two weeks, <strong>${srsCreated} service requests</strong> were raised for your sites and <strong>${srsResolved} were resolved</strong>. You currently have <strong>${openSRs.rows.length} open requests</strong>, <strong>${highPriorityOpen} of which ${highPriorityOpen === 1 ? 'is' : 'are'} high priority</strong>${highPriorityOpen > 0 ? ' and require immediate attention' : ''}.</p>
       <p>Your asset health stands at <strong>${healthPct}%</strong> with <strong>${onlineAssets} of ${totalAssets} assets</strong> online and healthy. <strong>${offlineAssets} assets</strong> are currently offline or defective and may need servicing.</p>
-      
       <h3 style="color:#1a3a5c;">Key Figures</h3>
       <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;">
         <tr style="background:#f0f0f0;"><td><strong>Service Requests Created</strong></td><td>${srsCreated}</td></tr>
@@ -1061,15 +1041,11 @@ async function generateClientReport(clientId, clientName, clientEmail, msToken) 
         <tr><td><strong>Online / Healthy</strong></td><td>${onlineAssets} (${healthPct}%)</td></tr>
         <tr style="background:#f0f0f0;"><td><strong>Offline / Defective</strong></td><td>${offlineAssets}</td></tr>
       </table>
-      
       <h3 style="color:#1a3a5c;">Service Requests This Period</h3>
       ${srTable}
-      
       ${highPriorityOpen > 0 ? `<h3 style="color:#cc0000;">What Needs Your Attention</h3><p><strong>${highPriorityOpen} high priority SR${highPriorityOpen > 1 ? 's' : ''} remain${highPriorityOpen === 1 ? 's' : ''} open.</strong> We recommend reviewing ${highPriorityOpen === 1 ? 'this request' : 'these requests'} as soon as possible.</p>` : ''}
       ${offlineAssets > 0 ? `<p><strong>${offlineAssets} assets are currently offline or defective.</strong> While not listed here, your account manager can provide a full breakdown on request.</p>` : ''}
-      
       <p>If you have any questions or need to escalate an issue, please reply to this email or submit a new request through the CAMS portal.</p>
-      
       <p>View full dashboard: <a href="https://e-tech-ccsm-production.up.railway.app">Open CAMS</a></p>
       <p style="color:#666;font-size:12px;">— E-Tech Systems Support</p>
     </div>`;
@@ -1084,11 +1060,9 @@ async function generateAdminReport(msToken) {
   const { start, end } = getWeekRange();
   const dateRangeStr = formatDateRange(start, end);
 
-  // Get all clients
   const clientsResult = await pool.query('SELECT id,name,email FROM clients');
   const clients = clientsResult.rows;
 
-  // Overall stats
   const totalCameras = await pool.query('SELECT status FROM cameras');
   const totalDoors = await pool.query('SELECT status FROM doors');
   const totalServers = await pool.query('SELECT status FROM servers');
@@ -1102,7 +1076,6 @@ async function generateAdminReport(msToken) {
   const offlineAssets = totalAssets - onlineAssets;
   const healthPct = totalAssets > 0 ? ((onlineAssets / totalAssets) * 100).toFixed(1) : '100.0';
 
-  // SR stats
   const allSRsPeriod = await pool.query(
     'SELECT * FROM service_requests WHERE created_at >= $1 AND created_at <= $2',
     [start.toISOString(), end.toISOString()]
@@ -1113,7 +1086,6 @@ async function generateAdminReport(msToken) {
   const openSRs = await pool.query("SELECT * FROM service_requests WHERE status != 'Resolved' ORDER BY created_at DESC");
   const highPriorityOpen = openSRs.rows.filter(sr => sr.priority === 'High');
 
-  // Build client breakdown table
   let clientTable = '';
   for (const client of clients) {
     const cCameras = await pool.query('SELECT status FROM cameras WHERE client_id=$1', [client.id]);
@@ -1136,7 +1108,6 @@ async function generateAdminReport(msToken) {
     clientTable += `<tr><td>${client.name}</td><td>${cTotal}</td><td>${cOnline}</td><td>${cOffline}</td><td>${cHealth}%</td><td>${cSRsCreated}</td><td>${cSRsResolved}</td><td>${cOpen}</td></tr>`;
   }
 
-  // Build high priority SR table
   let hpTable = '';
   if (highPriorityOpen.length > 0) {
     hpTable = `<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;margin-top:12px;">
@@ -1148,7 +1119,6 @@ async function generateAdminReport(msToken) {
     hpTable += '</table>';
   }
 
-  // Activity log
   const activityLog = await pool.query(
     'SELECT * FROM activity_log WHERE created_at >= $1 AND created_at <= $2 ORDER BY created_at DESC LIMIT 20',
     [start.toISOString(), end.toISOString()]
@@ -1165,7 +1135,6 @@ async function generateAdminReport(msToken) {
     activityTable += '</table>';
   }
 
-  // Find lowest health client
   let lowestHealthClient = null;
   let lowestHealth = 100;
   for (const client of clients) {
@@ -1190,11 +1159,9 @@ async function generateAdminReport(msToken) {
       <h2 style="color:#1a3a5c;">CAMS Bi-Weekly Admin Report</h2>
       <p><strong>Period:</strong> ${dateRangeStr}</p>
       <hr>
-      
       <h3 style="color:#1a3a5c;">Executive Summary</h3>
       <p>Across all <strong>${clients.length} clients</strong>, <strong>${srsCreated} service requests</strong> were created in the last two weeks and <strong>${srsResolved} were resolved</strong>. There are currently <strong>${openSRs.rows.length} open requests</strong>, of which <strong>${highPriorityOpen.length} ${highPriorityOpen.length === 1 ? 'is' : 'are'} high priority</strong> and require immediate action.</p>
       <p>Overall asset health across all clients is <strong>${healthPct}%</strong> — <strong>${onlineAssets} of ${totalAssets} assets</strong> are online and healthy. <strong>${offlineAssets} assets</strong> are currently offline or defective.</p>
-      
       <h3 style="color:#1a3a5c;">Overall Figures</h3>
       <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;">
         <tr style="background:#f0f0f0;"><td><strong>Total Clients</strong></td><td>${clients.length}</td></tr>
@@ -1206,18 +1173,14 @@ async function generateAdminReport(msToken) {
         <tr style="background:#f0f0f0;"><td><strong>Online / Healthy</strong></td><td>${onlineAssets} (${healthPct}%)</td></tr>
         <tr><td><strong>Offline / Defective</strong></td><td>${offlineAssets}</td></tr>
       </table>
-      
       <h3 style="color:#1a3a5c;">Breakdown by Client</h3>
       <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;">
         <tr style="background:#f0f0f0;"><th>Client</th><th>Assets</th><th>Online</th><th>Offline</th><th>Health</th><th>SRs Created</th><th>Resolved</th><th>Open</th></tr>
         ${clientTable}
       </table>
       ${lowestHealthClient && lowestHealth < 95 ? `<p><strong>${lowestHealthClient}</strong> has the lowest asset health at <strong>${lowestHealth}%</strong> and may need additional attention.</p>` : ''}
-      
       ${highPriorityOpen.length > 0 ? `<h3 style="color:#cc0000;">Open High Priority SRs</h3><p>These require immediate action:</p>${hpTable}` : '<p>No high priority SRs are currently open.</p>'}
-      
       ${activityLog.rows.length > 0 ? `<h3 style="color:#1a3a5c;">Notable Activity (Last 14 Days)</h3>${activityTable}` : ''}
-      
       <p>View full dashboard: <a href="https://e-tech-ccsm-production.up.railway.app">Open CAMS</a></p>
     </div>`;
 
@@ -1234,8 +1197,6 @@ async function runBiWeeklyReports() {
   console.log('📊 Running bi-weekly reports...');
   
   try {
-    // Get admin MS token (use a system token or the first admin token available)
-    // For scheduled reports, we need a valid msToken. This will be stored or fetched.
     const msToken = process.env.MS_GRAPH_TOKEN;
     
     if (!msToken) {
@@ -1243,10 +1204,8 @@ async function runBiWeeklyReports() {
       return;
     }
     
-    // Generate admin report
     await generateAdminReport(msToken);
     
-    // Generate client reports
     const clients = await pool.query('SELECT id,name,email FROM clients WHERE email IS NOT NULL AND email != \'\'');
     for (const client of clients.rows) {
       await generateClientReport(client.id, client.name, client.email, msToken);
@@ -1258,9 +1217,6 @@ async function runBiWeeklyReports() {
   }
 }
 
-// Schedule: Every other Friday at 5:00 PM
-// Cron: 0 17 * * 5 (every Friday at 5PM)
-// We'll check if it's an even week
 let reportWeekCounter = 0;
 cron.schedule('0 17 * * 5', () => {
   reportWeekCounter++;
@@ -1272,10 +1228,6 @@ cron.schedule('0 17 * * 5', () => {
 });
 
 console.log('📅 Bi-weekly reports scheduled: Every other Friday at 5:00 PM Jamaica time');
-
-// ============================================================
-// MANUAL REPORT TRIGGER (for testing)
-// ============================================================
 
 app.post('/api/reports/run', authMiddleware, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
