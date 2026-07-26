@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>CAMS Field — Mobile</title>
   <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#4f8cf7">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -769,7 +771,6 @@
 </head>
 <body>
 
-<!-- Login -->
 <div id="login-page">
   <div class="login-box">
     <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px;">
@@ -796,7 +797,6 @@
   </div>
 </div>
 
-<!-- App Shell -->
 <div id="app-shell">
   <header class="field-header">
     <div class="logo-area">
@@ -876,7 +876,7 @@
     <div class="tab-page" id="tab-profile">
       <div class="card">
         <div style="display:flex;align-items:center;gap:12px;">
-          <div style="width:48px;height:48px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;color:#fff;" id="profile-avatar">T</div>
+          <div style="width:48px;height:48px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;color:#fff;overflow:hidden;" id="profile-avatar">T</div>
           <div>
             <div style="font-size:18px;font-weight:600;color:var(--text);" id="profile-name">Technician</div>
             <div style="font-size:12px;color:var(--text3);" id="profile-role">Field Technician</div>
@@ -925,9 +925,6 @@
 <div class="toast-container" id="toast-container"></div>
 
 <script>
-// ============================================================
-// CONFIG
-// ============================================================
 var API_URL = window.location.origin;
 var MS_CLIENT_ID = 'e87a6592-aaa5-4a13-9c85-8dbc8e9cd7b2';
 var MS_TENANT_ID = '799ae988-9d3d-40d3-bf5c-93197f5d8d44';
@@ -940,7 +937,6 @@ var isAdmin = false;
 var userClient = null;
 var userClientId = null;
 
-// Data stores
 var CAMERAS = [];
 var DOORS = [];
 var SERVERS = [];
@@ -955,9 +951,6 @@ var ticketFilter = 'All';
 var deviceFilter = 'all';
 var clientFilter = 'all';
 
-// ============================================================
-// API
-// ============================================================
 function base64URLEncode(b) {
   var s = '', bytes = new Uint8Array(b);
   for (var i = 0; i < bytes.byteLength; i++) s += String.fromCharCode(bytes[i]);
@@ -975,9 +968,6 @@ async function apiCall(e, o) {
   return r.json();
 }
 
-// ============================================================
-// AUTH
-// ============================================================
 function showLogin() {
   document.getElementById('login-page').style.display = 'flex';
   document.getElementById('app-shell').classList.remove('active');
@@ -1002,7 +992,8 @@ function loginWithMicrosoft() {
 }
 
 async function handleMicrosoftCallback(code) {
-  var v = msCodeVerifier || '';
+  var v = msCodeVerifier || sessionStorage.getItem('msCodeVerifier') || '';
+  sessionStorage.removeItem('msCodeVerifier');
   try {
     var tr = await fetch('https://login.microsoftonline.com/' + MS_TENANT_ID + '/oauth2/v2.0/token', {
       method: 'POST',
@@ -1029,6 +1020,7 @@ async function handleMicrosoftCallback(code) {
     authToken = data.token;
     localStorage.setItem('token', authToken);
     localStorage.setItem('user', JSON.stringify(data.user));
+    if (data.user.photo_url) localStorage.setItem('userPhoto', data.user.photo_url);
     currentUser = data.user;
     isAdmin = data.user.role === 'admin';
     userClientId = data.user.client_id;
@@ -1055,6 +1047,7 @@ async function loginLocal() {
     authToken = d.token;
     localStorage.setItem('token', authToken);
     localStorage.setItem('user', JSON.stringify(d.user));
+    if (d.user.photo_url) localStorage.setItem('userPhoto', d.user.photo_url);
     currentUser = d.user;
     isAdmin = d.user.role === 'admin';
     userClientId = d.user.client_id;
@@ -1075,6 +1068,7 @@ async function loginLocal() {
 function logout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
+  localStorage.removeItem('userPhoto');
   authToken = null;
   currentUser = null;
   isAdmin = false;
@@ -1096,6 +1090,8 @@ function checkLogin() {
   authToken = localStorage.getItem('token');
   currentUser = JSON.parse(localStorage.getItem('user') || 'null');
   if (authToken && currentUser) {
+    var savedPhoto = localStorage.getItem('userPhoto');
+    if (savedPhoto && currentUser) currentUser.photo_url = savedPhoto;
     isAdmin = currentUser.role === 'admin';
     userClientId = currentUser.client_id;
     if (currentUser.client_id === 1) userClient = 'KFTL';
@@ -1108,9 +1104,6 @@ function checkLogin() {
   }
 }
 
-// ============================================================
-// INIT
-// ============================================================
 async function initApp() {
   await loadData();
   renderAll();
@@ -1137,16 +1130,12 @@ async function loadData() {
     SOFTWARE = results[4] || [];
     SERVICE_REQUESTS = results[5] || [];
     AUDIT_LOG = results[6] || [];
-
     if (isAdmin) {
-      try {
-        var clients = await apiCall('/clients');
-        CLIENTS = (clients || []).map(function(c) { return c.name; });
-      } catch (e) { CLIENTS = []; }
+      try { var clients = await apiCall('/clients'); CLIENTS = (clients || []).map(function(c) { return c.name; }); }
+      catch (e) { CLIENTS = []; }
     } else {
       CLIENTS = userClient ? [userClient] : [];
     }
-
     populateClientDropdown();
   } catch (err) {
     toast('Failed to load data: ' + err.message, 'error');
@@ -1188,9 +1177,6 @@ function getClientFromZone(zone) {
   return 'Unknown';
 }
 
-// ============================================================
-// THEME
-// ============================================================
 function toggleTheme() {
   var root = document.documentElement;
   var btn = document.getElementById('theme-toggle-btn');
@@ -1212,9 +1198,6 @@ function toggleTheme() {
   localStorage.setItem('ccsm_theme', root.classList.contains('light-theme') ? 'light' : root.classList.contains('jet-black-theme') ? 'jet-black' : 'dark');
 }
 
-// ============================================================
-// TOAST
-// ============================================================
 function toast(m, type) {
   type = type || 'info';
   var c = document.getElementById('toast-container');
@@ -1231,9 +1214,6 @@ function toast(m, type) {
   }, 3000);
 }
 
-// ============================================================
-// NAVIGATION
-// ============================================================
 function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.tab-page').forEach(function(el) { el.classList.remove('active'); });
@@ -1248,9 +1228,6 @@ function switchTab(tab) {
   if (tab === 'dashboard') renderDashboard();
 }
 
-// ============================================================
-// DASHBOARD
-// ============================================================
 function renderDashboard() {
   renderUrgentTickets();
   renderActivity();
@@ -1260,9 +1237,10 @@ function renderDashboard() {
 
 function renderUrgentTickets() {
   var container = document.getElementById('urgent-tickets');
+  var uname = currentUser ? (currentUser.username || '') : '';
   var urgent = SERVICE_REQUESTS.filter(function(r) {
     if (r.priority !== 'High' || r.status === 'Resolved') return false;
-    if (!isAdmin && currentUser) return (r.assigned_to || '').toLowerCase() === (currentUser.username || '').toLowerCase();
+    if (!isAdmin && currentUser) return (r.assigned_to || '').toLowerCase() === uname.toLowerCase();
     return true;
   }).slice(0, 3);
   if (!urgent.length) {
@@ -1332,20 +1310,14 @@ function checkAlerts() {
   var urgent = SERVICE_REQUESTS.filter(function(r) {
     return r.priority === 'High' && r.status !== 'Resolved' && (r.assigned_to || '').toLowerCase() === uname.toLowerCase();
   });
-  var alerts = [];
-  if (urgent.length) {
-    alerts.push({ icon: 'ti ti-alert-triangle', text: '<strong>' + urgent.length + '</strong> urgent ticket' + (urgent.length > 1 ? 's' : '') + ' assigned to you', type: 'urgent' });
-  }
   var dot = document.getElementById('notif-dot');
-  if (!alerts.length) {
+  if (!urgent.length) {
     container.innerHTML = '';
     if (dot) dot.classList.remove('active');
     return;
   }
   if (dot) dot.classList.add('active');
-  container.innerHTML = alerts.map(function(a) {
-    return '<div class="alert-banner"><i class="' + a.icon + '"></i><div class="alert-text">' + a.text + '</div></div>';
-  }).join('');
+  container.innerHTML = '<div class="alert-banner"><i class="ti ti-alert-triangle"></i><div class="alert-text"><strong>' + urgent.length + '</strong> urgent ticket' + (urgent.length > 1 ? 's' : '') + ' assigned to you</div></div>';
 }
 
 function viewAlerts() {
@@ -1353,18 +1325,12 @@ function viewAlerts() {
   toast('Showing your tickets', 'warning');
 }
 
-// ============================================================
-// TICKETS
-// ============================================================
 function renderTickets() {
   var q = document.getElementById('ticket-search') ? document.getElementById('ticket-search').value.toLowerCase() : '';
   var uname = currentUser ? (currentUser.username || '') : '';
   var filtered = SERVICE_REQUESTS.filter(function(r) {
-    var matchAssigned = (r.assigned_to || '').toLowerCase() === uname.toLowerCase();
-    var matchSearch = r.sr_id.toLowerCase().indexOf(q) !== -1 ||
-      r.subject.toLowerCase().indexOf(q) !== -1 ||
-      (r.client || '').toLowerCase().indexOf(q) !== -1 ||
-      (r.site || '').toLowerCase().indexOf(q) !== -1;
+    var matchAssigned = isAdmin ? true : (r.assigned_to || '').toLowerCase() === uname.toLowerCase();
+    var matchSearch = r.sr_id.toLowerCase().indexOf(q) !== -1 || r.subject.toLowerCase().indexOf(q) !== -1 || (r.client || '').toLowerCase().indexOf(q) !== -1 || (r.site || '').toLowerCase().indexOf(q) !== -1;
     var statusMatch = ticketFilter === 'All' || r.status === ticketFilter;
     return matchAssigned && matchSearch && statusMatch;
   });
@@ -1385,10 +1351,8 @@ function renderTickets() {
       '<span class="badge ' + (r.status === 'Open' ? 'b-open' : r.status === 'In Progress' ? 'b-progress' : r.status === 'Resolved' ? 'b-resolved' : 'b-open') + '">' + (r.status || '—') + '</span>' +
       '</div>' +
       '<div class="ticket-subject">' + r.subject + '</div>' +
-      '<div class="ticket-meta">' +
-      '<span>' + (r.client || '—') + ' · ' + (r.site || '—') + '</span>' +
-      '<span class="sla ' + getSLAClass(r) + '">⏱ ' + getSLAText(r) + '</span>' +
-      '</div></div>';
+      '<div class="ticket-meta"><span>' + (r.client || '—') + ' · ' + (r.site || '—') + '</span><span class="sla ' + getSLAClass(r) + '">⏱ ' + getSLAText(r) + '</span></div>' +
+      '</div>';
   }).join('');
 }
 
@@ -1401,9 +1365,6 @@ function setTicketFilter(f) {
   renderTickets();
 }
 
-// ============================================================
-// DEVICES
-// ============================================================
 function renderDevices() {
   var q = document.getElementById('device-search') ? document.getElementById('device-search').value.toLowerCase() : '';
   var allDevices = [];
@@ -1435,13 +1396,12 @@ function renderDevices() {
   }
   container.innerHTML = '<div class="device-grid">' + filtered.map(function(d) {
     var statusDot = d.status === 'Online' || d.status === 'Working' || d.status === 'ONLINE' ? 'online' : d.status === 'Offline' || d.status === 'OFFLINE' ? 'offline' : 'warning';
-    var statusDisplay = d.status || 'Unknown';
     var typeIcon = d.type === 'camera' ? '📷' : d.type === 'door' ? '🚪' : d.type === 'server' ? '🖥' : '🔌';
     var typeLabel = d.type.charAt(0).toUpperCase() + d.type.slice(1);
     return '<div class="device-card" onclick="openDeviceDetail(\'' + d.id + '\', \'' + d.type + '\')">' +
       '<div class="dev-left">' +
       '<div class="dev-name">' + typeIcon + ' ' + d.name + '<span class="dev-type">' + typeLabel + '</span></div>' +
-      '<div class="dev-detail"><span class="status-dot ' + statusDot + '"></span> ' + statusDisplay + ' · ' + d.zone + (d.ip ? ' · ' + d.ip : '') + '</div>' +
+      '<div class="dev-detail"><span class="status-dot ' + statusDot + '"></span> ' + (d.status || 'Unknown') + ' · ' + d.zone + (d.ip ? ' · ' + d.ip : '') + '</div>' +
       '</div>' +
       '<span class="dev-client">' + d.client + '</span>' +
       '<span class="dev-arrow"><i class="ti ti-chevron-right"></i></span>' +
@@ -1451,8 +1411,7 @@ function renderDevices() {
 
 function setClientFilter(client) {
   clientFilter = client;
-  var dropdown = document.getElementById('client-dropdown');
-  if (dropdown) dropdown.value = client;
+  document.getElementById('client-dropdown').value = client;
   renderDevices();
 }
 
@@ -1586,9 +1545,6 @@ function getWarrantyDisplay(expiryDate) {
   } catch (e) { return '—'; }
 }
 
-// ============================================================
-// TICKET DETAIL MODAL
-// ============================================================
 function openTicketDetail(srId) {
   var r = SERVICE_REQUESTS.find(function(x) { return x.sr_id === srId; });
   if (!r) return;
@@ -1612,17 +1568,17 @@ function openTicketDetail(srId) {
 
   var actions = document.getElementById('modal-actions');
   actions.innerHTML = '';
-  var btns = [
-    { label: 'Resolve', cls: 'success', action: function() { resolveTicket(r.id); } },
-    { label: 'Close', cls: '', action: function() { closeModal(); } }
-  ];
-  btns.forEach(function(b) {
-    var btn = document.createElement('button');
-    btn.className = 'btn' + (b.cls ? ' ' + b.cls : '');
-    btn.textContent = b.label;
-    btn.onclick = b.action;
-    actions.appendChild(btn);
-  });
+  var resolveBtn = document.createElement('button');
+  resolveBtn.className = 'btn success';
+  resolveBtn.textContent = 'Resolve';
+  resolveBtn.onclick = function() { resolveTicket(r.id); };
+  actions.appendChild(resolveBtn);
+  var closeBtn = document.createElement('button');
+  closeBtn.className = 'btn';
+  closeBtn.textContent = 'Close';
+  closeBtn.onclick = function() { closeModal(); };
+  actions.appendChild(closeBtn);
+
   document.getElementById('modal-sheet').classList.add('open');
 }
 
@@ -1643,9 +1599,6 @@ async function resolveTicket(id) {
   }
 }
 
-// ============================================================
-// DEVICE ACTIONS
-// ============================================================
 function pingDevice(ip, name) {
   if (!ip || ip === 'N/A') { toast('No IP for ' + name, 'warning'); return; }
   toast('Pinging ' + ip + '...', 'info');
@@ -1661,9 +1614,6 @@ function openController(ip) {
   toast('Opening ' + ip, 'info');
 }
 
-// ============================================================
-// SCANNER
-// ============================================================
 var scannerActive = false;
 
 function openScanner() {
@@ -1762,21 +1712,22 @@ function lookupDevice(query) {
   toast('Device found', 'success');
 }
 
-// ============================================================
-// PROFILE
-// ============================================================
 function updateProfile() {
   if (!currentUser) return;
   var name = currentUser.username || 'Technician';
   document.getElementById('profile-name').textContent = name;
   document.getElementById('profile-role').textContent = isAdmin ? 'Administrator' : (userClient ? userClient + ' Technician' : 'Field Technician');
-  document.getElementById('profile-avatar').textContent = name.charAt(0).toUpperCase();
+  var avatar = document.getElementById('profile-avatar');
+  var photoUrl = currentUser && currentUser.photo_url;
+  if (photoUrl) {
+    avatar.innerHTML = '<img src="' + photoUrl + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    avatar.style.background = 'none';
+  } else {
+    avatar.textContent = name.charAt(0).toUpperCase();
+  }
   document.getElementById('header-tech-name').textContent = name;
 }
 
-// ============================================================
-// RENDER ALL
-// ============================================================
 function renderAll() {
   renderDashboard();
   renderTickets();
@@ -1785,9 +1736,6 @@ function renderAll() {
   checkAlerts();
 }
 
-// ============================================================
-// GLOBAL EXPOSURE
-// ============================================================
 window.loginLocal = loginLocal;
 window.loginWithMicrosoft = loginWithMicrosoft;
 window.logout = logout;
@@ -1811,9 +1759,6 @@ window.openController = openController;
 window.viewAlerts = viewAlerts;
 window.saveDeviceComment = saveDeviceComment;
 
-// ============================================================
-// INIT
-// ============================================================
 var savedTheme = localStorage.getItem('ccsm_theme') || 'dark';
 if (savedTheme === 'light') document.documentElement.classList.add('light-theme');
 if (savedTheme === 'jet-black') document.documentElement.classList.add('jet-black-theme');
