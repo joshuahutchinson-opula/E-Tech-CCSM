@@ -1,0 +1,22 @@
+{
+  "name": "CAMS — Client Asset Management System",
+  "short_name": "CAMS",
+  "description": "E-Tech Systems Client Asset Management System",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0d15",
+  "theme_color": "#4f8cf7",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
