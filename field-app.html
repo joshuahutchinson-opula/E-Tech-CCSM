@@ -1009,12 +1009,21 @@ async function handleMicrosoftCallback(code) {
       body: new URLSearchParams({ client_id: MS_CLIENT_ID, grant_type: 'authorization_code', code: code, redirect_uri: MS_REDIRECT_URI, code_verifier: v })
     });
     var td = await tr.json();
+    if (td.error) {
+      toast('Microsoft auth error: ' + td.error_description, 'error');
+      return;
+    }
     var accessToken = td.access_token;
     var ur = await fetch('https://graph.microsoft.com/v1.0/me', { headers: { Authorization: 'Bearer ' + accessToken } });
     var msUser = await ur.json();
+    var email = msUser.mail || msUser.userPrincipalName || '';
+    if (!email) {
+      toast('Microsoft login failed: no email provided', 'error');
+      return;
+    }
     var data = await apiCall('/auth/microsoft-callback', {
       method: 'POST',
-      body: JSON.stringify({ msId: msUser.id, displayName: msUser.displayName, email: msUser.mail || msUser.userPrincipalName, msToken: accessToken })
+      body: JSON.stringify({ msId: msUser.id, displayName: msUser.displayName, email: email, msToken: accessToken })
     });
     authToken = data.token;
     localStorage.setItem('token', authToken);
