@@ -992,6 +992,7 @@ function loginWithMicrosoft() {
   var a = new Uint8Array(32);
   crypto.getRandomValues(a);
   msCodeVerifier = base64URLEncode(a);
+  sessionStorage.setItem('msCodeVerifier', msCodeVerifier);
   var e = new TextEncoder(), d = e.encode(msCodeVerifier);
   crypto.subtle.digest('SHA-256', d).then(function(h) {
     var c = base64URLEncode(new Uint8Array(h));
@@ -1088,6 +1089,7 @@ function checkLogin() {
   var urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('code')) {
     window.history.replaceState({}, document.title, window.location.pathname);
+    msCodeVerifier = sessionStorage.getItem('msCodeVerifier') || '';
     handleMicrosoftCallback(urlParams.get('code'));
     return;
   }
