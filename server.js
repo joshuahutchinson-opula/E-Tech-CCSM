@@ -1238,6 +1238,21 @@ app.post('/api/reports/run', authMiddleware, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+app.post('/api/import/software', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  const software = req.body;
+  let imported = 0;
+  try {
+    for (const sw of software) {
+      await pool.query(`INSERT INTO software (client_id, name, vendor, version, license_type, status, expiry_date, purchase_date, warranty_expiry, comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+        [sw.client_id||1, sw.name||'', sw.vendor||'', sw.version||'', sw.license_type||'', sw.status||'Good', sw.expiry_date||null, sw.purchase_date||null, sw.warranty_expiry||null, sw.comments||'']);
+      imported++;
+    }
+    await logActivity(1, req.user.username, 'Import', 'Imported ' + imported + ' software');
+    res.json({ success: true, imported });
+  } catch (err) { res.status(500).json({ error: err.message, imported }); }
+});
 
 // ============================================================
 // SERVE HTML
