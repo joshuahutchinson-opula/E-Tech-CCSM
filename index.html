@@ -471,7 +471,7 @@ function cleanDate(v){if(!v)return'';var s=String(v);if(s.length>=10)return s.su
 function assetStatusBadge(s){if(s==='Online')return'<span class="status-badge online">Online</span>';if(s==='Offline')return'<span class="status-badge offline">Offline</span>';return'<span class="status-badge offline">'+s+'</span>';}
 function camBadge(s){return assetStatusBadge(s);}
 function doorBadge(s){return assetStatusBadge(s);}
-function srvBadge(s){if(s==='Online')return'<span class="status-badge online">Online</span>';return'<span class="status-badge offline">Offline</span>';}
+function srvBadge(s){var st=(s||'').toString();if(st==='Online'||st==='ONLINE')return'<span class="status-badge online">Online</span>';return'<span class="status-badge offline">Offline</span>';}
 function intrusionBadge(s){return assetStatusBadge(s);}
 function srStatusBadge(s){if(s==='Open')return'<span class="badge b-open">Open</span>';if(s==='In Progress')return'<span class="badge b-in-progress">In Progress</span>';if(s==='On-Site Review')return'<span class="badge b-info">On-Site</span>';if(s==='Pending')return'<span class="badge b-pending">Pending</span>';if(s==='Resolved')return'<span class="badge b-done">Resolved</span>';if(s==='Retracted')return'<span class="badge b-retracted">Retracted</span>';return'<span class="badge b-open">'+s+'</span>';}
 function priBadge(p){if(!p)return'—';var c=p==='High'?'pri-high':p==='Medium'?'pri-med':'pri-low';return'<span class="pri-dot '+c+'"></span>'+p;}
