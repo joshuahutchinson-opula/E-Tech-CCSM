@@ -376,6 +376,9 @@ input[type="date"] { color-scheme:dark; }
   .tbl{font-size:10px;}.outlook-list-pane{width:35%;min-width:200px;max-width:350px;}
   .door-stats,.server-stats-grid,.switch-stats-grid,.assets-stats-grid,.intrusion-stats-grid,.software-stats-grid{grid-template-columns:repeat(2,1fr);}
 }
+.storage-input-group { display:flex !important;gap:4px !important;align-items:center !important; }
+.storage-input-group input { flex:3 !important;min-width:120px !important;width:auto !important; }
+.storage-input-group select { width:26px !important;min-width:26px !important;max-width:26px !important;flex-shrink:0 !important;font-size:9px !important;padding:1px 1px !important; }
 @media(max-width:600px){
   .stats-grid{grid-template-columns:1fr;}.content{padding:8px 6px;}.panel{padding:12px 10px;}
   .outlook-container{flex-direction:column;}.outlook-folder-pane{width:100%;min-width:100%;max-width:100%;border-right:none;border-bottom:1px solid var(--card-border);display:flex;flex-direction:row;padding:0;max-height:48px;overflow-x:auto;}
