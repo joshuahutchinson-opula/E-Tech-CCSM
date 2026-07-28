@@ -662,6 +662,11 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
     const params = clientId ? [priority,assigned_to,status,notes,id,clientId] : [priority,assigned_to,status,notes,id];
     await pool.query(query, params);
     
+    // Track resolution time for achievements
+    if (status === 'Resolved' && oldStatus !== 'Resolved') {
+      await pool.query('UPDATE service_requests SET resolved_at = CURRENT_TIMESTAMP WHERE id = $1', [id]);
+    }
+    
     if (assigned_to && assigned_to !== oldAssigned) {
       await pool.query('INSERT INTO sr_history (sr_id,time,msg) VALUES ($1,$2,$3)', [id, new Date().toLocaleTimeString(), `Transferred from ${oldAssigned||'Unassigned'} to ${assigned_to} by ${req.user.username}`]);
       
@@ -713,6 +718,190 @@ app.post('/api/service-requests/:id/transfer', authMiddleware, async (req, res) 
     const updated = await pool.query('SELECT * FROM service_requests WHERE id=$1', [id]);
     res.json({ success: true, data: updated.rows[0] });
   } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ============================================================
+// ACHIEVEMENT TICKER ENDPOINTS
+// ============================================================
+
+app.get('/api/achievements', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.json({ messages: [], has_messages: false });
+  
+  try {
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const messages = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const now = new Date();
+    
+    // 1. SR RESOLVED TODAY
+    const todayResolved = await pool.query(
+      "SELECT * FROM service_requests WHERE client_id=$1 AND status='Resolved' AND resolved_at >= $2 AND resolved_at < $3 ORDER BY resolved_at DESC",
+      [clientId || 1, today.toISOString(), tomorrow.toISOString()]
+    );
+    
+    const todayCount = todayResolved.rows.length;
+    if (todayCount > 0) {
+      const latest = todayResolved.rows[0];
+      const assigned = latest.assigned_to || 'Unassigned';
+      messages.push(`🎯 SR-${latest.sr_id} "${latest.subject}" resolved by ${assigned}`);
+    }
+    
+    // 2. FAST RESOLUTION (< 1 HOUR)
+    const fastResolved = await pool.query(
+      "SELECT * FROM service_requests WHERE client_id=$1 AND status='Resolved' AND resolved_at IS NOT NULL AND received IS NOT NULL AND (EXTRACT(EPOCH FROM (resolved_at - received)) / 60) < 60 ORDER BY resolved_at DESC LIMIT 1",
+      [clientId || 1]
+    );
+    if (fastResolved.rows.length > 0) {
+      const sr = fastResolved.rows[0];
+      const mins = Math.round((new Date(sr.resolved_at) - new Date(sr.received)) / 60000);
+      const assigned = sr.assigned_to || 'Unassigned';
+      messages.push(`⚡ Speed demon! SR-${sr.sr_id} resolved in ${mins} minutes by ${assigned}`);
+    }
+    
+    // 3. 5+ RESOLVED IN A DAY
+    if (todayCount >= 5) {
+      const assigned = todayResolved.rows[0]?.assigned_to || 'Someone';
+      messages.push(`🔥 ${assigned} is on fire — ${todayCount} SRs resolved today`);
+    }
+    
+    // 4. FIRST RESOLUTION OF THE DAY
+    if (todayResolved.rows.length > 0) {
+      const first = todayResolved.rows[todayResolved.rows.length - 1];
+      const time = new Date(first.resolved_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      const assigned = first.assigned_to || 'Unassigned';
+      messages.push(`🌅 First resolution of the day — ${assigned} at ${time}`);
+    }
+    
+    // 5. LAST RESOLUTION OF THE DAY
+    if (todayResolved.rows.length > 0) {
+      const last = todayResolved.rows[0];
+      const time = new Date(last.resolved_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      const assigned = last.assigned_to || 'Unassigned';
+      messages.push(`🌙 Night owl! ${assigned} resolved SR-${last.sr_id} at ${time}`);
+    }
+    
+    // 6. WEEKEND WORK
+    const isWeekend = now.getDay() === 6 || now.getDay() === 0;
+    if (isWeekend) {
+      const weekendResolved = await pool.query(
+        "SELECT * FROM service_requests WHERE client_id=$1 AND status='Resolved' AND resolved_at >= $2 AND resolved_at < $3",
+        [clientId || 1, today.toISOString(), tomorrow.toISOString()]
+      );
+      if (weekendResolved.rows.length > 0) {
+        const assigned = weekendResolved.rows[0]?.assigned_to || 'Someone';
+        messages.push(`💪 Weekend warrior! ${assigned} resolved ${weekendResolved.rows.length} SRs on ${today.toLocaleDateString('en-US', { weekday: 'long' })}`);
+      }
+    }
+    
+    // 7. MILESTONE: 50TH SR
+    const totalResolved = await pool.query(
+      "SELECT COUNT(*) as count FROM service_requests WHERE client_id=$1 AND status='Resolved'",
+      [clientId || 1]
+    );
+    const total = parseInt(totalResolved.rows[0]?.count || 0);
+    
+    if (total === 50) {
+      const lastResolved = await pool.query(
+        "SELECT * FROM service_requests WHERE client_id=$1 AND status='Resolved' ORDER BY resolved_at DESC LIMIT 1",
+        [clientId || 1]
+      );
+      const assigned = lastResolved.rows[0]?.assigned_to || 'Someone';
+      messages.push(`🏅 50 SRs resolved — ${assigned} joins the Half Century Club`);
+    }
+    if (total === 100) {
+      const lastResolved = await pool.query(
+        "SELECT * FROM service_requests WHERE client_id=$1 AND status='Resolved' ORDER BY resolved_at DESC LIMIT 1",
+        [clientId || 1]
+      );
+      const assigned = lastResolved.rows[0]?.assigned_to || 'Someone';
+      messages.push(`💯 Century! ${assigned} just resolved their 100th SR`);
+    }
+    if (total === 500) {
+      const lastResolved = await pool.query(
+        "SELECT * FROM service_requests WHERE client_id=$1 AND status='Resolved' ORDER BY resolved_at DESC LIMIT 1",
+        [clientId || 1]
+      );
+      const assigned = lastResolved.rows[0]?.assigned_to || 'Someone';
+      messages.push(`👑 Legend status: ${assigned} hits 500 resolved SRs`);
+    }
+    
+    // 8. TEAM MILESTONE: 1000TH ACROSS TEAM
+    if (total === 1000) {
+      messages.push(`🎉 Team milestone: 1,000 SRs resolved this year`);
+    }
+    
+    // 9. 7-DAY STREAK
+    const sevenDaysAgo = new Date(today);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const streakCheck = await pool.query(
+      "SELECT DISTINCT DATE(resolved_at) as date FROM service_requests WHERE client_id=$1 AND status='Resolved' AND resolved_at >= $2 ORDER BY date DESC",
+      [clientId || 1, sevenDaysAgo.toISOString()]
+    );
+    const uniqueDays = streakCheck.rows.map(r => new Date(r.date).getDate());
+    let streakCount = 0;
+    for (let i = 0; i < 7; i++) {
+      const checkDate = new Date(today);
+      checkDate.setDate(checkDate.getDate() - i);
+      if (uniqueDays.includes(checkDate.getDate())) {
+        streakCount++;
+      } else {
+        break;
+      }
+    }
+    if (streakCount >= 7) {
+      const assigned = todayResolved.rows[0]?.assigned_to || 'Someone';
+      messages.push(`🔥 7-day streak! ${assigned} has resolved at least 1 SR every day this week`);
+    }
+    if (streakCount >= 30) {
+      const assigned = todayResolved.rows[0]?.assigned_to || 'Someone';
+      messages.push(`📅 30-day resolution streak — ${assigned} is unstoppable`);
+    }
+    
+    // 10. DAILY LEADERBOARD
+    const dailyLeader = await pool.query(
+      "SELECT assigned_to, COUNT(*) as count FROM service_requests WHERE client_id=$1 AND status='Resolved' AND resolved_at >= $2 AND resolved_at < $3 AND assigned_to IS NOT NULL AND assigned_to != 'Unassigned' GROUP BY assigned_to ORDER BY count DESC LIMIT 1",
+      [clientId || 1, today.toISOString(), tomorrow.toISOString()]
+    );
+    if (dailyLeader.rows.length > 0 && dailyLeader.rows[0].assigned_to) {
+      messages.push(`👑 Today's MVP: ${dailyLeader.rows[0].assigned_to} — ${dailyLeader.rows[0].count} resolutions`);
+    }
+    
+    // 11. WEEKLY LEADERBOARD
+    const weekAgo = new Date(today);
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    const weeklyLeader = await pool.query(
+      "SELECT assigned_to, COUNT(*) as count FROM service_requests WHERE client_id=$1 AND status='Resolved' AND resolved_at >= $2 AND assigned_to IS NOT NULL AND assigned_to != 'Unassigned' GROUP BY assigned_to ORDER BY count DESC LIMIT 1",
+      [clientId || 1, weekAgo.toISOString()]
+    );
+    if (weeklyLeader.rows.length > 0 && weeklyLeader.rows[0].assigned_to) {
+      messages.push(`🏆 This week's champion: ${weeklyLeader.rows[0].assigned_to} — ${weeklyLeader.rows[0].count} SRs resolved`);
+    }
+    
+    // 12. BUSIEST TECH (MOST ACTIVE SRs)
+    const busiestTech = await pool.query(
+      "SELECT assigned_to, COUNT(*) as count FROM service_requests WHERE client_id=$1 AND status != 'Resolved' AND assigned_to IS NOT NULL AND assigned_to != 'Unassigned' GROUP BY assigned_to ORDER BY count DESC LIMIT 1",
+      [clientId || 1]
+    );
+    if (busiestTech.rows.length > 0 && busiestTech.rows[0].assigned_to) {
+      messages.push(`📋 Busiest tech: ${busiestTech.rows[0].assigned_to} with ${busiestTech.rows[0].count} active SRs`);
+    }
+    
+    // Check if we have any messages
+    const hasMessages = messages.length > 0;
+    
+    res.json({ 
+      messages: messages.slice(0, 12),
+      has_messages: hasMessages,
+      total_resolved: total
+    });
+    
+  } catch (err) {
+    console.error('Achievements error:', err);
+    res.json({ messages: [], has_messages: false });
+  }
 });
 
 // ============================================================
