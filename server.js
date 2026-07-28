@@ -380,8 +380,8 @@ app.post('/api/import/servers', authMiddleware, async (req, res) => {
   let imported = 0;
   try {
     for (const srv of servers) {
-      await pool.query(`INSERT INTO servers (client_id,name,zone,status,make,model,capacity,used,health,apps,ip_address,serial,purchase_date,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`,
-        [srv.client_id||1,srv.name||srv.serial||'',srv.zone||srv.location||'',srv.status||'ONLINE',srv.make||'',srv.model||'',srv.capacity||'',srv.used||'',srv.health||'',srv.apps||'',srv.ip_address||'',srv.serial||'',srv.purchase_date||null,srv.warranty_expiry||null,srv.comments||'']);
+      await pool.query(`INSERT INTO servers (client_id,name,zone,status,make,model,capacity,used,health,apps,serial,purchase_date,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
+        [srv.client_id||1,srv.name||srv.serial||'',srv.zone||srv.location||'',srv.status||'Online',srv.make||'',srv.model||'',srv.capacity||'',srv.used||'',srv.health||'',srv.apps||'',srv.serial||'',srv.purchase_date||null,srv.warranty_expiry||null,srv.comments||'']);
       imported++;
     }
     await logActivity(1, req.user.username, 'Import', 'Imported ' + imported + ' servers');
@@ -401,6 +401,22 @@ app.post('/api/import/switches', authMiddleware, async (req, res) => {
       imported++;
     }
     await logActivity(1, req.user.username, 'Import', 'Imported ' + imported + ' switches');
+    res.json({ success: true, imported });
+  } catch (err) { res.status(500).json({ error: err.message, imported }); }
+});
+
+app.post('/api/import/software', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  const software = req.body;
+  let imported = 0;
+  try {
+    for (const sw of software) {
+      await pool.query(`INSERT INTO software (client_id, name, vendor, version, license_type, status, expiry_date, purchase_date, warranty_expiry, comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+        [sw.client_id||1, sw.name||'', sw.vendor||'', sw.version||'', sw.license_type||'', sw.status||'Good', sw.expiry_date||null, sw.purchase_date||null, sw.warranty_expiry||null, sw.comments||'']);
+      imported++;
+    }
+    await logActivity(1, req.user.username, 'Import', 'Imported ' + imported + ' software');
     res.json({ success: true, imported });
   } catch (err) { res.status(500).json({ error: err.message, imported }); }
 });
@@ -459,12 +475,16 @@ app.get('/api/servers', authMiddleware, async (req, res) => {
 app.put('/api/servers/:id', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
-  const { status, comments, name, zone, make, model, capacity, used, health, apps, ip_address, serial, purchase_date, warranty_expiry } = req.body;
+  const { status, comments, name, zone, make, model, capacity, used, health, apps, serial, purchase_date, warranty_expiry } = req.body;
   try {
     const clientId = req.user.role === 'admin' ? null : req.user.client_id;
     if (req.user.role === 'admin') {
-      const query = clientId ? `UPDATE servers SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),capacity=COALESCE($6,capacity),used=COALESCE($7,used),health=COALESCE($8,health),apps=COALESCE($9,apps),ip_address=COALESCE($10,ip_address),serial=COALESCE($11,serial),purchase_date=COALESCE($12,purchase_date),warranty_expiry=COALESCE($13,warranty_expiry),comments=COALESCE($14,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$15 AND client_id=$16` : `UPDATE servers SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),capacity=COALESCE($6,capacity),used=COALESCE($7,used),health=COALESCE($8,health),apps=COALESCE($9,apps),ip_address=COALESCE($10,ip_address),serial=COALESCE($11,serial),purchase_date=COALESCE($12,purchase_date),warranty_expiry=COALESCE($13,warranty_expiry),comments=COALESCE($14,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$15`;
-      const params = clientId ? [name,zone,status,make,model,capacity,used,health,apps,ip_address,serial,purchase_date,warranty_expiry,comments,id,clientId] : [name,zone,status,make,model,capacity,used,health,apps,ip_address,serial,purchase_date,warranty_expiry,comments,id];
+      const query = clientId ? 
+        `UPDATE servers SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),capacity=COALESCE($6,capacity),used=COALESCE($7,used),health=COALESCE($8,health),apps=COALESCE($9,apps),serial=COALESCE($10,serial),purchase_date=COALESCE($11,purchase_date),warranty_expiry=COALESCE($12,warranty_expiry),comments=COALESCE($13,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$14 AND client_id=$15` :
+        `UPDATE servers SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),capacity=COALESCE($6,capacity),used=COALESCE($7,used),health=COALESCE($8,health),apps=COALESCE($9,apps),serial=COALESCE($10,serial),purchase_date=COALESCE($11,purchase_date),warranty_expiry=COALESCE($12,warranty_expiry),comments=COALESCE($13,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$14`;
+      const params = clientId ? 
+        [name,zone,status,make,model,capacity,used,health,apps,serial,purchase_date,warranty_expiry,comments,id,clientId] : 
+        [name,zone,status,make,model,capacity,used,health,apps,serial,purchase_date,warranty_expiry,comments,id];
       await pool.query(query, params);
     } else {
       const query = clientId ? 'UPDATE servers SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3 AND client_id=$4' : 'UPDATE servers SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3';
@@ -1237,21 +1257,6 @@ app.post('/api/reports/run', authMiddleware, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-});
-app.post('/api/import/software', authMiddleware, async (req, res) => {
-  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
-  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
-  const software = req.body;
-  let imported = 0;
-  try {
-    for (const sw of software) {
-      await pool.query(`INSERT INTO software (client_id, name, vendor, version, license_type, status, expiry_date, purchase_date, warranty_expiry, comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-        [sw.client_id||1, sw.name||'', sw.vendor||'', sw.version||'', sw.license_type||'', sw.status||'Good', sw.expiry_date||null, sw.purchase_date||null, sw.warranty_expiry||null, sw.comments||'']);
-      imported++;
-    }
-    await logActivity(1, req.user.username, 'Import', 'Imported ' + imported + ' software');
-    res.json({ success: true, imported });
-  } catch (err) { res.status(500).json({ error: err.message, imported }); }
 });
 
 // ============================================================
