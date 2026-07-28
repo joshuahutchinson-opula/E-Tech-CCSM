@@ -68,15 +68,53 @@ input, select, textarea, button { font-family: var(--font); }
 .import-csv-btn { }
 .client-mode-kftl .import-csv-btn, .client-mode-kwl .import-csv-btn { display: none !important; }
 
-/* Achievement ticker styles */
-.achievement-ticker-wrap { width:100%; overflow:hidden; background:rgba(52,211,153,0.08); border:1px solid rgba(52,211,153,0.2); border-radius:8px; margin-bottom:16px; height:36px; display:flex; align-items:center; transition:opacity 0.3s; }
-.achievement-ticker-wrap:hover { opacity:0.85; }
-.achievement-ticker-wrap .ticker-label { background:rgba(52,211,153,0.15); padding:4px 12px; flex-shrink:0; z-index:2; border-radius:6px 0 0 6px; display:flex; align-items:center; justify-content:center; height:100%; min-width:44px; font-size:14px; color:var(--success); }
-.achievement-ticker-wrap .ticker-track { flex:1; overflow:hidden; position:relative; height:100%; display:flex; align-items:center; }
-.achievement-ticker-wrap .ticker-content { display:flex; gap:48px; white-space:nowrap; animation:achievementScroll 80s linear infinite; font-size:12px; color:var(--text-secondary); font-weight:500; padding-left:16px; }
-.achievement-ticker-wrap .ticker-content:hover { animation-play-state:paused; }
-@keyframes achievementScroll { 0%{transform:translateX(0);} 100%{transform:translateX(-50%);} }
-.achievement-ticker-wrap .ticker-sep { color:var(--text-muted); opacity:0.3; }
+/* Achievement ticker styles - RED VERSION - NO LABEL */
+.achievement-ticker-wrap {
+  width: 100%;
+  overflow: hidden;
+  background: rgba(255, 94, 122, 0.08);
+  border: 1px solid rgba(255, 94, 122, 0.25);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  height: 44px;
+  display: none;
+  align-items: center;
+  transition: opacity 0.3s;
+}
+.achievement-ticker-wrap:hover {
+  opacity: 0.85;
+}
+.achievement-ticker-wrap .ticker-track {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+}
+.achievement-ticker-wrap .ticker-content {
+  display: flex;
+  gap: 48px;
+  white-space: nowrap;
+  animation: achievementScroll 80s linear infinite;
+  font-size: 13px;
+  color: #fca5a5;
+  font-weight: 500;
+}
+.achievement-ticker-wrap .ticker-content:hover {
+  animation-play-state: paused;
+}
+@keyframes achievementScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.achievement-ticker-wrap .ticker-sep {
+  color: rgba(255, 94, 122, 0.3);
+}
+.achievement-ticker-wrap .ticker-sep::before {
+  content: "•";
+}
 
 .ticker-wrap { width:100%;overflow:hidden;background:rgba(229,62,62,0.12);border:1px solid rgba(229,62,62,0.25);border-radius:8px;margin-bottom:16px;height:36px;display:flex;align-items:center; }
 .ticker-wrap .ticker-label { background:#ffffff;padding:4px 8px;flex-shrink:0;z-index:2;border-radius:6px 0 0 6px;display:flex;align-items:center;justify-content:center;height:100%;min-width:44px; }
@@ -420,13 +458,18 @@ input[type="date"] { color-scheme:dark; }
     <div class="content" id="main-content">
       <div class="ticker-wrap" id="dashboard-ticker" style="display:none;"><div class="ticker-label"><img src="favicon.png" alt="CAMS" onerror="this.parentElement.innerHTML='📢'"></div><div class="ticker-track"><div class="ticker-content" id="ticker-content"></div></div></div>
       <div class="tab active" id="tab-dashboard">
+        <!-- ACHIEVEMENT TICKER - RED VERSION - NO LABEL -->
+        <div class="achievement-ticker-wrap" id="achievement-ticker">
+          <div class="ticker-track">
+            <div class="ticker-content" id="achievement-content"></div>
+          </div>
+        </div>
         <div class="stats-grid">
           <div class="stat-card"><div class="stat-label">System Health</div><div class="stat-val" style="color:var(--success)" id="dash-health">--%</div><div class="stat-note note-success" id="dash-health-note">All systems operational</div></div>
           <div class="stat-card"><div class="stat-label">Active Alarms</div><div class="stat-val" style="color:var(--warning)" id="dash-alarms">0</div><div class="stat-note note-warn" id="dash-alarms-note">No active alarms</div></div>
           <div class="stat-card"><div class="stat-label">Offline Devices</div><div class="stat-val" style="color:var(--danger)" id="dash-offline">0</div><div class="stat-note note-danger" id="dash-offline-note">All Systems Online</div></div>
           <div class="stat-card"><div class="stat-label">Open SRs</div><div class="stat-val" style="color:var(--info)" id="dash-srs">0</div><div class="stat-note note-info" id="dash-srs-note">All requests resolved</div></div>
         </div>
-        <div class="achievement-ticker-wrap" id="achievement-ticker" style="display:none;"><div class="ticker-label">🏆</div><div class="ticker-track"><div class="ticker-content" id="achievement-content"></div></div></div>
         <div class="panel"><div class="panel-header"><span class="panel-title">Today's Activity</span></div><div class="timeline" id="dash-timeline"></div></div>
         <div class="panel"><div class="panel-header"><span class="panel-title">Urgent Service Requests</span><button class="link-btn" onclick="switchTab('service')">View all →</button></div><table class="tbl" id="dash-sr-table"><thead><tr><th>ID</th><th>Client</th><th>Site</th><th>Subject</th><th>Priority</th><th>Status</th></tr></thead><tbody id="dash-sr-tbody"></tbody></table></div>
       </div>
@@ -672,91 +715,67 @@ async function pingDevice(type,index){
 }
 
 // ========== ACHIEVEMENT TICKER ==========
-function updateAchievementTicker(){
-    var el=document.getElementById('achievement-content');
-    var wrap=document.getElementById('achievement-ticker');
-    if(!el||!wrap)return;
-    if(isAdmin||!userClient){wrap.style.display='none';return;}
-    wrap.style.display='flex';
-    var resolvedToday=0;
-    var speedRecords=[];
-    var streak3plus=false;
-    var firstResolution='';
-    var lastResolution='';
-    var weekendWork=false;
-    var milestones=[10,25,50,100,500,1000];
-    var streak7=false,streak30=false;
-    var techCounts={};
-    var today= new Date();
-    var todayStr=today.toDateString();
-    var todayResolved=0;
-    var dailyLeaderboard=[];
-    var weeklyLeaderboard=[];
-    var busiestTech='';
-
-    SERVICE_REQUESTS.forEach(function(sr){
-        var srDate=sr.resolved_at ? new Date(sr.resolved_at) : null;
-        if(srDate && srDate.toDateString()===todayStr && sr.status==='Resolved'){todayResolved++;}
-        if(srDate && sr.status==='Resolved'){
-            if(!firstResolution || srDate<firstResolution) firstResolution=srDate;
-            if(!lastResolution || srDate>lastResolution) lastResolution=srDate;
-            var hour=srDate.getHours();
-            if(hour>=22||hour<6) weekendWork=true;
-            var totalResolved=SERVICE_REQUESTS.filter(function(s){return s.status==='Resolved';}).length;
-            if(milestones.includes(totalResolved)) milestones.push(totalResolved+1);
-        }
-        if(sr.assigned_to && sr.status==='Resolved'){
-            techCounts[sr.assigned_to]=(techCounts[sr.assigned_to]||0)+1;
-        }
-    });
-
-    resolvedToday=todayResolved;
-    var totalResolved=SERVICE_REQUESTS.filter(function(s){return s.status==='Resolved';}).length;
-    if(totalResolved>=3) streak3plus=true;
-
-    var sortedTechs=Object.keys(techCounts).sort(function(a,b){return techCounts[b]-techCounts[a];});
-    if(sortedTechs.length>0) busiestTech=sortedTechs[0]+' ('+techCounts[sortedTechs[0]]+' resolved)';
-
-    var messages=[];
-    messages.push('🏆 '+userClient+' — Welcome to CAMS');
-    if(resolvedToday>0) messages.push('✅ '+resolvedToday+' SR'+(resolvedToday>1?'s':'')+' resolved today');
-    if(totalResolved>0){
-        messages.push('📊 '+totalResolved+' total SRs resolved');
-        if(totalResolved>=1000) messages.push('💎 '+totalResolved+' resolutions — LEGENDARY!');
-        else if(totalResolved>=500) messages.push('💎 '+totalResolved+' resolutions — EXCEPTIONAL!');
-        else if(totalResolved>=100) messages.push('🎯 '+totalResolved+' resolutions — MILESTONE!');
-        else if(totalResolved>=50) messages.push('🎯 '+totalResolved+' resolutions — GOLD!');
-        else if(totalResolved>=25) messages.push('🎯 '+totalResolved+' resolutions — SILVER!');
-        else if(totalResolved>=10) messages.push('🎯 '+totalResolved+' resolutions — BRONZE!');
-        if(totalResolved%100===0 && totalResolved>0) messages.push('🎉 '+totalResolved+' resolutions — CENTURY!');
+async function updateAchievementTicker() {
+  var el = document.getElementById('achievement-content');
+  var wrap = document.getElementById('achievement-ticker');
+  if (!el || !wrap) return;
+  
+  // Hide for admin or if no user client
+  if (isAdmin || !userClient) {
+    wrap.style.display = 'none';
+    return;
+  }
+  
+  try {
+    var data = await apiCall('/achievements');
+    
+    if (!data.has_messages || data.messages.length === 0) {
+      wrap.style.display = 'none';
+      return;
     }
-    if(streak3plus) messages.push('🔥 3+ day resolution streak — ON FIRE!');
-    if(firstResolution) messages.push('⏰ First resolution: '+firstResolution.toLocaleTimeString());
-    if(lastResolution) messages.push('⏰ Last resolution: '+lastResolution.toLocaleTimeString());
-    if(weekendWork) messages.push('🌙 Weekend/off-hours resolution logged');
-    if(busiestTech) messages.push('👑 Busiest tech: '+busiestTech);
-    if(messages.length<5){
-        messages.push('⭐ Keep up the great work, '+userClient+'!');
-        messages.push('💪 Every SR resolved makes a difference');
-        messages.push('📈 Your team is making progress');
+    
+    // Show the tape
+    wrap.style.display = 'flex';
+    
+    // Take up to 7 messages
+    var display = data.messages.slice(0, 7);
+    
+    // If less than 3 messages, pad with generic ones
+    if (display.length < 3) {
+      var pad = ['Keep up the great work!', 'Every SR resolved makes a difference', 'Your team is making progress'];
+      for (var i = 0; i < pad.length && display.length < 7; i++) {
+        if (display.indexOf(pad[i]) === -1) {
+          display.push(pad[i]);
+        }
+      }
     }
-
-    var display=messages.slice(0,7);
-    var doubled=display.concat(display);
-    el.innerHTML=doubled.map(function(x,i){return'<span>'+x+'</span>'+(i<doubled.length-1?'<span class="ticker-sep"></span>':'');}).join('');
+    
+    // Duplicate for seamless looping
+    var doubled = display.concat(display);
+    
+    el.innerHTML = doubled.map(function(x, i) {
+      return '<span>' + x + '</span>' + (i < doubled.length - 1 ? '<span class="ticker-sep"></span>' : '');
+    }).join('');
+    
+  } catch (err) {
+    console.log('Achievement ticker error:', err);
+    wrap.style.display = 'none';
+  }
 }
 
-var origRenderDashboard=renderDashboard;
-renderDashboard=function(){
-    origRenderDashboard();
-    updateAchievementTicker();
+// Override renderDashboard to include achievement ticker
+var origRenderDashboard = renderDashboard;
+renderDashboard = function() {
+  origRenderDashboard();
+  updateAchievementTicker();
 };
 
-var origLoadData=loadData;
-loadData=function(){
-    return origLoadData().then(function(){
-        updateAchievementTicker();
-    });
+// Override loadData to refresh achievements
+var origLoadData = loadData;
+loadData = function() {
+  return origLoadData().then(function() {
+    updateAchievementTicker();
+  });
 };
 
 document.getElementById('topbar-date').textContent=fullDateTime();
