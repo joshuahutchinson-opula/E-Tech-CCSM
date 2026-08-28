@@ -1320,26 +1320,56 @@ async function generateAdminReport(msToken) {
   const openSRs = await pool.query("SELECT * FROM service_requests WHERE status != 'Resolved' ORDER BY created_at DESC");
   const highPriorityOpen = openSRs.rows.filter(sr => sr.priority === 'High');
 
+  // Fetch client_id + status for every asset once (4 queries total instead of 4-per-client),
+  // then group in memory. This replaces the old per-client query loop that ran 4 queries
+  // per client per pass (and ran that whole loop twice).
+  const allCamerasByClient = await pool.query('SELECT client_id, status FROM cameras');
+  const allDoorsByClient = await pool.query('SELECT client_id, status FROM doors');
+  const allServersByClient = await pool.query('SELECT client_id, status FROM servers');
+  const allSwitchesByClient = await pool.query('SELECT client_id, status FROM switches');
+
+  function groupByClient(rows) {
+    const map = {};
+    for (const row of rows) {
+      if (!map[row.client_id]) map[row.client_id] = [];
+      map[row.client_id].push(row);
+    }
+    return map;
+  }
+  const camerasByClient = groupByClient(allCamerasByClient.rows);
+  const doorsByClient = groupByClient(allDoorsByClient.rows);
+  const serversByClient = groupByClient(allServersByClient.rows);
+  const switchesByClient = groupByClient(allSwitchesByClient.rows);
+
   let clientTable = '';
+  let lowestHealthClient = null;
+  let lowestHealth = 100;
+
   for (const client of clients) {
-    const cCameras = await pool.query('SELECT status FROM cameras WHERE client_id=$1', [client.id]);
-    const cDoors = await pool.query('SELECT status FROM doors WHERE client_id=$1', [client.id]);
-    const cServers = await pool.query('SELECT status FROM servers WHERE client_id=$1', [client.id]);
-    const cSwitches = await pool.query('SELECT status FROM switches WHERE client_id=$1', [client.id]);
-    
-    const cTotal = cCameras.rowCount + cDoors.rowCount + cServers.rowCount + cSwitches.rowCount;
-    const cOnline = cCameras.rows.filter(c => c.status === 'Online' || c.status === 'Working').length +
-                    cDoors.rows.filter(d => d.status === 'Online' || d.status === 'Working').length +
-                    cServers.rows.filter(s => s.status === 'ONLINE').length +
-                    cSwitches.rows.filter(s => s.status === 'Online').length;
+    const cCameras = camerasByClient[client.id] || [];
+    const cDoors = doorsByClient[client.id] || [];
+    const cServers = serversByClient[client.id] || [];
+    const cSwitches = switchesByClient[client.id] || [];
+
+    const cTotal = cCameras.length + cDoors.length + cServers.length + cSwitches.length;
+    const cOnline = cCameras.filter(c => c.status === 'Online' || c.status === 'Working').length +
+                    cDoors.filter(d => d.status === 'Online' || d.status === 'Working').length +
+                    cServers.filter(s => s.status === 'ONLINE').length +
+                    cSwitches.filter(s => s.status === 'Online').length;
     const cOffline = cTotal - cOnline;
-    const cHealth = cTotal > 0 ? ((cOnline / cTotal) * 100).toFixed(1) : '100.0';
-    
+    const cHealthNum = cTotal > 0 ? parseFloat(((cOnline / cTotal) * 100).toFixed(1)) : 100;
+    const cHealth = cHealthNum.toFixed(1);
+
     const cSRsCreated = allSRsPeriod.rows.filter(sr => sr.client_id === client.id).length;
     const cSRsResolved = allSRsPeriod.rows.filter(sr => sr.client_id === client.id && sr.status === 'Resolved').length;
     const cOpen = openSRs.rows.filter(sr => sr.client_id === client.id).length;
-    
+
     clientTable += `<tr><td>${client.name}</td><td>${cTotal}</td><td>${cOnline}</td><td>${cOffline}</td><td>${cHealth}%</td><td>${cSRsCreated}</td><td>${cSRsResolved}</td><td>${cOpen}</td></tr>`;
+
+    if (cHealthNum < lowestHealth) {
+      lowestHealth = cHealthNum;
+      lowestHealthClient = client.name;
+    }
   }
 
   let hpTable = '';
@@ -1367,25 +1397,6 @@ async function generateAdminReport(msToken) {
       activityTable += `<tr><td>${logDate}</td><td>${log.username}</td><td>${log.action}</td><td>${log.detail}</td></tr>`;
     });
     activityTable += '</table>';
-  }
-
-  let lowestHealthClient = null;
-  let lowestHealth = 100;
-  for (const client of clients) {
-    const cCameras = await pool.query('SELECT status FROM cameras WHERE client_id=$1', [client.id]);
-    const cDoors = await pool.query('SELECT status FROM doors WHERE client_id=$1', [client.id]);
-    const cServers = await pool.query('SELECT status FROM servers WHERE client_id=$1', [client.id]);
-    const cSwitches = await pool.query('SELECT status FROM switches WHERE client_id=$1', [client.id]);
-    const cTotal = cCameras.rowCount + cDoors.rowCount + cServers.rowCount + cSwitches.rowCount;
-    const cOnline = cCameras.rows.filter(c => c.status === 'Online' || c.status === 'Working').length +
-                    cDoors.rows.filter(d => d.status === 'Online' || d.status === 'Working').length +
-                    cServers.rows.filter(s => s.status === 'ONLINE').length +
-                    cSwitches.rows.filter(s => s.status === 'Online').length;
-    const cHealth = cTotal > 0 ? parseFloat(((cOnline / cTotal) * 100).toFixed(1)) : 100;
-    if (cHealth < lowestHealth) {
-      lowestHealth = cHealth;
-      lowestHealthClient = client.name;
-    }
   }
 
   const emailBody = `
