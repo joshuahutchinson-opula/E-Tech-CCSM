@@ -32,11 +32,32 @@ const TECH_EMAILS = {
 const ADMIN_EMAIL = 'support@e-techsystemsja.com';
 
 // ============================================================
+// REQUIRED ENVIRONMENT VARIABLES
+// ============================================================
+// These must be set in Railway (or your .env locally). The app refuses to
+// start without them rather than silently falling back to insecure defaults.
+const REQUIRED_ENV_VARS = [
+  'DATABASE_URL',
+  'JWT_SECRET',
+  'ADMIN_USERNAME', 'ADMIN_PASSWORD',
+  'KFTL_USERNAME', 'KFTL_PASSWORD',
+  'KWL_USERNAME', 'KWL_PASSWORD',
+  'TECH_USERNAME', 'TECH_PASSWORD',
+];
+const missingEnvVars = REQUIRED_ENV_VARS.filter(name => !process.env[name]);
+if (missingEnvVars.length > 0) {
+  console.error('❌ Missing required environment variables: ' + missingEnvVars.join(', '));
+  console.error('   Set these in Railway → Variables (or a local .env file) before starting the server.');
+  console.error('   See .env.example for the full list.');
+  process.exit(1);
+}
+
+// ============================================================
 // DATABASE CONNECTION
 // ============================================================
 
 const pool = new Pool({
-  connectionString: 'postgresql://postgres:UCQFilnOQPdfXfvIKdUeXfMdaGYeCDaU@hayabusa.proxy.rlwy.net:13542/railway',
+  connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
   connectionTimeoutMillis: 10000,
 });
@@ -65,6 +86,20 @@ app.use(express.static(__dirname));
 // LOGGING HELPER
 // ============================================================
 
+// Resolves a client_id to its real name from the clients table, instead of the
+// old hardcoded id===1?'KFTL':id===2?'KWL':'Unknown' check that every edit-route
+// activity log used — which meant any client besides KFTL/KWL always logged as
+// "Unknown" in the activity feed.
+async function getClientNameById(clientId) {
+  if (clientId == null) return 'Unknown';
+  try {
+    const result = await pool.query('SELECT name FROM clients WHERE id=$1', [clientId]);
+    return result.rows[0]?.name || 'Unknown';
+  } catch (err) {
+    return 'Unknown';
+  }
+}
+
 async function logActivity(clientId, username, action, detail) {
   if (!dbConnected) return;
   try {
@@ -74,6 +109,25 @@ async function logActivity(clientId, username, action, detail) {
     );
   } catch (err) {
     console.error('Failed to log activity:', err.message);
+  }
+}
+
+// Builds a client-aware activity log entry for an asset import/add. Import
+// routes used to always log client_id=1 (KFTL) regardless of which client the
+// assets actually belonged to, and never named the client in the log text at
+// all — this fixes both.
+async function describeClientsForLog(rows) {
+  const ids = [...new Set(rows.map(r => r.client_id).filter(id => id != null))];
+  if (ids.length === 0) return { clientIdForLog: 1, clientLabel: '' };
+  try {
+    const result = await pool.query('SELECT id, name FROM clients WHERE id = ANY($1)', [ids]);
+    const nameById = {};
+    result.rows.forEach(c => { nameById[c.id] = c.name; });
+    const names = ids.map(id => nameById[id] || `client #${id}`);
+    const label = names.length === 1 ? ` for ${names[0]}` : ` across ${names.length} clients (${names.join(', ')})`;
+    return { clientIdForLog: ids[0], clientLabel: label };
+  } catch (err) {
+    return { clientIdForLog: ids[0], clientLabel: '' };
   }
 }
 
@@ -116,7 +170,7 @@ function authMiddleware(req, res, next) {
   }
   
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
     next();
   } catch (err) {
@@ -139,28 +193,28 @@ app.get('/api/health', (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
   const { username, password } = req.body;
 
-  if (username === 'Admin' && password === 'Ad@E-Tech07') {
-    const token = jwt.sign({ id: 1, username: 'Admin', client_id: null, role: 'admin' }, process.env.JWT_SECRET || 'secret', { expiresIn: '24h' });
-    await logActivity(1, 'Admin', 'Login', 'Admin logged in');
-    return res.json({ token, user: { id: 1, username: 'Admin', client_id: null, role: 'admin', photo_url: null } });
+  if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
+    const token = jwt.sign({ id: 1, username: process.env.ADMIN_USERNAME, client_id: null, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    await logActivity(1, process.env.ADMIN_USERNAME, 'Login', 'Admin logged in');
+    return res.json({ token, user: { id: 1, username: process.env.ADMIN_USERNAME, client_id: null, role: 'admin', photo_url: null } });
   }
 
-  if (username === 'KFTL' && password === 'KFTL@E-Tech0151') {
-    const token = jwt.sign({ id: 2, username: 'KFTL', client_id: 1, role: 'client' }, process.env.JWT_SECRET || 'secret', { expiresIn: '24h' });
-    await logActivity(1, 'KFTL', 'Login', 'KFTL client logged in');
-    return res.json({ token, user: { id: 2, username: 'KFTL', client_id: 1, role: 'client', photo_url: null } });
+  if (username === process.env.KFTL_USERNAME && password === process.env.KFTL_PASSWORD) {
+    const token = jwt.sign({ id: 2, username: process.env.KFTL_USERNAME, client_id: 1, role: 'client' }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    await logActivity(1, process.env.KFTL_USERNAME, 'Login', 'KFTL client logged in');
+    return res.json({ token, user: { id: 2, username: process.env.KFTL_USERNAME, client_id: 1, role: 'client', photo_url: null } });
   }
 
-  if (username === 'KWL' && password === 'KWL@E-Tech0630') {
-    const token = jwt.sign({ id: 4, username: 'KWL', client_id: 2, role: 'client' }, process.env.JWT_SECRET || 'secret', { expiresIn: '24h' });
-    await logActivity(2, 'KWL', 'Login', 'KWL client logged in');
-    return res.json({ token, user: { id: 4, username: 'KWL', client_id: 2, role: 'client', photo_url: null } });
+  if (username === process.env.KWL_USERNAME && password === process.env.KWL_PASSWORD) {
+    const token = jwt.sign({ id: 4, username: process.env.KWL_USERNAME, client_id: 2, role: 'client' }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    await logActivity(2, process.env.KWL_USERNAME, 'Login', 'KWL client logged in');
+    return res.json({ token, user: { id: 4, username: process.env.KWL_USERNAME, client_id: 2, role: 'client', photo_url: null } });
   }
 
-  if (username === 'tech' && password === 'tech123') {
-    const token = jwt.sign({ id: 3, username: 'tech', client_id: null, role: 'technician' }, process.env.JWT_SECRET || 'secret', { expiresIn: '24h' });
-    await logActivity(1, 'tech', 'Login', 'Technician logged in');
-    return res.json({ token, user: { id: 3, username: 'tech', client_id: null, role: 'technician', photo_url: null } });
+  if (username === process.env.TECH_USERNAME && password === process.env.TECH_PASSWORD) {
+    const token = jwt.sign({ id: 3, username: process.env.TECH_USERNAME, client_id: null, role: 'technician' }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    await logActivity(1, process.env.TECH_USERNAME, 'Login', 'Technician logged in');
+    return res.json({ token, user: { id: 3, username: process.env.TECH_USERNAME, client_id: null, role: 'technician', photo_url: null } });
   }
 
   res.status(401).json({ error: 'Invalid credentials' });
@@ -206,12 +260,12 @@ app.post('/api/auth/microsoft-callback', async (req, res) => {
     const contentType = photoResponse.headers['content-type'] || 'image/jpeg';
     photoUrl = `data:${contentType};base64,${base64}`;
   } catch (photoErr) {
-    console.log('No profile photo available for ' + email);
+    console.log('No profile photo available for ' + email + ' — Graph error: ' + (photoErr.response?.status || '') + ' ' + (photoErr.response?.data?.error?.message || photoErr.message));
   }
 
   const jwtToken = jwt.sign(
     { id: msId, username: username, email: email, client_id: clientId, role: role, msToken: msToken },
-    process.env.JWT_SECRET || 'secret',
+    process.env.JWT_SECRET,
     { expiresIn: '24h' }
   );
 
@@ -301,7 +355,7 @@ app.put('/api/cameras/:id', authMiddleware, async (req, res) => {
     const asset = await pool.query('SELECT name, client_id FROM cameras WHERE id=$1', [id]);
     const assetName = asset.rows[0]?.name || id;
     const assetClientId = asset.rows[0]?.client_id;
-    const assetClient = assetClientId === 1 ? 'KFTL' : assetClientId === 2 ? 'KWL' : 'Unknown';
+    const assetClient = await getClientNameById(assetClientId);
     
     if (req.user.role === 'admin') {
       const query = userClientId ? 
@@ -328,7 +382,7 @@ app.put('/api/cameras/:id/comment', authMiddleware, async (req, res) => {
     const asset = await pool.query('SELECT name, client_id FROM cameras WHERE id=$1', [id]);
     const assetName = asset.rows[0]?.name || id;
     const assetClientId = asset.rows[0]?.client_id;
-    const assetClient = assetClientId === 1 ? 'KFTL' : assetClientId === 2 ? 'KWL' : 'Unknown';
+    const assetClient = await getClientNameById(assetClientId);
     const query = userClientId ? 'UPDATE cameras SET comments=$1,updated_at=CURRENT_TIMESTAMP WHERE id=$2 AND client_id=$3' : 'UPDATE cameras SET comments=$1,updated_at=CURRENT_TIMESTAMP WHERE id=$2';
     const params = userClientId ? [comments,id,userClientId] : [comments,id];
     await pool.query(query, params);
@@ -359,7 +413,8 @@ app.post('/api/import/cameras', authMiddleware, async (req, res) => {
         [cam.client_id||1,cam.name||'',cam.zone||'',cam.status||'Working',cam.comments||'',cam.model||'',cam.manufacturer||'',cam.resolution||'',cam.archiver||'',cam.ip_address||'',cam.mac_address||'',cam.warranty||null,cam.purchase_date||null,cam.date_cleaned||null]);
       imported++;
     }
-    await logActivity(1, req.user.username, 'Import', 'Imported ' + imported + ' cameras');
+    const { clientIdForLog, clientLabel } = await describeClientsForLog(cameras);
+    await logActivity(clientIdForLog, req.user.username, 'Import', 'Imported ' + imported + ' camera' + (imported === 1 ? '' : 's') + clientLabel);
     res.json({ success: true, imported });
   } catch (err) { res.status(500).json({ error: err.message, imported }); }
 });
@@ -375,7 +430,8 @@ app.post('/api/import/doors', authMiddleware, async (req, res) => {
         [door.client_id||1, door.name||'', door.zone||door.site||'', door.status||'Online', door.tech||'', door.reader||'', door.lock_type||'', door.ip_address||'', door.controller_type||'', door.door_swing||'', door.access_type||'', door.anti_passback||'', door.install_date||null, door.warranty_expiry||null, door.comments||'']);
       imported++;
     }
-    await logActivity(1, req.user.username, 'Import', 'Imported ' + imported + ' doors');
+    const { clientIdForLog, clientLabel } = await describeClientsForLog(doors);
+    await logActivity(clientIdForLog, req.user.username, 'Import', 'Imported ' + imported + ' door' + (imported === 1 ? '' : 's') + clientLabel);
     res.json({ success: true, imported });
   } catch (err) { res.status(500).json({ error: err.message, imported }); }
 });
@@ -391,7 +447,8 @@ app.post('/api/import/servers', authMiddleware, async (req, res) => {
         [srv.client_id||1,srv.name||srv.serial||'',srv.zone||srv.location||'',srv.status||'Online',srv.make||'',srv.model||'',srv.capacity||'',srv.used||'',srv.health||'',srv.apps||'',srv.serial||'',srv.purchase_date||null,srv.warranty_expiry||null,srv.comments||'']);
       imported++;
     }
-    await logActivity(1, req.user.username, 'Import', 'Imported ' + imported + ' servers');
+    const { clientIdForLog, clientLabel } = await describeClientsForLog(servers);
+    await logActivity(clientIdForLog, req.user.username, 'Import', 'Imported ' + imported + ' server' + (imported === 1 ? '' : 's') + clientLabel);
     res.json({ success: true, imported });
   } catch (err) { res.status(500).json({ error: err.message, imported }); }
 });
@@ -407,7 +464,8 @@ app.post('/api/import/switches', authMiddleware, async (req, res) => {
         [sw.client_id||1,sw.name||'',sw.zone||sw.location||'',sw.status||'Online',sw.model||'',sw.firmware||'',sw.ip_address||'',sw.mac||'',sw.purchase_date||null,sw.warranty_expiry||null,sw.comments||'']);
       imported++;
     }
-    await logActivity(1, req.user.username, 'Import', 'Imported ' + imported + ' switches');
+    const { clientIdForLog, clientLabel } = await describeClientsForLog(switches);
+    await logActivity(clientIdForLog, req.user.username, 'Import', 'Imported ' + imported + ' switch' + (imported === 1 ? '' : 'es') + clientLabel);
     res.json({ success: true, imported });
   } catch (err) { res.status(500).json({ error: err.message, imported }); }
 });
@@ -423,7 +481,76 @@ app.post('/api/import/software', authMiddleware, async (req, res) => {
         [sw.client_id||1, sw.name||'', sw.vendor||'', sw.version||'', sw.license_type||'', sw.status||'Good', sw.expiry_date||null, sw.purchase_date||null, sw.warranty_expiry||null, sw.comments||'']);
       imported++;
     }
-    await logActivity(1, req.user.username, 'Import', 'Imported ' + imported + ' software');
+    const { clientIdForLog, clientLabel } = await describeClientsForLog(software);
+    await logActivity(clientIdForLog, req.user.username, 'Import', 'Imported ' + imported + ' software' + clientLabel);
+    res.json({ success: true, imported });
+  } catch (err) { res.status(500).json({ error: err.message, imported }); }
+});
+
+app.post('/api/import/stations', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  const stations = req.body;
+  let imported = 0;
+  try {
+    for (const s of stations) {
+      await pool.query(`INSERT INTO stations (client_id,name,zone,status,make,model,apps,install_date,purchase_date,warranty_expiry) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+        [s.client_id||1, s.name||'', s.zone||'', s.status||'Online', s.make||'', s.model||'', s.apps||'', s.install_date||null, s.purchase_date||null, s.warranty_expiry||null]);
+      imported++;
+    }
+    const { clientIdForLog, clientLabel } = await describeClientsForLog(stations);
+    await logActivity(clientIdForLog, req.user.username, 'Import', 'Imported ' + imported + ' station' + (imported === 1 ? '' : 's') + clientLabel);
+    res.json({ success: true, imported });
+  } catch (err) { res.status(500).json({ error: err.message, imported }); }
+});
+
+app.post('/api/import/monitors', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  const monitors = req.body;
+  let imported = 0;
+  try {
+    for (const m of monitors) {
+      await pool.query(`INSERT INTO monitors (client_id,name,zone,status,make,model,size,install_date,purchase_date,warranty_expiry) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+        [m.client_id||1, m.name||'', m.zone||'', m.status||'Online', m.make||'', m.model||'', m.size||'', m.install_date||null, m.purchase_date||null, m.warranty_expiry||null]);
+      imported++;
+    }
+    const { clientIdForLog, clientLabel } = await describeClientsForLog(monitors);
+    await logActivity(clientIdForLog, req.user.username, 'Import', 'Imported ' + imported + ' monitor' + (imported === 1 ? '' : 's') + clientLabel);
+    res.json({ success: true, imported });
+  } catch (err) { res.status(500).json({ error: err.message, imported }); }
+});
+
+app.post('/api/import/intrusion', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  const points = req.body;
+  let imported = 0;
+  try {
+    for (const i of points) {
+      await pool.query(`INSERT INTO intrusion (client_id,name,zone,status,module,sensor_type,install_date,purchase_date,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+        [i.client_id||1, i.name||'', i.zone||'', i.status||'Online', i.module||'', i.sensor_type||'', i.install_date||null, i.purchase_date||null, i.warranty_expiry||null, i.comments||'']);
+      imported++;
+    }
+    const { clientIdForLog, clientLabel } = await describeClientsForLog(points);
+    await logActivity(clientIdForLog, req.user.username, 'Import', 'Imported ' + imported + ' intrusion point' + (imported === 1 ? '' : 's') + clientLabel);
+    res.json({ success: true, imported });
+  } catch (err) { res.status(500).json({ error: err.message, imported }); }
+});
+
+app.post('/api/import/storage', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  const devices = req.body;
+  let imported = 0;
+  try {
+    for (const s of devices) {
+      await pool.query(`INSERT INTO storage (client_id,name,zone,status,type,make,model,capacity,used,serial,purchase_date,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
+        [s.client_id||1, s.name||'', s.zone||'', s.status||'Online', s.type||'', s.make||'', s.model||'', s.capacity||'', s.used||'', s.serial||'', s.purchase_date||null, s.warranty_expiry||null, s.comments||'']);
+      imported++;
+    }
+    const { clientIdForLog, clientLabel } = await describeClientsForLog(devices);
+    await logActivity(clientIdForLog, req.user.username, 'Import', 'Imported ' + imported + ' storage device' + (imported === 1 ? '' : 's') + clientLabel);
     res.json({ success: true, imported });
   } catch (err) { res.status(500).json({ error: err.message, imported }); }
 });
@@ -452,7 +579,7 @@ app.put('/api/doors/:id', authMiddleware, async (req, res) => {
     const asset = await pool.query('SELECT name, client_id FROM doors WHERE id=$1', [id]);
     const assetName = asset.rows[0]?.name || id;
     const assetClientId = asset.rows[0]?.client_id;
-    const assetClient = assetClientId === 1 ? 'KFTL' : assetClientId === 2 ? 'KWL' : 'Unknown';
+    const assetClient = await getClientNameById(assetClientId);
     if (req.user.role === 'admin') {
       const query = userClientId ? `UPDATE doors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),tech=COALESCE($4,tech),reader=COALESCE($5,reader),lock_type=COALESCE($6,lock_type),ip_address=COALESCE($7,ip_address),controller_type=COALESCE($8,controller_type),door_swing=COALESCE($9,door_swing),access_type=COALESCE($10,access_type),anti_passback=COALESCE($11,anti_passback),install_date=$12,warranty_expiry=$13,comments=COALESCE($14,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$15 AND client_id=$16` : `UPDATE doors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),tech=COALESCE($4,tech),reader=COALESCE($5,reader),lock_type=COALESCE($6,lock_type),ip_address=COALESCE($7,ip_address),controller_type=COALESCE($8,controller_type),door_swing=COALESCE($9,door_swing),access_type=COALESCE($10,access_type),anti_passback=COALESCE($11,anti_passback),install_date=$12,warranty_expiry=$13,comments=COALESCE($14,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$15`;
       const params = userClientId ? [name,zone,status,tech,reader,lock_type,ip_address,controller_type,door_swing,access_type,anti_passback,install_date,warranty_expiry,comments,id,userClientId] : [name,zone,status,tech,reader,lock_type,ip_address,controller_type,door_swing,access_type,anti_passback,install_date,warranty_expiry,comments,id];
@@ -491,7 +618,7 @@ app.put('/api/servers/:id', authMiddleware, async (req, res) => {
     const asset = await pool.query('SELECT name, client_id FROM servers WHERE id=$1', [id]);
     const assetName = asset.rows[0]?.name || id;
     const assetClientId = asset.rows[0]?.client_id;
-    const assetClient = assetClientId === 1 ? 'KFTL' : assetClientId === 2 ? 'KWL' : 'Unknown';
+    const assetClient = await getClientNameById(assetClientId);
     if (req.user.role === 'admin') {
       const query = userClientId ? 
         `UPDATE servers SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),capacity=COALESCE($6,capacity),used=COALESCE($7,used),health=COALESCE($8,health),apps=COALESCE($9,apps),serial=COALESCE($10,serial),purchase_date=$11,warranty_expiry=$12,comments=COALESCE($13,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$14 AND client_id=$15` :
@@ -506,6 +633,49 @@ app.put('/api/servers/:id', authMiddleware, async (req, res) => {
       await pool.query(query, params);
     }
     await logActivity(assetClientId || userClientId || 1, req.user.username, 'Updated', `Server ${assetName} updated (${assetClient})`);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ============================================================
+// STORAGE
+// ============================================================
+
+app.get('/api/storage', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.json([]);
+  try {
+    const clientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const query = clientId ? 'SELECT * FROM storage WHERE client_id=$1 ORDER BY zone,name' : 'SELECT * FROM storage ORDER BY zone,name';
+    const params = clientId ? [clientId] : [];
+    const result = await pool.query(query, params);
+    res.json(result.rows);
+  } catch (err) { res.json([]); }
+});
+
+app.put('/api/storage/:id', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  const { id } = req.params;
+  const { status, comments, name, zone, type, make, model, capacity, used, serial, purchase_date, warranty_expiry } = req.body;
+  try {
+    const userClientId = req.user.role === 'admin' ? null : req.user.client_id;
+    const asset = await pool.query('SELECT name, client_id FROM storage WHERE id=$1', [id]);
+    const assetName = asset.rows[0]?.name || id;
+    const assetClientId = asset.rows[0]?.client_id;
+    const assetClient = await getClientNameById(assetClientId);
+    if (req.user.role === 'admin') {
+      const query = userClientId ?
+        `UPDATE storage SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),type=COALESCE($4,type),make=COALESCE($5,make),model=COALESCE($6,model),capacity=COALESCE($7,capacity),used=COALESCE($8,used),serial=COALESCE($9,serial),purchase_date=$10,warranty_expiry=$11,comments=COALESCE($12,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$13 AND client_id=$14` :
+        `UPDATE storage SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),type=COALESCE($4,type),make=COALESCE($5,make),model=COALESCE($6,model),capacity=COALESCE($7,capacity),used=COALESCE($8,used),serial=COALESCE($9,serial),purchase_date=$10,warranty_expiry=$11,comments=COALESCE($12,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$13`;
+      const params = userClientId ?
+        [name,zone,status,type,make,model,capacity,used,serial,purchase_date,warranty_expiry,comments,id,userClientId] :
+        [name,zone,status,type,make,model,capacity,used,serial,purchase_date,warranty_expiry,comments,id];
+      await pool.query(query, params);
+    } else {
+      const query = userClientId ? 'UPDATE storage SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3 AND client_id=$4' : 'UPDATE storage SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3';
+      const params = userClientId ? [status,comments,id,userClientId] : [status,comments,id];
+      await pool.query(query, params);
+    }
+    await logActivity(assetClientId || userClientId || 1, req.user.username, 'Updated', `Storage device ${assetName} updated (${assetClient})`);
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -534,7 +704,7 @@ app.put('/api/switches/:id', authMiddleware, async (req, res) => {
     const asset = await pool.query('SELECT name, client_id FROM switches WHERE id=$1', [id]);
     const assetName = asset.rows[0]?.name || id;
     const assetClientId = asset.rows[0]?.client_id;
-    const assetClient = assetClientId === 1 ? 'KFTL' : assetClientId === 2 ? 'KWL' : 'Unknown';
+    const assetClient = await getClientNameById(assetClientId);
     if (req.user.role === 'admin') {
       const query = userClientId ? `UPDATE switches SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),model=COALESCE($4,model),firmware=COALESCE($5,firmware),ip_address=COALESCE($6,ip_address),mac=COALESCE($7,mac),purchase_date=$8,warranty_expiry=$9,comments=COALESCE($10,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$11 AND client_id=$12` : `UPDATE switches SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),model=COALESCE($4,model),firmware=COALESCE($5,firmware),ip_address=COALESCE($6,ip_address),mac=COALESCE($7,mac),purchase_date=$8,warranty_expiry=$9,comments=COALESCE($10,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$11`;
       const params = userClientId ? [name,zone,status,model,firmware,ip_address,mac,purchase_date,warranty_expiry,comments,id,userClientId] : [name,zone,status,model,firmware,ip_address,mac,purchase_date,warranty_expiry,comments,id];
@@ -588,7 +758,7 @@ app.put('/api/intrusion/:id', authMiddleware, async (req, res) => {
     const asset = await pool.query('SELECT name, client_id FROM intrusion WHERE id=$1', [id]);
     const assetName = asset.rows[0]?.name || id;
     const assetClientId = asset.rows[0]?.client_id;
-    const assetClient = assetClientId === 1 ? 'KFTL' : assetClientId === 2 ? 'KWL' : 'Unknown';
+    const assetClient = await getClientNameById(assetClientId);
     const query = userClientId ? 'UPDATE intrusion SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3 AND client_id=$4' : 'UPDATE intrusion SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3';
     const params = userClientId ? [status,comments,id,userClientId] : [status,comments,id];
     await pool.query(query, params);
@@ -986,7 +1156,23 @@ app.post('/api/activity-log', authMiddleware, async (req, res) => {
 // OUTLOOK — SHARED MAILBOX support@e-techsystemsja.com
 // ============================================================
 
+// Shared mailbox access requires the current user to have personally signed in
+// via Microsoft SSO (req.user.msToken) — by design, only Microsoft-login users
+// can see the support inbox. No app-level fallback token here on purpose.
+// (The scheduled bi-weekly reports are separate and still use MS_GRAPH_TOKEN.)
+function getGraphToken(req) {
+  return req.user.msToken || null;
+}
+
 app.get('/api/outlook/emails', authMiddleware, async (req, res) => {
+  const graphToken = getGraphToken(req);
+  if (!graphToken) {
+    try {
+      const folder = req.query.folder || 'inbox';
+      const result = await pool.query('SELECT * FROM emails WHERE folder=$1 ORDER BY created_at DESC LIMIT 100', [folder]);
+      return res.json(result.rows);
+    } catch (dbErr) { return res.json([]); }
+  }
   try {
     const folder = req.query.folder || 'inbox';
     let endpoint;
@@ -998,9 +1184,10 @@ app.get('/api/outlook/emails', authMiddleware, async (req, res) => {
     }
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
     const response = await axios.get(endpoint, {
-      headers: { Authorization: `Bearer ${req.user.msToken}` },
+      headers: { Authorization: `Bearer ${graphToken}` },
+      timeout: 8000,
       params: { 
-        $top: 500, 
+        $top: 50, 
         $orderby: 'receivedDateTime desc', 
         $filter: `receivedDateTime ge ${thirtyDaysAgo}`,
         $select: 'id,subject,from,toRecipients,receivedDateTime,bodyPreview,body,isRead,flag,hasAttachments,webLink' 
@@ -1025,11 +1212,14 @@ app.get('/api/outlook/emails', authMiddleware, async (req, res) => {
 
 app.post('/api/outlook/send', authMiddleware, async (req, res) => {
   const { to, cc, subject, body } = req.body;
+  const graphToken = getGraphToken(req);
   try {
+    if (!graphToken) throw new Error('No Microsoft Graph token available');
     const emailData = { message: { subject, body: { contentType: 'HTML', content: body }, toRecipients: to.split(',').map(email => ({ emailAddress: { address: email.trim() } })) } };
     if (cc) { emailData.message.ccRecipients = cc.split(',').map(email => ({ emailAddress: { address: email.trim() } })); }
     await axios.post(`https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/sendMail`, emailData, {
-      headers: { Authorization: req.headers.authorization, 'Content-Type': 'application/json' }
+      headers: { Authorization: `Bearer ${graphToken}`, 'Content-Type': 'application/json' },
+      timeout: 8000
     });
     try {
       await pool.query('INSERT INTO emails (client_id,sender,recipient,subject,body,folder) VALUES ($1,$2,$3,$4,$5,$6)', [req.user.client_id||1,req.user.username,to,subject,body,'sent']);
@@ -1045,24 +1235,32 @@ app.post('/api/outlook/send', authMiddleware, async (req, res) => {
 });
 
 app.post('/api/outlook/read/:id', authMiddleware, async (req, res) => {
-  try { await axios.patch(`https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/messages/${req.params.id}`, { isRead: true }, { headers: { Authorization: req.headers.authorization, 'Content-Type': 'application/json' } }); res.json({ success: true }); }
+  const graphToken = getGraphToken(req);
+  if (!graphToken) return res.status(503).json({ error: 'No Microsoft Graph token available' });
+  try { await axios.patch(`https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/messages/${req.params.id}`, { isRead: true }, { headers: { Authorization: `Bearer ${graphToken}`, 'Content-Type': 'application/json' }, timeout: 8000 }); res.json({ success: true }); }
   catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/outlook/flag/:id', authMiddleware, async (req, res) => {
   const { flagged } = req.body;
-  try { await axios.patch(`https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/messages/${req.params.id}`, { flag: flagged ? { flagStatus: 'flagged' } : { flagStatus: 'notFlagged' } }, { headers: { Authorization: req.headers.authorization, 'Content-Type': 'application/json' } }); res.json({ success: true }); }
+  const graphToken = getGraphToken(req);
+  if (!graphToken) return res.status(503).json({ error: 'No Microsoft Graph token available' });
+  try { await axios.patch(`https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/messages/${req.params.id}`, { flag: flagged ? { flagStatus: 'flagged' } : { flagStatus: 'notFlagged' } }, { headers: { Authorization: `Bearer ${graphToken}`, 'Content-Type': 'application/json' }, timeout: 8000 }); res.json({ success: true }); }
   catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/outlook/delete/:id', authMiddleware, async (req, res) => {
-  try { await axios.post(`https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/messages/${req.params.id}/move`, { destinationId: 'deleteditems' }, { headers: { Authorization: req.headers.authorization, 'Content-Type': 'application/json' } }); res.json({ success: true }); }
+  const graphToken = getGraphToken(req);
+  if (!graphToken) return res.status(503).json({ error: 'No Microsoft Graph token available' });
+  try { await axios.post(`https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/messages/${req.params.id}/move`, { destinationId: 'deleteditems' }, { headers: { Authorization: `Bearer ${graphToken}`, 'Content-Type': 'application/json' }, timeout: 8000 }); res.json({ success: true }); }
   catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/outlook/convert-to-sr/:id', authMiddleware, async (req, res) => {
+  const graphToken = getGraphToken(req);
+  if (!graphToken) return res.status(503).json({ error: 'No Microsoft Graph token available' });
   try {
-    const response = await axios.get(`https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/messages/${req.params.id}`, { headers: { Authorization: `Bearer ${req.user.msToken}` } });
+    const response = await axios.get(`https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/messages/${req.params.id}`, { headers: { Authorization: `Bearer ${graphToken}` }, timeout: 8000 });
     const msg = response.data;
     const srId = `SR-${String(Math.floor(Math.random() * 9000) + 1000)}`;
     const subject = msg.subject || 'Converted from email';
@@ -1145,7 +1343,7 @@ app.put('/api/stations/:id', authMiddleware, async (req, res) => {
     const asset = await pool.query('SELECT name, client_id FROM stations WHERE id=$1', [id]);
     const assetName = asset.rows[0]?.name || id;
     const assetClientId = asset.rows[0]?.client_id;
-    const assetClient = assetClientId === 1 ? 'KFTL' : assetClientId === 2 ? 'KWL' : 'Unknown';
+    const assetClient = await getClientNameById(assetClientId);
     const query = userClientId ? 
       'UPDATE stations SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),apps=COALESCE($6,apps),install_date=$7,purchase_date=$8,warranty_expiry=$9,updated_at=CURRENT_TIMESTAMP WHERE id=$10 AND client_id=$11' :
       'UPDATE stations SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),apps=COALESCE($6,apps),install_date=$7,purchase_date=$8,warranty_expiry=$9,updated_at=CURRENT_TIMESTAMP WHERE id=$10';
@@ -1176,7 +1374,7 @@ app.put('/api/monitors/:id', authMiddleware, async (req, res) => {
     const asset = await pool.query('SELECT name, client_id FROM monitors WHERE id=$1', [id]);
     const assetName = asset.rows[0]?.name || id;
     const assetClientId = asset.rows[0]?.client_id;
-    const assetClient = assetClientId === 1 ? 'KFTL' : assetClientId === 2 ? 'KWL' : 'Unknown';
+    const assetClient = await getClientNameById(assetClientId);
     const query = userClientId ?
       'UPDATE monitors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),size=COALESCE($6,size),install_date=$7,purchase_date=$8,warranty_expiry=$9,updated_at=CURRENT_TIMESTAMP WHERE id=$10 AND client_id=$11' :
       'UPDATE monitors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),size=COALESCE($6,size),install_date=$7,purchase_date=$8,warranty_expiry=$9,updated_at=CURRENT_TIMESTAMP WHERE id=$10';
@@ -1204,6 +1402,18 @@ function getWeekRange() {
   return { start: monday, end: sunday };
 }
 
+// Deterministic "is this a report week" check based on the calendar date itself,
+// rather than an in-memory counter. The old approach (reportWeekCounter++, check
+// even/odd) reset to 0 every time the server restarted/redeployed, so which
+// Fridays actually sent reports was effectively random rather than a real
+// every-other-week cadence.
+const REPORT_SCHEDULE_EPOCH = new Date('2026-01-02T00:00:00Z'); // fixed reference Friday
+function isReportWeek(date = new Date()) {
+  const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+  const weeksSinceEpoch = Math.floor((date.getTime() - REPORT_SCHEDULE_EPOCH.getTime()) / msPerWeek);
+  return ((weeksSinceEpoch % 2) + 2) % 2 === 0;
+}
+
 function formatDateRange(start, end) {
   const options = { day: 'numeric', month: 'long', year: 'numeric' };
   return `${start.toLocaleDateString('en-GB', options)} — ${end.toLocaleDateString('en-GB', options)}`;
@@ -1221,7 +1431,7 @@ async function generateClientReport(clientId, clientName, clientEmail, msToken) 
   const totalAssets = cameras.rowCount + doors.rowCount + servers.rowCount + switches.rowCount;
   const onlineAssets = cameras.rows.filter(c => c.status === 'Online' || c.status === 'Working').length +
                        doors.rows.filter(d => d.status === 'Online' || d.status === 'Working').length +
-                       servers.rows.filter(s => s.status === 'ONLINE').length +
+                       servers.rows.filter(s => s.status === 'Online').length +
                        switches.rows.filter(s => s.status === 'Online').length;
   const offlineAssets = totalAssets - onlineAssets;
   const healthPct = totalAssets > 0 ? ((onlineAssets / totalAssets) * 100).toFixed(1) : '100.0';
@@ -1277,7 +1487,7 @@ async function generateClientReport(clientId, clientName, clientEmail, msToken) 
       </table>
       <h3 style="color:#1a3a5c;">Service Requests This Period</h3>
       ${srTable}
-      ${highPriorityOpen > 0 ? `<h3 style="color:#cc0000;">What Needs Your Attention</h3><p><strong>${highPriorityOpen} high priority SR${highPriorityOpen > 1 ? 's' : ''} remain${highPriorityOpen === 1 ? 's' : ''} open.</strong> We recommend reviewing ${highPriorityOpen === 1 ? 'this request' : 'these requests'} as soon as possible.</p>` : ''}
+      ${highPriorityOpen > 0 ? `<h3 style="color:#cc0000;">Priority Items In Progress</h3><p><strong>${highPriorityOpen} high priority SR${highPriorityOpen > 1 ? 's' : ''} remain${highPriorityOpen === 1 ? 's' : ''} open.</strong> Our team is actively working to resolve ${highPriorityOpen === 1 ? 'this request' : 'these requests'} as soon as possible.</p>` : ''}
       ${offlineAssets > 0 ? `<p><strong>${offlineAssets} assets are currently offline or defective.</strong> While not listed here, your account manager can provide a full breakdown on request.</p>` : ''}
       <p>If you have any questions or need to escalate an issue, please reply to this email or submit a new request through the CAMS portal.</p>
       <p>View full dashboard: <a href="https://e-tech-cams.up.railway.app">Open CAMS</a></p>
@@ -1305,7 +1515,7 @@ async function generateAdminReport(msToken) {
   const totalAssets = totalCameras.rowCount + totalDoors.rowCount + totalServers.rowCount + totalSwitches.rowCount;
   const onlineAssets = totalCameras.rows.filter(c => c.status === 'Online' || c.status === 'Working').length +
                        totalDoors.rows.filter(d => d.status === 'Online' || d.status === 'Working').length +
-                       totalServers.rows.filter(s => s.status === 'ONLINE').length +
+                       totalServers.rows.filter(s => s.status === 'Online').length +
                        totalSwitches.rows.filter(s => s.status === 'Online').length;
   const offlineAssets = totalAssets - onlineAssets;
   const healthPct = totalAssets > 0 ? ((onlineAssets / totalAssets) * 100).toFixed(1) : '100.0';
@@ -1354,7 +1564,7 @@ async function generateAdminReport(msToken) {
     const cTotal = cCameras.length + cDoors.length + cServers.length + cSwitches.length;
     const cOnline = cCameras.filter(c => c.status === 'Online' || c.status === 'Working').length +
                     cDoors.filter(d => d.status === 'Online' || d.status === 'Working').length +
-                    cServers.filter(s => s.status === 'ONLINE').length +
+                    cServers.filter(s => s.status === 'Online').length +
                     cSwitches.filter(s => s.status === 'Online').length;
     const cOffline = cTotal - cOnline;
     const cHealthNum = cTotal > 0 ? parseFloat(((cOnline / cTotal) * 100).toFixed(1)) : 100;
@@ -1462,10 +1672,8 @@ async function runBiWeeklyReports() {
   }
 }
 
-let reportWeekCounter = 0;
 cron.schedule('0 17 * * 5', () => {
-  reportWeekCounter++;
-  if (reportWeekCounter % 2 === 0) {
+  if (isReportWeek()) {
     runBiWeeklyReports();
   }
 }, {
