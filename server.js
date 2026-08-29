@@ -43,6 +43,7 @@ const REQUIRED_ENV_VARS = [
   'KFTL_USERNAME', 'KFTL_PASSWORD',
   'KWL_USERNAME', 'KWL_PASSWORD',
   'TECH_USERNAME', 'TECH_PASSWORD',
+  'PAJ_USERNAME', 'PAJ_PASSWORD',
 ];
 const missingEnvVars = REQUIRED_ENV_VARS.filter(name => !process.env[name]);
 if (missingEnvVars.length > 0) {
@@ -196,25 +197,37 @@ app.post('/api/auth/login', async (req, res) => {
   if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
     const token = jwt.sign({ id: 1, username: process.env.ADMIN_USERNAME, client_id: null, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '24h' });
     await logActivity(1, process.env.ADMIN_USERNAME, 'Login', 'Admin logged in');
-    return res.json({ token, user: { id: 1, username: process.env.ADMIN_USERNAME, client_id: null, role: 'admin', photo_url: null } });
+    return res.json({ token, user: { id: 1, username: process.env.ADMIN_USERNAME, client_id: null, client_name: null, role: 'admin', photo_url: null } });
   }
 
   if (username === process.env.KFTL_USERNAME && password === process.env.KFTL_PASSWORD) {
     const token = jwt.sign({ id: 2, username: process.env.KFTL_USERNAME, client_id: 1, role: 'client' }, process.env.JWT_SECRET, { expiresIn: '24h' });
     await logActivity(1, process.env.KFTL_USERNAME, 'Login', 'KFTL client logged in');
-    return res.json({ token, user: { id: 2, username: process.env.KFTL_USERNAME, client_id: 1, role: 'client', photo_url: null } });
+    return res.json({ token, user: { id: 2, username: process.env.KFTL_USERNAME, client_id: 1, client_name: 'KFTL', role: 'client', photo_url: null } });
   }
 
   if (username === process.env.KWL_USERNAME && password === process.env.KWL_PASSWORD) {
     const token = jwt.sign({ id: 4, username: process.env.KWL_USERNAME, client_id: 2, role: 'client' }, process.env.JWT_SECRET, { expiresIn: '24h' });
     await logActivity(2, process.env.KWL_USERNAME, 'Login', 'KWL client logged in');
-    return res.json({ token, user: { id: 4, username: process.env.KWL_USERNAME, client_id: 2, role: 'client', photo_url: null } });
+    return res.json({ token, user: { id: 4, username: process.env.KWL_USERNAME, client_id: 2, client_name: 'KWL', role: 'client', photo_url: null } });
+  }
+
+  if (username === process.env.PAJ_USERNAME && password === process.env.PAJ_PASSWORD) {
+    let clientId = null;
+    try {
+      const result = await pool.query("SELECT id FROM clients WHERE name = 'PAJ'");
+      clientId = result.rows[0]?.id || null;
+    } catch (err) { clientId = null; }
+    if (!clientId) return res.status(500).json({ error: "No client named 'PAJ' found in the clients table — create it first." });
+    const token = jwt.sign({ id: 5, username: process.env.PAJ_USERNAME, client_id: clientId, role: 'client' }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    await logActivity(clientId, process.env.PAJ_USERNAME, 'Login', 'PAJ client logged in');
+    return res.json({ token, user: { id: 5, username: process.env.PAJ_USERNAME, client_id: clientId, client_name: 'PAJ', role: 'client', photo_url: null } });
   }
 
   if (username === process.env.TECH_USERNAME && password === process.env.TECH_PASSWORD) {
     const token = jwt.sign({ id: 3, username: process.env.TECH_USERNAME, client_id: null, role: 'technician' }, process.env.JWT_SECRET, { expiresIn: '24h' });
     await logActivity(1, process.env.TECH_USERNAME, 'Login', 'Technician logged in');
-    return res.json({ token, user: { id: 3, username: process.env.TECH_USERNAME, client_id: null, role: 'technician', photo_url: null } });
+    return res.json({ token, user: { id: 3, username: process.env.TECH_USERNAME, client_id: null, client_name: null, role: 'technician', photo_url: null } });
   }
 
   res.status(401).json({ error: 'Invalid credentials' });
@@ -231,24 +244,17 @@ app.post('/api/auth/microsoft-callback', async (req, res) => {
     return res.status(400).json({ error: 'No email provided' });
   }
 
+  // Microsoft login is admin-only — clients always use their manual
+  // username/password. Anyone outside the E-Tech domain is rejected here
+  // rather than being silently logged in as a client.
+  const isETechUser = email.toLowerCase().endsWith('@e-techsystemsja.com');
+  if (!isETechUser) {
+    return res.status(403).json({ error: 'Microsoft login is only available for E-Tech staff. Clients should use their username and password.' });
+  }
+
   const emailName = email.split('@')[0] || '';
   const username = emailName.charAt(0).toUpperCase() + emailName.slice(1);
-  const isETechUser = email.toLowerCase().endsWith('@e-techsystemsja.com');
-  const role = isETechUser ? 'admin' : 'client';
-  
-  let clientId = null;
-  if (!isETechUser) {
-    try {
-      const clientResult = await pool.query('SELECT id FROM clients WHERE LOWER(email) = LOWER($1)', [email]);
-      if (clientResult.rows.length > 0) {
-        clientId = clientResult.rows[0].id;
-      } else {
-        clientId = 1;
-      }
-    } catch (err) {
-      clientId = 1;
-    }
-  }
+  const role = 'admin';
 
   let photoUrl = null;
   try {
@@ -264,17 +270,16 @@ app.post('/api/auth/microsoft-callback', async (req, res) => {
   }
 
   const jwtToken = jwt.sign(
-    { id: msId, username: username, email: email, client_id: clientId, role: role, msToken: msToken },
+    { id: msId, username: username, email: email, client_id: null, role: role, msToken: msToken },
     process.env.JWT_SECRET,
     { expiresIn: '24h' }
   );
 
-  const logClientId = clientId || 1;
-  await logActivity(logClientId, username, 'Login', `Microsoft login — ${email} (${role})`);
+  await logActivity(1, username, 'Login', `Microsoft login — ${email} (${role})`);
 
   res.json({
     token: jwtToken,
-    user: { id: msId, username: username, email: email, client_id: clientId, role: role, photo_url: photoUrl }
+    user: { id: msId, username: username, email: email, client_id: null, client_name: null, role: role, photo_url: photoUrl }
   });
 
   console.log(`✅ Microsoft login: ${username} (${email}) — Role: ${role}, Client ID: ${clientId}`);
