@@ -5,8 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>CAMS Field — Mobile</title>
   <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#4f8cf7">
+  <link rel="manifest" href="/field-manifest.json">
+  <meta name="theme-color" content="#0b0d15">
+  <link rel="apple-touch-icon" href="/192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CAMS Field">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -677,43 +681,6 @@
     .modal-sheet .modal-actions .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
     .modal-sheet .modal-actions .btn.success { background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.3); color: var(--success); }
 
-    #scanner-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.92);
-      z-index: 1000;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    #scanner-overlay.open { display: flex; }
-    #scanner-overlay .scanner-close {
-      position: absolute;
-      top: 40px;
-      right: 20px;
-      background: rgba(255,255,255,0.1);
-      border: none;
-      color: #fff;
-      font-size: 28px;
-      padding: 8px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    #scanner-overlay video {
-      width: 100%;
-      max-width: 420px;
-      border-radius: 12px;
-      background: #000;
-    }
-    #scanner-overlay .scanner-hint {
-      color: rgba(255,255,255,0.6);
-      font-size: 14px;
-      margin-top: 16px;
-      text-align: center;
-    }
-
     .activity-item {
       display: flex;
       gap: 10px;
@@ -786,12 +753,6 @@
         <path fill="#ffb900" d="M12 12h10v10H12z"/>
       </svg> Sign in with Microsoft
     </button>
-    <div class="login-divider">or</div>
-    <div>
-      <input id="login-username" type="text" placeholder="Username" style="width:100%;padding:10px 14px;border-radius:8px;font-size:14px;font-family:var(--font);margin-bottom:10px;">
-      <input id="login-password" type="password" placeholder="Password" style="width:100%;padding:10px 14px;border-radius:8px;font-size:14px;font-family:var(--font);margin-bottom:12px;">
-      <button onclick="loginLocal()" style="width:100%;padding:10px;border-radius:8px;border:none;background:linear-gradient(135deg,#4f8cf7,#00d4ff);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font);">Sign in</button>
-    </div>
     <div id="login-error"></div>
     <div class="login-loading" id="login-loading"><i class="ti ti-loader"></i> Signing in...</div>
   </div>
@@ -815,33 +776,17 @@
 
   <main class="field-content" id="field-content">
     <div class="tab-page active" id="tab-dashboard">
+      <div id="tech-name-banner" style="display:none;background:var(--accent-glow);border:1px solid var(--accent);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;cursor:pointer;" onclick="switchTab('profile')">
+        <i class="ti ti-user-question"></i> Tap here to set your name — "Assigned" and "Resolved" below need it to show your tickets.
+      </div>
       <div id="alert-container"></div>
       <div class="stats-row">
         <div class="stat-card"><div class="stat-number accent" id="stat-assigned">0</div><div class="stat-label">Assigned</div></div>
         <div class="stat-card"><div class="stat-number success" id="stat-resolved">0</div><div class="stat-label">Resolved</div></div>
         <div class="stat-card"><div class="stat-number danger" id="stat-alarms">0</div><div class="stat-label">Alerts</div></div>
       </div>
-      <div class="quick-grid">
-        <button class="quick-btn" onclick="switchTab('scanner')"><i class="ti ti-qrcode"></i> Scan</button>
-        <button class="quick-btn" onclick="switchTab('tickets')"><i class="ti ti-ticket"></i> Tickets</button>
-        <button class="quick-btn" onclick="switchTab('devices')"><i class="ti ti-devices"></i> Devices</button>
-        <button class="quick-btn" onclick="switchTab('profile')"><i class="ti ti-user"></i> Profile</button>
-      </div>
       <div class="card"><div class="card-title">Urgent Service Requests</div><div id="urgent-tickets"></div></div>
       <div class="card"><div class="card-title">Today's Activity</div><div id="today-activity"></div></div>
-    </div>
-
-    <div class="tab-page" id="tab-scanner">
-      <div class="card">
-        <div class="card-title">Scan QR Code</div>
-        <button class="quick-btn" style="width:100%;padding:16px;min-height:80px;font-size:14px;" onclick="openScanner()"><i class="ti ti-qrcode" style="font-size:32px;"></i> Tap to Scan</button>
-        <div id="scan-result" style="margin-top:10px;"></div>
-        <div style="margin-top:8px;">
-          <input type="text" id="manual-scan" placeholder="Or enter asset ID / serial..." style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:14px;font-family:var(--font);">
-          <button onclick="lookupManual()" style="margin-top:6px;width:100%;padding:10px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-size:14px;font-family:var(--font);cursor:pointer;">Lookup</button>
-        </div>
-      </div>
-      <div id="scanner-device-result"></div>
     </div>
 
     <div class="tab-page" id="tab-tickets">
@@ -883,6 +828,22 @@
           </div>
         </div>
       </div>
+      <div class="card" id="tech-name-card" style="display:none;">
+        <div class="card-title">Who are you?</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:8px;">Everyone shares the same technician login, so pick your name here — it's what makes "Assigned" and "Resolved" on the home screen show your tickets, not everyone's.</div>
+        <select id="tech-name-select" style="width:100%;padding:10px;border-radius:8px;background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:14px;margin-bottom:8px;">
+          <option value="">Select your name…</option>
+          <option value="Shanice">Shanice</option>
+          <option value="Roger">Roger</option>
+          <option value="Joshua">Joshua</option>
+          <option value="Rochelle">Rochelle</option>
+          <option value="Akeem">Akeem</option>
+          <option value="Marvin">Marvin</option>
+          <option value="Shavene">Shavene</option>
+          <option value="Venessa">Venessa</option>
+        </select>
+        <button class="quick-btn" style="width:100%;flex-direction:row;justify-content:center;gap:8px;min-height:44px;" onclick="saveTechName()"><i class="ti ti-check"></i> <span>Save</span></button>
+      </div>
       <div class="card">
         <div class="card-title">Settings</div>
         <button class="quick-btn" style="width:100%;flex-direction:row;justify-content:flex-start;gap:12px;min-height:44px;padding:8px 12px;" onclick="toggleTheme()"><i class="ti ti-palette"></i> <span>Toggle Theme</span></button>
@@ -897,18 +858,10 @@
 
   <nav class="field-nav">
     <button class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard')"><span class="icon-wrap"><i class="ti ti-home"></i></span>Home</button>
-    <button class="nav-item" data-tab="scanner" onclick="switchTab('scanner')"><span class="icon-wrap"><i class="ti ti-qrcode"></i></span>Scan</button>
     <button class="nav-item" data-tab="tickets" onclick="switchTab('tickets')"><span class="icon-wrap"><i class="ti ti-ticket"></i><span class="badge-nav" id="ticket-badge">0</span></span>Tickets</button>
     <button class="nav-item" data-tab="devices" onclick="switchTab('devices')"><span class="icon-wrap"><i class="ti ti-devices"></i></span>Devices</button>
     <button class="nav-item" data-tab="profile" onclick="switchTab('profile')"><span class="icon-wrap"><i class="ti ti-user"></i></span>Profile</button>
   </nav>
-</div>
-
-<div id="scanner-overlay">
-  <button class="scanner-close" onclick="closeScanner()"><i class="ti ti-x"></i></button>
-  <video id="scanner-video" autoplay playsinline muted></video>
-  <div class="scanner-hint">Position QR code in frame</div>
-  <div id="scanner-result-text"></div>
 </div>
 
 <div class="modal-overlay" id="modal-sheet">
@@ -936,6 +889,19 @@ var currentUser = null;
 var isAdmin = false;
 var userClient = null;
 var userClientId = null;
+
+// Same escaping helpers as the main dashboard (index.html) — see there for
+// why esc() alone isn't enough for values embedded inside onclick="...' handlers.
+function esc(v) {
+  if (v === null || v === undefined) return '';
+  return String(v).replace(/[&<>"']/g, function(c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+function escAttrJs(v) {
+  if (v === null || v === undefined) return '';
+  return String(v).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n');
+}
 
 var CAMERAS = [];
 var DOORS = [];
@@ -1015,7 +981,7 @@ async function handleMicrosoftCallback(code) {
     }
     var data = await apiCall('/auth/microsoft-callback', {
       method: 'POST',
-      body: JSON.stringify({ msId: msUser.id, displayName: msUser.displayName, email: email, msToken: accessToken })
+      body: JSON.stringify({ msId: msUser.id, displayName: msUser.displayName, email: email, msToken: accessToken, app: 'field' })
     });
     authToken = data.token;
     localStorage.setItem('token', authToken);
@@ -1024,44 +990,12 @@ async function handleMicrosoftCallback(code) {
     currentUser = data.user;
     isAdmin = data.user.role === 'admin';
     userClientId = data.user.client_id;
-    if (data.user.client_id === 1) userClient = 'KFTL';
-    else if (data.user.client_id === 2) userClient = 'KWL';
-    else userClient = null;
+    userClient = data.user.client_name || null;
     hideLogin();
     initApp();
     toast('Welcome!', 'success');
   } catch (err) {
     toast('Microsoft login failed: ' + err.message, 'error');
-  }
-}
-
-async function loginLocal() {
-  var u = document.getElementById('login-username').value;
-  var p = document.getElementById('login-password').value;
-  var ed = document.getElementById('login-error');
-  var ld = document.getElementById('login-loading');
-  ed.style.display = 'none';
-  ld.classList.add('active');
-  try {
-    var d = await apiCall('/auth/login', { method: 'POST', body: JSON.stringify({ username: u, password: p }) });
-    authToken = d.token;
-    localStorage.setItem('token', authToken);
-    localStorage.setItem('user', JSON.stringify(d.user));
-    if (d.user.photo_url) localStorage.setItem('userPhoto', d.user.photo_url);
-    currentUser = d.user;
-    isAdmin = d.user.role === 'admin';
-    userClientId = d.user.client_id;
-    if (d.user.client_id === 1) userClient = 'KFTL';
-    else if (d.user.client_id === 2) userClient = 'KWL';
-    else userClient = null;
-    hideLogin();
-    initApp();
-    ld.classList.remove('active');
-    toast('Welcome!', 'success');
-  } catch (err) {
-    ed.textContent = err.message || 'Login failed';
-    ed.style.display = 'block';
-    ld.classList.remove('active');
   }
 }
 
@@ -1094,9 +1028,7 @@ function checkLogin() {
     if (savedPhoto && currentUser) currentUser.photo_url = savedPhoto;
     isAdmin = currentUser.role === 'admin';
     userClientId = currentUser.client_id;
-    if (currentUser.client_id === 1) userClient = 'KFTL';
-    else if (currentUser.client_id === 2) userClient = 'KWL';
-    else userClient = null;
+    userClient = currentUser.client_name || null;
     hideLogin();
     initApp();
   } else {
@@ -1172,7 +1104,7 @@ function getClientFromZone(zone) {
     'NORTH': 'KFTL', 'WEST': 'KFTL', 'SOUTH': 'KFTL', 'EAST': 'KFTL'
   };
   if (zones[zone]) return zones[zone];
-  var patterns = { 'Kingport': 'KFTL', 'Port': 'KFTL', 'TLF': 'KFTL', 'KWC': 'KFTL', 'Tinson Pen': 'KWL', 'Warehouse 1': 'KWL', 'LDL Warehouse': 'Lasco', 'Showroom': 'Fidelity Motors' };
+  var patterns = { 'Kingport': 'KFTL', 'Port': 'KFTL', 'TLF': 'KFTL', 'KWC': 'KFTL', 'Tinson Pen': 'KWL', 'Warehouse 1': 'KWL' };
   for (var k in patterns) { if (zone.indexOf(k) !== -1) return patterns[k]; }
   return 'Unknown';
 }
@@ -1237,7 +1169,7 @@ function renderDashboard() {
 
 function renderUrgentTickets() {
   var container = document.getElementById('urgent-tickets');
-  var uname = currentUser ? (currentUser.username || '') : '';
+  var uname = getFieldTechName();
   var urgent = SERVICE_REQUESTS.filter(function(r) {
     if (r.priority !== 'High' || r.status === 'Resolved') return false;
     if (!isAdmin && currentUser) return (r.assigned_to || '').toLowerCase() === uname.toLowerCase();
@@ -1248,10 +1180,11 @@ function renderUrgentTickets() {
     return;
   }
   container.innerHTML = urgent.map(function(r) {
-    return '<div class="ticket-item" onclick="openTicketDetail(\'' + r.sr_id + '\')">' +
-      '<div class="ticket-top"><span class="ticket-id">' + r.sr_id + '</span><span class="badge b-high">' + (r.priority || '—') + '</span></div>' +
-      '<div class="ticket-subject">' + r.subject + '</div>' +
-      '<div class="ticket-meta"><span>' + (r.client || '—') + ' · ' + (r.site || '—') + '</span><span>👤 ' + (r.assigned_to || 'Unassigned') + '</span><span class="sla ' + getSLAClass(r) + '">⏱ ' + getSLAText(r) + '</span></div>' +
+    var sid = escAttrJs(r.sr_id);
+    return '<div class="ticket-item" onclick="openTicketDetail(\'' + sid + '\')">' +
+      '<div class="ticket-top"><span class="ticket-id">' + esc(r.sr_id) + '</span><span class="badge b-high">' + esc(r.priority || '—') + '</span></div>' +
+      '<div class="ticket-subject">' + esc(r.subject) + '</div>' +
+      '<div class="ticket-meta"><span>' + esc(r.client || '—') + ' · ' + esc(r.site || '—') + '</span><span>👤 ' + esc(r.assigned_to || 'Unassigned') + '</span><span class="sla ' + getSLAClass(r) + '">⏱ ' + getSLAText(r) + '</span></div>' +
       '</div>';
   }).join('');
 }
@@ -1265,8 +1198,7 @@ function renderActivity() {
   }
   container.innerHTML = recent.map(function(a) {
     var t = new Date(a.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-    var msg = (a.action || '') + ' — ' + (a.detail || '');
-    return '<div class="activity-item"><span class="act-time">' + t + '</span><span class="act-msg">' + msg + '</span></div>';
+    return '<div class="activity-item"><span class="act-time">' + t + '</span><span class="act-msg">' + esc(a.action || '') + ' — ' + esc(a.detail || '') + '</span></div>';
   }).join('');
 }
 
@@ -1288,19 +1220,45 @@ function getSLAText(r) {
 
 function updateStats() {
   if (!currentUser) return;
-  var uname = currentUser.username || '';
+  var uname = getFieldTechName();
   var assigned = SERVICE_REQUESTS.filter(function(r) {
     return (r.assigned_to || '').toLowerCase() === uname.toLowerCase() && r.status !== 'Resolved';
   });
   document.getElementById('stat-assigned').textContent = assigned.length;
+  var sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   var resolved = SERVICE_REQUESTS.filter(function(r) {
-    return (r.assigned_to || '').toLowerCase() === uname.toLowerCase() && r.status === 'Resolved';
+    return (r.assigned_to || '').toLowerCase() === uname.toLowerCase() && r.status === 'Resolved' && r.resolved_at && new Date(r.resolved_at) >= sevenDaysAgo;
   });
   document.getElementById('stat-resolved').textContent = resolved.length;
   var alarms = 0;
   CAMERAS.forEach(function(c) { if (c.status === 'Defective' || c.status === 'Not Working' || c.status === 'No Power') alarms++; });
   DOORS.forEach(function(d) { if (d.status === 'Offline') alarms++; });
   document.getElementById('stat-alarms').textContent = alarms;
+  var banner = document.getElementById('tech-name-banner');
+  if (banner) banner.style.display = (!isAdmin && !userClient && !localStorage.getItem('fieldTechName')) ? 'block' : 'none';
+}
+
+// Everyone shares the single TECH_USERNAME login, so currentUser.username is
+// always literally "tech" for every technician — it can't be used to tell
+// them apart. This resolves the actual person from a locally-saved choice
+// (set via the Profile tab) instead, falling back to the raw username for
+// admin/client logins where this ambiguity doesn't apply.
+function getFieldTechName() {
+  if (!isAdmin && !userClient) {
+    var saved = localStorage.getItem('fieldTechName');
+    if (saved) return saved;
+  }
+  return (currentUser && currentUser.username) || '';
+}
+
+function saveTechName() {
+  var sel = document.getElementById('tech-name-select');
+  var name = sel ? sel.value : '';
+  if (!name) { toast('Please select your name', 'warning'); return; }
+  localStorage.setItem('fieldTechName', name);
+  toast('Saved — you\'re set as ' + name, 'success');
+  updateProfile();
+  updateStats();
 }
 
 function checkAlerts() {
@@ -1327,7 +1285,7 @@ function viewAlerts() {
 
 function renderTickets() {
   var q = document.getElementById('ticket-search') ? document.getElementById('ticket-search').value.toLowerCase() : '';
-  var uname = currentUser ? (currentUser.username || '') : '';
+  var uname = getFieldTechName();
   var filtered = SERVICE_REQUESTS.filter(function(r) {
     var matchAssigned = isAdmin ? true : (r.assigned_to || '').toLowerCase() === uname.toLowerCase();
     var matchSearch = r.sr_id.toLowerCase().indexOf(q) !== -1 || r.subject.toLowerCase().indexOf(q) !== -1 || (r.client || '').toLowerCase().indexOf(q) !== -1 || (r.site || '').toLowerCase().indexOf(q) !== -1;
@@ -1344,14 +1302,15 @@ function renderTickets() {
     return;
   }
   container.innerHTML = filtered.map(function(r) {
-    return '<div class="ticket-item" onclick="openTicketDetail(\'' + r.sr_id + '\')">' +
+    var sid = escAttrJs(r.sr_id);
+    return '<div class="ticket-item" onclick="openTicketDetail(\'' + sid + '\')">' +
       '<div class="ticket-top">' +
-      '<span class="ticket-id">' + r.sr_id + '</span>' +
-      '<span class="badge ' + (r.priority === 'High' ? 'b-high' : r.priority === 'Medium' ? 'b-med' : 'b-low') + '">' + (r.priority || '—') + '</span>' +
-      '<span class="badge ' + (r.status === 'Open' ? 'b-open' : r.status === 'In Progress' ? 'b-progress' : r.status === 'Resolved' ? 'b-resolved' : 'b-open') + '">' + (r.status || '—') + '</span>' +
+      '<span class="ticket-id">' + esc(r.sr_id) + '</span>' +
+      '<span class="badge ' + (r.priority === 'High' ? 'b-high' : r.priority === 'Medium' ? 'b-med' : 'b-low') + '">' + esc(r.priority || '—') + '</span>' +
+      '<span class="badge ' + (r.status === 'Open' ? 'b-open' : r.status === 'In Progress' ? 'b-progress' : r.status === 'Resolved' ? 'b-resolved' : 'b-open') + '">' + esc(r.status || '—') + '</span>' +
       '</div>' +
-      '<div class="ticket-subject">' + r.subject + '</div>' +
-      '<div class="ticket-meta"><span>' + (r.client || '—') + ' · ' + (r.site || '—') + '</span><span class="sla ' + getSLAClass(r) + '">⏱ ' + getSLAText(r) + '</span></div>' +
+      '<div class="ticket-subject">' + esc(r.subject) + '</div>' +
+      '<div class="ticket-meta"><span>' + esc(r.client || '—') + ' · ' + esc(r.site || '—') + '</span><span class="sla ' + getSLAClass(r) + '">⏱ ' + getSLAText(r) + '</span></div>' +
       '</div>';
   }).join('');
 }
@@ -1551,16 +1510,16 @@ function openTicketDetail(srId) {
   document.getElementById('modal-title').textContent = r.sr_id + ' — ' + r.subject;
   document.getElementById('modal-sub').textContent = (r.client || '—') + ' · ' + (r.site || '—') + ' · ' + r.status;
 
-  var body = '<div class="detail-row"><span class="label">Priority</span><span class="value">' + (r.priority || '—') + '</span></div>';
-  body += '<div class="detail-row"><span class="label">Assigned</span><span class="value">' + (r.assigned_to || 'Unassigned') + '</span></div>';
-  body += '<div class="detail-row"><span class="label">Received</span><span class="value">' + (r.received || '—') + '</span></div>';
+  var body = '<div class="detail-row"><span class="label">Priority</span><span class="value">' + esc(r.priority || '—') + '</span></div>';
+  body += '<div class="detail-row"><span class="label">Assigned</span><span class="value">' + esc(r.assigned_to || 'Unassigned') + '</span></div>';
+  body += '<div class="detail-row"><span class="label">Received</span><span class="value">' + esc(r.received || '—') + '</span></div>';
   body += '<div class="detail-row"><span class="label">SLA</span><span class="value sla ' + getSLAClass(r) + '">' + getSLAText(r) + '</span></div>';
-  body += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);"><strong>Description:</strong><br>' + (r.body || 'No description') + '</div>';
-  if (r.notes) body += '<div style="margin-top:6px;color:var(--text3);"><strong>Notes:</strong> ' + r.notes + '</div>';
+  body += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);"><strong>Description:</strong><br>' + esc(r.body || 'No description') + '</div>';
+  if (r.notes) body += '<div style="margin-top:6px;color:var(--text3);"><strong>Notes:</strong> ' + esc(r.notes) + '</div>';
   if (r.history && r.history.length) {
     body += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);"><strong>History:</strong><br>';
     r.history.slice(-5).forEach(function(h) {
-      body += '<div style="font-size:11px;color:var(--text3);">' + h.time + ' — ' + h.msg + '</div>';
+      body += '<div style="font-size:11px;color:var(--text3);">' + esc(h.time) + ' — ' + esc(h.msg) + '</div>';
     });
     body += '</div>';
   }
@@ -1614,107 +1573,10 @@ function openController(ip) {
   toast('Opening ' + ip, 'info');
 }
 
-var scannerActive = false;
-
-function openScanner() {
-  var overlay = document.getElementById('scanner-overlay');
-  var video = document.getElementById('scanner-video');
-  overlay.classList.add('open');
-  scannerActive = true;
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-      .then(function(stream) {
-        video.srcObject = stream;
-        video.play();
-        scanQR();
-      })
-      .catch(function(err) {
-        toast('Camera access denied: ' + err.message, 'error');
-        closeScanner();
-      });
-  } else {
-    toast('Camera not supported', 'error');
-    closeScanner();
-  }
-}
-
-function scanQR() {
-  var video = document.getElementById('scanner-video');
-  var canvas = document.createElement('canvas');
-  var ctx = canvas.getContext('2d');
-  function tick() {
-    if (!scannerActive) return;
-    if (video.readyState === video.HAVE_ENOUGH_DATA) {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    }
-    setTimeout(tick, 200);
-  }
-  tick();
-}
-
-function closeScanner() {
-  scannerActive = false;
-  var overlay = document.getElementById('scanner-overlay');
-  var video = document.getElementById('scanner-video');
-  if (video.srcObject) {
-    video.srcObject.getTracks().forEach(function(t) { t.stop(); });
-  }
-  overlay.classList.remove('open');
-}
-
-function lookupManual() {
-  var val = document.getElementById('manual-scan').value.trim();
-  if (!val) { toast('Enter an asset ID', 'warning'); return; }
-  lookupDevice(val);
-}
-
-function lookupDevice(query) {
-  var all = [];
-  CAMERAS.forEach(function(c) { all.push({ type: 'camera', data: c, client: getClientFromZone(c.zone), id: c.id }); });
-  DOORS.forEach(function(d) { all.push({ type: 'door', data: d, client: getClientFromZone(d.zone), id: d.id }); });
-  SERVERS.forEach(function(s) { all.push({ type: 'server', data: s, client: getClientFromZone(s.zone), id: s.id }); });
-  SWITCHES.forEach(function(s) { all.push({ type: 'switch', data: s, client: getClientFromZone(s.zone), id: s.id }); });
-
-  var q = query.toLowerCase();
-  var found = null;
-  for (var i = 0; i < all.length; i++) {
-    var item = all[i];
-    var d = item.data;
-    if (d.name && d.name.toLowerCase().indexOf(q) !== -1) { found = item; break; }
-    if (d.serial && d.serial.toLowerCase().indexOf(q) !== -1) { found = item; break; }
-    if (d.ip_address && d.ip_address.indexOf(q) !== -1) { found = item; break; }
-  }
-
-  var container = document.getElementById('scanner-device-result');
-  if (!found) {
-    container.innerHTML = '<div class="card" style="border-color:var(--danger);"><div style="color:var(--danger);">No device found for "' + query + '"</div></div>';
-    toast('Device not found', 'error');
-    return;
-  }
-
-  var d = found.data;
-  var client = found.client || 'Unknown';
-  var statusDot = d.status === 'Online' || d.status === 'Working' || d.status === 'ONLINE' ? 'online' : d.status === 'Offline' || d.status === 'OFFLINE' ? 'offline' : 'warning';
-  var ip = d.ip_address || 'N/A';
-  var typeIcon = found.type === 'camera' ? '📷' : found.type === 'door' ? '🚪' : found.type === 'server' ? '🖥' : '🔌';
-
-  container.innerHTML = '<div class="card" style="border-color:var(--accent);cursor:pointer;" onclick="openDeviceDetail(\'' + found.id + '\', \'' + found.type + '\')">' +
-    '<div style="font-size:16px;font-weight:600;">' + typeIcon + ' ' + (d.name || d.serial || 'Unknown') + '</div>' +
-    '<div style="font-size:12px;color:var(--text2);"><span class="status-dot ' + statusDot + '"></span> ' + d.status + ' · ' + (d.zone || '') + '</div>' +
-    '<div style="font-size:12px;color:var(--text3);">Client: ' + client + (ip !== 'N/A' ? ' · IP: ' + ip : '') + '</div>' +
-    '<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">' +
-    (ip !== 'N/A' ? '<button class="btn" onclick="event.stopPropagation();pingDevice(\'' + ip + '\', \'' + (d.name || '') + '\')">Ping</button>' : '') +
-    (ip !== 'N/A' ? '<button class="btn" onclick="event.stopPropagation();openController(\'' + ip + '\')">Open</button>' : '') +
-    '<button class="btn primary" onclick="event.stopPropagation();openDeviceDetail(\'' + found.id + '\', \'' + found.type + '\')">View</button>' +
-    '</div></div>';
-  toast('Device found', 'success');
-}
 
 function updateProfile() {
   if (!currentUser) return;
-  var name = currentUser.username || 'Technician';
+  var name = getFieldTechName() || 'Technician';
   document.getElementById('profile-name').textContent = name;
   document.getElementById('profile-role').textContent = isAdmin ? 'Administrator' : (userClient ? userClient + ' Technician' : 'Field Technician');
   var avatar = document.getElementById('profile-avatar');
@@ -1726,6 +1588,13 @@ function updateProfile() {
     avatar.textContent = name.charAt(0).toUpperCase();
   }
   document.getElementById('header-tech-name').textContent = name;
+  var techCard = document.getElementById('tech-name-card');
+  if (techCard) {
+    techCard.style.display = (!isAdmin && !userClient) ? 'block' : 'none';
+    var sel = document.getElementById('tech-name-select');
+    var saved = localStorage.getItem('fieldTechName');
+    if (sel && saved) sel.value = saved;
+  }
 }
 
 function renderAll() {
@@ -1736,7 +1605,6 @@ function renderAll() {
   checkAlerts();
 }
 
-window.loginLocal = loginLocal;
 window.loginWithMicrosoft = loginWithMicrosoft;
 window.logout = logout;
 window.switchTab = switchTab;
@@ -1744,7 +1612,6 @@ window.toggleTheme = toggleTheme;
 window.toast = toast;
 window.openScanner = openScanner;
 window.closeScanner = closeScanner;
-window.lookupManual = lookupManual;
 window.renderTickets = renderTickets;
 window.renderDevices = renderDevices;
 window.setTicketFilter = setTicketFilter;
@@ -1771,6 +1638,13 @@ if (logo && savedTheme === 'jet-black') {
 
 checkLogin();
 console.log('📱 CAMS Field App v2.0 — Live API Mode');
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').then(function(reg) {
+    console.log('Service Worker registered');
+  }).catch(function(err) {
+    console.log('Service Worker failed:', err);
+  });
+}
 </script>
 </body>
 </html>
