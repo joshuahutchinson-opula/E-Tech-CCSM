@@ -503,8 +503,8 @@ app.post('/api/import/stations', authMiddleware, async (req, res) => {
   let imported = 0;
   try {
     for (const s of stations) {
-      await pool.query(`INSERT INTO stations (client_id,name,zone,status,make,model,apps,install_date,purchase_date,warranty_expiry) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-        [s.client_id||1, s.name||'', s.zone||'', s.status||'Online', s.make||'', s.model||'', s.apps||'', s.install_date||null, s.purchase_date||null, s.warranty_expiry||null]);
+      await pool.query(`INSERT INTO stations (client_id,name,zone,status,make,model,apps,ip_address,install_date,purchase_date,warranty_expiry) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+        [s.client_id||1, s.name||'', s.zone||'', s.status||'Online', s.make||'', s.model||'', s.apps||'', s.ip_address||'', s.install_date||null, s.purchase_date||null, s.warranty_expiry||null]);
       imported++;
     }
     const { clientIdForLog, clientLabel } = await describeClientsForLog(stations);
@@ -1091,6 +1091,14 @@ app.get('/api/achievements', authMiddleware, async (req, res) => {
 // CLIENTS
 // ============================================================
 
+app.get('/api/client-names', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.json([]);
+  try {
+    const result = await pool.query('SELECT id,name FROM clients');
+    res.json(result.rows);
+  } catch (err) { res.json([]); }
+});
+
 app.get('/api/clients', authMiddleware, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
   if (!dbConnected) return res.json([]);
@@ -1350,7 +1358,7 @@ app.get('/api/stations', authMiddleware, async (req, res) => {
 app.put('/api/stations/:id', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
-  const { status, name, zone, make, model, apps, install_date, purchase_date, warranty_expiry } = req.body;
+  const { status, name, zone, make, model, apps, ip_address, install_date, purchase_date, warranty_expiry } = req.body;
   try {
     const userClientId = req.user.role === 'admin' ? null : req.user.client_id;
     const asset = await pool.query('SELECT name, client_id FROM stations WHERE id=$1', [id]);
@@ -1358,9 +1366,9 @@ app.put('/api/stations/:id', authMiddleware, async (req, res) => {
     const assetClientId = asset.rows[0]?.client_id;
     const assetClient = await getClientNameById(assetClientId);
     const query = userClientId ? 
-      'UPDATE stations SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),apps=COALESCE($6,apps),install_date=$7,purchase_date=$8,warranty_expiry=$9,updated_at=CURRENT_TIMESTAMP WHERE id=$10 AND client_id=$11' :
-      'UPDATE stations SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),apps=COALESCE($6,apps),install_date=$7,purchase_date=$8,warranty_expiry=$9,updated_at=CURRENT_TIMESTAMP WHERE id=$10';
-    const params = userClientId ? [name,zone,status,make,model,apps,install_date,purchase_date,warranty_expiry,id,userClientId] : [name,zone,status,make,model,apps,install_date,purchase_date,warranty_expiry,id];
+      'UPDATE stations SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),apps=COALESCE($6,apps),ip_address=COALESCE($7,ip_address),install_date=$8,purchase_date=$9,warranty_expiry=$10,updated_at=CURRENT_TIMESTAMP WHERE id=$11 AND client_id=$12' :
+      'UPDATE stations SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),apps=COALESCE($6,apps),ip_address=COALESCE($7,ip_address),install_date=$8,purchase_date=$9,warranty_expiry=$10,updated_at=CURRENT_TIMESTAMP WHERE id=$11';
+    const params = userClientId ? [name,zone,status,make,model,apps,ip_address,install_date,purchase_date,warranty_expiry,id,userClientId] : [name,zone,status,make,model,apps,ip_address,install_date,purchase_date,warranty_expiry,id];
     await pool.query(query, params);
     await logActivity(assetClientId || userClientId || 1, req.user.username, 'Updated', `Station ${assetName} updated (${assetClient})`);
     res.json({ success: true });
