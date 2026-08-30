@@ -946,16 +946,22 @@ function hideLogin() {
 }
 
 function loginWithMicrosoft() {
-  var a = new Uint8Array(32);
-  crypto.getRandomValues(a);
-  msCodeVerifier = base64URLEncode(a);
-  localStorage.setItem('msCodeVerifier', msCodeVerifier);
-  var e = new TextEncoder(), d = e.encode(msCodeVerifier);
-  crypto.subtle.digest('SHA-256', d).then(function(h) {
-    var c = base64URLEncode(new Uint8Array(h));
-    var u = 'https://login.microsoftonline.com/' + MS_TENANT_ID + '/oauth2/v2.0/authorize?client_id=' + MS_CLIENT_ID + '&response_type=code&redirect_uri=' + encodeURIComponent(MS_REDIRECT_URI) + '&scope=' + encodeURIComponent('https://graph.microsoft.com/Mail.Read https://graph.microsoft.com/Mail.ReadWrite https://graph.microsoft.com/Files.Read.All https://graph.microsoft.com/Sites.Read.All https://graph.microsoft.com/Group.Read.All User.Read offline_access') + '&response_mode=query&code_challenge=' + c + '&code_challenge_method=S256';
-    window.location.href = u;
-  });
+  try {
+    var a = new Uint8Array(32);
+    crypto.getRandomValues(a);
+    msCodeVerifier = base64URLEncode(a);
+    localStorage.setItem('msCodeVerifier', msCodeVerifier);
+    var e = new TextEncoder(), d = e.encode(msCodeVerifier);
+    crypto.subtle.digest('SHA-256', d).then(function(h) {
+      var c = base64URLEncode(new Uint8Array(h));
+      var u = 'https://login.microsoftonline.com/' + MS_TENANT_ID + '/oauth2/v2.0/authorize?client_id=' + MS_CLIENT_ID + '&response_type=code&redirect_uri=' + encodeURIComponent(MS_REDIRECT_URI) + '&scope=' + encodeURIComponent('https://graph.microsoft.com/Mail.Read https://graph.microsoft.com/Mail.ReadWrite https://graph.microsoft.com/Files.Read.All https://graph.microsoft.com/Sites.Read.All https://graph.microsoft.com/Group.Read.All User.Read offline_access') + '&response_mode=query&code_challenge=' + c + '&code_challenge_method=S256';
+      window.location.href = u;
+    }).catch(function(err) {
+      toast('Sign-in setup failed (crypto step): ' + err.message, 'error');
+    });
+  } catch (err) {
+    toast('Sign-in failed to start: ' + err.message, 'error');
+  }
 }
 
 async function handleMicrosoftCallback(code) {
