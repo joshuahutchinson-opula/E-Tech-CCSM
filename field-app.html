@@ -911,6 +911,7 @@ var SOFTWARE = [];
 var SERVICE_REQUESTS = [];
 var AUDIT_LOG = [];
 var CLIENTS = [];
+var CLIENT_ID_TO_NAME = {};
 
 var currentTab = 'dashboard';
 var ticketFilter = 'All';
@@ -948,7 +949,7 @@ function loginWithMicrosoft() {
   var a = new Uint8Array(32);
   crypto.getRandomValues(a);
   msCodeVerifier = base64URLEncode(a);
-  sessionStorage.setItem('msCodeVerifier', msCodeVerifier);
+  localStorage.setItem('msCodeVerifier', msCodeVerifier);
   var e = new TextEncoder(), d = e.encode(msCodeVerifier);
   crypto.subtle.digest('SHA-256', d).then(function(h) {
     var c = base64URLEncode(new Uint8Array(h));
@@ -958,8 +959,8 @@ function loginWithMicrosoft() {
 }
 
 async function handleMicrosoftCallback(code) {
-  var v = msCodeVerifier || sessionStorage.getItem('msCodeVerifier') || '';
-  sessionStorage.removeItem('msCodeVerifier');
+  var v = msCodeVerifier || localStorage.getItem('msCodeVerifier') || '';
+  localStorage.removeItem('msCodeVerifier');
   try {
     var tr = await fetch('https://login.microsoftonline.com/' + MS_TENANT_ID + '/oauth2/v2.0/token', {
       method: 'POST',
@@ -1015,9 +1016,14 @@ function logout() {
 
 function checkLogin() {
   var urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('error')) {
+    var errDesc = urlParams.get('error_description') || urlParams.get('error');
+    window.history.replaceState({}, document.title, window.location.pathname);
+    toast('Microsoft sign-in error: ' + errDesc, 'error');
+  }
   if (urlParams.get('code')) {
     window.history.replaceState({}, document.title, window.location.pathname);
-    msCodeVerifier = sessionStorage.getItem('msCodeVerifier') || '';
+    msCodeVerifier = localStorage.getItem('msCodeVerifier') || '';
     handleMicrosoftCallback(urlParams.get('code'));
     return;
   }
@@ -1068,6 +1074,11 @@ async function loadData() {
     } else {
       CLIENTS = userClient ? [userClient] : [];
     }
+    try {
+      var clientNames = await apiCall('/client-names');
+      CLIENT_ID_TO_NAME = {};
+      (clientNames || []).forEach(function(c) { CLIENT_ID_TO_NAME[c.id] = c.name; });
+    } catch (e) { CLIENT_ID_TO_NAME = {}; }
     populateClientDropdown();
   } catch (err) {
     toast('Failed to load data: ' + err.message, 'error');
@@ -1078,10 +1089,10 @@ function populateClientDropdown() {
   var dropdown = document.getElementById('client-dropdown');
   if (!dropdown) return;
   var allClients = new Set();
-  CAMERAS.forEach(function(c) { if (c.zone) allClients.add(getClientFromZone(c.zone)); });
-  DOORS.forEach(function(d) { if (d.zone) allClients.add(getClientFromZone(d.zone)); });
-  SERVERS.forEach(function(s) { if (s.zone) allClients.add(getClientFromZone(s.zone)); });
-  SWITCHES.forEach(function(s) { if (s.zone) allClients.add(getClientFromZone(s.zone)); });
+  CAMERAS.forEach(function(c) { allClients.add(getClientFromId(c.client_id)); });
+  DOORS.forEach(function(d) { allClients.add(getClientFromId(d.client_id)); });
+  SERVERS.forEach(function(s) { allClients.add(getClientFromId(s.client_id)); });
+  SWITCHES.forEach(function(s) { allClients.add(getClientFromId(s.client_id)); });
   CLIENTS.forEach(function(c) { allClients.add(c); });
   var sorted = Array.from(allClients).sort();
   var html = '<option value="all">All Clients</option>';
@@ -1089,24 +1100,14 @@ function populateClientDropdown() {
   dropdown.innerHTML = html;
 }
 
-function getClientFromZone(zone) {
-  if (!zone) return 'Unknown';
-  var zones = {
-    'MOB North': 'KFTL', 'MOB South West': 'KFTL', 'MOB South East': 'KFTL',
-    'Operations Rest Bay': 'KFTL', 'Entrance': 'KFTL', 'Security': 'KFTL',
-    'Admin': 'KFTL', 'Engineering': 'KFTL', 'Data Center A': 'KFTL',
-    'Data Center B': 'KFTL', 'Admin/HR': 'KFTL', 'High Mast': 'KFTL',
-    'North Terminal Perimeter': 'KFTL', 'North Terminal Thermal': 'KFTL',
-    'Welfare': 'KFTL', 'Wharfage': 'KFTL', 'Registry Office': 'KFTL',
-    'LPR System Units': 'KFTL', 'JIEIC Warehouse': 'KFTL',
-    'Port Entry Exit': 'KFTL', 'Car Parks': 'KFTL', 'Others': 'KFTL',
-    'Crane': 'KFTL', 'Vet': 'KFTL', 'West': 'KFTL', 'South': 'KFTL',
-    'NORTH': 'KFTL', 'WEST': 'KFTL', 'SOUTH': 'KFTL', 'EAST': 'KFTL'
-  };
-  if (zones[zone]) return zones[zone];
-  var patterns = { 'Kingport': 'KFTL', 'Port': 'KFTL', 'TLF': 'KFTL', 'KWC': 'KFTL', 'Tinson Pen': 'KWL', 'Warehouse 1': 'KWL' };
-  for (var k in patterns) { if (zone.indexOf(k) !== -1) return patterns[k]; }
-  return 'Unknown';
+// Replaces the old zone-name substring guessing (e.g. treating any zone
+// containing "TLF" as KFTL) with the actual client_id already present on
+// every device row — no more guessing, and no more zones getting lumped
+// into the wrong client just because their name happened to contain a
+// matching substring.
+function getClientFromId(clientId) {
+  if (clientId == null) return 'Unknown';
+  return CLIENT_ID_TO_NAME[clientId] || 'Unknown';
 }
 
 function toggleTheme() {
@@ -1328,16 +1329,16 @@ function renderDevices() {
   var q = document.getElementById('device-search') ? document.getElementById('device-search').value.toLowerCase() : '';
   var allDevices = [];
   CAMERAS.forEach(function(c) {
-    allDevices.push({ type: 'camera', name: c.name, zone: c.zone, status: c.status, ip: c.ip_address || '', model: c.model || '', manufacturer: c.manufacturer || '', archiver: c.archiver || '', resolution: c.resolution || '', mac_address: c.mac_address || '', purchase_date: c.purchase_date || '', warranty_expiry: c.warranty || '', comments: c.comments || '', client: getClientFromZone(c.zone), id: c.id, raw: c });
+    allDevices.push({ type: 'camera', name: c.name, zone: c.zone, status: c.status, ip: c.ip_address || '', model: c.model || '', manufacturer: c.manufacturer || '', archiver: c.archiver || '', resolution: c.resolution || '', mac_address: c.mac_address || '', purchase_date: c.purchase_date || '', warranty_expiry: c.warranty || '', comments: c.comments || '', client: getClientFromId(c.client_id), id: c.id, raw: c });
   });
   DOORS.forEach(function(d) {
-    allDevices.push({ type: 'door', name: d.name, zone: d.zone || '', status: d.status, ip: d.ip_address || '', model: d.reader || '', manufacturer: d.lock_type || '', controllerType: d.controller_type || '', doorSwing: d.door_swing || '', accessType: d.access_type || '', antiPassback: d.anti_passback || '', tech: d.tech || '', purchase_date: d.install_date || '', warranty_expiry: d.warranty_expiry || '', comments: d.comments || '', client: getClientFromZone(d.zone), id: d.id, raw: d });
+    allDevices.push({ type: 'door', name: d.name, zone: d.zone || '', status: d.status, ip: d.ip_address || '', model: d.reader || '', manufacturer: d.lock_type || '', controllerType: d.controller_type || '', doorSwing: d.door_swing || '', accessType: d.access_type || '', antiPassback: d.anti_passback || '', tech: d.tech || '', purchase_date: d.install_date || '', warranty_expiry: d.warranty_expiry || '', comments: d.comments || '', client: getClientFromId(d.client_id), id: d.id, raw: d });
   });
   SERVERS.forEach(function(s) {
-    allDevices.push({ type: 'server', name: s.name || s.serial, zone: s.zone || '', status: s.status, ip: s.ip_address || '', model: s.make + ' ' + s.model, manufacturer: s.make || '', capacity: s.capacity || '', used: s.used || '', health: s.health || '', apps: s.apps || '', serial: s.serial || '', purchase_date: s.purchase_date || '', warranty_expiry: s.warranty_expiry || '', comments: s.comments || '', client: getClientFromZone(s.zone), id: s.id, raw: s });
+    allDevices.push({ type: 'server', name: s.name || s.serial, zone: s.zone || '', status: s.status, ip: s.ip_address || '', model: s.make + ' ' + s.model, manufacturer: s.make || '', capacity: s.capacity || '', used: s.used || '', health: s.health || '', apps: s.apps || '', serial: s.serial || '', purchase_date: s.purchase_date || '', warranty_expiry: s.warranty_expiry || '', comments: s.comments || '', client: getClientFromId(s.client_id), id: s.id, raw: s });
   });
   SWITCHES.forEach(function(s) {
-    allDevices.push({ type: 'switch', name: s.name, zone: s.zone || '', status: s.status || 'Online', ip: s.ip_address || '', model: s.model || '', manufacturer: s.model || '', firmware: s.firmware || '', mac: s.mac_address || s.mac || '', purchase_date: s.purchase_date || '', warranty_expiry: s.warranty_expiry || '', comments: s.comments || '', client: getClientFromZone(s.zone), id: s.id, raw: s });
+    allDevices.push({ type: 'switch', name: s.name, zone: s.zone || '', status: s.status || 'Online', ip: s.ip_address || '', model: s.model || '', manufacturer: s.model || '', firmware: s.firmware || '', mac: s.mac_address || s.mac || '', purchase_date: s.purchase_date || '', warranty_expiry: s.warranty_expiry || '', comments: s.comments || '', client: getClientFromId(s.client_id), id: s.id, raw: s });
   });
 
   var filtered = allDevices.filter(function(d) {
@@ -1393,7 +1394,7 @@ function openDeviceDetail(id, type) {
 
   var d = device;
   var typeLabel = type.charAt(0).toUpperCase() + type.slice(1);
-  var client = getClientFromZone(d.zone);
+  var client = getClientFromId(d.client_id);
   var typeIcon = type === 'camera' ? '📷' : type === 'door' ? '🚪' : type === 'server' ? '🖥' : '🔌';
 
   document.getElementById('modal-title').textContent = typeIcon + ' ' + (d.name || 'Unknown');
@@ -1453,11 +1454,6 @@ function openDeviceDetail(id, type) {
   actions.innerHTML = '';
   var ip = d.ip_address || d.ip || '';
   if (ip) {
-    var pingBtn = document.createElement('button');
-    pingBtn.className = 'btn';
-    pingBtn.textContent = 'Ping';
-    pingBtn.onclick = function() { pingDevice(ip, d.name); };
-    actions.appendChild(pingBtn);
     var openBtn = document.createElement('button');
     openBtn.className = 'btn';
     openBtn.textContent = 'Open';
@@ -1558,15 +1554,6 @@ async function resolveTicket(id) {
   }
 }
 
-function pingDevice(ip, name) {
-  if (!ip || ip === 'N/A') { toast('No IP for ' + name, 'warning'); return; }
-  toast('Pinging ' + ip + '...', 'info');
-  setTimeout(function() {
-    var online = Math.random() > 0.2;
-    toast(ip + ' is ' + (online ? 'online' : 'unreachable'), online ? 'success' : 'error');
-  }, 1200);
-}
-
 function openController(ip) {
   if (!ip || ip === 'N/A') { toast('No IP address', 'warning'); return; }
   window.open('http://' + ip, '_blank');
@@ -1621,7 +1608,6 @@ window.openTicketDetail = openTicketDetail;
 window.openDeviceDetail = openDeviceDetail;
 window.closeModal = closeModal;
 window.resolveTicket = resolveTicket;
-window.pingDevice = pingDevice;
 window.openController = openController;
 window.viewAlerts = viewAlerts;
 window.saveDeviceComment = saveDeviceComment;
