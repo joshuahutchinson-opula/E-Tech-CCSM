@@ -469,7 +469,7 @@ app.post('/api/import/switches', authMiddleware, async (req, res) => {
   let imported = 0;
   try {
     for (const sw of switches) {
-      await pool.query(`INSERT INTO switches (client_id,name,zone,status,model,firmware,ip_address,mac,purchase_date,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+      await pool.query(`INSERT INTO switches (client_id,name,zone,status,model,firmware,ip_address,mac_address,purchase_date,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
         [sw.client_id||1,sw.name||'',sw.zone||sw.location||'',sw.status||'Online',sw.model||'',sw.firmware||'',sw.ip_address||'',sw.mac||'',sw.purchase_date||null,sw.warranty_expiry||null,sw.comments||'']);
       imported++;
     }
@@ -715,7 +715,7 @@ app.put('/api/switches/:id', authMiddleware, async (req, res) => {
     const assetClientId = asset.rows[0]?.client_id;
     const assetClient = await getClientNameById(assetClientId);
     if (req.user.role === 'admin') {
-      const query = userClientId ? `UPDATE switches SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),model=COALESCE($4,model),firmware=COALESCE($5,firmware),ip_address=COALESCE($6,ip_address),mac=COALESCE($7,mac),purchase_date=$8,warranty_expiry=$9,comments=COALESCE($10,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$11 AND client_id=$12` : `UPDATE switches SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),model=COALESCE($4,model),firmware=COALESCE($5,firmware),ip_address=COALESCE($6,ip_address),mac=COALESCE($7,mac),purchase_date=$8,warranty_expiry=$9,comments=COALESCE($10,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$11`;
+      const query = userClientId ? `UPDATE switches SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),model=COALESCE($4,model),firmware=COALESCE($5,firmware),ip_address=COALESCE($6,ip_address),mac_address=COALESCE($7,mac_address),purchase_date=$8,warranty_expiry=$9,comments=COALESCE($10,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$11 AND client_id=$12` : `UPDATE switches SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),model=COALESCE($4,model),firmware=COALESCE($5,firmware),ip_address=COALESCE($6,ip_address),mac_address=COALESCE($7,mac_address),purchase_date=$8,warranty_expiry=$9,comments=COALESCE($10,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$11`;
       const params = userClientId ? [name,zone,status,model,firmware,ip_address,mac,purchase_date,warranty_expiry,comments,id,userClientId] : [name,zone,status,model,firmware,ip_address,mac,purchase_date,warranty_expiry,comments,id];
       await pool.query(query, params);
     } else {
