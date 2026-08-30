@@ -207,9 +207,9 @@ app.post('/api/auth/login', async (req, res) => {
   }
 
   if (username === process.env.KWL_USERNAME && password === process.env.KWL_PASSWORD) {
-    const token = jwt.sign({ id: 4, username: process.env.KWL_USERNAME, client_id: 2, role: 'client' }, process.env.JWT_SECRET, { expiresIn: '24h' });
-    await logActivity(2, process.env.KWL_USERNAME, 'Login', 'KWL client logged in');
-    return res.json({ token, user: { id: 4, username: process.env.KWL_USERNAME, client_id: 2, client_name: 'KWL', role: 'client', photo_url: null } });
+    const token = jwt.sign({ id: 4, username: process.env.KWL_USERNAME, client_id: 3, role: 'client' }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    await logActivity(3, process.env.KWL_USERNAME, 'Login', 'KWL client logged in');
+    return res.json({ token, user: { id: 4, username: process.env.KWL_USERNAME, client_id: 3, client_name: 'KWL', role: 'client', photo_url: null } });
   }
 
   if (username === process.env.PAJ_USERNAME && password === process.env.PAJ_PASSWORD) {
