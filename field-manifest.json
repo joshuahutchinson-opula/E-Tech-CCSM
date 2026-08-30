@@ -1,0 +1,26 @@
+{
+  "name": "CAMS Field — E-Tech Systems",
+  "short_name": "CAMS Field",
+  "description": "E-Tech Systems — Field technician app for tickets, device lookup, and on-site work.",
+  "id": "/mobile",
+  "start_url": "/mobile",
+  "display": "standalone",
+  "background_color": "#0b0d15",
+  "theme_color": "#0b0d15",
+  "orientation": "portrait",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
