@@ -238,15 +238,15 @@ app.post('/api/auth/login', async (req, res) => {
 // ============================================================
 
 app.post('/api/auth/microsoft-callback', async (req, res) => {
-  const { msId, displayName, email, msToken } = req.body;
+  const { msId, displayName, email, msToken, app: appName } = req.body;
   
   if (!email) {
     return res.status(400).json({ error: 'No email provided' });
   }
 
-  // Microsoft login is admin-only — clients always use their manual
-  // username/password. Anyone outside the E-Tech domain is rejected here
-  // rather than being silently logged in as a client.
+  // Microsoft login is restricted to E-Tech staff — clients always use their
+  // manual username/password. Anyone outside the E-Tech domain is rejected
+  // here rather than being silently logged in as a client.
   const isETechUser = email.toLowerCase().endsWith('@e-techsystemsja.com');
   if (!isETechUser) {
     return res.status(403).json({ error: 'Microsoft login is only available for E-Tech staff. Clients should use their username and password.' });
@@ -254,7 +254,11 @@ app.post('/api/auth/microsoft-callback', async (req, res) => {
 
   const emailName = email.split('@')[0] || '';
   const username = emailName.charAt(0).toUpperCase() + emailName.slice(1);
-  const role = 'admin';
+  // The field app identifies itself with app:'field' so E-Tech staff signing
+  // in there get technician-scoped access (their assigned tickets only) —
+  // not full admin access, even though they're using the same company email
+  // that would grant admin access on the main dashboard.
+  const role = appName === 'field' ? 'technician' : 'admin';
 
   let photoUrl = null;
   try {
@@ -833,7 +837,11 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
     const oldSr = current.rows[0];
     const oldAssigned = oldSr?.assigned_to;
     const oldStatus = oldSr?.status;
-    const query = clientId ? `UPDATE service_requests SET priority=$1,assigned_to=$2,status=$3,notes=$4,updated_at=CURRENT_TIMESTAMP WHERE id=$5 AND client_id=$6` : `UPDATE service_requests SET priority=$1,assigned_to=$2,status=$3,notes=$4,updated_at=CURRENT_TIMESTAMP WHERE id=$5`;
+    // COALESCE so a partial update (e.g. the field app's "Resolve" button,
+    // which only sends {status:'Resolved'}) doesn't wipe out the other
+    // fields — this route previously overwrote priority/assigned_to/notes
+    // with NULL whenever they weren't included in the request body.
+    const query = clientId ? `UPDATE service_requests SET priority=COALESCE($1,priority),assigned_to=COALESCE($2,assigned_to),status=COALESCE($3,status),notes=COALESCE($4,notes),updated_at=CURRENT_TIMESTAMP WHERE id=$5 AND client_id=$6` : `UPDATE service_requests SET priority=COALESCE($1,priority),assigned_to=COALESCE($2,assigned_to),status=COALESCE($3,status),notes=COALESCE($4,notes),updated_at=CURRENT_TIMESTAMP WHERE id=$5`;
     const params = clientId ? [priority,assigned_to,status,notes,id,clientId] : [priority,assigned_to,status,notes,id];
     await pool.query(query, params);
     
