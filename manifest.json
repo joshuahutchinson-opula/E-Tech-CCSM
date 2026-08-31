@@ -1,7 +1,7 @@
 {
-  "name": "CAMS — Client Asset Management System",
+  "name": "CAMS",
   "short_name": "CAMS",
-  "description": "E-Tech Systems — Manage client security assets, service requests, and system health from one dashboard.",
+  "description": "E-Tech Client Asset Management System — Manage client security assets, service requests, and system health from one dashboard.",
   "id": "/",
   "start_url": "/",
   "display": "standalone",
