@@ -765,6 +765,7 @@
       <span class="tech-name" id="header-tech-name">Name</span>
     </div>
     <div class="header-actions">
+      <span id="sync-pending-badge" style="display:none;background:#fbbf24;color:#1a1a1a;font-size:10px;font-weight:600;padding:3px 8px;border-radius:10px;margin-right:4px;white-space:nowrap;"></span>
       <button class="theme-btn" onclick="toggleTheme()" id="theme-toggle-btn"><i class="ti ti-sun"></i></button>
       <button class="notif-btn" onclick="viewAlerts()">
         <i class="ti ti-bell"></i>
@@ -773,6 +774,10 @@
       <button class="theme-btn" onclick="logout()" title="Logout"><i class="ti ti-logout"></i></button>
     </div>
   </header>
+
+  <div id="offline-banner" style="display:none;background:rgba(251,191,36,0.15);border-bottom:1px solid #fbbf24;color:#fbbf24;padding:8px 16px;font-size:12px;text-align:center;">
+    <i class="ti ti-cloud-off"></i> <span id="offline-banner-text">You're offline — showing saved data</span>
+  </div>
 
   <main class="field-content" id="field-content">
     <div class="tab-page active" id="tab-dashboard">
@@ -927,7 +932,18 @@ function base64URLEncode(b) {
 async function apiCall(e, o) {
   o = o || {};
   var h = { 'Content-Type': 'application/json', Authorization: 'Bearer ' + authToken };
-  var r = await fetch(API_URL + '/api' + e, Object.assign({}, o, { headers: Object.assign({}, h, o.headers || {}) }));
+  var r;
+  try {
+    r = await fetch(API_URL + '/api' + e, Object.assign({}, o, { headers: Object.assign({}, h, o.headers || {}) }));
+  } catch (networkErr) {
+    // fetch() itself throwing (not a server response) means the request never
+    // reached the server at all — genuinely offline/unreachable, as opposed to
+    // the server responding with an error. Callers use err.isOffline to tell
+    // these apart: one should queue-and-retry, the other is a real failure.
+    var offlineErr = new Error('Network unavailable');
+    offlineErr.isOffline = true;
+    throw offlineErr;
+  }
   if (!r.ok) {
     var er = await r.json().catch(function() { return { error: 'Unknown error' }; });
     throw new Error(er.error || 'API call failed: ' + r.status);
@@ -939,6 +955,152 @@ function showLogin() {
   document.getElementById('login-page').style.display = 'flex';
   document.getElementById('app-shell').classList.remove('active');
 }
+
+// ============================================================
+// OFFLINE SUPPORT
+// ============================================================
+// Two separate concerns:
+// 1. Read side: cache the last successful data fetch in localStorage, and
+//    fall back to it when a fetch fails due to a real connectivity problem
+//    (not a server error — see apiCall's isOffline distinction above).
+// 2. Write side: actions a technician takes while offline (resolving a
+//    ticket, saving a device comment) get queued locally instead of failing,
+//    applied optimistically to the in-memory data so the UI reflects the
+//    change immediately, and replayed against the real API once back online.
+function timeAgo(dateStr) {
+  if (!dateStr) return 'a while ago';
+  var diff = Date.now() - new Date(dateStr).getTime();
+  var mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return mins + ' minute' + (mins === 1 ? '' : 's') + ' ago';
+  var hrs = Math.floor(mins / 60);
+  if (hrs < 24) return hrs + ' hour' + (hrs === 1 ? '' : 's') + ' ago';
+  var days = Math.floor(hrs / 24);
+  return days + ' day' + (days === 1 ? '' : 's') + ' ago';
+}
+
+var CACHE_KEY = 'fieldapp_cache_data';
+var QUEUE_KEY = 'fieldapp_sync_queue';
+
+function cacheDataLocally() {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({
+      cameras: CAMERAS, doors: DOORS, servers: SERVERS, switches: SWITCHES,
+      software: SOFTWARE, serviceRequests: SERVICE_REQUESTS, auditLog: AUDIT_LOG,
+      cachedAt: new Date().toISOString()
+    }));
+  } catch (e) { /* storage full or unavailable — offline mode just won't have cached data */ }
+}
+
+function loadCachedData() {
+  try {
+    var raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    var cached = JSON.parse(raw);
+    CAMERAS = cached.cameras || [];
+    DOORS = cached.doors || [];
+    SERVERS = cached.servers || [];
+    SWITCHES = cached.switches || [];
+    SOFTWARE = cached.software || [];
+    SERVICE_REQUESTS = cached.serviceRequests || [];
+    AUDIT_LOG = cached.auditLog || [];
+    return cached;
+  } catch (e) { return null; }
+}
+
+function setOfflineBanner(offline, cachedAt) {
+  var banner = document.getElementById('offline-banner');
+  var text = document.getElementById('offline-banner-text');
+  if (!banner) return;
+  if (offline) {
+    banner.style.display = 'block';
+    if (text) {
+      text.textContent = cachedAt
+        ? "You're offline — showing data saved " + timeAgo(cachedAt)
+        : "You're offline — no saved data yet, connect once to load your tickets and devices";
+    }
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+function getSyncQueue() {
+  try { return JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]'); } catch (e) { return []; }
+}
+
+function saveSyncQueue(q) {
+  try { localStorage.setItem(QUEUE_KEY, JSON.stringify(q)); } catch (e) {}
+  updateSyncBadge();
+}
+
+function queueAction(action) {
+  var q = getSyncQueue();
+  action.id = Date.now() + '-' + Math.random().toString(36).slice(2);
+  action.queuedAt = new Date().toISOString();
+  q.push(action);
+  saveSyncQueue(q);
+}
+
+function updateSyncBadge() {
+  var q = getSyncQueue();
+  var badge = document.getElementById('sync-pending-badge');
+  if (!badge) return;
+  if (q.length > 0) {
+    badge.style.display = 'inline-block';
+    badge.textContent = q.length + ' pending';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+async function processSyncQueue() {
+  var q = getSyncQueue();
+  if (q.length === 0) return;
+  var remaining = [];
+  var succeeded = 0;
+  var hitOffline = false;
+  for (var i = 0; i < q.length; i++) {
+    if (hitOffline) { remaining.push(q[i]); continue; }
+    var action = q[i];
+    try {
+      if (action.type === 'resolve_ticket') {
+        await apiCall('/service-requests/' + action.ticketId, { method: 'PUT', body: JSON.stringify({ status: 'Resolved' }) });
+      } else if (action.type === 'device_comment') {
+        await apiCall(action.endpoint, { method: 'PUT', body: JSON.stringify({ comments: action.comment }) });
+      }
+      succeeded++;
+    } catch (err) {
+      if (err.isOffline) {
+        hitOffline = true;
+        remaining.push(action);
+      } else {
+        // A real server error (e.g. the ticket was deleted in the meantime) —
+        // drop it rather than retry forever, but let the technician know.
+        toast('Could not sync a queued change: ' + err.message, 'error');
+      }
+    }
+  }
+  saveSyncQueue(remaining);
+  if (succeeded > 0) {
+    toast(succeeded + ' offline change' + (succeeded > 1 ? 's' : '') + ' synced', 'success');
+    await loadData();
+    if (typeof renderDashboard === 'function') renderDashboard();
+    if (typeof renderTickets === 'function') renderTickets();
+    if (typeof renderDevices === 'function') renderDevices();
+  }
+}
+
+window.addEventListener('online', function() {
+  setOfflineBanner(false);
+  toast('Back online — syncing…', 'info');
+  loadData().then(function() { processSyncQueue(); });
+});
+window.addEventListener('offline', function() {
+  var cached = null;
+  try { cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); } catch (e) {}
+  setOfflineBanner(true, cached ? cached.cachedAt : null);
+  toast("You're offline — changes will be saved and synced once you're back online", 'warning');
+});
 
 function hideLogin() {
   document.getElementById('login-page').style.display = 'none';
@@ -1049,7 +1211,15 @@ function checkLogin() {
 }
 
 async function initApp() {
+  updateSyncBadge();
+  if (!navigator.onLine) {
+    var cached = loadCachedData();
+    setOfflineBanner(true, cached ? cached.cachedAt : null);
+  }
   await loadData();
+  if (navigator.onLine) {
+    await processSyncQueue();
+  }
   renderAll();
   updateProfile();
   checkAlerts();
@@ -1074,6 +1244,8 @@ async function loadData() {
     SOFTWARE = results[4] || [];
     SERVICE_REQUESTS = results[5] || [];
     AUDIT_LOG = results[6] || [];
+    cacheDataLocally();
+    setOfflineBanner(false);
     if (isAdmin) {
       try { var clients = await apiCall('/clients'); CLIENTS = (clients || []).map(function(c) { return c.name; }); }
       catch (e) { CLIENTS = []; }
@@ -1087,7 +1259,13 @@ async function loadData() {
     } catch (e) { CLIENT_ID_TO_NAME = {}; }
     populateClientDropdown();
   } catch (err) {
-    toast('Failed to load data: ' + err.message, 'error');
+    if (err.isOffline) {
+      var cached = loadCachedData();
+      setOfflineBanner(true, cached ? cached.cachedAt : null);
+      if (!cached) toast("You're offline and no data has been saved yet — connect once to load your tickets and devices", 'error');
+    } else {
+      toast('Failed to load data: ' + err.message, 'error');
+    }
   }
 }
 
@@ -1492,7 +1670,18 @@ async function saveDeviceComment(id, type) {
     await loadData();
     renderDevices();
   } catch (err) {
-    toast('Failed: ' + err.message, 'error');
+    if (err.isOffline) {
+      var arr = type === 'camera' ? CAMERAS : type === 'door' ? DOORS : type === 'server' ? SERVERS : SWITCHES;
+      var dev = arr.find(function(d) { return d.id === id; });
+      if (dev) dev.comments = newComment;
+      queueAction({ type: 'device_comment', endpoint: endpoint, comment: newComment, deviceId: id });
+      cacheDataLocally();
+      closeModal();
+      renderDevices();
+      toast("Offline — this comment will sync once you're back online", 'warning');
+    } else {
+      toast('Failed: ' + err.message, 'error');
+    }
   }
 }
 
@@ -1548,6 +1737,7 @@ function closeModal() {
 }
 
 async function resolveTicket(id) {
+  var r = SERVICE_REQUESTS.find(function(x) { return x.id === id; });
   try {
     await apiCall('/service-requests/' + id, { method: 'PUT', body: JSON.stringify({ status: 'Resolved' }) });
     closeModal();
@@ -1556,7 +1746,17 @@ async function resolveTicket(id) {
     renderDashboard();
     toast('Ticket resolved', 'success');
   } catch (err) {
-    toast('Failed: ' + err.message, 'error');
+    if (err.isOffline) {
+      if (r) r.status = 'Resolved';
+      queueAction({ type: 'resolve_ticket', ticketId: id, srId: r ? r.sr_id : null });
+      cacheDataLocally();
+      closeModal();
+      renderTickets();
+      renderDashboard();
+      toast("Offline — this ticket will be marked resolved once you're back online", 'warning');
+    } else {
+      toast('Failed: ' + err.message, 'error');
+    }
   }
 }
 
