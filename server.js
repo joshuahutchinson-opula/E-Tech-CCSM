@@ -238,7 +238,7 @@ app.post('/api/auth/login', async (req, res) => {
 // ============================================================
 
 app.post('/api/auth/microsoft-callback', async (req, res) => {
-  const { msId, displayName, email, msToken, app: appName } = req.body;
+  const { msId, displayName, email, msToken } = req.body;
   
   if (!email) {
     return res.status(400).json({ error: 'No email provided' });
@@ -254,11 +254,11 @@ app.post('/api/auth/microsoft-callback', async (req, res) => {
 
   const emailName = email.split('@')[0] || '';
   const username = emailName.charAt(0).toUpperCase() + emailName.slice(1);
-  // The field app identifies itself with app:'field' so E-Tech staff signing
-  // in there get technician-scoped access (their assigned tickets only) —
-  // not full admin access, even though they're using the same company email
-  // that would grant admin access on the main dashboard.
-  const role = appName === 'field' ? 'technician' : 'admin';
+  // Every E-Tech staff member gets the same access on both the main dashboard
+  // and the field app, via their own Microsoft account — no separate
+  // "technician" role tier. Simpler than branching access by which app they
+  // signed in from.
+  const role = 'admin';
 
   let photoUrl = null;
   try {
@@ -537,8 +537,8 @@ app.post('/api/import/intrusion', authMiddleware, async (req, res) => {
   let imported = 0;
   try {
     for (const i of points) {
-      await pool.query(`INSERT INTO intrusion (client_id,name,zone,status,module,sensor_type,install_date,purchase_date,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-        [i.client_id||1, i.name||'', i.zone||'', i.status||'Online', i.module||'', i.sensor_type||'', i.install_date||null, i.purchase_date||null, i.warranty_expiry||null, i.comments||'']);
+      await pool.query(`INSERT INTO intrusion (client_id,name,zone,status,module,sensor_type,ip_address,purchase_date,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+        [i.client_id||1, i.name||'', i.zone||'', i.status||'Online', i.module||'', i.sensor_type||'', i.ip_address||'', i.purchase_date||null, i.warranty_expiry||null, i.comments||'']);
       imported++;
     }
     const { clientIdForLog, clientLabel } = await describeClientsForLog(points);
@@ -761,15 +761,25 @@ app.get('/api/intrusion', authMiddleware, async (req, res) => {
 app.put('/api/intrusion/:id', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
-  const { status, comments } = req.body;
+  const { status, comments, name, zone, module, sensor_type, ip_address, purchase_date, warranty_expiry } = req.body;
   try {
     const userClientId = req.user.role === 'admin' ? null : req.user.client_id;
     const asset = await pool.query('SELECT name, client_id FROM intrusion WHERE id=$1', [id]);
     const assetName = asset.rows[0]?.name || id;
     const assetClientId = asset.rows[0]?.client_id;
     const assetClient = await getClientNameById(assetClientId);
-    const query = userClientId ? 'UPDATE intrusion SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3 AND client_id=$4' : 'UPDATE intrusion SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3';
-    const params = userClientId ? [status,comments,id,userClientId] : [status,comments,id];
+    let query, params;
+    if (req.user.role === 'admin') {
+      query = userClientId ?
+        'UPDATE intrusion SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),module=COALESCE($4,module),sensor_type=COALESCE($5,sensor_type),ip_address=COALESCE($6,ip_address),purchase_date=$7,warranty_expiry=$8,comments=COALESCE($9,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$10 AND client_id=$11' :
+        'UPDATE intrusion SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),module=COALESCE($4,module),sensor_type=COALESCE($5,sensor_type),ip_address=COALESCE($6,ip_address),purchase_date=$7,warranty_expiry=$8,comments=COALESCE($9,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$10';
+      params = userClientId ?
+        [name,zone,status,module,sensor_type,ip_address,purchase_date,warranty_expiry,comments,id,userClientId] :
+        [name,zone,status,module,sensor_type,ip_address,purchase_date,warranty_expiry,comments,id];
+    } else {
+      query = userClientId ? 'UPDATE intrusion SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3 AND client_id=$4' : 'UPDATE intrusion SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3';
+      params = userClientId ? [status,comments,id,userClientId] : [status,comments,id];
+    }
     await pool.query(query, params);
     await logActivity(assetClientId || userClientId || 1, req.user.username, 'Updated', `Intrusion point ${assetName} updated (${assetClient})`);
     res.json({ success: true });
