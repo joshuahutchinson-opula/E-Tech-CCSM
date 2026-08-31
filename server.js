@@ -824,11 +824,11 @@ app.post('/api/service-requests', authMiddleware, async (req, res) => {
     
     const msToken = req.user.msToken;
     if (msToken) {
-      const emailBody = `<h2>New Service Request: ${srId}</h2><p><strong>Client:</strong> ${client}</p><p><strong>Site:</strong> ${site}</p><p><strong>Category:</strong> ${category}</p><p><strong>Priority:</strong> ${priority}</p><p><strong>Assigned To:</strong> ${assigned_to}</p><p><strong>Subject:</strong> ${subject}</p><p><strong>Description:</strong> ${body || 'No description'}</p><hr><p>View in CAMS: <a href="https://e-tech-cams.up.railway.app">Open Dashboard</a></p>`;
+      const emailBody = `<h2>New Service Request: ${srId}</h2><p><strong>Client:</strong> ${client}</p><p><strong>Site:</strong> ${site}</p><p><strong>Category:</strong> ${category}</p><p><strong>Priority:</strong> ${priority}</p><p><strong>Assigned To:</strong> ${assigned_to}</p><p><strong>Subject:</strong> ${subject}</p><p><strong>Description:</strong> ${body || 'No description'}</p><hr><p>View in CAMS: <a href="${process.env.APP_URL || "https://e-tech-cams.up.railway.app"}">Open Dashboard</a></p>`;
       await sendEmailNotification('support@e-techsystemsja.com', `[CAMS] New SR: ${srId} — ${subject}`, emailBody, `Bearer ${msToken}`);
       
       if (assigned_to && assigned_to !== 'Unassigned' && TECH_EMAILS[assigned_to]) {
-        const techEmailBody = `<h2>You've been assigned a Service Request</h2><p><strong>SR ID:</strong> ${srId}</p><p><strong>Subject:</strong> ${subject}</p><p><strong>Client:</strong> ${client}</p><p><strong>Site:</strong> ${site}</p><p><strong>Priority:</strong> ${priority}</p><hr><p>View in CAMS: <a href="https://e-tech-cams.up.railway.app">Open Dashboard</a></p>`;
+        const techEmailBody = `<h2>You've been assigned a Service Request</h2><p><strong>SR ID:</strong> ${srId}</p><p><strong>Subject:</strong> ${subject}</p><p><strong>Client:</strong> ${client}</p><p><strong>Site:</strong> ${site}</p><p><strong>Priority:</strong> ${priority}</p><hr><p>View in CAMS: <a href="${process.env.APP_URL || "https://e-tech-cams.up.railway.app"}">Open Dashboard</a></p>`;
         await sendEmailNotification(TECH_EMAILS[assigned_to], `[CAMS] Assigned: ${srId} — ${subject}`, techEmailBody, `Bearer ${msToken}`);
       }
     }
@@ -865,7 +865,7 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
       
       const msToken = req.user.msToken;
       if (msToken && assigned_to !== 'Unassigned' && TECH_EMAILS[assigned_to]) {
-        const techEmailBody = `<h2>You've been assigned a Service Request</h2><p><strong>SR ID:</strong> ${oldSr.sr_id}</p><p><strong>Subject:</strong> ${oldSr.subject}</p><p><strong>Client:</strong> ${oldSr.client}</p><p><strong>Site:</strong> ${oldSr.site}</p><p><strong>Priority:</strong> ${priority || oldSr.priority}</p><hr><p>View in CAMS: <a href="https://e-tech-cams.up.railway.app">Open Dashboard</a></p>`;
+        const techEmailBody = `<h2>You've been assigned a Service Request</h2><p><strong>SR ID:</strong> ${oldSr.sr_id}</p><p><strong>Subject:</strong> ${oldSr.subject}</p><p><strong>Client:</strong> ${oldSr.client}</p><p><strong>Site:</strong> ${oldSr.site}</p><p><strong>Priority:</strong> ${priority || oldSr.priority}</p><hr><p>View in CAMS: <a href="${process.env.APP_URL || "https://e-tech-cams.up.railway.app"}">Open Dashboard</a></p>`;
         await sendEmailNotification(TECH_EMAILS[assigned_to], `[CAMS] Assigned: ${oldSr.sr_id} — ${oldSr.subject}`, techEmailBody, `Bearer ${msToken}`);
       }
     }
@@ -880,7 +880,7 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
       const history = await pool.query('SELECT * FROM sr_history WHERE sr_id=$1 ORDER BY created_at', [id]);
       const msToken = req.user.msToken;
       if (msToken) {
-        const reportBody = `<h2>Service Request Resolved: ${sr.sr_id}</h2><p><strong>Client:</strong> ${sr.client}</p><p><strong>Site:</strong> ${sr.site}</p><p><strong>Category:</strong> ${sr.category}</p><p><strong>Priority:</strong> ${sr.priority}</p><p><strong>Subject:</strong> ${sr.subject}</p><p><strong>Created By:</strong> ${sr.created_by}</p><p><strong>Resolved By:</strong> ${req.user.username}</p><p><strong>Resolution Notes:</strong> ${notes||'No notes'}</p><hr><h3>Timeline</h3><ul>${history.rows.map(h=>`<li>${h.time} — ${h.msg}</li>`).join('')}</ul><hr><p>View in CAMS: <a href="https://e-tech-cams.up.railway.app">Open Dashboard</a></p>`;
+        const reportBody = `<h2>Service Request Resolved: ${sr.sr_id}</h2><p><strong>Client:</strong> ${sr.client}</p><p><strong>Site:</strong> ${sr.site}</p><p><strong>Category:</strong> ${sr.category}</p><p><strong>Priority:</strong> ${sr.priority}</p><p><strong>Subject:</strong> ${sr.subject}</p><p><strong>Created By:</strong> ${sr.created_by}</p><p><strong>Resolved By:</strong> ${req.user.username}</p><p><strong>Resolution Notes:</strong> ${notes||'No notes'}</p><hr><h3>Timeline</h3><ul>${history.rows.map(h=>`<li>${h.time} — ${h.msg}</li>`).join('')}</ul><hr><p>View in CAMS: <a href="${process.env.APP_URL || "https://e-tech-cams.up.railway.app"}">Open Dashboard</a></p>`;
         await sendEmailNotification('support@e-techsystemsja.com', `[CAMS] RESOLVED: ${sr.sr_id} — ${sr.subject}`, reportBody, `Bearer ${msToken}`);
       }
     }
@@ -904,7 +904,7 @@ app.post('/api/service-requests/:id/transfer', authMiddleware, async (req, res) 
     const msToken = req.user.msToken;
     if (msToken && assigned_to !== 'Unassigned' && TECH_EMAILS[assigned_to]) {
       const sr = current.rows[0];
-      const techEmailBody = `<h2>You've been assigned a Service Request</h2><p><strong>SR ID:</strong> ${sr.sr_id}</p><p><strong>Subject:</strong> ${sr.subject}</p><p><strong>Client:</strong> ${sr.client}</p><p><strong>Site:</strong> ${sr.site}</p><p><strong>Priority:</strong> ${sr.priority}</p><hr><p>View in CAMS: <a href="https://e-tech-cams.up.railway.app">Open Dashboard</a></p>`;
+      const techEmailBody = `<h2>You've been assigned a Service Request</h2><p><strong>SR ID:</strong> ${sr.sr_id}</p><p><strong>Subject:</strong> ${sr.subject}</p><p><strong>Client:</strong> ${sr.client}</p><p><strong>Site:</strong> ${sr.site}</p><p><strong>Priority:</strong> ${sr.priority}</p><hr><p>View in CAMS: <a href="${process.env.APP_URL || "https://e-tech-cams.up.railway.app"}">Open Dashboard</a></p>`;
       await sendEmailNotification(TECH_EMAILS[assigned_to], `[CAMS] Assigned: ${sr.sr_id} — ${sr.subject}`, techEmailBody, `Bearer ${msToken}`);
     }
     
@@ -1521,7 +1521,7 @@ async function generateClientReport(clientId, clientName, clientEmail, msToken) 
       ${highPriorityOpen > 0 ? `<h3 style="color:#cc0000;">Priority Items In Progress</h3><p><strong>${highPriorityOpen} high priority SR${highPriorityOpen > 1 ? 's' : ''} remain${highPriorityOpen === 1 ? 's' : ''} open.</strong> Our team is actively working to resolve ${highPriorityOpen === 1 ? 'this request' : 'these requests'} as soon as possible.</p>` : ''}
       ${offlineAssets > 0 ? `<p><strong>${offlineAssets} assets are currently offline or defective.</strong> While not listed here, your account manager can provide a full breakdown on request.</p>` : ''}
       <p>If you have any questions or need to escalate an issue, please reply to this email or submit a new request through the CAMS portal.</p>
-      <p>View full dashboard: <a href="https://e-tech-cams.up.railway.app">Open CAMS</a></p>
+      <p>View full dashboard: <a href="${process.env.APP_URL || "https://e-tech-cams.up.railway.app"}">Open CAMS</a></p>
       <p style="color:#666;font-size:12px;">— E-Tech Systems Support</p>
     </div>`;
 
@@ -1667,7 +1667,7 @@ async function generateAdminReport(msToken) {
       ${lowestHealthClient && lowestHealth < 95 ? `<p><strong>${lowestHealthClient}</strong> has the lowest asset health at <strong>${lowestHealth}%</strong> and may need additional attention.</p>` : ''}
       ${highPriorityOpen.length > 0 ? `<h3 style="color:#cc0000;">Open High Priority SRs</h3><p>These require immediate action:</p>${hpTable}` : '<p>No high priority SRs are currently open.</p>'}
       ${activityLog.rows.length > 0 ? `<h3 style="color:#1a3a5c;">Notable Activity (Last 14 Days)</h3>${activityTable}` : ''}
-      <p>View full dashboard: <a href="https://e-tech-cams.up.railway.app">Open CAMS</a></p>
+      <p>View full dashboard: <a href="${process.env.APP_URL || "https://e-tech-cams.up.railway.app"}">Open CAMS</a></p>
     </div>`;
 
   await sendEmailNotification(ADMIN_EMAIL, `[CAMS] Bi-Weekly Admin Report — ${dateRangeStr}`, emailBody, `Bearer ${msToken}`);
