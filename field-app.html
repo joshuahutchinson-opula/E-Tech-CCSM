@@ -988,7 +988,7 @@ async function handleMicrosoftCallback(code) {
     }
     var data = await apiCall('/auth/microsoft-callback', {
       method: 'POST',
-      body: JSON.stringify({ msId: msUser.id, displayName: msUser.displayName, email: email, msToken: accessToken, app: 'field' })
+      body: JSON.stringify({ msId: msUser.id, displayName: msUser.displayName, email: email, msToken: accessToken })
     });
     authToken = data.token;
     localStorage.setItem('token', authToken);
