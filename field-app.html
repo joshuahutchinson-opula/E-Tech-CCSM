@@ -781,9 +781,6 @@
 
   <main class="field-content" id="field-content">
     <div class="tab-page active" id="tab-dashboard">
-      <div id="tech-name-banner" style="display:none;background:var(--accent-glow);border:1px solid var(--accent);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;cursor:pointer;" onclick="switchTab('profile')">
-        <i class="ti ti-user-question"></i> Tap here to set your name — "Assigned" and "Resolved" below need it to show your tickets.
-      </div>
       <div id="alert-container"></div>
       <div class="stats-row">
         <div class="stat-card"><div class="stat-number accent" id="stat-assigned">0</div><div class="stat-label">Assigned</div></div>
@@ -832,22 +829,6 @@
             <div style="font-size:12px;color:var(--text3);" id="profile-role">Field Technician</div>
           </div>
         </div>
-      </div>
-      <div class="card" id="tech-name-card" style="display:none;">
-        <div class="card-title">Who are you?</div>
-        <div style="font-size:11px;color:var(--text3);margin-bottom:8px;">Everyone shares the same technician login, so pick your name here — it's what makes "Assigned" and "Resolved" on the home screen show your tickets, not everyone's.</div>
-        <select id="tech-name-select" style="width:100%;padding:10px;border-radius:8px;background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:14px;margin-bottom:8px;">
-          <option value="">Select your name…</option>
-          <option value="Shanice">Shanice</option>
-          <option value="Roger">Roger</option>
-          <option value="Joshua">Joshua</option>
-          <option value="Rochelle">Rochelle</option>
-          <option value="Akeem">Akeem</option>
-          <option value="Marvin">Marvin</option>
-          <option value="Shavene">Shavene</option>
-          <option value="Venessa">Venessa</option>
-        </select>
-        <button class="quick-btn" style="width:100%;flex-direction:row;justify-content:center;gap:8px;min-height:44px;" onclick="saveTechName()"><i class="ti ti-check"></i> <span>Save</span></button>
       </div>
       <div class="card">
         <div class="card-title">Settings</div>
@@ -1280,7 +1261,7 @@ function populateClientDropdown() {
   CLIENTS.forEach(function(c) { allClients.add(c); });
   var sorted = Array.from(allClients).sort();
   var html = '<option value="all">All Clients</option>';
-  sorted.forEach(function(c) { html += '<option value="' + c + '">' + c + '</option>'; });
+  sorted.forEach(function(c) { html += '<option value="' + esc(c) + '">' + esc(c) + '</option>'; });
   dropdown.innerHTML = html;
 }
 
@@ -1322,7 +1303,7 @@ function toast(m, type) {
   var t = document.createElement('div');
   t.className = 'toast ' + type;
   var icons = { info: 'ti ti-info-circle', success: 'ti ti-check', warning: 'ti ti-alert-triangle', error: 'ti ti-x' };
-  t.innerHTML = '<i class="' + (icons[type] || icons.info) + '"></i> ' + m;
+  t.innerHTML = '<i class="' + (icons[type] || icons.info) + '"></i> ' + esc(m);
   c.appendChild(t);
   setTimeout(function() {
     t.style.opacity = '0';
@@ -1419,39 +1400,22 @@ function updateStats() {
   CAMERAS.forEach(function(c) { if (c.status === 'Defective' || c.status === 'Not Working' || c.status === 'No Power') alarms++; });
   DOORS.forEach(function(d) { if (d.status === 'Offline') alarms++; });
   document.getElementById('stat-alarms').textContent = alarms;
-  var banner = document.getElementById('tech-name-banner');
-  if (banner) banner.style.display = (!isAdmin && !userClient && !localStorage.getItem('fieldTechName')) ? 'block' : 'none';
 }
 
-// Everyone shares the single TECH_USERNAME login, so currentUser.username is
-// always literally "tech" for every technician — it can't be used to tell
-// them apart. This resolves the actual person from a locally-saved choice
-// (set via the Profile tab) instead, falling back to the raw username for
-// admin/client logins where this ambiguity doesn't apply.
+// Everyone signs in with their own Microsoft account (see the login flow),
+// so currentUser.username is already each person's real name — nothing
+// further to resolve here.
 function getFieldTechName() {
-  if (!isAdmin && !userClient) {
-    var saved = localStorage.getItem('fieldTechName');
-    if (saved) return saved;
-  }
   return (currentUser && currentUser.username) || '';
-}
-
-function saveTechName() {
-  var sel = document.getElementById('tech-name-select');
-  var name = sel ? sel.value : '';
-  if (!name) { toast('Please select your name', 'warning'); return; }
-  localStorage.setItem('fieldTechName', name);
-  toast('Saved — you\'re set as ' + name, 'success');
-  updateProfile();
-  updateStats();
 }
 
 function checkAlerts() {
   var container = document.getElementById('alert-container');
   if (!currentUser) return;
-  var uname = currentUser.username || '';
+  var uname = getFieldTechName();
   var urgent = SERVICE_REQUESTS.filter(function(r) {
-    return r.priority === 'High' && r.status !== 'Resolved' && (r.assigned_to || '').toLowerCase() === uname.toLowerCase();
+    if (r.priority !== 'High' || r.status === 'Resolved') return false;
+    return isAdmin ? true : (r.assigned_to || '').toLowerCase() === uname.toLowerCase();
   });
   var dot = document.getElementById('notif-dot');
   if (!urgent.length) {
@@ -1527,7 +1491,8 @@ function renderDevices() {
 
   var filtered = allDevices.filter(function(d) {
     var match = d.name.toLowerCase().indexOf(q) !== -1 || d.zone.toLowerCase().indexOf(q) !== -1 || d.ip.toLowerCase().indexOf(q) !== -1 || d.model.toLowerCase().indexOf(q) !== -1 || d.client.toLowerCase().indexOf(q) !== -1;
-    var typeMatch = deviceFilter === 'all' || deviceFilter === d.type + 's' || deviceFilter === d.type;
+    var pluralOf = { camera: 'cameras', door: 'doors', server: 'servers', switch: 'switches' };
+    var typeMatch = deviceFilter === 'all' || deviceFilter === pluralOf[d.type] || deviceFilter === d.type;
     var clientMatch = clientFilter === 'all' || d.client === clientFilter;
     return match && typeMatch && clientMatch;
   });
@@ -1542,12 +1507,12 @@ function renderDevices() {
     var statusDot = d.status === 'Online' || d.status === 'Working' || d.status === 'ONLINE' ? 'online' : d.status === 'Offline' || d.status === 'OFFLINE' ? 'offline' : 'warning';
     var typeIcon = d.type === 'camera' ? '📷' : d.type === 'door' ? '🚪' : d.type === 'server' ? '🖥' : '🔌';
     var typeLabel = d.type.charAt(0).toUpperCase() + d.type.slice(1);
-    return '<div class="device-card" onclick="openDeviceDetail(\'' + d.id + '\', \'' + d.type + '\')">' +
+    return '<div class="device-card" onclick="openDeviceDetail(' + d.id + ', \'' + d.type + '\')">' +
       '<div class="dev-left">' +
-      '<div class="dev-name">' + typeIcon + ' ' + d.name + '<span class="dev-type">' + typeLabel + '</span></div>' +
-      '<div class="dev-detail"><span class="status-dot ' + statusDot + '"></span> ' + (d.status || 'Unknown') + ' · ' + d.zone + (d.ip ? ' · ' + d.ip : '') + '</div>' +
+      '<div class="dev-name">' + typeIcon + ' ' + esc(d.name) + '<span class="dev-type">' + typeLabel + '</span></div>' +
+      '<div class="dev-detail"><span class="status-dot ' + statusDot + '"></span> ' + esc(d.status || 'Unknown') + ' · ' + esc(d.zone) + (d.ip ? ' · ' + esc(d.ip) : '') + '</div>' +
       '</div>' +
-      '<span class="dev-client">' + d.client + '</span>' +
+      '<span class="dev-client">' + esc(d.client) + '</span>' +
       '<span class="dev-arrow"><i class="ti ti-chevron-right"></i></span>' +
       '</div>';
   }).join('') + '</div>';
@@ -1585,50 +1550,50 @@ function openDeviceDetail(id, type) {
   document.getElementById('modal-sub').textContent = typeLabel + ' · ' + client + ' · ' + (d.status || '—');
 
   var body = '';
-  body += '<div class="detail-row"><span class="label">Name</span><span class="value">' + (d.name || '—') + '</span></div>';
-  body += '<div class="detail-row"><span class="label">Status</span><span class="value">' + (d.status || '—') + '</span></div>';
-  body += '<div class="detail-row"><span class="label">Client</span><span class="value">' + client + '</span></div>';
-  body += '<div class="detail-row"><span class="label">Zone</span><span class="value">' + (d.zone || '—') + '</span></div>';
+  body += '<div class="detail-row"><span class="label">Name</span><span class="value">' + esc(d.name || '—') + '</span></div>';
+  body += '<div class="detail-row"><span class="label">Status</span><span class="value">' + esc(d.status || '—') + '</span></div>';
+  body += '<div class="detail-row"><span class="label">Client</span><span class="value">' + esc(client) + '</span></div>';
+  body += '<div class="detail-row"><span class="label">Zone</span><span class="value">' + esc(d.zone || '—') + '</span></div>';
 
   if (type === 'camera') {
     body += '<div class="section-divider">Camera Details</div>';
-    body += '<div class="detail-row"><span class="label">IP Address</span><span class="value">' + (d.ip_address || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Model</span><span class="value">' + (d.model || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Manufacturer</span><span class="value">' + (d.manufacturer || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Resolution</span><span class="value">' + (d.resolution || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Archiver</span><span class="value">' + (d.archiver || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">MAC Address</span><span class="value">' + (d.mac_address || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">IP Address</span><span class="value">' + esc(d.ip_address || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Model</span><span class="value">' + esc(d.model || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Manufacturer</span><span class="value">' + esc(d.manufacturer || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Resolution</span><span class="value">' + esc(d.resolution || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Archiver</span><span class="value">' + esc(d.archiver || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">MAC Address</span><span class="value">' + esc(d.mac_address || '—') + '</span></div>';
   } else if (type === 'door') {
     body += '<div class="section-divider">Access Control Details</div>';
-    body += '<div class="detail-row"><span class="label">IP Address</span><span class="value">' + (d.ip_address || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Reader</span><span class="value">' + (d.reader || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Lock Type</span><span class="value">' + (d.lock_type || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Controller Type</span><span class="value">' + (d.controller_type || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Door Swing</span><span class="value">' + (d.door_swing || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Access Type</span><span class="value">' + (d.access_type || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">IP Address</span><span class="value">' + esc(d.ip_address || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Reader</span><span class="value">' + esc(d.reader || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Lock Type</span><span class="value">' + esc(d.lock_type || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Controller Type</span><span class="value">' + esc(d.controller_type || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Door Swing</span><span class="value">' + esc(d.door_swing || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Access Type</span><span class="value">' + esc(d.access_type || '—') + '</span></div>';
   } else if (type === 'server') {
     body += '<div class="section-divider">Server Details</div>';
-    body += '<div class="detail-row"><span class="label">Serial</span><span class="value">' + (d.serial || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Make/Model</span><span class="value">' + (d.make || '') + ' ' + (d.model || '') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Capacity</span><span class="value">' + (d.capacity || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Used</span><span class="value">' + (d.used || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Health</span><span class="value">' + (d.health || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Serial</span><span class="value">' + esc(d.serial || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Make/Model</span><span class="value">' + esc((d.make || '') + ' ' + (d.model || '')) + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Capacity</span><span class="value">' + esc(d.capacity || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Used</span><span class="value">' + esc(d.used || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Health</span><span class="value">' + esc(d.health || '—') + '</span></div>';
   } else if (type === 'switch') {
     body += '<div class="section-divider">Switch Details</div>';
-    body += '<div class="detail-row"><span class="label">IP Address</span><span class="value">' + (d.ip_address || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Model</span><span class="value">' + (d.model || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Firmware</span><span class="value">' + (d.firmware || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">MAC</span><span class="value">' + (d.mac_address || d.mac || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">IP Address</span><span class="value">' + esc(d.ip_address || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Model</span><span class="value">' + esc(d.model || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">Firmware</span><span class="value">' + esc(d.firmware || '—') + '</span></div>';
+    body += '<div class="detail-row"><span class="label">MAC</span><span class="value">' + esc(d.mac_address || d.mac || '—') + '</span></div>';
   }
 
   body += '<div class="section-divider">Purchase & Warranty</div>';
-  body += '<div class="detail-row"><span class="label">Purchase Date</span><span class="value">' + (d.purchase_date || d.install_date || '—') + '</span></div>';
+  body += '<div class="detail-row"><span class="label">Purchase Date</span><span class="value">' + esc(d.purchase_date || d.install_date || '—') + '</span></div>';
   body += '<div class="detail-row"><span class="label">Warranty</span><span class="value">' + getWarrantyDisplay(d.warranty_expiry) + '</span></div>';
 
   body += '<div class="section-divider">Comments</div>';
-  body += '<div id="device-comment-display" style="padding:6px 0;font-size:12px;color:var(--text2);">' + (d.comments || 'No comments') + '</div>';
+  body += '<div id="device-comment-display" style="padding:6px 0;font-size:12px;color:var(--text2);">' + esc(d.comments || 'No comments') + '</div>';
   body += '<div class="comment-input-wrap">';
-  body += '<input type="text" id="device-comment-input" placeholder="Add a comment..." value="' + (d.comments || '') + '">';
+  body += '<input type="text" id="device-comment-input" placeholder="Add a comment..." value="' + esc(d.comments || '') + '">';
   body += '<button class="btn" onclick="saveDeviceComment(' + d.id + ', \'' + type + '\')">Save</button>';
   body += '</div>';
 
@@ -1672,7 +1637,7 @@ async function saveDeviceComment(id, type) {
   } catch (err) {
     if (err.isOffline) {
       var arr = type === 'camera' ? CAMERAS : type === 'door' ? DOORS : type === 'server' ? SERVERS : SWITCHES;
-      var dev = arr.find(function(d) { return d.id === id; });
+      var dev = arr.find(function(d) { return d.id == id; });
       if (dev) dev.comments = newComment;
       queueAction({ type: 'device_comment', endpoint: endpoint, comment: newComment, deviceId: id });
       cacheDataLocally();
@@ -1781,13 +1746,6 @@ function updateProfile() {
     avatar.textContent = name.charAt(0).toUpperCase();
   }
   document.getElementById('header-tech-name').textContent = name;
-  var techCard = document.getElementById('tech-name-card');
-  if (techCard) {
-    techCard.style.display = (!isAdmin && !userClient) ? 'block' : 'none';
-    var sel = document.getElementById('tech-name-select');
-    var saved = localStorage.getItem('fieldTechName');
-    if (sel && saved) sel.value = saved;
-  }
 }
 
 function renderAll() {
