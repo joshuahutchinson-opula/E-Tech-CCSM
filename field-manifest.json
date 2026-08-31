@@ -1,6 +1,6 @@
 {
   "name": "CAMS Field — E-Tech Systems",
-  "short_name": "CAMS Field",
+  "short_name": "CAMS",
   "description": "E-Tech Systems — Field technician app for tickets, device lookup, and on-site work.",
   "id": "/mobile",
   "start_url": "/mobile",
