@@ -1651,13 +1651,13 @@ async function saveDeviceComment(id, type) {
 }
 
 function getWarrantyDisplay(expiryDate) {
-  if (!expiryDate) return '—';
+  if (!expiryDate) return '<span style="color:#4ade80;">N/A</span>';
   try {
     var daysLeft = Math.ceil((new Date(expiryDate) - new Date()) / (1000 * 60 * 60 * 24));
     if (daysLeft < 0) return '<span style="color:#f87171;">Expired</span>';
     if (daysLeft <= 30) return '<span style="color:#fbbf24;">' + daysLeft + 'd</span>';
     return '<span style="color:#4ade80;">' + daysLeft + 'd</span>';
-  } catch (e) { return '—'; }
+  } catch (e) { return '<span style="color:#4ade80;">N/A</span>'; }
 }
 
 function openTicketDetail(srId) {
