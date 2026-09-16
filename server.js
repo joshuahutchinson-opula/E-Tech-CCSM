@@ -8,6 +8,7 @@ const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 const fs = require('fs');
 const cron = require('node-cron');
+const crypto = require('crypto');
 require('dotenv').config();
 
 const app = express();
@@ -1801,6 +1802,29 @@ console.log('📅 Bi-weekly reports scheduled: Every other Friday at 5:00 PM Jam
 // silently grabbing the ?code= parameter for its own unrelated login flow
 // before a human ever got a chance to see or copy it. This route captures
 // the code and completes the whole exchange itself — no copy/paste needed.
+// PKCE helpers — same technique the app's own frontend login already uses,
+// just needed server-side now too since Azure AD requires it for this kind
+// of browser redirect flow.
+function base64URLEncode(buffer) {
+  return buffer.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+let pendingGraphAuthVerifier = null; // rare, single-admin, one-time action — in-memory is fine
+
+// Visit this URL directly (no manual URL-building needed) to start connecting
+// the shared mailbox. Generates the required PKCE challenge and redirects to
+// Microsoft automatically.
+app.get('/api/admin/graph-auth/start', (req, res) => {
+  const verifier = base64URLEncode(crypto.randomBytes(32));
+  pendingGraphAuthVerifier = verifier;
+  const challenge = base64URLEncode(crypto.createHash('sha256').update(verifier).digest());
+  const redirectUri = `${req.protocol}://${req.get('host')}/api/admin/graph-auth/callback`;
+  const authUrl = `https://login.microsoftonline.com/${MS_TENANT_ID_SERVER}/oauth2/v2.0/authorize?` +
+    `client_id=${MS_CLIENT_ID_SERVER}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}` +
+    `&scope=${encodeURIComponent(GRAPH_SCOPES)}&response_mode=query` +
+    `&code_challenge=${challenge}&code_challenge_method=S256`;
+  res.redirect(authUrl);
+});
+
 app.get('/api/admin/graph-auth/callback', async (req, res) => {
   const { code, error, error_description } = req.query;
   const redirectUri = `${req.protocol}://${req.get('host')}/api/admin/graph-auth/callback`;
@@ -1820,7 +1844,8 @@ app.get('/api/admin/graph-auth/callback', async (req, res) => {
         grant_type: 'authorization_code',
         code,
         redirect_uri: redirectUri,
-        scope: GRAPH_SCOPES
+        scope: GRAPH_SCOPES,
+        code_verifier: pendingGraphAuthVerifier || ''
       }),
       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
     );
