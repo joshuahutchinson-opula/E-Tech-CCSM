@@ -16,6 +16,78 @@ const port = process.env.PORT || 3000;
 // Shared mailbox
 const SHARED_MAILBOX = 'support@e-techsystemsja.com';
 
+// ============================================================
+// SELF-REFRESHING MICROSOFT GRAPH TOKEN (for the shared mailbox)
+// ============================================================
+// Graph access tokens cannot be made to never expire — that's a Microsoft
+// platform limit, not a config option. What CAN last effectively forever is
+// the refresh_token issued alongside it (as long as it's used at least once
+// every ~90 days), which this exchanges for a fresh access_token
+// automatically whenever the stored one is close to expiring. This replaces
+// the old approach of manually pasting a new MS_GRAPH_TOKEN into Railway
+// roughly every hour.
+const MS_CLIENT_ID_SERVER = 'e87a6592-aaa5-4a13-9c85-8dbc8e9cd7b2';
+const MS_TENANT_ID_SERVER = '799ae988-9d3d-40d3-bf5c-93197f5d8d44';
+const GRAPH_SCOPES = 'https://graph.microsoft.com/Mail.Send https://graph.microsoft.com/Mail.ReadWrite offline_access';
+
+async function getStoredGraphAuth() {
+  if (!dbConnected) return null;
+  try {
+    const result = await pool.query('SELECT access_token, refresh_token, expires_at FROM graph_auth WHERE id = 1');
+    return result.rows[0] || null;
+  } catch (err) { return null; }
+}
+
+async function saveGraphAuth(accessToken, refreshToken, expiresInSeconds) {
+  const expiresAt = new Date(Date.now() + expiresInSeconds * 1000);
+  await pool.query(
+    `INSERT INTO graph_auth (id, access_token, refresh_token, expires_at, updated_at)
+     VALUES (1, $1, $2, $3, CURRENT_TIMESTAMP)
+     ON CONFLICT (id) DO UPDATE SET access_token = $1, refresh_token = $2, expires_at = $3, updated_at = CURRENT_TIMESTAMP`,
+    [accessToken, refreshToken, expiresAt]
+  );
+}
+
+async function refreshGraphToken(refreshToken) {
+  const response = await axios.post(
+    `https://login.microsoftonline.com/${MS_TENANT_ID_SERVER}/oauth2/v2.0/token`,
+    new URLSearchParams({
+      client_id: MS_CLIENT_ID_SERVER,
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+      scope: GRAPH_SCOPES
+    }),
+    { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+  );
+  const { access_token, refresh_token, expires_in } = response.data;
+  // Microsoft may or may not rotate the refresh_token on each use — if it
+  // doesn't send a new one, keep using the current one.
+  await saveGraphAuth(access_token, refresh_token || refreshToken, expires_in);
+  return access_token;
+}
+
+// The one function everything else should call — always returns a valid,
+// current token (refreshing automatically if needed), or null if the shared
+// mailbox has never been connected at all.
+async function getValidGraphToken() {
+  const stored = await getStoredGraphAuth();
+  if (!stored || !stored.access_token) {
+    return process.env.MS_GRAPH_TOKEN || null; // fallback for a not-yet-migrated deployment
+  }
+  const refreshBufferMs = 5 * 60 * 1000; // refresh 5 minutes before actual expiry
+  const isExpiringSoon = new Date(stored.expires_at).getTime() - refreshBufferMs < Date.now();
+  if (isExpiringSoon && stored.refresh_token) {
+    try {
+      return await refreshGraphToken(stored.refresh_token);
+    } catch (err) {
+      console.error('❌ Failed to auto-refresh Graph token:', err.response?.data?.error_description || err.message);
+      return stored.access_token; // fall back to what we have rather than fail outright
+    }
+  }
+  return stored.access_token;
+}
+
+
 // Technician email mapping
 const TECH_EMAILS = {
   'Shanice': 'shanice@e-techsystemsja.com',
@@ -195,19 +267,19 @@ app.post('/api/auth/login', async (req, res) => {
   const { username, password } = req.body;
 
   if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
-    const token = jwt.sign({ id: 1, username: process.env.ADMIN_USERNAME, client_id: null, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    const token = jwt.sign({ id: 1, username: process.env.ADMIN_USERNAME, client_id: null, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '42d' });
     await logActivity(1, process.env.ADMIN_USERNAME, 'Login', 'Admin logged in');
     return res.json({ token, user: { id: 1, username: process.env.ADMIN_USERNAME, client_id: null, client_name: null, role: 'admin', photo_url: null } });
   }
 
   if (username === process.env.KFTL_USERNAME && password === process.env.KFTL_PASSWORD) {
-    const token = jwt.sign({ id: 2, username: process.env.KFTL_USERNAME, client_id: 1, role: 'client' }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    const token = jwt.sign({ id: 2, username: process.env.KFTL_USERNAME, client_id: 1, role: 'client' }, process.env.JWT_SECRET, { expiresIn: '42d' });
     await logActivity(1, process.env.KFTL_USERNAME, 'Login', 'KFTL client logged in');
     return res.json({ token, user: { id: 2, username: process.env.KFTL_USERNAME, client_id: 1, client_name: 'KFTL', role: 'client', photo_url: null } });
   }
 
   if (username === process.env.KWL_USERNAME && password === process.env.KWL_PASSWORD) {
-    const token = jwt.sign({ id: 4, username: process.env.KWL_USERNAME, client_id: 3, role: 'client' }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    const token = jwt.sign({ id: 4, username: process.env.KWL_USERNAME, client_id: 3, role: 'client' }, process.env.JWT_SECRET, { expiresIn: '42d' });
     await logActivity(3, process.env.KWL_USERNAME, 'Login', 'KWL client logged in');
     return res.json({ token, user: { id: 4, username: process.env.KWL_USERNAME, client_id: 3, client_name: 'KWL', role: 'client', photo_url: null } });
   }
@@ -219,13 +291,13 @@ app.post('/api/auth/login', async (req, res) => {
       clientId = result.rows[0]?.id || null;
     } catch (err) { clientId = null; }
     if (!clientId) return res.status(500).json({ error: "No client named 'PAJ' found in the clients table — create it first." });
-    const token = jwt.sign({ id: 5, username: process.env.PAJ_USERNAME, client_id: clientId, role: 'client' }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    const token = jwt.sign({ id: 5, username: process.env.PAJ_USERNAME, client_id: clientId, role: 'client' }, process.env.JWT_SECRET, { expiresIn: '42d' });
     await logActivity(clientId, process.env.PAJ_USERNAME, 'Login', 'PAJ client logged in');
     return res.json({ token, user: { id: 5, username: process.env.PAJ_USERNAME, client_id: clientId, client_name: 'PAJ', role: 'client', photo_url: null } });
   }
 
   if (username === process.env.TECH_USERNAME && password === process.env.TECH_PASSWORD) {
-    const token = jwt.sign({ id: 3, username: process.env.TECH_USERNAME, client_id: null, role: 'technician' }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    const token = jwt.sign({ id: 3, username: process.env.TECH_USERNAME, client_id: null, role: 'technician' }, process.env.JWT_SECRET, { expiresIn: '42d' });
     await logActivity(1, process.env.TECH_USERNAME, 'Login', 'Technician logged in');
     return res.json({ token, user: { id: 3, username: process.env.TECH_USERNAME, client_id: null, client_name: null, role: 'technician', photo_url: null } });
   }
@@ -276,7 +348,7 @@ app.post('/api/auth/microsoft-callback', async (req, res) => {
   const jwtToken = jwt.sign(
     { id: msId, username: username, email: email, client_id: null, role: role, msToken: msToken },
     process.env.JWT_SECRET,
-    { expiresIn: '24h' }
+    { expiresIn: '42d' }
   );
 
   await logActivity(1, username, 'Login', `Microsoft login — ${email} (${role})`);
@@ -1677,17 +1749,17 @@ async function generateAdminReport(msToken) {
 async function runBiWeeklyReports() {
   if (!dbConnected) {
     console.log('⚠️ Reports skipped: DB not connected');
-    return;
+    return { sent: false, reason: 'Database not connected' };
   }
   
   console.log('📊 Running bi-weekly reports...');
   
   try {
-    const msToken = process.env.MS_GRAPH_TOKEN;
+    const msToken = await getValidGraphToken();
     
     if (!msToken) {
-      console.log('⚠️ No MS Graph token available for reports. Skipping.');
-      return;
+      console.log('⚠️ Shared mailbox has never been connected — reports skipped. Use POST /api/admin/graph-auth/connect once to set this up.');
+      return { sent: false, reason: 'Shared mailbox not connected yet — this needs a one-time setup via /api/admin/graph-auth/connect, not just an env var' };
     }
     
     await generateAdminReport(msToken);
@@ -1698,8 +1770,10 @@ async function runBiWeeklyReports() {
     }
     
     console.log('✅ Bi-weekly reports completed');
+    return { sent: true, clientsEmailed: clients.rows.length };
   } catch (err) {
     console.error('❌ Report generation failed:', err.message);
+    return { sent: false, reason: err.message };
   }
 }
 
@@ -1713,11 +1787,52 @@ cron.schedule('0 17 * * 5', () => {
 
 console.log('📅 Bi-weekly reports scheduled: Every other Friday at 5:00 PM Jamaica time');
 
+// One-time (or re-run if it ever fully lapses) setup: exchange an
+// authorization code for the shared mailbox's first access+refresh token
+// pair. After this, the app refreshes itself automatically forever.
+app.post('/api/admin/graph-auth/connect', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  const { code, redirectUri } = req.body;
+  if (!code || !redirectUri) return res.status(400).json({ error: 'code and redirectUri are required' });
+  try {
+    const response = await axios.post(
+      `https://login.microsoftonline.com/${MS_TENANT_ID_SERVER}/oauth2/v2.0/token`,
+      new URLSearchParams({
+        client_id: MS_CLIENT_ID_SERVER,
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: redirectUri,
+        scope: GRAPH_SCOPES
+      }),
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
+    const { access_token, refresh_token, expires_in } = response.data;
+    if (!refresh_token) {
+      return res.status(400).json({ error: 'Microsoft did not return a refresh_token — make sure the authorization request included the offline_access scope' });
+    }
+    await saveGraphAuth(access_token, refresh_token, expires_in);
+    res.json({ success: true, message: 'Shared mailbox connected — reports will now refresh their own access automatically' });
+  } catch (err) {
+    res.status(500).json({ error: err.response?.data?.error_description || err.message });
+  }
+});
+
+app.get('/api/admin/graph-auth/status', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  const stored = await getStoredGraphAuth();
+  if (!stored || !stored.access_token) return res.json({ connected: false });
+  res.json({ connected: true, expiresAt: stored.expires_at, hasRefreshToken: !!stored.refresh_token });
+});
+
 app.post('/api/reports/run', authMiddleware, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
   try {
-    await runBiWeeklyReports();
-    res.json({ success: true, message: 'Reports generated and sent' });
+    const result = await runBiWeeklyReports();
+    if (result.sent) {
+      res.json({ success: true, message: `Reports actually sent to admin + ${result.clientsEmailed} client(s)` });
+    } else {
+      res.status(200).json({ success: false, message: 'Reports were NOT sent', reason: result.reason });
+    }
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
