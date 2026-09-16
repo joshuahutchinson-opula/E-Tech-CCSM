@@ -1790,6 +1790,45 @@ console.log('📅 Bi-weekly reports scheduled: Every other Friday at 5:00 PM Jam
 // One-time (or re-run if it ever fully lapses) setup: exchange an
 // authorization code for the shared mailbox's first access+refresh token
 // pair. After this, the app refreshes itself automatically forever.
+// Dedicated redirect target for connecting the shared mailbox — deliberately
+// NOT the app's homepage, since that page's own Microsoft-login code was
+// silently grabbing the ?code= parameter for its own unrelated login flow
+// before a human ever got a chance to see or copy it. This route captures
+// the code and completes the whole exchange itself — no copy/paste needed.
+app.get('/api/admin/graph-auth/callback', async (req, res) => {
+  const { code, error, error_description } = req.query;
+  const redirectUri = `${req.protocol}://${req.get('host')}/api/admin/graph-auth/callback`;
+
+  if (error) {
+    return res.send(`<html><body style="font-family:sans-serif;padding:40px;"><h2>❌ Microsoft returned an error</h2><p>${error}: ${error_description || ''}</p></body></html>`);
+  }
+  if (!code) {
+    return res.send(`<html><body style="font-family:sans-serif;padding:40px;"><h2>No authorization code received</h2></body></html>`);
+  }
+
+  try {
+    const response = await axios.post(
+      `https://login.microsoftonline.com/${MS_TENANT_ID_SERVER}/oauth2/v2.0/token`,
+      new URLSearchParams({
+        client_id: MS_CLIENT_ID_SERVER,
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: redirectUri,
+        scope: GRAPH_SCOPES
+      }),
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
+    const { access_token, refresh_token, expires_in } = response.data;
+    if (!refresh_token) {
+      return res.send(`<html><body style="font-family:sans-serif;padding:40px;"><h2>⚠️ No refresh_token returned</h2><p>Make sure the sign-in request included the offline_access scope.</p></body></html>`);
+    }
+    await saveGraphAuth(access_token, refresh_token, expires_in);
+    res.send(`<html><body style="font-family:sans-serif;padding:40px;"><h2>✅ Shared mailbox connected</h2><p>Reports will now refresh their own Graph access automatically. You can close this tab.</p></body></html>`);
+  } catch (err) {
+    res.send(`<html><body style="font-family:sans-serif;padding:40px;"><h2>❌ Token exchange failed</h2><p>${err.response?.data?.error_description || err.message}</p></body></html>`);
+  }
+});
+
 app.post('/api/admin/graph-auth/connect', authMiddleware, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
   const { code, redirectUri } = req.body;
