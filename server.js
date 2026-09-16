@@ -11,6 +11,12 @@ const cron = require('node-cron');
 require('dotenv').config();
 
 const app = express();
+// Railway (like most PaaS providers) terminates HTTPS at its proxy layer and
+// forwards plain HTTP internally to this app — without this, req.protocol
+// always reports "http" even when the actual visitor connected over https,
+// which broke the Graph OAuth redirect_uri matching (Microsoft requires an
+// exact match, and "http://..." != "https://..." as far as it's concerned).
+app.set('trust proxy', true);
 const port = process.env.PORT || 3000;
 
 // Shared mailbox
