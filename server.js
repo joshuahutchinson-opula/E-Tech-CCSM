@@ -9,6 +9,8 @@ const upload = multer({ dest: 'uploads/' });
 const fs = require('fs');
 const cron = require('node-cron');
 const crypto = require('crypto');
+const bcrypt = require('bcrypt');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const app = express();
@@ -238,25 +240,86 @@ async function sendEmailNotification(to, subject, body, authHeader) {
 // AUTH MIDDLEWARE
 // ============================================================
 
-function authMiddleware(req, res, next) {
+// client_admin/client_user tokens (the new per-person client accounts) only
+// carry {id, role} — never client_id or zone access — so that revoking a
+// sub-user's zone access, or disabling their account, takes effect on their
+// very next request instead of waiting up to 42 days for their token to
+// expire. This looks up their current client_id/zones/status fresh from the
+// DB on every request. Older token shapes (admin, technician, and the
+// shared KFTL/KWL/PAJ 'client' logins) already carry client_id directly in
+// the token and are left untouched — they don't hit the DB here at all.
+async function loadFreshUserPermissions(decoded) {
+  const result = await pool.query('SELECT id,email,client_id,role,status FROM users WHERE id=$1', [decoded.id]);
+  const u = result.rows[0];
+  if (!u || u.status !== 'active') return null;
+  const user = { id: u.id, username: u.email, email: u.email, client_id: u.client_id, role: u.role };
+  if (u.role === 'client_user') {
+    const zoneRows = await pool.query('SELECT z.name FROM user_zone_access uza JOIN zones z ON z.id=uza.zone_id WHERE uza.user_id=$1', [u.id]);
+    user.zones = zoneRows.rows.map(r => r.name);
+  }
+  return user;
+}
+
+async function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
     return res.status(401).json({ error: 'No token provided' });
   }
-  
+
   const token = authHeader.split(' ')[1];
   if (!token) {
     return res.status(401).json({ error: 'Invalid token format' });
   }
-  
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+    if (decoded.role === 'client_admin' || decoded.role === 'client_user') {
+      const user = await loadFreshUserPermissions(decoded);
+      if (!user) return res.status(401).json({ error: 'Account no longer active' });
+      req.user = user;
+    } else {
+      req.user = decoded;
+    }
     next();
   } catch (err) {
     return res.status(401).json({ error: 'Invalid token' });
   }
 }
+
+// Applied to any list endpoint whose rows carry a `zone` column — a
+// client_user only sees rows in the zone(s) their client_admin assigned
+// them. client_admin (whole-client access) and every other role are
+// unaffected, since only client_user tokens ever populate req.user.zones.
+function filterByZoneAccess(rows, req) {
+  if (req.user.role !== 'client_user' || !req.user.zones) return rows;
+  return rows.filter(r => req.user.zones.includes(r.zone));
+}
+
+// client_admin/client_user are read-only for asset data — asset CRUD stays
+// E-Tech-admin-only. Their job is people-management (My Team), not editing
+// hardware records.
+function blockAssetEdit(req, res, next) {
+  if (req.user.role === 'client_admin' || req.user.role === 'client_user') {
+    return res.status(403).json({ error: 'Read-only access — asset changes must be made by E-Tech staff.' });
+  }
+  next();
+}
+
+const loginRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many login attempts. Try again in a few minutes.' }
+});
+
+const inviteRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many attempts. Try again in a few minutes.' }
+});
 
 // ============================================================
 // HEALTH CHECK
@@ -270,7 +333,7 @@ app.get('/api/health', (req, res) => {
 // AUTH
 // ============================================================
 
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', loginRateLimit, async (req, res) => {
   const { username, password } = req.body;
 
   if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
@@ -307,6 +370,28 @@ app.post('/api/auth/login', async (req, res) => {
     const token = jwt.sign({ id: 3, username: process.env.TECH_USERNAME, client_id: null, role: 'technician' }, process.env.JWT_SECRET, { expiresIn: '42d' });
     await logActivity(1, process.env.TECH_USERNAME, 'Login', 'Technician logged in');
     return res.json({ token, user: { id: 3, username: process.env.TECH_USERNAME, client_id: null, client_name: null, role: 'technician', photo_url: null } });
+  }
+
+  // Per-person client accounts (client_admin / client_user) — email is the
+  // username here. Tried last, after all the shared env-var logins, so the
+  // existing shared KFTL/KWL/PAJ logins keep working exactly as before
+  // during the migration to real per-person accounts.
+  if (dbConnected && username && username.includes('@')) {
+    try {
+      const result = await pool.query('SELECT id,client_id,email,password_hash,role,status FROM users WHERE email=$1', [username.toLowerCase()]);
+      const u = result.rows[0];
+      if (u && u.status === 'active') {
+        const match = await bcrypt.compare(password || '', u.password_hash);
+        if (match) {
+          const token = jwt.sign({ id: u.id, role: u.role }, process.env.JWT_SECRET, { expiresIn: '42d' });
+          const clientName = await getClientNameById(u.client_id);
+          await logActivity(u.client_id, u.email, 'Login', `${u.role === 'client_admin' ? 'Client admin' : 'Client user'} logged in`);
+          return res.json({ token, user: { id: u.id, username: u.email, email: u.email, client_id: u.client_id, client_name: clientName, role: u.role, photo_url: null } });
+        }
+      }
+    } catch (err) {
+      console.error('Client account login lookup failed:', err.message);
+    }
   }
 
   res.status(401).json({ error: 'Invalid credentials' });
@@ -428,13 +513,13 @@ app.get('/api/cameras', authMiddleware, async (req, res) => {
     const query = clientId ? 'SELECT * FROM cameras WHERE client_id = $1 ORDER BY zone, name' : 'SELECT * FROM cameras ORDER BY zone, name';
     const params = clientId ? [clientId] : [];
     const result = await pool.query(query, params);
-    res.json(result.rows);
+    res.json(filterByZoneAccess(result.rows, req));
   } catch (err) {
     res.json([]);
   }
 });
 
-app.put('/api/cameras/:id', authMiddleware, async (req, res) => {
+app.put('/api/cameras/:id', authMiddleware, blockAssetEdit, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
   const { status, comments, name, zone, model, manufacturer, resolution, archiver, ip_address, mac_address, warranty, purchase_date, date_cleaned } = req.body;
@@ -461,7 +546,7 @@ app.put('/api/cameras/:id', authMiddleware, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.put('/api/cameras/:id/comment', authMiddleware, async (req, res) => {
+app.put('/api/cameras/:id/comment', authMiddleware, blockAssetEdit, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
   const { comments } = req.body;
@@ -654,11 +739,11 @@ app.get('/api/doors', authMiddleware, async (req, res) => {
     const query = clientId ? 'SELECT * FROM doors WHERE client_id=$1 ORDER BY zone,name' : 'SELECT * FROM doors ORDER BY zone,name';
     const params = clientId ? [clientId] : [];
     const result = await pool.query(query, params);
-    res.json(result.rows);
+    res.json(filterByZoneAccess(result.rows, req));
   } catch (err) { res.json([]); }
 });
 
-app.put('/api/doors/:id', authMiddleware, async (req, res) => {
+app.put('/api/doors/:id', authMiddleware, blockAssetEdit, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
   const { status, comments, name, zone, tech, reader, lock_type, ip_address, controller_type, door_swing, access_type, anti_passback, install_date, warranty_expiry } = req.body;
@@ -693,11 +778,11 @@ app.get('/api/servers', authMiddleware, async (req, res) => {
     const query = clientId ? 'SELECT * FROM servers WHERE client_id=$1 ORDER BY zone,name' : 'SELECT * FROM servers ORDER BY zone,name';
     const params = clientId ? [clientId] : [];
     const result = await pool.query(query, params);
-    res.json(result.rows);
+    res.json(filterByZoneAccess(result.rows, req));
   } catch (err) { res.json([]); }
 });
 
-app.put('/api/servers/:id', authMiddleware, async (req, res) => {
+app.put('/api/servers/:id', authMiddleware, blockAssetEdit, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
   const { status, comments, name, zone, make, model, capacity, used, health, apps, serial, purchase_date, warranty_expiry } = req.body;
@@ -736,11 +821,11 @@ app.get('/api/storage', authMiddleware, async (req, res) => {
     const query = clientId ? 'SELECT * FROM storage WHERE client_id=$1 ORDER BY zone,name' : 'SELECT * FROM storage ORDER BY zone,name';
     const params = clientId ? [clientId] : [];
     const result = await pool.query(query, params);
-    res.json(result.rows);
+    res.json(filterByZoneAccess(result.rows, req));
   } catch (err) { res.json([]); }
 });
 
-app.put('/api/storage/:id', authMiddleware, async (req, res) => {
+app.put('/api/storage/:id', authMiddleware, blockAssetEdit, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
   const { status, comments, name, zone, type, make, model, capacity, used, serial, purchase_date, warranty_expiry } = req.body;
@@ -779,11 +864,11 @@ app.get('/api/switches', authMiddleware, async (req, res) => {
     const query = clientId ? 'SELECT * FROM switches WHERE client_id=$1 ORDER BY zone,name' : 'SELECT * FROM switches ORDER BY zone,name';
     const params = clientId ? [clientId] : [];
     const result = await pool.query(query, params);
-    res.json(result.rows);
+    res.json(filterByZoneAccess(result.rows, req));
   } catch (err) { res.json([]); }
 });
 
-app.put('/api/switches/:id', authMiddleware, async (req, res) => {
+app.put('/api/switches/:id', authMiddleware, blockAssetEdit, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
   const { status, comments, name, zone, model, firmware, ip_address, mac, purchase_date, warranty_expiry } = req.body;
@@ -833,11 +918,11 @@ app.get('/api/intrusion', authMiddleware, async (req, res) => {
     const query = clientId ? 'SELECT * FROM intrusion WHERE client_id=$1 ORDER BY zone,name' : 'SELECT * FROM intrusion ORDER BY zone,name';
     const params = clientId ? [clientId] : [];
     const result = await pool.query(query, params);
-    res.json(result.rows);
+    res.json(filterByZoneAccess(result.rows, req));
   } catch (err) { res.json([]); }
 });
 
-app.put('/api/intrusion/:id', authMiddleware, async (req, res) => {
+app.put('/api/intrusion/:id', authMiddleware, blockAssetEdit, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
   const { status, comments, name, zone, module, sensor_type, ip_address, purchase_date, warranty_expiry } = req.body;
@@ -1234,6 +1319,324 @@ app.delete('/api/clients/:name', authMiddleware, async (req, res) => {
 });
 
 // ============================================================
+// CLIENT USER ACCOUNTS (per-person client logins)
+// ============================================================
+// Two roles: client_admin ("main user", sees their whole client, manages
+// their own client's sub-users via My Team) and client_user ("sub-user",
+// scoped to whichever zones their client_admin assigned them). Both are
+// read-only for asset data (see blockAssetEdit above). Requires
+// migrations/001_client_user_accounts.sql to have been run against the
+// database — the routes below will error until then.
+
+const INVITE_EXPIRY_DAYS = 7;
+
+function generateInviteToken() {
+  const token = crypto.randomBytes(32).toString('hex');
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+  return { token, tokenHash };
+}
+
+async function sendInviteEmail(email, token, clientName, role) {
+  const appUrl = process.env.APP_URL || 'https://e-tech-cams.up.railway.app';
+  const acceptLink = `${appUrl}/accept-invite.html?token=${token}`;
+  const roleLabel = role === 'client_admin' ? 'main user' : 'team member';
+  const body = `<h2>You've been invited to CAMS</h2><p>You've been added as a ${roleLabel} for <strong>${clientName}</strong> on E-Tech's Client Asset Management System.</p><p><a href="${acceptLink}">Click here to set your password and activate your account</a></p><p>This link expires in ${INVITE_EXPIRY_DAYS} days.</p><hr><p style="color:#888;font-size:12px;">If you weren't expecting this invite, you can ignore this email.</p>`;
+  const graphToken = await getValidGraphToken();
+  if (!graphToken) {
+    console.error('Cannot send invite email — no Graph token available for the shared mailbox');
+    return false;
+  }
+  return sendEmailNotification(email, `[CAMS] You're invited — ${clientName}`, body, `Bearer ${graphToken}`);
+}
+
+// ---- Zones ----
+// A real table purely to drive per-zone permissions — it does not replace
+// the free-text `zone` field already on every asset row. Membership is
+// matched by name against that field, not a foreign key.
+
+app.get('/api/zones', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.json([]);
+  const clientId = req.user.role === 'admin' ? req.query.client_id : req.user.client_id;
+  if (!clientId) return res.status(400).json({ error: 'client_id required' });
+  try {
+    const result = await pool.query('SELECT id,name FROM zones WHERE client_id=$1 ORDER BY name', [clientId]);
+    res.json(result.rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Suggests zone names already in use across a client's assets, so a
+// client_admin (or E-Tech admin) populating the zones table for the first
+// time doesn't have to retype names by hand.
+app.get('/api/zones/discover', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.json([]);
+  const clientId = req.user.role === 'admin' ? req.query.client_id : req.user.client_id;
+  if (!clientId) return res.status(400).json({ error: 'client_id required' });
+  try {
+    const tables = ['cameras', 'doors', 'servers', 'switches', 'storage', 'intrusion', 'stations', 'monitors'];
+    const unionQuery = tables.map(t => `SELECT DISTINCT zone FROM ${t} WHERE client_id=$1 AND zone IS NOT NULL AND zone <> ''`).join(' UNION ');
+    const result = await pool.query(unionQuery, [clientId]);
+    res.json(result.rows.map(r => r.zone).sort());
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/zones', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  if (req.user.role !== 'admin' && req.user.role !== 'client_admin') return res.status(403).json({ error: 'Not authorized' });
+  const clientId = req.user.role === 'admin' ? req.body.client_id : req.user.client_id;
+  const { name } = req.body;
+  if (!clientId || !name) return res.status(400).json({ error: 'client_id and name required' });
+  try {
+    const result = await pool.query('INSERT INTO zones (client_id,name) VALUES ($1,$2) ON CONFLICT (client_id,name) DO NOTHING RETURNING *', [clientId, name]);
+    res.json(result.rows[0] || { client_id: clientId, name });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/zones/:id', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  if (req.user.role !== 'admin' && req.user.role !== 'client_admin') return res.status(403).json({ error: 'Not authorized' });
+  try {
+    const zone = await pool.query('SELECT client_id FROM zones WHERE id=$1', [req.params.id]);
+    if (!zone.rows[0]) return res.status(404).json({ error: 'Zone not found' });
+    if (req.user.role === 'client_admin' && zone.rows[0].client_id !== req.user.client_id) return res.status(403).json({ error: 'Not authorized' });
+    await pool.query('DELETE FROM zones WHERE id=$1', [req.params.id]);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ---- Invite accept flow (public — the invite token itself is the credential) ----
+
+app.get('/api/auth/invite/:token', inviteRateLimit, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  const tokenHash = crypto.createHash('sha256').update(req.params.token).digest('hex');
+  try {
+    const result = await pool.query(
+      `SELECT i.email, i.role, i.expires_at, i.used_at, c.name AS client_name
+       FROM invites i JOIN clients c ON c.id = i.client_id WHERE i.token_hash=$1`,
+      [tokenHash]
+    );
+    const invite = result.rows[0];
+    if (!invite) return res.status(404).json({ error: 'Invite not found' });
+    if (invite.used_at) return res.status(410).json({ error: 'This invite has already been used' });
+    if (new Date(invite.expires_at) < new Date()) return res.status(410).json({ error: 'This invite has expired' });
+    res.json({ email: invite.email, role: invite.role, client_name: invite.client_name });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/auth/invite/:token/accept', inviteRateLimit, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  const { password } = req.body;
+  if (!password || password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
+  const tokenHash = crypto.createHash('sha256').update(req.params.token).digest('hex');
+  try {
+    const result = await pool.query('SELECT * FROM invites WHERE token_hash=$1', [tokenHash]);
+    const invite = result.rows[0];
+    if (!invite) return res.status(404).json({ error: 'Invite not found' });
+    if (invite.used_at) return res.status(410).json({ error: 'This invite has already been used' });
+    if (new Date(invite.expires_at) < new Date()) return res.status(410).json({ error: 'This invite has expired' });
+
+    const passwordHash = await bcrypt.hash(password, 12);
+    const existing = await pool.query('SELECT id FROM users WHERE email=$1', [invite.email]);
+    let userId;
+    if (existing.rows[0]) {
+      userId = existing.rows[0].id;
+      await pool.query('UPDATE users SET password_hash=$1,status=$2,role=$3,client_id=$4 WHERE id=$5', [passwordHash, 'active', invite.role, invite.client_id, userId]);
+    } else {
+      const inserted = await pool.query(
+        'INSERT INTO users (client_id,email,password_hash,role,invited_by,status) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id',
+        [invite.client_id, invite.email, passwordHash, invite.role, invite.invited_by, 'active']
+      );
+      userId = inserted.rows[0].id;
+    }
+    if (invite.role === 'client_user' && invite.zone_ids && invite.zone_ids.length) {
+      for (const zoneId of invite.zone_ids) {
+        await pool.query('INSERT INTO user_zone_access (user_id,zone_id) VALUES ($1,$2) ON CONFLICT DO NOTHING', [userId, zoneId]);
+      }
+    }
+    await pool.query('UPDATE invites SET used_at=CURRENT_TIMESTAMP WHERE id=$1', [invite.id]);
+    await logActivity(invite.client_id, invite.email, 'Account activated', `${invite.role === 'client_admin' ? 'Client admin' : 'Client user'} account activated from invite`);
+
+    const token = jwt.sign({ id: userId, role: invite.role }, process.env.JWT_SECRET, { expiresIn: '42d' });
+    const clientName = await getClientNameById(invite.client_id);
+    res.json({ token, user: { id: userId, username: invite.email, email: invite.email, client_id: invite.client_id, client_name: clientName, role: invite.role, photo_url: null } });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ---- E-Tech admin "Users" panel — cross-client ----
+
+app.get('/api/users', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  if (!dbConnected) return res.json([]);
+  try {
+    const users = await pool.query(
+      `SELECT u.id,u.email,u.role,u.status,u.created_at,u.client_id,c.name AS client_name
+       FROM users u JOIN clients c ON c.id = u.client_id ORDER BY c.name, u.email`
+    );
+    const invites = await pool.query(
+      `SELECT i.id,i.email,i.role,i.client_id,c.name AS client_name,i.expires_at,i.created_at
+       FROM invites i JOIN clients c ON c.id = i.client_id WHERE i.used_at IS NULL AND i.expires_at > CURRENT_TIMESTAMP ORDER BY c.name, i.email`
+    );
+    res.json({ users: users.rows, invites: invites.rows });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/users/invite', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  const { email, client_id, role } = req.body;
+  if (!email || !client_id || !['client_admin', 'client_user'].includes(role)) {
+    return res.status(400).json({ error: 'email, client_id, and role (client_admin|client_user) required' });
+  }
+  try {
+    const client = await pool.query('SELECT name FROM clients WHERE id=$1', [client_id]);
+    if (!client.rows[0]) return res.status(404).json({ error: 'Client not found' });
+    const { token, tokenHash } = generateInviteToken();
+    const expiresAt = new Date(Date.now() + INVITE_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
+    await pool.query(
+      'INSERT INTO invites (email,client_id,role,invited_by,token_hash,expires_at) VALUES ($1,$2,$3,$4,$5,$6)',
+      [email.toLowerCase(), client_id, role, req.user.username, tokenHash, expiresAt]
+    );
+    await sendInviteEmail(email, token, client.rows[0].name, role);
+    await logActivity(client_id, req.user.username, 'Invited', `Invited ${email} as ${role} for ${client.rows[0].name}`);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/users/:id/status', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  const { status } = req.body;
+  if (!['active', 'disabled'].includes(status)) return res.status(400).json({ error: 'status must be active or disabled' });
+  try {
+    const result = await pool.query('UPDATE users SET status=$1 WHERE id=$2 RETURNING email,client_id', [status, req.params.id]);
+    if (!result.rows[0]) return res.status(404).json({ error: 'User not found' });
+    await logActivity(result.rows[0].client_id, req.user.username, 'Updated', `${result.rows[0].email} ${status === 'disabled' ? 'disabled' : 're-enabled'}`);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/users/:id', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  try {
+    const result = await pool.query('DELETE FROM users WHERE id=$1 RETURNING email,client_id', [req.params.id]);
+    if (!result.rows[0]) return res.status(404).json({ error: 'User not found' });
+    await logActivity(result.rows[0].client_id, req.user.username, 'Deleted', `Removed user ${result.rows[0].email}`);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/invites/:id', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  try {
+    const result = await pool.query('DELETE FROM invites WHERE id=$1 AND used_at IS NULL RETURNING email,client_id', [req.params.id]);
+    if (!result.rows[0]) return res.status(404).json({ error: 'Invite not found' });
+    await logActivity(result.rows[0].client_id, req.user.username, 'Deleted', `Revoked invite for ${result.rows[0].email}`);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ---- Client-side "My Team" panel — client_admin manages their own client's sub-users ----
+
+app.get('/api/my-team', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'client_admin') return res.status(403).json({ error: 'Client admin only' });
+  if (!dbConnected) return res.json({ users: [], invites: [] });
+  try {
+    const users = await pool.query(
+      `SELECT u.id,u.email,u.role,u.status,u.created_at,
+              COALESCE(array_agg(z.name) FILTER (WHERE z.name IS NOT NULL), '{}') AS zones
+       FROM users u
+       LEFT JOIN user_zone_access uza ON uza.user_id = u.id
+       LEFT JOIN zones z ON z.id = uza.zone_id
+       WHERE u.client_id=$1 GROUP BY u.id ORDER BY u.email`,
+      [req.user.client_id]
+    );
+    const invites = await pool.query(
+      `SELECT i.id,i.email,i.role,i.expires_at,i.created_at,
+              COALESCE(array_agg(z.name) FILTER (WHERE z.name IS NOT NULL), '{}') AS zones
+       FROM invites i
+       LEFT JOIN zones z ON z.id = ANY(i.zone_ids)
+       WHERE i.client_id=$1 AND i.used_at IS NULL AND i.expires_at > CURRENT_TIMESTAMP GROUP BY i.id ORDER BY i.email`,
+      [req.user.client_id]
+    );
+    res.json({ users: users.rows, invites: invites.rows });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/my-team/invite', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'client_admin') return res.status(403).json({ error: 'Client admin only' });
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  const { email, zone_ids } = req.body;
+  if (!email) return res.status(400).json({ error: 'email required' });
+  try {
+    const { token, tokenHash } = generateInviteToken();
+    const expiresAt = new Date(Date.now() + INVITE_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
+    await pool.query(
+      'INSERT INTO invites (email,client_id,role,invited_by,token_hash,zone_ids,expires_at) VALUES ($1,$2,$3,$4,$5,$6,$7)',
+      [email.toLowerCase(), req.user.client_id, 'client_user', req.user.username, tokenHash, zone_ids || [], expiresAt]
+    );
+    const clientName = await getClientNameById(req.user.client_id);
+    await sendInviteEmail(email, token, clientName, 'client_user');
+    await logActivity(req.user.client_id, req.user.username, 'Invited', `Invited ${email} to the team`);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/my-team/:userId/zones', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'client_admin') return res.status(403).json({ error: 'Client admin only' });
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  const { zone_ids } = req.body;
+  try {
+    const target = await pool.query('SELECT email,client_id,role FROM users WHERE id=$1', [req.params.userId]);
+    if (!target.rows[0] || target.rows[0].client_id !== req.user.client_id) return res.status(404).json({ error: 'User not found' });
+    if (target.rows[0].role !== 'client_user') return res.status(400).json({ error: 'Only sub-users have zone assignments' });
+    await pool.query('DELETE FROM user_zone_access WHERE user_id=$1', [req.params.userId]);
+    for (const zoneId of (zone_ids || [])) {
+      await pool.query('INSERT INTO user_zone_access (user_id,zone_id) VALUES ($1,$2) ON CONFLICT DO NOTHING', [req.params.userId, zoneId]);
+    }
+    await logActivity(req.user.client_id, req.user.username, 'Updated', `Zone access updated for ${target.rows[0].email}`);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/my-team/:userId/status', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'client_admin') return res.status(403).json({ error: 'Client admin only' });
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  const { status } = req.body;
+  if (!['active', 'disabled'].includes(status)) return res.status(400).json({ error: 'status must be active or disabled' });
+  try {
+    const target = await pool.query('SELECT email,client_id FROM users WHERE id=$1', [req.params.userId]);
+    if (!target.rows[0] || target.rows[0].client_id !== req.user.client_id) return res.status(404).json({ error: 'User not found' });
+    await pool.query('UPDATE users SET status=$1 WHERE id=$2', [status, req.params.userId]);
+    await logActivity(req.user.client_id, req.user.username, 'Updated', `${target.rows[0].email} ${status === 'disabled' ? 'disabled' : 're-enabled'}`);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/my-team/:userId', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'client_admin') return res.status(403).json({ error: 'Client admin only' });
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  try {
+    const target = await pool.query('SELECT email,client_id FROM users WHERE id=$1', [req.params.userId]);
+    if (!target.rows[0] || target.rows[0].client_id !== req.user.client_id) return res.status(404).json({ error: 'User not found' });
+    await pool.query('DELETE FROM users WHERE id=$1', [req.params.userId]);
+    await logActivity(req.user.client_id, req.user.username, 'Deleted', `Removed ${target.rows[0].email} from the team`);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/my-team/invites/:id', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'client_admin') return res.status(403).json({ error: 'Client admin only' });
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  try {
+    const result = await pool.query('DELETE FROM invites WHERE id=$1 AND client_id=$2 AND used_at IS NULL RETURNING email', [req.params.id, req.user.client_id]);
+    if (!result.rows[0]) return res.status(404).json({ error: 'Invite not found' });
+    await logActivity(req.user.client_id, req.user.username, 'Deleted', `Revoked invite for ${result.rows[0].email}`);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ============================================================
 // ACTIVITY LOG
 // ============================================================
 
@@ -1440,11 +1843,11 @@ app.get('/api/stations', authMiddleware, async (req, res) => {
     const query = clientId ? 'SELECT * FROM stations WHERE client_id=$1 ORDER BY zone,name' : 'SELECT * FROM stations ORDER BY zone,name';
     const params = clientId ? [clientId] : [];
     const result = await pool.query(query, params);
-    res.json(result.rows);
+    res.json(filterByZoneAccess(result.rows, req));
   } catch (err) { res.json([]); }
 });
 
-app.put('/api/stations/:id', authMiddleware, async (req, res) => {
+app.put('/api/stations/:id', authMiddleware, blockAssetEdit, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
   const { status, name, zone, make, model, apps, ip_address, install_date, purchase_date, warranty_expiry } = req.body;
@@ -1471,11 +1874,11 @@ app.get('/api/monitors', authMiddleware, async (req, res) => {
     const query = clientId ? 'SELECT * FROM monitors WHERE client_id=$1 ORDER BY zone,name' : 'SELECT * FROM monitors ORDER BY zone,name';
     const params = clientId ? [clientId] : [];
     const result = await pool.query(query, params);
-    res.json(result.rows);
+    res.json(filterByZoneAccess(result.rows, req));
   } catch (err) { res.json([]); }
 });
 
-app.put('/api/monitors/:id', authMiddleware, async (req, res) => {
+app.put('/api/monitors/:id', authMiddleware, blockAssetEdit, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
   const { status, name, zone, make, model, size, install_date, purchase_date, warranty_expiry } = req.body;
