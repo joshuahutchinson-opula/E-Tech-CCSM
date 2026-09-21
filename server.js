@@ -1049,10 +1049,40 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
       const updated = await pool.query('SELECT * FROM service_requests WHERE id=$1', [id]);
       const sr = updated.rows[0];
       const history = await pool.query('SELECT * FROM sr_history WHERE sr_id=$1 ORDER BY created_at', [id]);
-      const msToken = req.user.msToken;
-      if (msToken) {
+      // Uses the self-refreshing shared-mailbox token (same as
+      // runBiWeeklyReports()) instead of req.user.msToken — the old
+      // approach silently skipped this email whenever the person who
+      // resolved the ticket didn't happen to have a live Microsoft session
+      // at that exact moment, the same failure mode that used to make the
+      // bi-weekly reports go silently missing.
+      const graphToken = await getValidGraphToken();
+      if (graphToken) {
+        const authHeader = `Bearer ${graphToken}`;
+        const resolvedSubject = `[CAMS] RESOLVED: ${sr.sr_id} — ${sr.subject}`;
         const reportBody = `<h2>Service Request Resolved: ${sr.sr_id}</h2><p><strong>Client:</strong> ${sr.client}</p><p><strong>Site:</strong> ${sr.site}</p><p><strong>Category:</strong> ${sr.category}</p><p><strong>Priority:</strong> ${sr.priority}</p><p><strong>Subject:</strong> ${sr.subject}</p><p><strong>Created By:</strong> ${sr.created_by}</p><p><strong>Resolved By:</strong> ${req.user.username}</p><p><strong>Resolution Notes:</strong> ${notes||'No notes'}</p><hr><h3>Timeline</h3><ul>${history.rows.map(h=>`<li>${h.time} — ${h.msg}</li>`).join('')}</ul><hr><p>View in CAMS: <a href="${process.env.APP_URL || "https://e-tech-cams.up.railway.app"}">Open Dashboard</a></p>`;
-        await sendEmailNotification('support@e-techsystemsja.com', `[CAMS] RESOLVED: ${sr.sr_id} — ${sr.subject}`, reportBody, `Bearer ${msToken}`);
+        await sendEmailNotification('support@e-techsystemsja.com', resolvedSubject, reportBody, authHeader);
+
+        // Also notify the SR's client's own registered users (the new
+        // per-person client accounts), one email per recipient rather than
+        // one email with everyone in To/CC. Most clients have no registered
+        // users yet (still on the shared KFTL/KWL/PAJ-style logins), so
+        // this is expected to no-op for now — that's fine, the support@
+        // email above always goes out regardless.
+        let clientUsersNotified = 0;
+        if (sr.client_id) {
+          try {
+            const clientUsers = await pool.query("SELECT email FROM users WHERE client_id=$1 AND status='active'", [sr.client_id]);
+            for (const u of clientUsers.rows) {
+              const sent = await sendEmailNotification(u.email, resolvedSubject, reportBody, authHeader);
+              if (sent) clientUsersNotified++;
+            }
+          } catch (notifyErr) {
+            console.error('Could not notify client users of SR resolution:', notifyErr.message);
+          }
+        }
+        await logActivity(logClientId, req.user.username, 'Notified', `SR ${sr.sr_id} resolution emailed to support@e-techsystemsja.com` + (clientUsersNotified > 0 ? ` and ${clientUsersNotified} registered client user${clientUsersNotified === 1 ? '' : 's'}` : ' (no registered client users to notify)'));
+      } else {
+        console.error('Cannot send SR-resolved email — no Graph token available for the shared mailbox');
       }
     }
     
