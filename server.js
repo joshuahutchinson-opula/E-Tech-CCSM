@@ -365,7 +365,7 @@ app.post('/api/auth/microsoft-callback', async (req, res) => {
     user: { id: msId, username: username, email: email, client_id: null, client_name: null, role: role, photo_url: photoUrl }
   });
 
-  console.log(`✅ Microsoft login: ${username} (${email}) — Role: ${role}, Client ID: ${clientId}`);
+  console.log(`✅ Microsoft login: ${username} (${email}) — Role: ${role}`);
 });
 
 // ============================================================
