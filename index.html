@@ -418,6 +418,8 @@ input[type="date"] { color-scheme:dark; }
 .microsoft-btn:hover { background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.2); }
 .login-divider { display:flex;align-items:center;gap:12px;margin:16px 0;color:rgba(255,255,255,0.25);font-size:11px; }
 .login-divider::before,.login-divider::after { content:'';flex:1;height:1px;background:rgba(255,255,255,0.06); }
+.login-back-link { display:flex;align-items:center;gap:6px;color:rgba(255,255,255,0.4);font-size:12px;cursor:pointer;margin-bottom:14px;text-align:left;width:fit-content; }
+.login-back-link:hover { color:rgba(255,255,255,0.7); }
 #login-error { color:#f87171;font-size:12px;margin-top:12px;display:none; }
 .login-loading { display:none;align-items:center;justify-content:center;gap:8px;color:rgba(255,255,255,0.25);font-size:13px;margin-top:12px; }
 .login-loading.active { display:flex; } .login-loading i { animation:spin 1s linear infinite; }
@@ -454,9 +456,19 @@ input[type="date"] { color-scheme:dark; }
   <div class="login-box">
     <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:8px;"><img src="/logo.png" alt="CAMS" style="height:48px;width:auto;"></div>
     <h2>CAMS</h2><p>Client Asset Management System</p>
-    <button class="microsoft-btn" onclick="loginWithMicrosoft()"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 23 23"><path fill="#f25022" d="M1 1h10v10H1z"/><path fill="#7fba00" d="M12 1h10v10H12z"/><path fill="#00a4ef" d="M1 12h10v10H1z"/><path fill="#ffb900" d="M12 12h10v10H12z"/></svg> Sign in with Microsoft</button>
-    <div class="login-divider">or</div>
-    <div style="margin-top:4px;"><input id="login-username" type="text" placeholder="Username" style="width:100%;padding:10px 14px;border-radius:8px;font-size:14px;font-family:var(--font);margin-bottom:10px;"><input id="login-password" type="password" placeholder="Password" style="width:100%;padding:10px 14px;border-radius:8px;font-size:14px;font-family:var(--font);margin-bottom:12px;"><button onclick="loginLocal()" style="width:100%;padding:10px;border-radius:8px;border:none;background:linear-gradient(135deg,#4f8cf7,#00d4ff);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font);">Sign in</button></div>
+    <div id="login-selector">
+      <button class="microsoft-btn" onclick="showClientLogin()"><i class="ti ti-users"></i> Client Login</button>
+      <div style="height:10px;"></div>
+      <button class="microsoft-btn" onclick="showStaffLogin()"><i class="ti ti-building"></i> E-Tech Staff</button>
+    </div>
+    <div id="login-client-form" style="display:none;">
+      <div class="login-back-link" onclick="showLoginSelector()"><i class="ti ti-arrow-left"></i> Back</div>
+      <div style="margin-top:4px;"><input id="login-username" type="text" placeholder="Username or Email" style="width:100%;padding:10px 14px;border-radius:8px;font-size:14px;font-family:var(--font);margin-bottom:10px;"><input id="login-password" type="password" placeholder="Password" style="width:100%;padding:10px 14px;border-radius:8px;font-size:14px;font-family:var(--font);margin-bottom:12px;"><button onclick="loginLocal()" style="width:100%;padding:10px;border-radius:8px;border:none;background:linear-gradient(135deg,#4f8cf7,#00d4ff);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font);">Sign in</button></div>
+    </div>
+    <div id="login-staff-form" style="display:none;">
+      <div class="login-back-link" onclick="showLoginSelector()"><i class="ti ti-arrow-left"></i> Back</div>
+      <button class="microsoft-btn" onclick="loginWithMicrosoft()"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 23 23"><path fill="#f25022" d="M1 1h10v10H1z"/><path fill="#7fba00" d="M12 1h10v10H12z"/><path fill="#00a4ef" d="M1 12h10v10H1z"/><path fill="#ffb900" d="M12 12h10v10H12z"/></svg> Sign in with Microsoft</button>
+    </div>
     <div id="login-error"></div><div class="login-loading" id="login-loading"><i class="ti ti-loader"></i> Signing in...</div>
   </div>
 </div>
@@ -772,8 +784,11 @@ function searchHardwareForSR(){var q=(document.getElementById('sr-hw-search').va
 function addHardwareToSR(type,id,name){if(srSelectedHardware.some(function(h){return h.type===type&&h.id===id;}))return;srSelectedHardware.push({type:type,id:id,name:name});renderSelectedHardware();document.getElementById('sr-hw-search').value='';document.getElementById('sr-hw-results').innerHTML='';}
 function removeHardwareFromSR(type,id){srSelectedHardware=srSelectedHardware.filter(function(h){return!(h.type===type&&h.id===id);});renderSelectedHardware();}
 function renderSelectedHardware(){var c=document.getElementById('sr-hw-selected');if(!c)return;c.innerHTML=srSelectedHardware.map(function(h){var i=h.type==='camera'?'📷':h.type==='door'?'🚪':h.type==='server'?'🖥':h.type==='switch'?'🔀':'🔒';return'<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:6px;font-size:11px;color:var(--text-primary);cursor:pointer;" onclick="navigateToAsset(\''+h.type+'\',\''+h.name.replace(/'/g,"\\'")+'\')">'+i+' '+h.name+' <span style="cursor:pointer;color:var(--text-muted);" onclick="event.stopPropagation();removeHardwareFromSR(\''+h.type+'\','+h.id+')">×</span></span>';}).join('');}
-function showLogin(){document.getElementById('login-page').style.display='flex';document.getElementById('app').style.display='none';initParticles();}
+function showLogin(){document.getElementById('login-page').style.display='flex';document.getElementById('app').style.display='none';showLoginSelector();initParticles();}
 function hideLogin(){document.getElementById('login-page').style.display='none';}
+function showLoginSelector(){document.getElementById('login-selector').style.display='';document.getElementById('login-client-form').style.display='none';document.getElementById('login-staff-form').style.display='none';document.getElementById('login-error').style.display='none';}
+function showClientLogin(){document.getElementById('login-selector').style.display='none';document.getElementById('login-client-form').style.display='';document.getElementById('login-staff-form').style.display='none';document.getElementById('login-error').style.display='none';}
+function showStaffLogin(){document.getElementById('login-selector').style.display='none';document.getElementById('login-client-form').style.display='none';document.getElementById('login-staff-form').style.display='';document.getElementById('login-error').style.display='none';}
 function initParticles(){var el=document.getElementById('particles-js');if(el&&typeof particlesJS!=='undefined'){el.innerHTML='';particlesJS.load('particles-js','particlesjs-config.json',function(){console.log('Particles loaded');});}}
 function loginWithMicrosoft(){var a=new Uint8Array(32);crypto.getRandomValues(a);var v=base64URLEncode(a);sessionStorage.setItem('msCodeVerifier',v);var e=new TextEncoder(),d=e.encode(v);crypto.subtle.digest('SHA-256',d).then(function(h){var c=base64URLEncode(new Uint8Array(h)),u='https://login.microsoftonline.com/'+MS_TENANT_ID+'/oauth2/v2.0/authorize?client_id='+MS_CLIENT_ID+'&response_type=code&redirect_uri='+encodeURIComponent(MS_REDIRECT_URI)+'&scope='+encodeURIComponent('https://graph.microsoft.com/Mail.Read https://graph.microsoft.com/Mail.ReadWrite https://graph.microsoft.com/Files.Read.All https://graph.microsoft.com/Sites.Read.All https://graph.microsoft.com/Group.Read.All User.Read offline_access')+'&response_mode=query&code_challenge='+c+'&code_challenge_method=S256';window.location.href=u;});}
 function applyLoginSession(user){
