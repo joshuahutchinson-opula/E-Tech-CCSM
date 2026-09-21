@@ -437,6 +437,13 @@ app.post('/api/auth/microsoft-callback', async (req, res) => {
     console.log('No profile photo available for ' + email + ' — Graph error: ' + (photoErr.response?.status || '') + ' ' + (photoErr.response?.data?.error?.message || photoErr.message));
   }
 
+  // KNOWN LIMITATION: msToken (a live Microsoft Graph access token — mailbox
+  // read/send included, see GRAPH_SCOPES) rides inside the CAMS JWT itself.
+  // Anyone who gets hold of a leaked CAMS token doesn't just get CAMS access,
+  // they get that staff member's mailbox too. Fixing this means moving the
+  // Graph token to server-side storage keyed by user id (like graph_auth
+  // already does for the shared mailbox) instead of embedding it — bigger
+  // change than fits here, not done in this pass.
   const jwtToken = jwt.sign(
     { id: msId, username: username, email: email, client_id: null, role: role, msToken: msToken },
     process.env.JWT_SECRET,

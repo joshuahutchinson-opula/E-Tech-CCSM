@@ -797,7 +797,10 @@
         <button class="filter-pill active" onclick="setTicketFilter('All')">All</button>
         <button class="filter-pill" onclick="setTicketFilter('Open')">Open</button>
         <button class="filter-pill" onclick="setTicketFilter('In Progress')">In Progress</button>
+        <button class="filter-pill" onclick="setTicketFilter('On-Site Review')">On-Site Review</button>
+        <button class="filter-pill" onclick="setTicketFilter('Pending')">Pending</button>
         <button class="filter-pill" onclick="setTicketFilter('Resolved')">Resolved</button>
+        <button class="filter-pill" onclick="setTicketFilter('Retracted')">Retracted</button>
       </div>
       <div id="ticket-list"></div>
     </div>
@@ -1034,6 +1037,14 @@ function updateSyncBadge() {
   }
 }
 
+// KNOWN LIMITATION: no conflict detection. If the same ticket/device is
+// edited offline on two devices (or edited on the server while one is
+// offline), whichever queued action syncs last silently overwrites the
+// other — there's no check here that the record hasn't changed since the
+// action was queued. Fine for this app's normal single-technician-per-job
+// usage; would need each queued action to capture the record's state (or
+// an updated_at) at queue time and compare it against the server's current
+// state before applying, which isn't in scope for now.
 async function processSyncQueue() {
   var q = getSyncQueue();
   if (q.length === 0) return;
