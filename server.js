@@ -1050,11 +1050,11 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
       const sr = updated.rows[0];
       const history = await pool.query('SELECT * FROM sr_history WHERE sr_id=$1 ORDER BY created_at', [id]);
       // Uses the self-refreshing shared-mailbox token (same as
-      // runBiWeeklyReports()) instead of req.user.msToken — the old
+      // runMonthlyReports()) instead of req.user.msToken — the old
       // approach silently skipped this email whenever the person who
       // resolved the ticket didn't happen to have a live Microsoft session
       // at that exact moment, the same failure mode that used to make the
-      // bi-weekly reports go silently missing.
+      // monthly reports go silently missing.
       const graphToken = await getValidGraphToken();
       if (graphToken) {
         const authHeader = `Bearer ${graphToken}`;
@@ -1709,7 +1709,7 @@ app.post('/api/activity-log', authMiddleware, async (req, res) => {
 // Shared mailbox access requires the current user to have personally signed in
 // via Microsoft SSO (req.user.msToken) — by design, only Microsoft-login users
 // can see the support inbox. No app-level fallback token here on purpose.
-// (The scheduled bi-weekly reports are separate and still use MS_GRAPH_TOKEN.)
+// (The scheduled monthly reports are separate and still use MS_GRAPH_TOKEN.)
 function getGraphToken(req) {
   return req.user.msToken || null;
 }
@@ -1936,32 +1936,17 @@ app.put('/api/monitors/:id', authMiddleware, blockAssetEdit, async (req, res) =>
 });
 
 // ============================================================
-// BI-WEEKLY REPORTS
+// MONTHLY REPORTS
 // ============================================================
 
-function getWeekRange() {
+// Covers the previous full calendar month — e.g. a report sent on the 1st
+// of February covers all of January. Date's month arithmetic handles the
+// January/December year rollover on its own.
+function getMonthRange() {
   const now = new Date();
-  const dayOfWeek = now.getDay();
-  const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - daysToMonday - 14);
-  monday.setHours(0, 0, 0, 0);
-  const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 13);
-  sunday.setHours(23, 59, 59, 999);
-  return { start: monday, end: sunday };
-}
-
-// Deterministic "is this a report week" check based on the calendar date itself,
-// rather than an in-memory counter. The old approach (reportWeekCounter++, check
-// even/odd) reset to 0 every time the server restarted/redeployed, so which
-// Fridays actually sent reports was effectively random rather than a real
-// every-other-week cadence.
-const REPORT_SCHEDULE_EPOCH = new Date('2026-01-02T00:00:00Z'); // fixed reference Friday
-function isReportWeek(date = new Date()) {
-  const msPerWeek = 7 * 24 * 60 * 60 * 1000;
-  const weeksSinceEpoch = Math.floor((date.getTime() - REPORT_SCHEDULE_EPOCH.getTime()) / msPerWeek);
-  return ((weeksSinceEpoch % 2) + 2) % 2 === 0;
+  const start = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
+  const end = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+  return { start, end };
 }
 
 function formatDateRange(start, end) {
@@ -1970,7 +1955,7 @@ function formatDateRange(start, end) {
 }
 
 async function generateClientReport(clientId, clientName, clientEmail, msToken) {
-  const { start, end } = getWeekRange();
+  const { start, end } = getMonthRange();
   const dateRangeStr = formatDateRange(start, end);
 
   const cameras = await pool.query('SELECT status FROM cameras WHERE client_id=$1', [clientId]);
@@ -2016,14 +2001,14 @@ async function generateClientReport(clientId, clientName, clientEmail, msToken) 
 
   const emailBody = `
     <div style="font-family:Arial,sans-serif;max-width:650px;margin:0 auto;">
-      <h2 style="color:#1a3a5c;">CAMS Bi-Weekly Report</h2>
+      <h2 style="color:#1a3a5c;">CAMS Monthly Report</h2>
       <p><strong>Client:</strong> ${clientName}</p>
       <p><strong>Period:</strong> ${dateRangeStr}</p>
       <hr>
       <p>Dear ${clientName} Team,</p>
-      <p>Here is your bi-weekly asset management summary from E-Tech Systems.</p>
+      <p>Here is your monthly asset management summary from E-Tech Systems.</p>
       <h3 style="color:#1a3a5c;">Overview</h3>
-      <p>Over the past two weeks, <strong>${srsCreated} service requests</strong> were raised for your sites and <strong>${srsResolved} were resolved</strong>. You currently have <strong>${openSRs.rows.length} open requests</strong>, <strong>${highPriorityOpen} of which ${highPriorityOpen === 1 ? 'is' : 'are'} high priority</strong>${highPriorityOpen > 0 ? ' and require immediate attention' : ''}.</p>
+      <p>Over the past month, <strong>${srsCreated} service requests</strong> were raised for your sites and <strong>${srsResolved} were resolved</strong>. You currently have <strong>${openSRs.rows.length} open requests</strong>, <strong>${highPriorityOpen} of which ${highPriorityOpen === 1 ? 'is' : 'are'} high priority</strong>${highPriorityOpen > 0 ? ' and require immediate attention' : ''}.</p>
       <p>Your asset health stands at <strong>${healthPct}%</strong> with <strong>${onlineAssets} of ${totalAssets} assets</strong> online and healthy. <strong>${offlineAssets} assets</strong> are currently offline or defective and may need servicing.</p>
       <h3 style="color:#1a3a5c;">Key Figures</h3>
       <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;">
@@ -2045,13 +2030,13 @@ async function generateClientReport(clientId, clientName, clientEmail, msToken) 
     </div>`;
 
   if (clientEmail) {
-    await sendEmailNotification(clientEmail, `[CAMS] Bi-Weekly Report — ${clientName} — ${dateRangeStr}`, emailBody, `Bearer ${msToken}`);
+    await sendEmailNotification(clientEmail, `[CAMS] Monthly Report — ${clientName} — ${dateRangeStr}`, emailBody, `Bearer ${msToken}`);
     console.log(`✅ Client report sent to ${clientName} (${clientEmail})`);
   }
 }
 
 async function generateAdminReport(msToken) {
-  const { start, end } = getWeekRange();
+  const { start, end } = getMonthRange();
   const dateRangeStr = formatDateRange(start, end);
 
   const clientsResult = await pool.query('SELECT id,name,email FROM clients');
@@ -2161,11 +2146,11 @@ async function generateAdminReport(msToken) {
 
   const emailBody = `
     <div style="font-family:Arial,sans-serif;max-width:650px;margin:0 auto;">
-      <h2 style="color:#1a3a5c;">CAMS Bi-Weekly Admin Report</h2>
+      <h2 style="color:#1a3a5c;">CAMS Monthly Admin Report</h2>
       <p><strong>Period:</strong> ${dateRangeStr}</p>
       <hr>
       <h3 style="color:#1a3a5c;">Executive Summary</h3>
-      <p>Across all <strong>${clients.length} clients</strong>, <strong>${srsCreated} service requests</strong> were created in the last two weeks and <strong>${srsResolved} were resolved</strong>. There are currently <strong>${openSRs.rows.length} open requests</strong>, of which <strong>${highPriorityOpen.length} ${highPriorityOpen.length === 1 ? 'is' : 'are'} high priority</strong> and require immediate action.</p>
+      <p>Across all <strong>${clients.length} clients</strong>, <strong>${srsCreated} service requests</strong> were created in the last month and <strong>${srsResolved} were resolved</strong>. There are currently <strong>${openSRs.rows.length} open requests</strong>, of which <strong>${highPriorityOpen.length} ${highPriorityOpen.length === 1 ? 'is' : 'are'} high priority</strong> and require immediate action.</p>
       <p>Overall asset health across all clients is <strong>${healthPct}%</strong> — <strong>${onlineAssets} of ${totalAssets} assets</strong> are online and healthy. <strong>${offlineAssets} assets</strong> are currently offline or defective.</p>
       <h3 style="color:#1a3a5c;">Overall Figures</h3>
       <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;">
@@ -2185,21 +2170,21 @@ async function generateAdminReport(msToken) {
       </table>
       ${lowestHealthClient && lowestHealth < 95 ? `<p><strong>${lowestHealthClient}</strong> has the lowest asset health at <strong>${lowestHealth}%</strong> and may need additional attention.</p>` : ''}
       ${highPriorityOpen.length > 0 ? `<h3 style="color:#cc0000;">Open High Priority SRs</h3><p>These require immediate action:</p>${hpTable}` : '<p>No high priority SRs are currently open.</p>'}
-      ${activityLog.rows.length > 0 ? `<h3 style="color:#1a3a5c;">Notable Activity (Last 14 Days)</h3>${activityTable}` : ''}
+      ${activityLog.rows.length > 0 ? `<h3 style="color:#1a3a5c;">Notable Activity (Last Month)</h3>${activityTable}` : ''}
       <p>View full dashboard: <a href="${process.env.APP_URL || "https://e-tech-cams.up.railway.app"}">Open CAMS</a></p>
     </div>`;
 
-  await sendEmailNotification(ADMIN_EMAIL, `[CAMS] Bi-Weekly Admin Report — ${dateRangeStr}`, emailBody, `Bearer ${msToken}`);
+  await sendEmailNotification(ADMIN_EMAIL, `[CAMS] Monthly Admin Report — ${dateRangeStr}`, emailBody, `Bearer ${msToken}`);
   console.log(`✅ Admin report sent to ${ADMIN_EMAIL}`);
 }
 
-async function runBiWeeklyReports() {
+async function runMonthlyReports() {
   if (!dbConnected) {
     console.log('⚠️ Reports skipped: DB not connected');
     return { sent: false, reason: 'Database not connected' };
   }
-  
-  console.log('📊 Running bi-weekly reports...');
+
+  console.log('📊 Running monthly reports...');
   
   try {
     const msToken = await getValidGraphToken();
@@ -2216,7 +2201,7 @@ async function runBiWeeklyReports() {
       await generateClientReport(client.id, client.name, client.email, msToken);
     }
     
-    console.log('✅ Bi-weekly reports completed');
+    console.log('✅ Monthly reports completed');
     return { sent: true, clientsEmailed: clients.rows.length };
   } catch (err) {
     console.error('❌ Report generation failed:', err.message);
@@ -2224,15 +2209,15 @@ async function runBiWeeklyReports() {
   }
 }
 
-cron.schedule('0 17 * * 5', () => {
-  if (isReportWeek()) {
-    runBiWeeklyReports();
-  }
+// 5:00 PM Jamaica time on the 1st of every month — by then the previous
+// calendar month (the period getMonthRange() reports on) has fully ended.
+cron.schedule('0 17 1 * *', () => {
+  runMonthlyReports();
 }, {
   timezone: "America/Jamaica"
 });
 
-console.log('📅 Bi-weekly reports scheduled: Every other Friday at 5:00 PM Jamaica time');
+console.log('📅 Monthly reports scheduled: 1st of each month at 5:00 PM Jamaica time');
 
 // One-time (or re-run if it ever fully lapses) setup: exchange an
 // authorization code for the shared mailbox's first access+refresh token
@@ -2337,7 +2322,7 @@ app.get('/api/admin/graph-auth/status', authMiddleware, async (req, res) => {
 app.post('/api/reports/run', authMiddleware, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
   try {
-    const result = await runBiWeeklyReports();
+    const result = await runMonthlyReports();
     if (result.sent) {
       res.json({ success: true, message: `Reports actually sent to admin + ${result.clientsEmailed} client(s)` });
     } else {
