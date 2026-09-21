@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Accept Invite — CAMS</title>
+<link rel="icon" href="/favicon.ico">
+<style>
+  :root{--bg:#0b0e14;--card:#141924;--border:rgba(255,255,255,0.08);--text:#e8ecf3;--text-muted:rgba(255,255,255,0.5);--accent:#4f8cf7;--accent2:#00d4ff;--danger:#ff5e7a;--success:#34d399;}
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 20%,#182238,var(--bg));font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--text);padding:16px;}
+  .card{width:100%;max-width:380px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:32px 28px;box-shadow:0 20px 60px rgba(0,0,0,0.4);}
+  .logo{display:flex;justify-content:center;margin-bottom:14px;}
+  .logo img{height:44px;}
+  h2{text-align:center;margin:0 0 4px;font-size:20px;}
+  p.sub{text-align:center;margin:0 0 22px;color:var(--text-muted);font-size:13px;}
+  .field{margin-bottom:14px;}
+  label{display:block;font-size:12px;color:var(--text-muted);margin-bottom:6px;}
+  input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,0.03);color:var(--text);font-size:14px;font-family:inherit;}
+  input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(79,140,247,0.25);}
+  button{width:100%;padding:11px;border-radius:8px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px;}
+  button:disabled{opacity:0.6;cursor:default;}
+  .msg{margin-top:14px;font-size:13px;text-align:center;padding:10px;border-radius:8px;display:none;}
+  .msg.error{display:block;background:rgba(255,94,122,0.12);color:var(--danger);}
+  .msg.success{display:block;background:rgba(52,211,153,0.12);color:var(--success);}
+  .invite-info{background:rgba(79,140,247,0.08);border:1px solid rgba(79,140,247,0.2);border-radius:8px;padding:10px 12px;margin-bottom:18px;font-size:12px;}
+  .invite-info b{color:var(--text);}
+  .center-state{text-align:center;color:var(--text-muted);font-size:13px;}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo"><img src="/logo.png" alt="CAMS" onerror="this.style.display='none'"></div>
+  <h2>Activate Your Account</h2>
+  <p class="sub">Client Asset Management System</p>
+  <div id="content"><div class="center-state">Checking your invite…</div></div>
+</div>
+<script>
+const API_URL = window.location.origin;
+const params = new URLSearchParams(window.location.search);
+const token = params.get('token');
+const content = document.getElementById('content');
+
+function esc(v){ if(v===null||v===undefined) return ''; return String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+async function init(){
+  if(!token){
+    content.innerHTML = '<div class="msg error">No invite token found in the link. Please use the exact link from your invite email.</div>';
+    return;
+  }
+  try{
+    const res = await fetch(`${API_URL}/api/auth/invite/${encodeURIComponent(token)}`);
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || 'This invite could not be found.');
+    const roleLabel = data.role === 'client_admin' ? 'Client Admin' : 'Client User';
+    content.innerHTML = `
+      <div class="invite-info">You're setting up access for <b>${esc(data.email)}</b><br>${esc(data.client_name)} — ${roleLabel}</div>
+      <div class="field"><label>Password</label><input type="password" id="pw" placeholder="At least 8 characters"></div>
+      <div class="field"><label>Confirm Password</label><input type="password" id="pw2" placeholder="Re-enter your password"></div>
+      <button id="submit-btn" onclick="acceptInvite()">Activate Account</button>
+      <div class="msg error" id="err-msg"></div>
+    `;
+  }catch(err){
+    content.innerHTML = `<div class="msg error">${esc(err.message)}</div>`;
+  }
+}
+
+async function acceptInvite(){
+  const pw = document.getElementById('pw').value;
+  const pw2 = document.getElementById('pw2').value;
+  const errEl = document.getElementById('err-msg');
+  const btn = document.getElementById('submit-btn');
+  errEl.style.display = 'none';
+  if(pw.length < 8){ errEl.textContent = 'Password must be at least 8 characters.'; errEl.style.display = 'block'; return; }
+  if(pw !== pw2){ errEl.textContent = 'Passwords do not match.'; errEl.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = 'Activating…';
+  try{
+    const res = await fetch(`${API_URL}/api/auth/invite/${encodeURIComponent(token)}/accept`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw })
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || 'Could not activate account.');
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    content.innerHTML = '<div class="msg success">Account activated! Redirecting you to CAMS…</div>';
+    setTimeout(() => { window.location.href = '/'; }, 1200);
+  }catch(err){
+    btn.disabled = false; btn.textContent = 'Activate Account';
+    errEl.textContent = err.message; errEl.style.display = 'block';
+  }
+}
+
+init();
+</script>
+</body>
+</html>
