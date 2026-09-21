@@ -498,7 +498,7 @@ input[type="date"] { color-scheme:dark; }
       <div class="tab" id="tab-software"><div class="panel"><div class="panel-header"><span class="panel-title">Software & Licenses</span><div style="display:flex;align-items:center;gap:8px;"><button class="btn btn-sm admin-only" id="add-sw-lic-btn" onclick="openAddAssetModal('software')"><i class="ti ti-plus"></i> Add Software</button><button class="btn btn-sm" onclick="downloadCSVTemplate('software')"><i class="ti ti-file-download"></i> Template</button><button class="btn btn-sm import-csv-btn" onclick="importCSV('software')">Import CSV</button><button class="btn btn-sm" onclick="exportSoftwareCSV()">Export CSV</button><button class="btn btn-sm" onclick="refreshSoftware()"><i class="ti ti-refresh"></i></button></div></div><div class="software-stats-grid"><div class="door-stat-card"><div class="ds-label">Total</div><div class="ds-value" id="sw-total-count">0</div></div><div class="door-stat-card"><div class="ds-label">Good</div><div class="ds-value online" id="sw-good-count">0</div></div><div class="door-stat-card"><div class="ds-label">Warning</div><div class="ds-value under-maintenance" id="sw-warning-count">0</div></div><div class="door-stat-card"><div class="ds-label">Expired</div><div class="ds-value offline" id="sw-expired-count">0</div></div></div><div class="search-bar"><input type="text" id="sw-search-soft" placeholder="Search software…" oninput="debounceRenderSoftware()"><select id="sw-status-filter" onchange="renderSoftware()" style="flex:0 0 150px;"><option value="All">All</option><option value="Good">Good</option><option value="Warning">Warning</option><option value="Expired">Expired</option></select></div><div id="sw-groups-container"></div></div></div>
       <div class="tab" id="tab-intrusion"><div class="panel"><div class="panel-header"><span class="panel-title">Intrusion Detection</span><div style="display:flex;align-items:center;gap:8px;"><button class="btn btn-sm admin-only" id="add-intrusion-btn" onclick="openAddAssetModal('intrusion')"><i class="ti ti-plus"></i> Add</button><button class="btn btn-sm" onclick="downloadCSVTemplate('intrusion')"><i class="ti ti-file-download"></i> Template</button><button class="btn btn-sm import-csv-btn" onclick="importCSV('intrusion')">Import CSV</button><button class="btn btn-sm" onclick="exportIntrusionCSV()">Export CSV</button><button class="btn btn-sm" onclick="refreshIntrusion()"><i class="ti ti-refresh"></i></button></div></div><div class="intrusion-stats-grid"><div class="intrusion-stat-card"><div class="is-label">Total Points</div><div class="is-value" id="intrusion-total">0</div></div><div class="intrusion-stat-card"><div class="is-label">Online</div><div class="is-value green" id="intrusion-online">0</div></div><div class="intrusion-stat-card"><div class="is-label">Offline</div><div class="is-value red" id="intrusion-offline">0</div></div><div class="intrusion-stat-card"><div class="is-label">Warning</div><div class="is-value yellow" id="intrusion-warning">—</div></div></div><div class="search-bar"><input type="text" id="intrusion-search" placeholder="Search…" oninput="debounceRenderIntrusion()"></div><div id="intrusion-groups-container"></div></div></div>
       <div class="tab" id="tab-files"><div class="panel" style="margin-bottom:14px;"><div class="panel-header"><span class="panel-title">📁 OneDrive Files</span><button class="btn btn-xs" onclick="refreshFileExplorer()"><i class="ti ti-refresh"></i> Refresh</button></div><div class="file-search-bar"><input type="text" id="file-search" placeholder="Search files…" oninput="debounceRenderFiles()"></div><div class="file-explorer" id="file-explorer-container"></div></div><div class="panel"><div class="panel-header"><span class="panel-title">📋 Activity Log</span><button class="btn btn-xs" onclick="refreshAuditLog()"><i class="ti ti-refresh"></i></button></div><div class="audit-log" id="audit-log-container"></div></div></div>
-      <div class="tab" id="tab-users"><div class="panel"><div class="panel-header"><span class="panel-title">Client Users</span><button class="btn btn-sm btn-accent" onclick="openInviteUserModal()"><i class="ti ti-user-plus"></i> Invite User</button></div><table class="tbl"><thead><tr><th>Client</th><th>Email</th><th>Role</th><th>Status</th><th>Created</th><th></th></tr></thead><tbody id="users-tbody"></tbody></table></div><div class="panel"><div class="panel-header"><span class="panel-title">Pending Invites</span></div><table class="tbl"><thead><tr><th>Client</th><th>Email</th><th>Role</th><th>Expires</th><th></th></tr></thead><tbody id="user-invites-tbody"></tbody></table></div></div>
+      <div class="tab" id="tab-users"><div class="panel"><div class="panel-header"><span class="panel-title">Client Users</span><button class="btn btn-sm btn-accent" onclick="openInviteUserModal()"><i class="ti ti-user-plus"></i> Invite User</button></div><table class="tbl"><thead><tr><th>Client</th><th>Email</th><th>Role</th><th>Zones</th><th>Status</th><th>Created</th><th></th></tr></thead><tbody id="users-tbody"></tbody></table></div><div class="panel"><div class="panel-header"><span class="panel-title">Pending Invites</span></div><table class="tbl"><thead><tr><th>Client</th><th>Email</th><th>Role</th><th>Expires</th><th></th></tr></thead><tbody id="user-invites-tbody"></tbody></table></div></div>
       <div class="tab" id="tab-myteam"><div class="panel"><div class="panel-header"><span class="panel-title">My Team</span><div style="display:flex;gap:8px;"><button class="btn btn-sm" onclick="openManageZonesModal()"><i class="ti ti-map-pin"></i> Manage Zones</button><button class="btn btn-sm btn-accent" onclick="openInviteTeamModal()"><i class="ti ti-user-plus"></i> Invite Team Member</button></div></div><table class="tbl"><thead><tr><th>Email</th><th>Zones</th><th>Status</th><th>Created</th><th></th></tr></thead><tbody id="myteam-tbody"></tbody></table></div><div class="panel"><div class="panel-header"><span class="panel-title">Pending Invites</span></div><table class="tbl"><thead><tr><th>Email</th><th>Zones</th><th>Expires</th><th></th></tr></thead><tbody id="myteam-invites-tbody"></tbody></table></div></div>
     </div>
   </div>
@@ -1212,8 +1212,10 @@ async function renderUsersPanel(){
     var data=await apiCall('/users');
     var ut=document.getElementById('users-tbody');
     if(ut)ut.innerHTML=(data.users||[]).map(function(u){
-      return '<tr><td>'+esc(u.client_name)+'</td><td>'+esc(u.email)+'</td><td>'+roleLabel(u.role)+'</td><td>'+userStatusBadge(u.status)+'</td><td>'+formatDate(u.created_at)+'</td><td style="text-align:right;white-space:nowrap;"><button class="btn btn-xs" onclick="toggleUserStatus('+u.id+',\''+(u.status==='disabled'?'active':'disabled')+'\')">'+(u.status==='disabled'?'Enable':'Disable')+'</button> <button class="btn btn-xs" onclick="deleteUserAccount('+u.id+',\''+esc(u.email).replace(/'/g,"\\'")+'\')"><i class="ti ti-trash"></i></button></td></tr>';
-    }).join('')||'<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-muted);">No users yet</td></tr>';
+      var zonesLabel=u.role==='client_admin'?'All zones':((u.zones&&u.zones.length)?esc(u.zones.join(', ')):'None assigned');
+      var zoneBtn=u.role==='client_user'?'<button class="btn btn-xs" onclick=\'openEditZonesModal('+u.id+',"'+esc(u.email).replace(/"/g,'&quot;')+'",'+JSON.stringify(u.zones||[]).replace(/'/g,'&#39;')+','+u.client_id+')\'><i class="ti ti-map-pin"></i> Zones</button> ':'';
+      return '<tr><td>'+esc(u.client_name)+'</td><td>'+esc(u.email)+'</td><td>'+roleLabel(u.role)+'</td><td>'+zonesLabel+'</td><td>'+userStatusBadge(u.status)+'</td><td>'+formatDate(u.created_at)+'</td><td style="text-align:right;white-space:nowrap;">'+zoneBtn+'<button class="btn btn-xs" onclick="toggleUserStatus('+u.id+',\''+(u.status==='disabled'?'active':'disabled')+'\')">'+(u.status==='disabled'?'Enable':'Disable')+'</button> <button class="btn btn-xs" onclick="deleteUserAccount('+u.id+',\''+esc(u.email).replace(/'/g,"\\'")+'\')"><i class="ti ti-trash"></i></button></td></tr>';
+    }).join('')||'<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-muted);">No users yet</td></tr>';
     var it=document.getElementById('user-invites-tbody');
     if(it)it.innerHTML=(data.invites||[]).map(function(i){
       return '<tr><td>'+esc(i.client_name)+'</td><td>'+esc(i.email)+'</td><td>'+roleLabel(i.role)+'</td><td>'+formatDate(i.expires_at)+'</td><td style="text-align:right;"><button class="btn btn-xs" onclick="revokeUserInvite('+i.id+')"><i class="ti ti-x"></i> Revoke</button></td></tr>';
@@ -1332,10 +1334,21 @@ async function deleteZone(id){
   try{await apiCall('/zones/'+id,{method:'DELETE'});await refreshManageZonesList();toast('Zone deleted','success');}catch(err){toast('Failed: '+err.message,'error');}
 }
 var editZonesUserId=null;
-async function openEditZonesModal(userId,email,currentZoneNames){
+// targetClientId is only passed by the admin "Users" panel, where one
+// session might open this for users across several different clients in
+// a row — unlike My Team (always the logged-in client_admin's own single
+// client), so this path always fetches fresh rather than reusing
+// myTeamZonesCache, which would otherwise leak zones from whichever
+// client was looked up last into every other client's checkbox list.
+async function openEditZonesModal(userId,email,currentZoneNames,targetClientId){
   editZonesUserId=userId;
   document.getElementById('edit-zones-sub').textContent=email;
-  var zones=await loadMyTeamZones();
+  var zones;
+  if(targetClientId){
+    try{zones=await apiCall('/zones?client_id='+targetClientId);}catch(err){zones=[];}
+  }else{
+    zones=await loadMyTeamZones();
+  }
   var c=document.getElementById('edit-zones-list');
   c.innerHTML=zones.length?zones.map(function(z){var checked=currentZoneNames.indexOf(z.name)!==-1?' checked':'';return '<label style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:12px;"><input type="checkbox" class="edit-zone-cb" value="'+z.id+'"'+checked+'> '+esc(z.name)+'</label>';}).join('')
     :'<div style="font-size:12px;color:var(--text-muted);">No zones set up yet.</div>';
@@ -1347,7 +1360,7 @@ async function saveZoneAccess(){
     await apiCall('/my-team/'+editZonesUserId+'/zones',{method:'PUT',body:JSON.stringify({zone_ids:zoneIds})});
     closeAddModal('edit-zones-modal');
     toast('Zone access updated','success');
-    renderMyTeamPanel();
+    if(isAdmin)renderUsersPanel();else renderMyTeamPanel();
   }catch(err){toast('Failed: '+err.message,'error');}
 }
 async function toggleTeamMemberStatus(id,status){

@@ -1505,8 +1505,13 @@ app.get('/api/users', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.json([]);
   try {
     const users = await pool.query(
-      `SELECT u.id,u.email,u.role,u.status,u.created_at,u.client_id,c.name AS client_name
-       FROM users u JOIN clients c ON c.id = u.client_id ORDER BY c.name, u.email`
+      `SELECT u.id,u.email,u.role,u.status,u.created_at,u.client_id,c.name AS client_name,
+              COALESCE(array_agg(z.name) FILTER (WHERE z.name IS NOT NULL), '{}') AS zones
+       FROM users u
+       JOIN clients c ON c.id = u.client_id
+       LEFT JOIN user_zone_access uza ON uza.user_id = u.id
+       LEFT JOIN zones z ON z.id = uza.zone_id
+       GROUP BY u.id, c.name ORDER BY c.name, u.email`
     );
     const invites = await pool.query(
       `SELECT i.id,i.email,i.role,i.client_id,c.name AS client_name,i.expires_at,i.created_at
@@ -1619,19 +1624,25 @@ app.post('/api/my-team/invite', authMiddleware, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// Also used by the E-Tech admin "Users" panel (admin can manage any
+// client's zone assignments), not just My Team (client_admin, own client
+// only) — same URL for both rather than a mirrored /api/users/:id/zones,
+// since the only real difference is the ownership check below.
 app.put('/api/my-team/:userId/zones', authMiddleware, async (req, res) => {
-  if (req.user.role !== 'client_admin') return res.status(403).json({ error: 'Client admin only' });
+  if (req.user.role !== 'admin' && req.user.role !== 'client_admin') return res.status(403).json({ error: 'Not authorized' });
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { zone_ids } = req.body;
   try {
     const target = await pool.query('SELECT email,client_id,role FROM users WHERE id=$1', [req.params.userId]);
-    if (!target.rows[0] || target.rows[0].client_id !== req.user.client_id) return res.status(404).json({ error: 'User not found' });
+    if (!target.rows[0]) return res.status(404).json({ error: 'User not found' });
+    if (req.user.role === 'client_admin' && target.rows[0].client_id !== req.user.client_id) return res.status(404).json({ error: 'User not found' });
     if (target.rows[0].role !== 'client_user') return res.status(400).json({ error: 'Only sub-users have zone assignments' });
     await pool.query('DELETE FROM user_zone_access WHERE user_id=$1', [req.params.userId]);
     for (const zoneId of (zone_ids || [])) {
       await pool.query('INSERT INTO user_zone_access (user_id,zone_id) VALUES ($1,$2) ON CONFLICT DO NOTHING', [req.params.userId, zoneId]);
     }
-    await logActivity(req.user.client_id, req.user.username, 'Updated', `Zone access updated for ${target.rows[0].email}`);
+    const logClientId = req.user.role === 'admin' ? target.rows[0].client_id : req.user.client_id;
+    await logActivity(logClientId, req.user.username, 'Updated', `Zone access updated for ${target.rows[0].email}`);
     res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
