@@ -80,6 +80,20 @@ input, select, textarea, button { font-family: var(--font); }
 .client-mode-paj .nav-item { color: rgba(0,0,0,0.6) !important; }
 .client-mode-paj .door-sub-section .sub-val { color: #1a1a2e !important; font-weight: 700 !important; }
 .client-mode-paj .ticker-wrap .ticker-content { color: #3d209f !important; font-weight: 600 !important; }
+.client-mode-moh {
+  --sidebar-bg: #ffffff !important; --main-bg: #f5f5f5 !important; --card-bg: #ffffff !important;
+  --card-border: rgba(0,0,0,0.08) !important; --text-primary: #1a1a2e !important;
+  --text-secondary: rgba(0,0,0,0.6) !important; --text-muted: rgba(0,0,0,0.5) !important; --stat-val-color: #1a1a2e !important;
+}
+.client-mode-moh .sidebar,.client-mode-moh .topbar { background: #ffffff !important; }
+.client-mode-moh .stat-card,.client-mode-moh .panel { background: #ffffff !important; }
+.client-mode-moh .nav-item.active { background: rgba(30,154,58,0.12) !important; color: #157a2e !important; border-left: 2px solid #f5b301 !important; }
+.client-mode-moh .btn-accent { background: linear-gradient(135deg, #157a2e, #1e9a3a) !important; color: #fff !important; }
+.client-mode-moh .add-btn { background: linear-gradient(135deg, #157a2e, #1e9a3a) !important; }
+.client-mode-moh .tbl th { color: #157a2e !important; } .client-mode-moh .tbl td { color: #1a1a2e !important; }
+.client-mode-moh .nav-item { color: rgba(0,0,0,0.6) !important; }
+.client-mode-moh .door-sub-section .sub-val { color: #1a1a2e !important; font-weight: 700 !important; }
+.client-mode-moh .ticker-wrap .ticker-content { color: #157a2e !important; font-weight: 600 !important; }
 .import-csv-btn { }
 .client-mode-kftl .import-csv-btn, .client-mode-kwl .import-csv-btn { display: none !important; }
 
@@ -481,7 +495,7 @@ input[type="date"] { color-scheme:dark; }
     <div class="sidebar-footer"><div class="user-av" id="user-avatar"></div><div class="user-info"><div class="user-name" id="user-name-display">Jane Doe</div><div class="user-role" id="user-role-display">Administrator</div></div><button class="btn btn-xs" onclick="logout()" style="color:var(--text-muted);"><i class="ti ti-logout"></i></button></div>
   </div>
   <div class="main">
-    <div class="topbar"><span class="page-title" id="page-title">Dashboard</span><div class="client-topbar-logo" id="kftl-topbar-logo"><img src="logo-kftlfull.png" alt="KFTL" onerror="this.src='logo.png'"></div><div class="client-topbar-logo" id="kwl-topbar-logo"><img src="logo-kwlfull.png" alt="KWL" onerror="this.src='logo.png'"></div><div class="client-topbar-logo" id="paj-topbar-logo"><img src="logo-pajfull.png" alt="PAJ" onerror="this.src='logo.png'"></div><div class="topbar-right"><button class="btn theme-toggle-btn" onclick="toggleThemeDropdown()" id="theme-toggle-btn"><i class="ti ti-palette"></i> Theme</button><div class="theme-dropdown" id="theme-dropdown"><button class="theme-option" onclick="setTheme('dark');closeThemeDropdown();">🌙 Dark</button><button class="theme-option" onclick="setTheme('light');closeThemeDropdown();">☀️ Light</button><button class="theme-option" onclick="setTheme('jet-black');closeThemeDropdown();">⚫ Jet Black</button></div><button class="add-btn" onclick="toggleAddDropdown()" id="add-btn"><i class="ti ti-plus"></i></button><div class="add-dropdown" id="add-dropdown"><button class="dd-item" onclick="openAddSRModal();closeAddDropdown();"><span class="dd-icon">📋</span> Add Service Request</button><div class="dd-sep" id="add-client-sep"></div><button class="dd-item" id="add-client-btn" onclick="openAddClientModal();closeAddDropdown();"><span class="dd-icon">👤</span> Add Client</button></div><span class="topbar-date" id="topbar-date"></span></div></div>
+    <div class="topbar"><span class="page-title" id="page-title">Dashboard</span><div class="client-topbar-logo" id="kftl-topbar-logo"><img src="logo-kftlfull.png" alt="KFTL" onerror="this.src='logo.png'"></div><div class="client-topbar-logo" id="kwl-topbar-logo"><img src="logo-kwlfull.png" alt="KWL" onerror="this.src='logo.png'"></div><div class="client-topbar-logo" id="paj-topbar-logo"><img src="logo-pajfull.png" alt="PAJ" onerror="this.src='logo.png'"></div><div class="client-topbar-logo" id="moh-topbar-logo"><img src="logo-MOHfull.png" alt="MOH" onerror="this.src='logo.png'"></div><div class="topbar-right"><button class="btn theme-toggle-btn" onclick="toggleThemeDropdown()" id="theme-toggle-btn"><i class="ti ti-palette"></i> Theme</button><div class="theme-dropdown" id="theme-dropdown"><button class="theme-option" onclick="setTheme('dark');closeThemeDropdown();">🌙 Dark</button><button class="theme-option" onclick="setTheme('light');closeThemeDropdown();">☀️ Light</button><button class="theme-option" onclick="setTheme('jet-black');closeThemeDropdown();">⚫ Jet Black</button></div><button class="add-btn" onclick="toggleAddDropdown()" id="add-btn"><i class="ti ti-plus"></i></button><div class="add-dropdown" id="add-dropdown"><button class="dd-item" onclick="openAddSRModal();closeAddDropdown();"><span class="dd-icon">📋</span> Add Service Request</button><div class="dd-sep" id="add-client-sep"></div><button class="dd-item" id="add-client-btn" onclick="openAddClientModal();closeAddDropdown();"><span class="dd-icon">👤</span> Add Client</button></div><span class="topbar-date" id="topbar-date"></span></div></div>
     <div class="content" id="main-content">
       <div class="ticker-wrap" id="dashboard-ticker" style="display:none;"><div class="ticker-label"><img src="black-logo.png" alt="CAMS" onerror="this.parentElement.innerHTML='📢'"></div><div class="ticker-track"><div class="ticker-content" id="ticker-content"></div></div></div>
       <div class="tab active" id="tab-dashboard">
@@ -674,7 +688,8 @@ let authToken=localStorage.getItem('token')||null,currentUser=null,isAdmin=true,
 var CLIENT_THEMES={
   KFTL:{cssClass:'client-mode-kftl',topbarLogoId:'kftl-topbar-logo'},
   KWL:{cssClass:'client-mode-kwl',topbarLogoId:'kwl-topbar-logo'},
-  PAJ:{cssClass:'client-mode-paj',topbarLogoId:'paj-topbar-logo'}
+  PAJ:{cssClass:'client-mode-paj',topbarLogoId:'paj-topbar-logo'},
+  MOH:{cssClass:'client-mode-moh',topbarLogoId:'moh-topbar-logo'}
 };
 function clearClientThemes(){
   var app=document.getElementById('app');
@@ -695,7 +710,7 @@ function applyClientTheme(clientName){
 }
 var MS_CLIENT_ID='e87a6592-aaa5-4a13-9c85-8dbc8e9cd7b2',MS_TENANT_ID='799ae988-9d3d-40d3-bf5c-93197f5d8d44',MS_REDIRECT_URI=window.location.origin+window.location.pathname;
 function base64URLEncode(b){var s='',bytes=new Uint8Array(b);for(var i=0;i<bytes.byteLength;i++)s+=String.fromCharCode(bytes[i]);return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');}
-async function apiCall(e,o={}){const h={'Content-Type':'application/json',Authorization:`Bearer ${authToken}`},r=await fetch(`${API_URL}/api${e}`,{...o,headers:{...h,...o.headers}});if(!r.ok){const er=await r.json().catch(()=>({error:'Unknown error'}));throw new Error(er.error||`API call failed: ${r.status}`);}return r.json();}
+async function apiCall(e,o={}){const h={'Content-Type':'application/json',Authorization:`Bearer ${authToken}`},r=await fetch(`${API_URL}/api${e}`,{...o,headers:{...h,...o.headers}});if(r.status===401&&authToken&&e.indexOf('/auth/')!==0){const er=await r.json().catch(()=>({error:'Session expired'}));logout();toast((er.error||'Session expired')+' Please sign in again.','warning');throw new Error(er.error||'Session expired');}if(!r.ok){const er=await r.json().catch(()=>({error:'Unknown error'}));throw new Error(er.error||`API call failed: ${r.status}`);}return r.json();}
 function toast(m,t){t=t||'info';var c=document.getElementById('toast-container');if(!c)return;var d=document.createElement('div');d.className='toast '+t;var i={info:'ti ti-info-circle',success:'ti ti-check',warning:'ti ti-alert-triangle',error:'ti ti-x'};d.innerHTML='<i class="'+(i[t]||i.info)+'"></i> '+m;c.appendChild(d);setTimeout(function(){d.style.opacity='0';d.style.transition='opacity 0.3s';setTimeout(function(){if(d.parentNode)d.remove();},300);},3000);}
 function openConfirm(t,d,c,b){b=b||false;document.getElementById('confirm-title').textContent=t;document.getElementById('confirm-desc').textContent=d;document.getElementById('confirm-btn').textContent=b?'Delete':'Confirm';document.getElementById('confirm-btn').className='btn '+(b?'btn-danger':'btn-accent');confirmCallback=c;document.getElementById('confirm-overlay').classList.add('open');}
 function closeConfirm(){document.getElementById('confirm-overlay').classList.remove('open');confirmCallback=null;}
