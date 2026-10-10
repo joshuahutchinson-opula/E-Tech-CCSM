@@ -121,10 +121,7 @@ const REQUIRED_ENV_VARS = [
   'DATABASE_URL',
   'JWT_SECRET',
   'ADMIN_USERNAME', 'ADMIN_PASSWORD',
-  'KFTL_USERNAME', 'KFTL_PASSWORD',
-  'KWL_USERNAME', 'KWL_PASSWORD',
   'TECH_USERNAME', 'TECH_PASSWORD',
-  'PAJ_USERNAME', 'PAJ_PASSWORD',
 ];
 const missingEnvVars = REQUIRED_ENV_VARS.filter(name => !process.env[name]);
 if (missingEnvVars.length > 0) {
@@ -245,9 +242,9 @@ async function sendEmailNotification(to, subject, body, authHeader) {
 // sub-user's zone access, or disabling their account, takes effect on their
 // very next request instead of waiting up to 42 days for their token to
 // expire. This looks up their current client_id/zones/status fresh from the
-// DB on every request. Older token shapes (admin, technician, and the
-// shared KFTL/KWL/PAJ 'client' logins) already carry client_id directly in
-// the token and are left untouched — they don't hit the DB here at all.
+// DB on every request. Staff token shapes (admin, technician) already carry
+// client_id directly in the token and are left untouched — they don't hit
+// the DB here at all.
 async function loadFreshUserPermissions(decoded) {
   const result = await pool.query('SELECT id,email,client_id,role,status FROM users WHERE id=$1', [decoded.id]);
   const u = result.rows[0];
@@ -271,19 +268,35 @@ async function authMiddleware(req, res, next) {
     return res.status(401).json({ error: 'Invalid token format' });
   }
 
+  let decoded;
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (decoded.role === 'client_admin' || decoded.role === 'client_user') {
-      const user = await loadFreshUserPermissions(decoded);
-      if (!user) return res.status(401).json({ error: 'Account no longer active' });
-      req.user = user;
-    } else {
-      req.user = decoded;
-    }
-    next();
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
   } catch (err) {
     return res.status(401).json({ error: 'Invalid token' });
   }
+
+  // The shared KFTL/KWL/PAJ logins (role 'client') have been retired — every
+  // client now signs in with their own invited account. Old shared-login
+  // tokens are refused so those sessions end instead of lingering for up to
+  // 42 days.
+  if (decoded.role === 'client') {
+    return res.status(401).json({ error: 'Shared client logins have been retired — sign in with your invited email account.' });
+  }
+
+  if (decoded.role === 'client_admin' || decoded.role === 'client_user') {
+    let user;
+    try {
+      user = await loadFreshUserPermissions(decoded);
+    } catch (err) {
+      // A database hiccup is not a reason to sign the person out.
+      return res.status(503).json({ error: 'Service temporarily unavailable' });
+    }
+    if (!user) return res.status(401).json({ error: 'Account no longer active' });
+    req.user = user;
+  } else {
+    req.user = decoded;
+  }
+  next();
 }
 
 // Applied to any list endpoint whose rows carry a `zone` column — a
@@ -295,14 +308,41 @@ function filterByZoneAccess(rows, req) {
   return rows.filter(r => req.user.zones.includes(r.zone));
 }
 
-// client_admin/client_user are read-only for asset data — asset CRUD stays
-// E-Tech-admin-only. Their job is people-management (My Team), not editing
-// hardware records.
-function blockAssetEdit(req, res, next) {
-  if (req.user.role === 'client_admin' || req.user.role === 'client_user') {
-    return res.status(403).json({ error: 'Read-only access — asset changes must be made by E-Tech staff.' });
+// client_admin/client_user may update an asset's status and comments only —
+// the same thing the old shared client logins could do. Every other field
+// stays E-Tech-staff-only. The asset must belong to their client, and a
+// client_user may only touch assets in the zone(s) assigned to them.
+// Admin and technician requests pass through untouched.
+const CLIENT_EDITABLE_ASSET_TABLES = ['cameras', 'doors', 'servers', 'storage', 'switches', 'intrusion', 'stations', 'monitors'];
+
+async function blockAssetEdit(req, res, next) {
+  if (req.user.role !== 'client_admin' && req.user.role !== 'client_user') return next();
+
+  const table = req.path.split('/')[2]; // '/api/<table>/:id[/comment]'
+  if (!CLIENT_EDITABLE_ASSET_TABLES.includes(table)) {
+    return res.status(403).json({ error: 'Not authorized' });
   }
-  next();
+
+  // Drop everything except status and comments before the route sees it.
+  req.body = { status: req.body?.status, comments: req.body?.comments };
+
+  try {
+    const result = await pool.query(`SELECT client_id, zone FROM ${table} WHERE id=$1`, [req.params.id]);
+    const asset = result.rows[0];
+    if (!asset || asset.client_id !== req.user.client_id) {
+      return res.status(404).json({ error: 'Asset not found' });
+    }
+    if (req.user.role === 'client_user' && !(req.user.zones || []).includes(asset.zone)) {
+      return res.status(404).json({ error: 'Asset not found' });
+    }
+    next();
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+function isClientAccount(req) {
+  return req.user.role === 'client_admin' || req.user.role === 'client_user';
 }
 
 const loginRateLimit = rateLimit({
@@ -342,30 +382,6 @@ app.post('/api/auth/login', loginRateLimit, async (req, res) => {
     return res.json({ token, user: { id: 1, username: process.env.ADMIN_USERNAME, client_id: null, client_name: null, role: 'admin', photo_url: null } });
   }
 
-  if (username === process.env.KFTL_USERNAME && password === process.env.KFTL_PASSWORD) {
-    const token = jwt.sign({ id: 2, username: process.env.KFTL_USERNAME, client_id: 1, role: 'client' }, process.env.JWT_SECRET, { expiresIn: '42d' });
-    await logActivity(1, process.env.KFTL_USERNAME, 'Login', 'KFTL client logged in');
-    return res.json({ token, user: { id: 2, username: process.env.KFTL_USERNAME, client_id: 1, client_name: 'KFTL', role: 'client', photo_url: null } });
-  }
-
-  if (username === process.env.KWL_USERNAME && password === process.env.KWL_PASSWORD) {
-    const token = jwt.sign({ id: 4, username: process.env.KWL_USERNAME, client_id: 3, role: 'client' }, process.env.JWT_SECRET, { expiresIn: '42d' });
-    await logActivity(3, process.env.KWL_USERNAME, 'Login', 'KWL client logged in');
-    return res.json({ token, user: { id: 4, username: process.env.KWL_USERNAME, client_id: 3, client_name: 'KWL', role: 'client', photo_url: null } });
-  }
-
-  if (username === process.env.PAJ_USERNAME && password === process.env.PAJ_PASSWORD) {
-    let clientId = null;
-    try {
-      const result = await pool.query("SELECT id FROM clients WHERE name = 'PAJ'");
-      clientId = result.rows[0]?.id || null;
-    } catch (err) { clientId = null; }
-    if (!clientId) return res.status(500).json({ error: "No client named 'PAJ' found in the clients table — create it first." });
-    const token = jwt.sign({ id: 5, username: process.env.PAJ_USERNAME, client_id: clientId, role: 'client' }, process.env.JWT_SECRET, { expiresIn: '42d' });
-    await logActivity(clientId, process.env.PAJ_USERNAME, 'Login', 'PAJ client logged in');
-    return res.json({ token, user: { id: 5, username: process.env.PAJ_USERNAME, client_id: clientId, client_name: 'PAJ', role: 'client', photo_url: null } });
-  }
-
   if (username === process.env.TECH_USERNAME && password === process.env.TECH_PASSWORD) {
     const token = jwt.sign({ id: 3, username: process.env.TECH_USERNAME, client_id: null, role: 'technician' }, process.env.JWT_SECRET, { expiresIn: '42d' });
     await logActivity(1, process.env.TECH_USERNAME, 'Login', 'Technician logged in');
@@ -373,9 +389,8 @@ app.post('/api/auth/login', loginRateLimit, async (req, res) => {
   }
 
   // Per-person client accounts (client_admin / client_user) — email is the
-  // username here. Tried last, after all the shared env-var logins, so the
-  // existing shared KFTL/KWL/PAJ logins keep working exactly as before
-  // during the migration to real per-person accounts.
+  // username here. This is the only way clients sign in; the old shared
+  // KFTL/KWL/PAJ logins have been retired.
   if (dbConnected && username && username.includes('@')) {
     try {
       const result = await pool.query('SELECT id,client_id,email,password_hash,role,status FROM users WHERE email=$1', [username.toLowerCase()]);
@@ -1905,6 +1920,14 @@ app.put('/api/stations/:id', authMiddleware, blockAssetEdit, async (req, res) =>
     const assetName = asset.rows[0]?.name || id;
     const assetClientId = asset.rows[0]?.client_id;
     const assetClient = await getClientNameById(assetClientId);
+    // Invited client accounts change status only (blockAssetEdit already
+    // checked ownership and zone). The full update below would also null
+    // out the date fields, which the client form never sends.
+    if (isClientAccount(req)) {
+      await pool.query('UPDATE stations SET status=COALESCE($1,status),updated_at=CURRENT_TIMESTAMP WHERE id=$2 AND client_id=$3', [status, id, req.user.client_id]);
+      await logActivity(assetClientId || req.user.client_id, req.user.username, 'Updated', `Station ${assetName} status updated (${assetClient})`);
+      return res.json({ success: true });
+    }
     const query = userClientId ? 
       'UPDATE stations SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),apps=COALESCE($6,apps),ip_address=COALESCE($7,ip_address),install_date=$8,purchase_date=$9,warranty_expiry=$10,updated_at=CURRENT_TIMESTAMP WHERE id=$11 AND client_id=$12' :
       'UPDATE stations SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),apps=COALESCE($6,apps),ip_address=COALESCE($7,ip_address),install_date=$8,purchase_date=$9,warranty_expiry=$10,updated_at=CURRENT_TIMESTAMP WHERE id=$11';
@@ -1936,6 +1959,14 @@ app.put('/api/monitors/:id', authMiddleware, blockAssetEdit, async (req, res) =>
     const assetName = asset.rows[0]?.name || id;
     const assetClientId = asset.rows[0]?.client_id;
     const assetClient = await getClientNameById(assetClientId);
+    // Invited client accounts change status only (blockAssetEdit already
+    // checked ownership and zone). The full update below would also null
+    // out the date fields, which the client form never sends.
+    if (isClientAccount(req)) {
+      await pool.query('UPDATE monitors SET status=COALESCE($1,status),updated_at=CURRENT_TIMESTAMP WHERE id=$2 AND client_id=$3', [status, id, req.user.client_id]);
+      await logActivity(assetClientId || req.user.client_id, req.user.username, 'Updated', `Monitor ${assetName} status updated (${assetClient})`);
+      return res.json({ success: true });
+    }
     const query = userClientId ?
       'UPDATE monitors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),size=COALESCE($6,size),install_date=$7,purchase_date=$8,warranty_expiry=$9,updated_at=CURRENT_TIMESTAMP WHERE id=$10 AND client_id=$11' :
       'UPDATE monitors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),size=COALESCE($6,size),install_date=$7,purchase_date=$8,warranty_expiry=$9,updated_at=CURRENT_TIMESTAMP WHERE id=$10';
