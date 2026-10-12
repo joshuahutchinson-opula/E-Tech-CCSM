@@ -191,6 +191,34 @@ async function logActivity(clientId, username, action, detail) {
   }
 }
 
+// Validates the client of every import row before anything is inserted. Returns the
+// parsed client_id for each row, or null after sending a 400 if any row is unusable.
+async function validateImportClients(rows, res) {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    res.status(400).json({ error: 'Import body must be a non-empty array of rows.' });
+    return null;
+  }
+  const clientIds = rows.map(r => {
+    const raw = r && r.client_id != null ? String(r.client_id).trim() : '';
+    return /^\d+$/.test(raw) && Number(raw) > 0 ? Number(raw) : null;
+  });
+  if (clientIds.some(id => id === null)) {
+    res.status(400).json({ error: 'Every row needs a client. Select a client before importing.' });
+    return null;
+  }
+  const distinct = [...new Set(clientIds)];
+  // ids beyond the int4 range cannot exist and would make the lookup itself throw
+  const lookup = distinct.filter(id => id <= 2147483647);
+  const result = lookup.length ? await pool.query('SELECT id FROM clients WHERE id = ANY($1)', [lookup]) : { rows: [] };
+  const known = new Set(result.rows.map(c => Number(c.id)));
+  const unknown = distinct.filter(id => !known.has(id));
+  if (unknown.length) {
+    res.status(400).json({ error: 'Unknown client id(s): ' + unknown.join(', ') });
+    return null;
+  }
+  return clientIds;
+}
+
 // Builds a client-aware activity log entry for an asset import/add. Import
 // routes used to always log client_id=1 (KFTL) regardless of which client the
 // assets actually belonged to, and never named the client in the log text at
@@ -603,9 +631,11 @@ app.post('/api/import/cameras', authMiddleware, async (req, res) => {
   const cameras = req.body;
   let imported = 0;
   try {
-    for (const cam of cameras) {
+    const clientIds = await validateImportClients(cameras, res);
+    if (!clientIds) return;
+    for (const [idx, cam] of cameras.entries()) {
       await pool.query(`INSERT INTO cameras (client_id,name,zone,status,comments,model,manufacturer,resolution,archiver,ip_address,mac_address,warranty,purchase_date,date_cleaned) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
-        [cam.client_id||1,cam.name||'',cam.zone||'',cam.status||'Working',cam.comments||'',cam.model||'',cam.manufacturer||'',cam.resolution||'',cam.archiver||'',cam.ip_address||'',cam.mac_address||'',cam.warranty||null,cam.purchase_date||null,cam.date_cleaned||null]);
+        [clientIds[idx],cam.name||'',cam.zone||'',cam.status||'Working',cam.comments||'',cam.model||'',cam.manufacturer||'',cam.resolution||'',cam.archiver||'',cam.ip_address||'',cam.mac_address||'',cam.warranty||null,cam.purchase_date||null,cam.date_cleaned||null]);
       imported++;
     }
     const { clientIdForLog, clientLabel } = await describeClientsForLog(cameras);
@@ -620,9 +650,11 @@ app.post('/api/import/doors', authMiddleware, async (req, res) => {
   const doors = req.body;
   let imported = 0;
   try {
-    for (const door of doors) {
+    const clientIds = await validateImportClients(doors, res);
+    if (!clientIds) return;
+    for (const [idx, door] of doors.entries()) {
       await pool.query(`INSERT INTO doors (client_id,name,zone,status,tech,reader,lock_type,ip_address,controller_type,door_swing,access_type,anti_passback,install_date,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`,
-        [door.client_id||1, door.name||'', door.zone||door.site||'', door.status||'Online', door.tech||'', door.reader||'', door.lock_type||'', door.ip_address||'', door.controller_type||'', door.door_swing||'', door.access_type||'', door.anti_passback||'', door.install_date||null, door.warranty_expiry||null, door.comments||'']);
+        [clientIds[idx], door.name||'', door.zone||door.site||'', door.status||'Online', door.tech||'', door.reader||'', door.lock_type||'', door.ip_address||'', door.controller_type||'', door.door_swing||'', door.access_type||'', door.anti_passback||'', door.install_date||null, door.warranty_expiry||null, door.comments||'']);
       imported++;
     }
     const { clientIdForLog, clientLabel } = await describeClientsForLog(doors);
@@ -637,9 +669,11 @@ app.post('/api/import/servers', authMiddleware, async (req, res) => {
   const servers = req.body;
   let imported = 0;
   try {
-    for (const srv of servers) {
+    const clientIds = await validateImportClients(servers, res);
+    if (!clientIds) return;
+    for (const [idx, srv] of servers.entries()) {
       await pool.query(`INSERT INTO servers (client_id,name,zone,status,make,model,capacity,used,health,apps,serial,purchase_date,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
-        [srv.client_id||1,srv.name||srv.serial||'',srv.zone||srv.location||'',srv.status||'Online',srv.make||'',srv.model||'',srv.capacity||'',srv.used||'',srv.health||'',srv.apps||'',srv.serial||'',srv.purchase_date||null,srv.warranty_expiry||null,srv.comments||'']);
+        [clientIds[idx],srv.name||srv.serial||'',srv.zone||srv.location||'',srv.status||'Online',srv.make||'',srv.model||'',srv.capacity||'',srv.used||'',srv.health||'',srv.apps||'',srv.serial||'',srv.purchase_date||null,srv.warranty_expiry||null,srv.comments||'']);
       imported++;
     }
     const { clientIdForLog, clientLabel } = await describeClientsForLog(servers);
@@ -654,9 +688,11 @@ app.post('/api/import/switches', authMiddleware, async (req, res) => {
   const switches = req.body;
   let imported = 0;
   try {
-    for (const sw of switches) {
+    const clientIds = await validateImportClients(switches, res);
+    if (!clientIds) return;
+    for (const [idx, sw] of switches.entries()) {
       await pool.query(`INSERT INTO switches (client_id,name,zone,status,model,firmware,ip_address,mac_address,purchase_date,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
-        [sw.client_id||1,sw.name||'',sw.zone||sw.location||'',sw.status||'Online',sw.model||'',sw.firmware||'',sw.ip_address||'',sw.mac||'',sw.purchase_date||null,sw.warranty_expiry||null,sw.comments||'']);
+        [clientIds[idx],sw.name||'',sw.zone||sw.location||'',sw.status||'Online',sw.model||'',sw.firmware||'',sw.ip_address||'',sw.mac||'',sw.purchase_date||null,sw.warranty_expiry||null,sw.comments||'']);
       imported++;
     }
     const { clientIdForLog, clientLabel } = await describeClientsForLog(switches);
@@ -671,9 +707,11 @@ app.post('/api/import/software', authMiddleware, async (req, res) => {
   const software = req.body;
   let imported = 0;
   try {
-    for (const sw of software) {
+    const clientIds = await validateImportClients(software, res);
+    if (!clientIds) return;
+    for (const [idx, sw] of software.entries()) {
       await pool.query(`INSERT INTO software (client_id, name, vendor, version, license_type, status, expiry_date, purchase_date, warranty_expiry, comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-        [sw.client_id||1, sw.name||'', sw.vendor||'', sw.version||'', sw.license_type||'', sw.status||'Good', sw.expiry_date||null, sw.purchase_date||null, sw.warranty_expiry||null, sw.comments||'']);
+        [clientIds[idx], sw.name||'', sw.vendor||'', sw.version||'', sw.license_type||'', sw.status||'Good', sw.expiry_date||null, sw.purchase_date||null, sw.warranty_expiry||null, sw.comments||'']);
       imported++;
     }
     const { clientIdForLog, clientLabel } = await describeClientsForLog(software);
@@ -688,9 +726,11 @@ app.post('/api/import/stations', authMiddleware, async (req, res) => {
   const stations = req.body;
   let imported = 0;
   try {
-    for (const s of stations) {
+    const clientIds = await validateImportClients(stations, res);
+    if (!clientIds) return;
+    for (const [idx, s] of stations.entries()) {
       await pool.query(`INSERT INTO stations (client_id,name,zone,status,make,model,apps,ip_address,install_date,purchase_date,warranty_expiry) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
-        [s.client_id||1, s.name||'', s.zone||'', s.status||'Online', s.make||'', s.model||'', s.apps||'', s.ip_address||'', s.install_date||null, s.purchase_date||null, s.warranty_expiry||null]);
+        [clientIds[idx], s.name||'', s.zone||'', s.status||'Online', s.make||'', s.model||'', s.apps||'', s.ip_address||'', s.install_date||null, s.purchase_date||null, s.warranty_expiry||null]);
       imported++;
     }
     const { clientIdForLog, clientLabel } = await describeClientsForLog(stations);
@@ -705,9 +745,11 @@ app.post('/api/import/monitors', authMiddleware, async (req, res) => {
   const monitors = req.body;
   let imported = 0;
   try {
-    for (const m of monitors) {
+    const clientIds = await validateImportClients(monitors, res);
+    if (!clientIds) return;
+    for (const [idx, m] of monitors.entries()) {
       await pool.query(`INSERT INTO monitors (client_id,name,zone,status,make,model,size,install_date,purchase_date,warranty_expiry) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-        [m.client_id||1, m.name||'', m.zone||'', m.status||'Online', m.make||'', m.model||'', m.size||'', m.install_date||null, m.purchase_date||null, m.warranty_expiry||null]);
+        [clientIds[idx], m.name||'', m.zone||'', m.status||'Online', m.make||'', m.model||'', m.size||'', m.install_date||null, m.purchase_date||null, m.warranty_expiry||null]);
       imported++;
     }
     const { clientIdForLog, clientLabel } = await describeClientsForLog(monitors);
@@ -722,9 +764,11 @@ app.post('/api/import/intrusion', authMiddleware, async (req, res) => {
   const points = req.body;
   let imported = 0;
   try {
-    for (const i of points) {
+    const clientIds = await validateImportClients(points, res);
+    if (!clientIds) return;
+    for (const [idx, i] of points.entries()) {
       await pool.query(`INSERT INTO intrusion (client_id,name,zone,status,module,sensor_type,ip_address,purchase_date,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-        [i.client_id||1, i.name||'', i.zone||'', i.status||'Online', i.module||'', i.sensor_type||'', i.ip_address||'', i.purchase_date||null, i.warranty_expiry||null, i.comments||'']);
+        [clientIds[idx], i.name||'', i.zone||'', i.status||'Online', i.module||'', i.sensor_type||'', i.ip_address||'', i.purchase_date||null, i.warranty_expiry||null, i.comments||'']);
       imported++;
     }
     const { clientIdForLog, clientLabel } = await describeClientsForLog(points);
@@ -739,9 +783,11 @@ app.post('/api/import/storage', authMiddleware, async (req, res) => {
   const devices = req.body;
   let imported = 0;
   try {
-    for (const s of devices) {
+    const clientIds = await validateImportClients(devices, res);
+    if (!clientIds) return;
+    for (const [idx, s] of devices.entries()) {
       await pool.query(`INSERT INTO storage (client_id,name,zone,status,type,make,model,capacity,used,serial,purchase_date,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
-        [s.client_id||1, s.name||'', s.zone||'', s.status||'Online', s.type||'', s.make||'', s.model||'', s.capacity||'', s.used||'', s.serial||'', s.purchase_date||null, s.warranty_expiry||null, s.comments||'']);
+        [clientIds[idx], s.name||'', s.zone||'', s.status||'Online', s.type||'', s.make||'', s.model||'', s.capacity||'', s.used||'', s.serial||'', s.purchase_date||null, s.warranty_expiry||null, s.comments||'']);
       imported++;
     }
     const { clientIdForLog, clientLabel } = await describeClientsForLog(devices);

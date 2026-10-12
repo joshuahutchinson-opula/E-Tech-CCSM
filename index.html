@@ -950,6 +950,8 @@ function genericExportCSV(type){
 }
 
 function importCSV(type){
+  var importClientId=currentClientFilter?CLIENT_IDS[currentClientFilter]:null;
+  if(!importClientId){toast('Select a client in the sidebar before importing','warning');return;}
   var input=document.createElement('input');
   input.type='file';input.accept='.csv';
   input.onchange=function(e){
@@ -968,9 +970,7 @@ function importCSV(type){
           var row={};
           headers.forEach(function(h,idx){row[h]=(values[idx]!==undefined?values[idx]:'').trim();});
           if(!row.name){skipped++;continue;}
-          if(currentClientFilter&&CLIENT_IDS[currentClientFilter]){row.client_id=CLIENT_IDS[currentClientFilter];}
-          else if(currentClientFilter==='KFTL'){row.client_id=1;}
-          else if(currentClientFilter==='KWL'){row.client_id=3;}
+          row.client_id=importClientId;
           data.push(row);
         }
         if(data.length===0){toast('No valid rows found in CSV (each row needs at least a name)','error');return;}
@@ -1091,7 +1091,8 @@ async function saveNewAsset(type){
   if(!client){toast('Please select a client','warning');return;}
   if(hasZone&&!zone){toast('Please enter a zone','warning');return;}
   if(!name){toast('Please enter a name','warning');return;}
-  var clientId=CLIENT_IDS[client]||(client==='KFTL'?1:client==='KWL'?3:1);
+  var clientId=CLIENT_IDS[client];
+  if(!clientId){toast('Unknown client "'+client+'" - reload the page and try again','warning');return;}
   var row={client_id:clientId,name:name,comments:gfv('add-'+prefix+'-comments')};
   if(hasZone){row.zone=zone;row.status=gfv('add-'+prefix+'-status')||'Online';}
   var apiType;
