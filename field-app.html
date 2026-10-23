@@ -314,51 +314,59 @@
     .activity-item .act-when { display: block; font-size: 12px; color: var(--text-3); margin-bottom: 2px; }
     .activity-item strong { color: var(--text); font-weight: 600; }
 
-    /* ---------- Devices ---------- */
-    .filter-btn {
-      flex-shrink: 0; min-height: 50px; padding: 0 14px; border-radius: 12px;
-      display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
-      border: 1px solid var(--border); background: var(--surface); color: var(--text-2); font-size: 14px; font-weight: 600;
+    /* ---------- Devices (Clients → Sites → Devices) ---------- */
+    .level { animation: none; }
+    .level.slide-fwd { animation: levelFwd 180ms var(--ease); }
+    .level.slide-back { animation: levelBack 180ms var(--ease); }
+    @keyframes levelFwd { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
+    @keyframes levelBack { from { opacity: 0; transform: translateX(-28px); } to { opacity: 1; transform: none; } }
+    .level-head { display: flex; align-items: center; gap: 4px; margin: 0 0 10px -8px; min-height: 44px; }
+    .level-head.top { margin-left: 0; }
+    .level-title { flex: 1; min-width: 0; font-size: 18px; font-weight: 700; color: var(--text); overflow-wrap: anywhere; outline: none; }
+    .level-title:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+    .level-title .crumb {
+      min-height: 44px; padding: 0 2px; font-weight: 700; color: var(--accent);
+      text-decoration: underline; text-underline-offset: 3px;
     }
-    .filter-btn i { font-size: 18px; }
-    .filter-btn.active { border-color: var(--accent); color: var(--accent); }
-    .seg-count { font-size: 12px; font-weight: 700; color: var(--danger); }
-    .site-group { margin-bottom: 10px; }
-    .site-head-wrap { position: sticky; top: var(--toolbar-h, 0px); z-index: 3; margin: 0; font: inherit; }
-    .site-head {
-      width: 100%; min-height: 52px; padding: 8px 14px; display: flex; align-items: center; gap: 10px; text-align: left;
-      background: var(--surface); border-radius: var(--radius); font-size: 14px; font-weight: 600; color: var(--text);
+    .level-title .sep { color: var(--text-3); font-weight: 500; margin: 0 4px; }
+    .level-meta { font-size: 13px; color: var(--text-2); margin: -6px 0 12px; }
+    .nav-list { display: flex; flex-direction: column; gap: 10px; }
+    .nav-row {
+      width: 100%; min-height: 64px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; text-align: left;
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      transition: transform 150ms var(--ease), border-color 150ms;
     }
-    .site-group.open .site-head { border-radius: var(--radius) var(--radius) 0 0; border-bottom: 1px solid var(--border); }
-    .site-head .sh-text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-    .site-head .sh-meta { color: var(--text-2); font-weight: 500; }
-    .site-head .sh-off { color: var(--danger); font-weight: 600; }
-    .site-head .chev { color: var(--text-3); transition: transform 200ms var(--ease); }
-    .site-head[aria-expanded="false"] .chev { transform: rotate(-90deg); }
+    .nav-row:active { transform: scale(0.985); border-color: var(--accent); }
+    .nav-row .nr-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .nav-row .nr-name { font-size: 16px; font-weight: 600; color: var(--text); overflow-wrap: anywhere; }
+    .nav-row .nr-sub { font-size: 13px; color: var(--text-2); }
+    .nav-row .chev, .dev-row .chev { color: var(--text-3); flex-shrink: 0; }
+    .nav-row.continue { border-color: var(--accent); }
+    .nav-row.continue .nr-name { color: var(--accent); }
+    .nav-row .nr-icon { width: 44px; height: 44px; flex-shrink: 0; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 22px; background: var(--accent-soft); color: var(--accent); }
+    .client-logo { width: 44px; height: 44px; flex-shrink: 0; border-radius: 12px; background: #ffffff; border: 1px solid var(--border); object-fit: contain; padding: 4px; }
+    .initials { width: 44px; height: 44px; flex-shrink: 0; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; color: #ffffff; font-size: 16px; font-weight: 700; }
+    .off-pill { flex-shrink: 0; }
+    .type-head { font-size: 13px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.06em; margin: 18px 0 8px; }
+    .type-head:first-of-type { margin-top: 4px; }
+    .dev-group-card { overflow: hidden; }
     .dev-row {
-      width: 100%; min-height: 52px; padding: 0 14px; display: flex; align-items: center; gap: 12px; text-align: left;
+      width: 100%; min-height: 60px; padding: 8px 14px; display: flex; align-items: center; gap: 12px; text-align: left;
       border-top: 1px solid var(--border);
     }
     .dev-row:first-child { border-top: none; }
     .dev-row:active { background: var(--accent-soft); }
     .dev-row .dt { font-size: 20px; color: var(--text-2); flex-shrink: 0; }
-    .dev-row .dn { flex: 1; min-width: 0; font-size: 15px; font-weight: 500; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .dev-row .dstate { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--danger); white-space: nowrap; }
+    .dev-row .dr-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .dev-row .dn { font-size: 15px; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .dev-row .dsub { font-size: 12px; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .dev-row .dstat { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+    .dev-row .dstat.on { color: var(--success); }
+    .dev-row .dstat.off { color: var(--danger); }
+    .level .chip { margin-bottom: 4px; }
     .status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; background: var(--dot-offline); }
     .status-dot.online { background: var(--dot-online); }
     .ds-sub { font-size: 14px; color: var(--text-2); margin-bottom: 8px; }
-
-    /* ---------- Filter sheet ---------- */
-    .opt-group { border: none; margin-bottom: 18px; }
-    .opt-group legend { font-size: 13px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
-    .opt {
-      display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 4px;
-      border-bottom: 1px solid var(--border); font-size: 15px; cursor: pointer;
-    }
-    .opt input { width: 20px; height: 20px; flex-shrink: 0; accent-color: var(--accent-fill); }
-    .opt .ti { font-size: 18px; color: var(--text-2); }
-    .opt .opt-label { flex: 1; min-width: 0; }
-    .opt .count { font-size: 13px; color: var(--text-2); }
 
     /* ---------- Install ---------- */
     .install-card { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; padding: 14px; margin-bottom: 12px; }
@@ -589,15 +597,8 @@
 
     <section class="tab-page" id="tab-devices" aria-labelledby="page-title">
       <div class="list-toolbar" id="device-toolbar">
-        <label class="search"><span class="sr-only">Search devices</span><i class="ti ti-search" aria-hidden="true"></i>
-          <input type="search" id="device-search" placeholder="Search name, site, IP, model" autocomplete="off" enterkeyhint="search"></label>
-        <div class="toolbar-row">
-          <div class="segmented" role="group" aria-label="Show devices">
-            <button type="button" data-action="device-view" data-view="all" aria-pressed="true">All</button>
-            <button type="button" data-action="device-view" data-view="offline" aria-pressed="false">Offline <span class="seg-count" id="offline-count"></span></button>
-          </div>
-          <button type="button" class="filter-btn" id="device-filter-btn" data-action="device-filters"><i class="ti ti-adjustments-horizontal" aria-hidden="true"></i><span id="device-filter-label">Filter</span></button>
-        </div>
+        <label class="search"><span class="sr-only">Search all devices</span><i class="ti ti-search" aria-hidden="true"></i>
+          <input type="search" id="device-search" placeholder="Search devices, sites, IP, MAC" autocomplete="off" enterkeyhint="search"></label>
       </div>
       <div id="device-list"></div>
     </section>
@@ -792,28 +793,21 @@ var loadingPromise = null;
 var currentTab = 'home';
 var ticketScope = 'mine';
 var ticketFilter = 'active';
-// Devices tab: All/Offline view and the Filter sheet's client + type,
-// remembered on this phone. Site groups the user opened or closed are kept
-// until the context (client filter / search) changes.
-var DEVICE_PREFS_KEY = 'fieldapp_device_prefs';
-var deviceView = 'all';
-var deviceTypeFilter = 'all';
-var clientFilter = 'all';
-var siteToggles = {};
-var siteTogglesCtx = '';
-(function() {
-  try {
-    var p = JSON.parse(localStorage.getItem(DEVICE_PREFS_KEY) || 'null');
-    if (p) {
-      if (p.view === 'offline' || p.view === 'all') deviceView = p.view;
-      if (typeof p.client === 'string') clientFilter = p.client;
-      if (p.type === 'all' || ASSET_TYPE[p.type]) deviceTypeFilter = p.type;
-    }
-  } catch (e) {}
-})();
-function saveDevicePrefs() {
-  try { localStorage.setItem(DEVICE_PREFS_KEY, JSON.stringify({ view: deviceView, client: clientFilter, type: deviceTypeFilter })); } catch (e) {}
-}
+// Devices tab: folder-style navigation, Clients → Sites → Devices, plus the
+// "Offline devices" list opened from Home. Each level below the top gets a
+// history entry so the phone's back button/gesture goes up one level.
+var DEVICE_LAST_KEY = 'fieldapp_devices_last';   // { client, site } for "Continue"
+var ALL_SITES = '\u0000all';
+var NO_SITE = 'No site';
+var DEVICE_TYPE_ORDER = ['cameras', 'doors', 'servers', 'switches', 'storage', 'intrusion', 'stations', 'monitors'];
+var devNav = null;          // { level: 'clients'|'sites'|'devices'|'offline', client, site }
+var devDepth = 0;           // history entries pushed above the Devices tab's base entry
+var devIgnorePops = 0;      // popstates caused by our own history.go() calls
+var devOfflineOnly = false; // Level 3 "Offline only" chip, not remembered
+var devScrolls = {};
+var devPending = null;      // 'fwd' | 'back' | null — animation/focus for the next render
+try { localStorage.removeItem('fieldapp_device_prefs'); } catch (e) {}   // old All/Offline + filter prefs
+
 var timers = [];
 
 function allDevices() {
@@ -1387,7 +1381,10 @@ var TAB_TITLES = { home: 'Home', tickets: 'Tickets', devices: 'Devices', profile
 
 function switchTab(tab) {
   if (!TAB_TITLES[tab]) return;
+  var prevTab = currentTab;
+  if (prevTab === 'devices' && tab !== 'devices') devUnwind();
   currentTab = tab;
+  if (tab === 'devices' && prevTab !== 'devices') devOnShow();
   document.querySelectorAll('.tab-page').forEach(function(el) { el.classList.toggle('active', el.id === 'tab-' + tab); });
   document.querySelectorAll('.tabbar button').forEach(function(el) {
     if (el.dataset.tab === tab) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
@@ -1451,7 +1448,7 @@ function renderHome() {
   summary.innerHTML =
     card(mine.length, 'My open tickets', 'ti-ticket', 'accent', 'data-action="go-tickets" data-scope="mine" data-filter="active"') +
     card(urgent.length, 'Urgent', 'ti-alert-triangle', 'danger', 'data-action="go-tickets" data-scope="mine" data-filter="urgent"') +
-    card(offline, 'Offline devices', 'ti-plug-connected-x', 'warning', 'data-action="go-devices" data-view="offline"') +
+    card(offline, 'Offline devices', 'ti-plug-connected-x', 'warning', 'data-action="go-devices"') +
     card(resolved, 'Resolved this week', 'ti-circle-check', 'success', 'data-action="go-tickets" data-scope="mine" data-filter="resolved7"');
   document.getElementById('home-banner').innerHTML = urgent.length
     ? '<button type="button" class="alert-banner" data-action="go-tickets" data-scope="mine" data-filter="urgent"><i class="ti ti-alert-triangle" aria-hidden="true"></i><span class="grow">' +
@@ -1531,127 +1528,301 @@ function renderTickets() {
 }
 
 // ---------- Devices ----------
-function deviceMatches(d, q) {
-  if (!q) return true;
-  var r = d.raw;
-  return [r.name, r.serial, r.zone, r.ip_address, r.model, r.make, getClientFromId(r.client_id), ASSET_TYPE[d.type].label].some(function(v) { return lc(v).indexOf(q) !== -1; });
+function deviceSite(r) { return String(r.zone || '').trim() || NO_SITE; }
+function devTypeRank(t) { return DEVICE_TYPE_ORDER.indexOf(t); }
+function devOfflineFirst(a, b) {
+  var ao = isDeviceOnline(a.raw.status), bo = isDeviceOnline(b.raw.status);
+  return ao === bo ? deviceName(a.raw).localeCompare(deviceName(b.raw)) : ao ? 1 : -1;
 }
-function deviceSite(r) { return String(r.zone || '').trim() || 'No site'; }
-function deviceClientNames() {
-  var names = {};
-  allDevices().forEach(function(d) { names[getClientFromId(d.raw.client_id)] = 1; });
-  return Object.keys(names).sort();
-}
-function activeDeviceFilterCount() { return (clientFilter !== 'all' ? 1 : 0) + (deviceTypeFilter !== 'all' ? 1 : 0); }
-
-function renderDevices() {
-  var container = document.getElementById('device-list');
-  document.querySelectorAll('[data-action="device-view"]').forEach(function(b) { b.setAttribute('aria-pressed', String(b.dataset.view === deviceView)); });
-  if (!dataLoaded) { container.innerHTML = skeletons(5, 52); return; }
-  if (clientFilter !== 'all' && deviceClientNames().indexOf(clientFilter) === -1) { clientFilter = 'all'; saveDevicePrefs(); }
-  var nFilters = activeDeviceFilterCount();
-  var fbtn = document.getElementById('device-filter-btn');
-  fbtn.classList.toggle('active', nFilters > 0);
-  document.getElementById('device-filter-label').textContent = nFilters ? 'Filter · ' + nFilters : 'Filter';
-  fbtn.setAttribute('aria-label', nFilters ? 'Filter, ' + plural(nFilters, 'filter') + ' on' : 'Filter');
-
-  var q = lc(document.getElementById('device-search').value).trim();
-  var base = allDevices().filter(function(d) {
-    return (clientFilter === 'all' || getClientFromId(d.raw.client_id) === clientFilter) &&
-      (deviceTypeFilter === 'all' || d.type === deviceTypeFilter) && deviceMatches(d, q);
+function siteSort(a, b) { return a === NO_SITE ? 1 : b === NO_SITE ? -1 : a.localeCompare(b); }
+// { clientName: { siteName: [devices] } }
+function devTree() {
+  var tree = {};
+  allDevices().forEach(function(d) {
+    var c = getClientFromId(d.raw.client_id), z = deviceSite(d.raw);
+    tree[c] = tree[c] || {};
+    (tree[c][z] = tree[c][z] || []).push(d);
   });
-  var offlineCount = base.filter(function(d) { return !isDeviceOnline(d.raw.status); }).length;
-  document.getElementById('offline-count').textContent = offlineCount ? String(offlineCount) : '';
-  var list = deviceView === 'offline' ? base.filter(function(d) { return !isDeviceOnline(d.raw.status); }) : base;
+  return tree;
+}
+function devClientNames(tree) { return Object.keys(tree).sort(function(a, b) { return a.localeCompare(b); }); }
+function devSiteNames(tree, c) { return tree[c] ? Object.keys(tree[c]).sort(siteSort) : []; }
+function devicesOf(tree, c, site) {
+  if (!tree[c]) return [];
+  if (site === ALL_SITES) return [].concat.apply([], devSiteNames(tree, c).map(function(z) { return tree[c][z]; }));
+  return tree[c][site] || [];
+}
+function offlineIn(list) { return list.filter(function(d) { return !isDeviceOnline(d.raw.status); }).length; }
 
-  if (!list.length) {
-    if (!allDevices().length) container.innerHTML = emptyState('ti-devices', 'No devices yet', 'Devices added on the CAMS dashboard appear here.', 'Refresh', 'refresh');
-    else if (deviceView === 'offline' && !q && base.length) container.innerHTML = emptyState('ti-circle-check', 'Everything\'s online', nFilters ? 'No offline devices for these filters.' : 'No devices are offline right now.', 'Show all devices', 'device-view', ' data-view="all"');
-    else container.innerHTML = emptyState('ti-filter-off', 'No devices match', q ? 'Nothing matches “' + q + '” with these filters.' : 'Nothing matches these filters.', 'Clear filters', 'clear-device-filters');
+// A one-site client has no Sites level; a lone client has no Clients level.
+function devNormalize(n, tree) {
+  if (n.level === 'sites' && devSiteNames(tree, n.client).length === 1) return { level: 'devices', client: n.client, site: devSiteNames(tree, n.client)[0] };
+  return n;
+}
+function devTop(tree) {
+  var clients = devClientNames(tree);
+  if (clients.length === 1) return devNormalize({ level: 'sites', client: clients[0] }, tree);
+  return { level: 'clients' };
+}
+// Levels from the top down to n (the top itself is index 0).
+function devPath(n, tree) {
+  if (n.level === 'offline') return [null, n];
+  var path = [];
+  if (devClientNames(tree).length > 1) path.push({ level: 'clients' });
+  if (n.level === 'clients') return path;
+  if (devSiteNames(tree, n.client).length > 1) path.push({ level: 'sites', client: n.client });
+  if (n.level === 'devices') path.push(n);
+  return path;
+}
+function devKey(n) { return n ? [n.level, n.client || '', n.site || ''].join('\u0001') : ''; }
+function devSameNav(a, b) { return devKey(a) === devKey(b); }
+
+function devSaveScroll() { if (devNav) devScrolls[devKey(devNav)] = document.getElementById('field-content').scrollTop; }
+
+// Forward navigation chosen by the user: push one history entry per level.
+function devGo(n) {
+  var tree = devTree();
+  n = devNormalize(n, tree);
+  var path = devPath(n, tree);
+  var depth = path.length - 1;
+  if (depth <= devDepth) {          // going up (breadcrumb): let popstate land on it
+    if (depth < devDepth) history.go(depth - devDepth);
     return;
   }
-
-  // Sites start open only when narrowed to one client or searching.
-  var ctx = clientFilter + '|' + (q ? 'q' : '');
-  if (ctx !== siteTogglesCtx) { siteToggles = {}; siteTogglesCtx = ctx; }
-  var openByDefault = clientFilter !== 'all' || !!q;
-  var groups = {};
-  list.forEach(function(d) {
-    var key = getClientFromId(d.raw.client_id) + '\u0001' + deviceSite(d.raw);
-    (groups[key] = groups[key] || []).push(d);
-  });
-  container.innerHTML = Object.keys(groups).sort(function(a, b) { return a.localeCompare(b); }).map(function(key) {
-    var parts = key.split('\u0001'), client = parts[0], site = parts[1];
-    var devs = groups[key].slice().sort(function(a, b) {
-      var ao = isDeviceOnline(a.raw.status), bo = isDeviceOnline(b.raw.status);
-      return ao === bo ? deviceName(a.raw).localeCompare(deviceName(b.raw)) : ao ? 1 : -1;
-    });
-    var off = devs.filter(function(d) { return !isDeviceOnline(d.raw.status); }).length;
-    var open = siteToggles.hasOwnProperty(key) ? siteToggles[key] : openByDefault;
-    var title = (clientFilter === 'all' ? client + ' — ' : '') + site;
-    return '<section class="card site-group' + (open ? ' open' : '') + '">' +
-      '<h3 class="site-head-wrap"><button type="button" class="site-head" data-action="toggle-site" data-key="' + esc(key) + '" aria-expanded="' + open + '">' +
-      '<span class="sh-text">' + esc(title) + ' <span class="sh-meta">· ' + esc(plural(devs.length, 'device')) + '</span>' +
-      (off ? ' <span class="sh-off">· ' + off + ' offline</span>' : '') + '</span>' +
-      '<i class="ti ti-chevron-down chev" aria-hidden="true"></i></button></h3>' +
-      '<div' + (open ? '' : ' hidden') + '>' + devs.map(deviceRow).join('') + '</div></section>';
-  }).join('');
-  var toolbar = document.getElementById('device-toolbar');
-  document.getElementById('tab-devices').style.setProperty('--toolbar-h', toolbar.offsetHeight + 'px');
+  devSaveScroll();
+  for (var i = devDepth + 1; i <= depth; i++) history.pushState({ fa: 'dev', nav: path[i], depth: i }, '');
+  devDepth = depth;
+  devSetNav(n, 'fwd');
 }
-function deviceRow(d) {
+function devSetNav(n, dir) {
+  devNav = n;
+  if (dir === 'fwd') devOfflineOnly = false;
+  if (n.level === 'devices' && n.site !== ALL_SITES) {
+    try { localStorage.setItem(DEVICE_LAST_KEY, JSON.stringify({ client: n.client, site: n.site })); } catch (e) {}
+  }
+  devPending = dir;
+  renderDevices();
+}
+// Back to the top level (Devices tab tapped again, or leaving the tab).
+function devUnwind() {
+  if (devDepth > 0) { devIgnorePops++; history.go(-devDepth); devDepth = 0; }
+}
+function devGoTop() {
+  devUnwind();
+  document.getElementById('device-search').value = '';
+  devSetNav(devTop(devTree()), 'back');
+  document.getElementById('field-content').scrollTop = 0;
+}
+// Coming back to the Devices tab from another tab: rebuild the back stack
+// for wherever it was left (the Home offline list is not kept).
+function devOnShow() {
+  var tree = devTree();
+  if (!devNav || devNav.level === 'offline') { devNav = devTop(tree); devDepth = 0; return; }
+  var path = devPath(devNav, tree);
+  devDepth = 0;
+  for (var i = 1; i < path.length; i++) { history.pushState({ fa: 'dev', nav: path[i], depth: i }, ''); devDepth = i; }
+}
+function devOpenOffline() {
+  document.getElementById('device-search').value = '';
+  var offline = { level: 'offline' };
+  devNav = offline;   // so devOnShow() doesn't rebuild (then unwind) the old back stack
+  if (currentTab !== 'devices') switchTab('devices');
+  devUnwind();
+  history.pushState({ fa: 'dev', nav: offline, depth: 1 }, '');
+  devDepth = 1;
+  devSetNav(offline, 'fwd');
+}
+
+window.addEventListener('popstate', function(e) {
+  if (devIgnorePops) { devIgnorePops--; return; }
+  if (!authToken) return;
+  var st = e.state && e.state.fa === 'dev' ? e.state : null;
+  // An open sheet closes first; stay on the level it was opened from.
+  if (sheetStack.length) {
+    closeSheet(sheetStack[sheetStack.length - 1]);
+    if (currentTab === 'devices' && devDepth > 0) history.pushState({ fa: 'dev', nav: devNav, depth: devDepth }, '');
+    return;
+  }
+  if (currentTab !== 'devices') return;
+  if (devNav && devNav.level === 'offline' && !st) { devDepth = 0; devNav = null; switchTab('home'); return; }
+  devDepth = st ? st.depth : 0;
+  devSaveScroll();
+  devSetNav(st ? st.nav : devTop(devTree()), 'back');
+});
+
+// After a refresh: if the client/site on screen is gone, go up to the
+// nearest level that still exists and say why.
+function devValidate(tree) {
+  if (!devNav || devNav.level === 'offline' || devNav.level === 'clients') return;
+  var target = null, why = '';
+  if (!tree[devNav.client]) {
+    target = devTop(tree);
+    why = devNav.client + ' no longer has any devices — showing ' + (target.level === 'clients' ? 'all clients' : target.client) + '.';
+  } else if (devNav.level === 'devices' && devNav.site !== ALL_SITES && !tree[devNav.client][devNav.site]) {
+    target = devNormalize({ level: 'sites', client: devNav.client }, tree);
+    if (target.level === 'devices' && target.site === devNav.site) target = devTop(tree);
+    why = devNav.site + ' no longer has any devices — showing ' + devNav.client + '.';
+  }
+  if (!target) return;
+  var depth = devPath(target, tree).length - 1;
+  if (depth < devDepth) { devIgnorePops++; history.go(depth - devDepth); }
+  devDepth = Math.min(depth, devDepth);
+  devNav = target;
+  devPending = 'back';
+  toast(why, 'warning');
+}
+
+var INITIAL_COLOURS = ['#1f5fd6', '#7c3aed', '#b4142f', '#046c4e', '#8a4b00', '#0e7490', '#be185d', '#4338ca'];
+function clientBadge(name) {
+  var h = 0;
+  for (var i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  var words = name.split(/\s+/).filter(Boolean);
+  var initials = (words.length > 1 ? words[0].charAt(0) + words[1].charAt(0) : name.slice(0, 2)).toUpperCase() || '?';
+  var file = 'logo-' + name.toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9_-]/g, '') + '.png';
+  return '<img class="client-logo" alt="" src="' + esc(file) + '" data-initials="' + esc(initials) + '" data-colour="' + INITIAL_COLOURS[h % INITIAL_COLOURS.length] + '">';
+}
+// logo file missing -> coloured initials badge
+document.addEventListener('error', function(e) {
+  var img = e.target;
+  if (!img || !img.classList || !img.classList.contains('client-logo')) return;
+  var b = document.createElement('span');
+  b.className = 'initials';
+  b.setAttribute('aria-hidden', 'true');
+  b.style.background = img.dataset.colour;
+  b.textContent = img.dataset.initials;
+  img.replaceWith(b);
+}, true);
+
+function offPill(n) { return n ? '<span class="badge pri-high off-pill">' + n + ' offline</span>' : ''; }
+function navRow(attrs, lead, name, sub, off, cls) {
+  return '<button type="button" class="nav-row' + (cls ? ' ' + cls : '') + '" ' + attrs + '>' + lead +
+    '<span class="nr-main"><span class="nr-name">' + name + '</span><span class="nr-sub">' + esc(sub) + '</span></span>' +
+    offPill(off) + '<i class="ti ti-chevron-right chev" aria-hidden="true"></i></button>';
+}
+function devRow(d, sub) {
   var r = d.raw, t = ASSET_TYPE[d.type], online = isDeviceOnline(r.status);
   return '<button type="button" class="dev-row" data-action="open-device" data-type="' + d.type + '" data-id="' + esc(r.id) + '">' +
     '<i class="ti ' + t.icon + ' dt" aria-hidden="true"></i>' +
-    '<span class="dn">' + esc(deviceName(r)) + '<span class="sr-only">, ' + esc(t.label) + (online ? ', online' : '') + '</span></span>' +
-    (online ? '<span class="status-dot online" aria-hidden="true"></span>'
-            : '<span class="dstate"><span class="status-dot" aria-hidden="true"></span>Offline</span>') +
-    '</button>';
+    '<span class="dr-main"><span class="dn">' + esc(deviceName(r)) + '</span><span class="dsub">' + esc(sub) + '</span></span>' +
+    '<span class="dstat ' + (online ? 'on' : 'off') + '"><span class="status-dot' + (online ? ' online' : '') + '" aria-hidden="true"></span>' + (online ? 'Online' : 'Offline') + '</span>' +
+    '<i class="ti ti-chevron-right chev" aria-hidden="true"></i></button>';
+}
+function levelHead(title, backLabel, top) {
+  return '<div class="level-head' + (top ? ' top' : '') + '">' +
+    (top ? '' : '<button type="button" class="icon-btn" data-action="dev-back" aria-label="' + esc(backLabel) + '"><i class="ti ti-arrow-left" aria-hidden="true"></i></button>') +
+    '<h2 class="level-title" tabindex="-1">' + title + '</h2></div>';
+}
+function typeGroups(list, subOf) {
+  var by = {};
+  list.forEach(function(d) { (by[d.type] = by[d.type] || []).push(d); });
+  return DEVICE_TYPE_ORDER.filter(function(t) { return by[t]; }).map(function(t) {
+    return '<h3 class="type-head">' + esc(ASSET_TYPE[t].plural) + ' (' + by[t].length + ')</h3>' +
+      '<div class="card dev-group-card">' + by[t].sort(devOfflineFirst).map(function(d) { return devRow(d, subOf(d)); }).join('') + '</div>';
+  }).join('');
 }
 
-function openDeviceFilters() {
-  var clients = deviceClientNames();
-  function typeOptions(client) {
-    var pool = allDevices().filter(function(d) { return client === 'all' || getClientFromId(d.raw.client_id) === client; });
-    return '<label class="opt"><input type="radio" name="f-type" value="all"' + (deviceTypeFilter === 'all' ? ' checked' : '') + '><span class="opt-label">All types</span><span class="count">' + pool.length + '</span></label>' +
-      ASSET_TYPES.map(function(t) {
-        var n = pool.filter(function(d) { return d.type === t.key; }).length;
-        return '<label class="opt"><input type="radio" name="f-type" value="' + t.key + '"' + (deviceTypeFilter === t.key ? ' checked' : '') + '>' +
-          '<i class="ti ' + t.icon + '" aria-hidden="true"></i><span class="opt-label">' + esc(t.plural) + '</span><span class="count">' + n + '</span></label>';
-      }).join('');
+function renderDevices() {
+  var container = document.getElementById('device-list');
+  if (!dataLoaded) { container.innerHTML = skeletons(5, 64); return; }
+  var tree = devTree();
+  if (!devNav) devNav = devTop(tree);
+  devValidate(tree);
+  var dir = devPending;
+  devPending = null;
+  var q = lc(document.getElementById('device-search').value).trim();
+  var html;
+  if (!allDevices().length) html = emptyState('ti-devices', 'No devices yet', 'Devices added on the CAMS dashboard appear here.', 'Refresh', 'refresh');
+  else if (q) html = devSearchHtml(q);
+  else if (devNav.level === 'clients') html = devClientsHtml(tree);
+  else if (devNav.level === 'sites') html = devSitesHtml(tree);
+  else if (devNav.level === 'offline') html = devOfflineHtml(tree);
+  else html = devDevicesHtml(tree);
+  container.innerHTML = '<div class="level' + (dir === 'fwd' ? ' slide-fwd' : dir === 'back' && !q ? ' slide-back' : '') + '">' + html + '</div>';
+  if (dir && !q) {
+    var scroller = document.getElementById('field-content');
+    scroller.scrollTop = dir === 'back' ? (devScrolls[devKey(devNav)] || 0) : 0;
+    var heading = container.querySelector('.level-title');
+    if (heading) heading.focus({ preventScroll: true });
   }
-  var all = allDevices();
-  var html = '<fieldset class="opt-group"><legend>Client</legend>' +
-      '<label class="opt"><input type="radio" name="f-client" value="all"' + (clientFilter === 'all' ? ' checked' : '') + '><span class="opt-label">All clients</span><span class="count">' + all.length + '</span></label>' +
-      clients.map(function(c) {
-        var n = all.filter(function(d) { return getClientFromId(d.raw.client_id) === c; }).length;
-        return '<label class="opt"><input type="radio" name="f-client" value="' + esc(c) + '"' + (clientFilter === c ? ' checked' : '') + '><span class="opt-label">' + esc(c) + '</span><span class="count">' + n + '</span></label>';
-      }).join('') + '</fieldset>' +
-    '<fieldset class="opt-group"><legend>Type</legend><div id="filter-type-options">' + typeOptions(clientFilter) + '</div></fieldset>';
-  var entry = openSheet({
-    title: 'Filter devices', html: html, kind: 'device-filters', full: true,
-    actions: '<button type="button" class="btn" data-action="filter-clear">Clear</button><button type="button" class="btn primary" data-action="filter-apply">Apply</button>'
-  });
-  // type counts follow the client picked in the sheet
-  entry.layer.addEventListener('change', function(e) {
-    if (e.target.name !== 'f-client') return;
-    var keepType = (entry.layer.querySelector('input[name="f-type"]:checked') || {}).value || 'all';
-    entry.layer.querySelector('#filter-type-options').innerHTML = typeOptions(e.target.value);
-    var again = entry.layer.querySelector('input[name="f-type"][value="' + keepType + '"]');
-    if (again) again.checked = true;
-  });
 }
-function applyDeviceFilters(clear) {
-  var top = topSheet('device-filters');
-  if (!top) return;
-  if (clear) { clientFilter = 'all'; deviceTypeFilter = 'all'; }
-  else {
-    clientFilter = (top.layer.querySelector('input[name="f-client"]:checked') || {}).value || 'all';
-    deviceTypeFilter = (top.layer.querySelector('input[name="f-type"]:checked') || {}).value || 'all';
+
+function devClientsHtml(tree) {
+  var clients = devClientNames(tree);
+  var html = levelHead('Clients', '', true);
+  var last = null;
+  try { last = JSON.parse(localStorage.getItem(DEVICE_LAST_KEY) || 'null'); } catch (e) {}
+  if (last && tree[last.client] && tree[last.client][last.site]) {
+    html += '<div class="nav-list" style="margin-bottom:12px;">' +
+      navRow('data-action="dev-continue" data-client="' + esc(last.client) + '" data-site="' + esc(last.site) + '"',
+        '<span class="nr-icon"><i class="ti ti-history" aria-hidden="true"></i></span>',
+        'Continue', last.client + ' › ' + last.site, 0, 'continue') + '</div>';
   }
-  saveDevicePrefs();
-  closeSheet(top);
-  renderDevices();
+  html += '<div class="nav-list">' + clients.map(function(c) {
+    var list = devicesOf(tree, c, ALL_SITES);
+    return navRow('data-action="dev-client" data-client="' + esc(c) + '"', clientBadge(c), esc(c), plural(list.length, 'device'), offlineIn(list));
+  }).join('') + '</div>';
+  return html;
+}
+function devSitesHtml(tree) {
+  var c = devNav.client, sites = devSiteNames(tree, c), all = devicesOf(tree, c, ALL_SITES);
+  var top = devSameNav(devTop(tree), devNav);
+  var html = levelHead(esc(c), 'Back to clients', top);
+  html += '<div class="nav-list">' +
+    navRow('data-action="dev-site" data-client="' + esc(c) + '" data-all="1"', '<span class="nr-icon"><i class="ti ti-building" aria-hidden="true"></i></span>', 'All sites', plural(all.length, 'device'), offlineIn(all)) +
+    sites.map(function(z) {
+      var list = tree[c][z];
+      return navRow('data-action="dev-site" data-client="' + esc(c) + '" data-site="' + esc(z) + '"', '<span class="nr-icon"><i class="ti ti-map-pin" aria-hidden="true"></i></span>', esc(z), plural(list.length, 'device'), offlineIn(list));
+    }).join('') + '</div>';
+  return html;
+}
+function devDevicesHtml(tree) {
+  var c = devNav.client, site = devNav.site, allSites = site === ALL_SITES;
+  var list = devicesOf(tree, c, site);
+  var off = offlineIn(list);
+  if (!off) devOfflineOnly = false;
+  var top = devSameNav(devTop(tree), devNav);
+  var sitesLevel = devSiteNames(tree, c).length > 1;
+  var crumb = sitesLevel
+    ? '<button type="button" class="crumb" data-action="dev-crumb" data-client="' + esc(c) + '">' + esc(c) + '</button>'
+    : esc(c);
+  var html = levelHead(crumb + '<span class="sep" aria-hidden="true">›</span><span class="sr-only">, </span>' + esc(allSites ? 'All sites' : site),
+    sitesLevel ? 'Back to ' + c : 'Back to clients', top);
+  html += '<p class="level-meta">' + esc(plural(list.length, 'device')) + (off ? ' · ' + off + ' offline' : '') + '</p>';
+  if (off) html += '<button type="button" class="chip" data-action="dev-offline-only" aria-pressed="' + devOfflineOnly + '">Offline only (' + off + ')</button>';
+  var shown = devOfflineOnly ? list.filter(function(d) { return !isDeviceOnline(d.raw.status); }) : list;
+  html += typeGroups(shown, function(d) { return ASSET_TYPE[d.type].label + (allSites ? ' · ' + deviceSite(d.raw) : ''); });
+  return html;
+}
+function devOfflineHtml(tree) {
+  var html = levelHead('Offline devices', 'Back to Home', false);
+  var groups = [];
+  devClientNames(tree).forEach(function(c) {
+    devSiteNames(tree, c).forEach(function(z) {
+      var off = tree[c][z].filter(function(d) { return !isDeviceOnline(d.raw.status); });
+      if (off.length) groups.push({ c: c, z: z, list: off });
+    });
+  });
+  if (!groups.length) return html + emptyState('ti-circle-check', 'Everything\'s online', 'No devices are offline right now.', 'Back to Home', 'dev-back');
+  var total = groups.reduce(function(n, g) { return n + g.list.length; }, 0);
+  html += '<p class="level-meta">' + esc(plural(total, 'device')) + ' offline</p>';
+  return html + groups.map(function(g) {
+    return '<h3 class="type-head">' + esc(g.c + ' › ' + g.z) + ' (' + g.list.length + ')</h3>' +
+      '<div class="card dev-group-card">' + g.list.sort(function(a, b) { return devTypeRank(a.type) - devTypeRank(b.type) || deviceName(a.raw).localeCompare(deviceName(b.raw)); })
+        .map(function(d) { return devRow(d, ASSET_TYPE[d.type].label); }).join('') + '</div>';
+  }).join('');
+}
+function devMatches(d, q) {
+  var r = d.raw, t = ASSET_TYPE[d.type];
+  return [r.name, r.serial, deviceSite(r), r.ip_address, r.mac_address, r.mac, r.model, t.label, t.plural].some(function(v) { return lc(v).indexOf(q) !== -1; });
+}
+function devSearchHtml(q) {
+  var raw = document.getElementById('device-search').value.trim();
+  var found = allDevices().filter(function(d) { return devMatches(d, q); }).sort(devOfflineFirst);
+  var html = levelHead(esc(plural(found.length, 'result')), '', true);
+  if (!found.length) return html + emptyState('ti-search', 'No devices match ‘' + raw + '’', 'Search covers every client: name, site, IP, MAC, model and type.', 'Clear search', 'dev-clear-search');
+  return html + '<div class="card dev-group-card">' + found.map(function(d) {
+    return devRow(d, ASSET_TYPE[d.type].label + ' · ' + getClientFromId(d.raw.client_id) + ' › ' + deviceSite(d.raw));
+  }).join('') + '</div>';
 }
 
 // ---------- Profile ----------
@@ -2228,7 +2399,10 @@ document.addEventListener('click', function(e) {
   var a = el.dataset.action;
   switch (a) {
     case 'login': loginWithMicrosoft(); break;
-    case 'tab': switchTab(el.dataset.tab); break;
+    case 'tab':
+      if (el.dataset.tab === 'devices' && currentTab === 'devices') devGoTop();
+      else switchTab(el.dataset.tab);
+      break;
     case 'refresh': refreshNow(); break;
     case 'sync-now':
       if (!navigator.onLine) toast("You're offline — changes will sync once you reconnect.", 'warning');
@@ -2244,33 +2418,17 @@ document.addEventListener('click', function(e) {
       document.getElementById('ticket-search').value = '';
       switchTab('tickets');
       break;
-    case 'go-devices':
-      deviceView = el.dataset.view || 'all';
-      deviceTypeFilter = 'all'; clientFilter = 'all';
-      saveDevicePrefs();
-      document.getElementById('device-search').value = '';
-      switchTab('devices');
-      break;
+    case 'go-devices': devOpenOffline(); break;
     case 'ticket-scope': ticketScope = el.dataset.scope; renderTickets(); break;
     case 'ticket-filter': ticketFilter = el.dataset.filter; renderTickets(); break;
     case 'clear-ticket-search': document.getElementById('ticket-search').value = ''; renderTickets(); break;
-    case 'device-view': deviceView = el.dataset.view === 'offline' ? 'offline' : 'all'; saveDevicePrefs(); renderDevices(); break;
-    case 'device-filters': openDeviceFilters(); break;
-    case 'filter-apply': applyDeviceFilters(false); break;
-    case 'filter-clear': applyDeviceFilters(true); break;
-    case 'clear-device-filters':
-      deviceView = 'all'; deviceTypeFilter = 'all'; clientFilter = 'all';
-      saveDevicePrefs();
-      document.getElementById('device-search').value = '';
-      renderDevices();
-      break;
-    case 'toggle-site':
-      var nowOpen = el.getAttribute('aria-expanded') !== 'true';
-      siteToggles[el.dataset.key] = nowOpen;
-      el.setAttribute('aria-expanded', String(nowOpen));
-      el.closest('.site-group').classList.toggle('open', nowOpen);
-      el.parentNode.nextElementSibling.hidden = !nowOpen;
-      break;
+    case 'dev-client': devGo({ level: 'sites', client: el.dataset.client }); break;
+    case 'dev-site': devGo({ level: 'devices', client: el.dataset.client, site: el.dataset.all ? ALL_SITES : el.dataset.site }); break;
+    case 'dev-continue': devGo({ level: 'devices', client: el.dataset.client, site: el.dataset.site }); break;
+    case 'dev-crumb': devGo({ level: 'sites', client: el.dataset.client }); break;
+    case 'dev-back': if (devDepth > 0) history.back(); else switchTab('home'); break;
+    case 'dev-offline-only': devOfflineOnly = !devOfflineOnly; renderDevices(); break;
+    case 'dev-clear-search': document.getElementById('device-search').value = ''; renderDevices(); document.getElementById('device-search').focus(); break;
     case 'install': startInstall(); break;
     case 'install-dismiss': dismissInstallCard(); break;
     case 'open-ticket': openTicketDetail(el.dataset.id); break;
