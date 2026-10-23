@@ -1358,7 +1358,6 @@ const TICKER_ASSET_TABLES = [
   ['monitors', 'monitor', 'controlcenter'],
 ];
 const TICKER_TIME_ZONE = 'America/Jamaica';
-const TICKER_MAX_OFFLINE = 5;
 
 function tickerJamaicaYMD(date) {
   return new Intl.DateTimeFormat('en-CA', { timeZone: TICKER_TIME_ZONE, year: 'numeric', month: '2-digit', day: '2-digit' }).format(date);
@@ -1417,15 +1416,10 @@ app.get('/api/ticker', authMiddleware, async (req, res) => {
     const items = [];
     const now = new Date();
 
-    // 1–2. Offline devices by name, or an all-clear when everything is up.
+    // 1. All-clear when every device is up (offline devices are not listed).
     const devices = filterByZoneAccess(assets.rows, req);
     const isOnline = d => ['online', 'working'].includes(String(d.status || '').trim().toLowerCase());
-    const offline = devices.filter(d => !isOnline(d));
-    if (offline.length) {
-      const named = offline.slice(0, TICKER_MAX_OFFLINE).map(d => `${d.name || 'Unnamed'} ${d.type}` + (d.zone ? ` (${d.zone})` : ''));
-      const more = offline.length > TICKER_MAX_OFFLINE ? ` · +${offline.length - TICKER_MAX_OFFLINE} more` : '';
-      items.push({ kind: 'offline', text: 'Offline: ' + named.join(' · ') + more, priority: 'high', link: { type: 'tab', tab: offline[0].tab } });
-    } else if (devices.length) {
+    if (devices.length && devices.every(isOnline)) {
       const sites = new Set(devices.map(d => (d.zone || '').trim()).filter(Boolean)).size;
       items.push({ kind: 'all_clear', text: `All ${tickerPlural(devices.length, 'device')} online` + (sites ? ` across ${tickerPlural(sites, 'site')}` : ''), priority: 'info' });
     }
