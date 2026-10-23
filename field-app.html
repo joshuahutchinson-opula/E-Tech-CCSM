@@ -246,7 +246,7 @@
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
       background-repeat: no-repeat; background-position: right 14px center;
     }
-    .select:focus, .field input:focus, .field textarea:focus, .field select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+    .select:focus, .field textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 
     /* ---------- Cards, lists ---------- */
     .section-title { font-size: 13px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.06em; margin: 20px 0 10px; }
@@ -315,31 +315,63 @@
     .activity-item strong { color: var(--text); font-weight: 600; }
 
     /* ---------- Devices ---------- */
-    .dev-group { margin-bottom: 12px; overflow: hidden; }
-    .group-head, .zone-head {
-      width: 100%; display: flex; align-items: center; gap: 10px; text-align: left;
-      min-height: 52px; padding: 8px 14px; font-weight: 700;
+    .filter-btn {
+      flex-shrink: 0; min-height: 50px; padding: 0 14px; border-radius: 12px;
+      display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+      border: 1px solid var(--border); background: var(--surface); color: var(--text-2); font-size: 14px; font-weight: 600;
     }
-    .group-head { font-size: 16px; }
-    .zone-head { font-size: 14px; min-height: 48px; color: var(--text-2); border-top: 1px solid var(--border); background: var(--surface-2); }
-    .group-head .chev, .zone-head .chev { transition: transform 200ms var(--ease); color: var(--text-3); }
-    .group-head[aria-expanded="false"] .chev, .zone-head[aria-expanded="false"] .chev { transform: rotate(-90deg); }
-    .group-head .grow, .zone-head .grow { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .count-muted { font-size: 13px; font-weight: 500; color: var(--text-3); }
-    .off-count { background: var(--pri-high-bg); color: var(--pri-high); }
-    .device-row {
-      width: 100%; display: flex; align-items: center; gap: 12px; text-align: left;
-      min-height: 60px; padding: 10px 14px; border-top: 1px solid var(--border);
+    .filter-btn i { font-size: 18px; }
+    .filter-btn.active { border-color: var(--accent); color: var(--accent); }
+    .seg-count { font-size: 12px; font-weight: 700; color: var(--danger); }
+    .site-group { margin-bottom: 10px; }
+    .site-head-wrap { position: sticky; top: var(--toolbar-h, 0px); z-index: 3; margin: 0; font: inherit; }
+    .site-head {
+      width: 100%; min-height: 52px; padding: 8px 14px; display: flex; align-items: center; gap: 10px; text-align: left;
+      background: var(--surface); border-radius: var(--radius); font-size: 14px; font-weight: 600; color: var(--text);
     }
-    .device-row:active { background: var(--accent-soft); }
+    .site-group.open .site-head { border-radius: var(--radius) var(--radius) 0 0; border-bottom: 1px solid var(--border); }
+    .site-head .sh-text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    .site-head .sh-meta { color: var(--text-2); font-weight: 500; }
+    .site-head .sh-off { color: var(--danger); font-weight: 600; }
+    .site-head .chev { color: var(--text-3); transition: transform 200ms var(--ease); }
+    .site-head[aria-expanded="false"] .chev { transform: rotate(-90deg); }
+    .dev-row {
+      width: 100%; min-height: 52px; padding: 0 14px; display: flex; align-items: center; gap: 12px; text-align: left;
+      border-top: 1px solid var(--border);
+    }
+    .dev-row:first-child { border-top: none; }
+    .dev-row:active { background: var(--accent-soft); }
+    .dev-row .dt { font-size: 20px; color: var(--text-2); flex-shrink: 0; }
+    .dev-row .dn { flex: 1; min-width: 0; font-size: 15px; font-weight: 500; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .dev-row .dstate { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--danger); white-space: nowrap; }
     .status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; background: var(--dot-offline); }
     .status-dot.online { background: var(--dot-online); }
-    .dr-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-    .dr-name { font-size: 15px; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .dr-sub { font-size: 13px; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .dr-status { font-size: 13px; font-weight: 600; color: var(--text-2); white-space: nowrap; }
-    .dr-status.offline { color: var(--danger); }
-    .device-row .chev { color: var(--text-3); }
+    .ds-sub { font-size: 14px; color: var(--text-2); margin-bottom: 8px; }
+
+    /* ---------- Filter sheet ---------- */
+    .opt-group { border: none; margin-bottom: 18px; }
+    .opt-group legend { font-size: 13px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+    .opt {
+      display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 4px;
+      border-bottom: 1px solid var(--border); font-size: 15px; cursor: pointer;
+    }
+    .opt input { width: 20px; height: 20px; flex-shrink: 0; accent-color: var(--accent-fill); }
+    .opt .ti { font-size: 18px; color: var(--text-2); }
+    .opt .opt-label { flex: 1; min-width: 0; }
+    .opt .count { font-size: 13px; color: var(--text-2); }
+
+    /* ---------- Install ---------- */
+    .install-card { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; padding: 14px; margin-bottom: 12px; }
+    .install-card > .ti { font-size: 26px; color: var(--accent); }
+    .install-card .ic-text { flex: 1; min-width: 160px; font-size: 14px; color: var(--text-2); }
+    .install-card .ic-text strong { display: block; color: var(--text); font-size: 15px; }
+    .install-card .ic-actions { display: flex; gap: 8px; margin-left: auto; }
+    .steps { list-style: none; counter-reset: step; }
+    .steps li { counter-increment: step; display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 15px; }
+    .steps li:last-child { border-bottom: none; }
+    .steps li::before { content: counter(step); flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 14px; }
+    .steps .ti { font-size: 22px; color: var(--accent); }
+    .note-box { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: var(--surface-2); font-size: 14px; color: var(--text-2); }
 
     /* ---------- States ---------- */
     .empty-state { text-align: center; padding: 36px 20px; color: var(--text-2); }
@@ -367,15 +399,6 @@
     .btn.danger { color: var(--danger); }
     .btn.block { width: 100%; }
     .btn.small { min-height: 44px; font-size: 14px; }
-
-    .fab {
-      position: fixed; right: 16px; bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 16px); z-index: 20;
-      width: 58px; height: 58px; border-radius: 18px;
-      display: inline-flex; align-items: center; justify-content: center; font-size: 28px;
-      background: var(--accent-fill); color: var(--on-accent); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-      transition: transform 150ms var(--ease);
-    }
-    .fab:active { transform: scale(0.94); }
 
     /* ---------- Profile ---------- */
     .profile-head { display: flex; align-items: center; gap: 14px; padding: 16px; }
@@ -482,23 +505,16 @@
 
     .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
     .field label { font-size: 14px; font-weight: 600; color: var(--text-2); }
-    .field input, .field textarea, .field select {
-      width: 100%; min-height: 48px; padding: 11px 14px; border-radius: 12px;
+    .field textarea {
+      width: 100%; min-height: 110px; padding: 11px 14px; border-radius: 12px; resize: vertical;
       background-color: var(--surface-2); border: 1px solid var(--border); font-size: 16px;
     }
-    .field select { appearance: none; -webkit-appearance: none; padding-right: 40px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: right 14px center; }
-    .field textarea { min-height: 110px; resize: vertical; }
-    .field .err { color: var(--danger); font-size: 13px; }
-    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
     }
     @media (max-width: 360px) {
       .summary-card .sc-num { font-size: 26px; }
-      .field-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -540,6 +556,14 @@
     <div class="ptr" id="ptr" aria-hidden="true"><span><i class="ti ti-arrow-down" id="ptr-icon"></i><span id="ptr-text">Pull to refresh</span></span></div>
 
     <section class="tab-page active" id="tab-home" aria-labelledby="page-title">
+      <div class="card install-card" id="install-card" hidden>
+        <i class="ti ti-device-mobile-down" aria-hidden="true"></i>
+        <div class="ic-text"><strong>Install CAMS Field</strong>for quick access from your home screen</div>
+        <div class="ic-actions">
+          <button type="button" class="btn small" data-action="install-dismiss">Not now</button>
+          <button type="button" class="btn small primary" data-action="install">Install</button>
+        </div>
+      </div>
       <div class="summary-grid" id="home-summary"></div>
       <div id="home-banner"></div>
       <h2 class="section-title">My urgent tickets</h2>
@@ -564,15 +588,16 @@
     </section>
 
     <section class="tab-page" id="tab-devices" aria-labelledby="page-title">
-      <div class="list-toolbar">
+      <div class="list-toolbar" id="device-toolbar">
         <label class="search"><span class="sr-only">Search devices</span><i class="ti ti-search" aria-hidden="true"></i>
           <input type="search" id="device-search" placeholder="Search name, site, IP, model" autocomplete="off" enterkeyhint="search"></label>
         <div class="toolbar-row">
-          <label class="sr-only" for="client-dropdown">Client</label>
-          <select class="select" id="client-dropdown"><option value="all">All clients</option></select>
+          <div class="segmented" role="group" aria-label="Show devices">
+            <button type="button" data-action="device-view" data-view="all" aria-pressed="true">All</button>
+            <button type="button" data-action="device-view" data-view="offline" aria-pressed="false">Offline <span class="seg-count" id="offline-count"></span></button>
+          </div>
+          <button type="button" class="filter-btn" id="device-filter-btn" data-action="device-filters"><i class="ti ti-adjustments-horizontal" aria-hidden="true"></i><span id="device-filter-label">Filter</span></button>
         </div>
-        <div class="chip-row" id="device-status-chips" role="group" aria-label="Filter devices by status"></div>
-        <div class="chip-row" id="device-type-chips" role="group" aria-label="Filter devices by type"></div>
       </div>
       <div id="device-list"></div>
     </section>
@@ -597,6 +622,13 @@
           <button type="button" data-action="theme" data-theme="jet-black" aria-pressed="false">Jet black</button>
         </div>
       </div>
+      <div id="profile-install" hidden>
+        <h2 class="section-title">App</h2>
+        <div class="card settings" style="padding-top:16px;">
+          <button type="button" class="btn block" data-action="install"><i class="ti ti-download" aria-hidden="true"></i> Install app</button>
+          <p class="hint" style="margin-top:0;">Adds CAMS Field to your home screen so it opens like an app.</p>
+        </div>
+      </div>
       <h2 class="section-title">Account</h2>
       <div class="card settings" style="padding-top:16px;">
         <button type="button" class="btn block" id="profile-sync-btn" data-action="sync-now" hidden><i class="ti ti-cloud-upload" aria-hidden="true"></i> <span id="profile-sync-text">Sync now</span></button>
@@ -605,8 +637,6 @@
       <div class="about" id="about-text"></div>
     </section>
   </main>
-
-  <button type="button" class="fab" id="new-sr-fab" data-action="new-sr" aria-label="New service request" hidden><i class="ti ti-plus" aria-hidden="true"></i></button>
 
   <nav class="tabbar" aria-label="Main">
     <button type="button" data-action="tab" data-tab="home" aria-current="page"><i class="ti ti-home" aria-hidden="true"></i>Home</button>
@@ -708,36 +738,34 @@ function timeAgo(dateStr) {
 // DEVICE TYPES — all eight, matching the dashboard's field names
 // ============================================================
 var ASSET_TYPES = [
-  { key: 'cameras', label: 'Camera', plural: 'Cameras', hw: 'camera', icon: 'ti-video', warranty: 'warranty', comments: true,
+  { key: 'cameras', label: 'Camera', plural: 'Cameras', icon: 'ti-video', warranty: 'warranty', comments: true,
     fields: [['IP address', 'ip_address'], ['Model', 'model'], ['Manufacturer', 'manufacturer'], ['Resolution', 'resolution'], ['Archiver', 'archiver'], ['MAC address', 'mac_address']],
     dates: [['Purchased', 'purchase_date'], ['Last cleaned', 'date_cleaned']] },
-  { key: 'doors', label: 'Door', plural: 'Doors', hw: 'door', icon: 'ti-door', warranty: 'warranty_expiry', comments: true,
+  { key: 'doors', label: 'Door', plural: 'Doors', icon: 'ti-door', warranty: 'warranty_expiry', comments: true,
     fields: [['IP address', 'ip_address'], ['Reader', 'reader'], ['Lock type', 'lock_type'], ['Controller', 'controller_type'], ['Door swing', 'door_swing'], ['Access type', 'access_type'], ['Anti-passback', 'anti_passback'], ['Technology', 'tech']],
     dates: [['Installed', 'install_date']] },
-  { key: 'servers', label: 'Server', plural: 'Servers', hw: 'server', icon: 'ti-server', warranty: 'warranty_expiry', comments: true,
+  { key: 'servers', label: 'Server', plural: 'Servers', icon: 'ti-server', warranty: 'warranty_expiry', comments: true,
     fields: [['Make', 'make'], ['Model', 'model'], ['Serial', 'serial'], ['Capacity', 'capacity'], ['Used', 'used'], ['Health', 'health'], ['Applications', 'apps']],
     dates: [['Purchased', 'purchase_date']] },
-  { key: 'storage', label: 'Storage', plural: 'Storage', hw: 'storage', icon: 'ti-database', warranty: 'warranty_expiry', comments: true,
+  { key: 'storage', label: 'Storage', plural: 'Storage', icon: 'ti-database', warranty: 'warranty_expiry', comments: true,
     fields: [['Type', 'type'], ['Make', 'make'], ['Model', 'model'], ['Serial', 'serial'], ['Capacity', 'capacity'], ['Used', 'used']],
     dates: [['Purchased', 'purchase_date']] },
-  { key: 'switches', label: 'Switch', plural: 'Switches', hw: 'switch', icon: 'ti-router', warranty: 'warranty_expiry', comments: true,
+  { key: 'switches', label: 'Switch', plural: 'Switches', icon: 'ti-router', warranty: 'warranty_expiry', comments: true,
     fields: [['IP address', 'ip_address'], ['Model', 'model'], ['Firmware', 'firmware'], ['MAC address', 'mac_address']],
     dates: [['Purchased', 'purchase_date']] },
-  { key: 'intrusion', label: 'Intrusion point', plural: 'Intrusion', hw: 'intrusion', icon: 'ti-shield', warranty: 'warranty_expiry', comments: true,
+  { key: 'intrusion', label: 'Intrusion point', plural: 'Intrusion', icon: 'ti-shield', warranty: 'warranty_expiry', comments: true,
     fields: [['Module', 'module'], ['Sensor type', 'sensor_type'], ['IP address', 'ip_address']],
     dates: [['Purchased', 'purchase_date']] },
-  { key: 'stations', label: 'Workstation', plural: 'Workstations', hw: 'station', icon: 'ti-device-desktop', warranty: 'warranty_expiry', comments: false,
+  { key: 'stations', label: 'Workstation', plural: 'Workstations', icon: 'ti-device-desktop', warranty: 'warranty_expiry', comments: false,
     fields: [['Make', 'make'], ['Model', 'model'], ['Applications', 'apps'], ['IP address', 'ip_address']],
     dates: [['Installed', 'install_date'], ['Purchased', 'purchase_date']] },
-  { key: 'monitors', label: 'Monitor', plural: 'Monitors', hw: 'monitor', icon: 'ti-device-tv', warranty: 'warranty_expiry', comments: false,
+  { key: 'monitors', label: 'Monitor', plural: 'Monitors', icon: 'ti-device-tv', warranty: 'warranty_expiry', comments: false,
     fields: [['Make', 'make'], ['Model', 'model'], ['Size', 'size']],
     dates: [['Installed', 'install_date'], ['Purchased', 'purchase_date']] }
 ];
 var ASSET_TYPE = {};
 ASSET_TYPES.forEach(function(t) { ASSET_TYPE[t.key] = t; });
 
-var TECHNICIANS = ['Shanice', 'Roger', 'Joshua', 'Rochelle', 'Akeem', 'Marvin', 'Shavene', 'Venessa'];
-var SR_CATEGORIES = ['Camera', 'Access Control', 'Server', 'Network', 'Power', 'Other'];
 var SR_STATUS_OPTIONS = ['Open', 'In Progress', 'On-Site Review', 'Pending', 'Resolved'];
 var STATUS_CLASS = { 'Open': 'st-open', 'In Progress': 'st-progress', 'On-Site Review': 'st-onsite', 'Pending': 'st-pending', 'Resolved': 'st-resolved', 'Retracted': 'st-retracted' };
 var TICKET_CHIPS = [
@@ -764,10 +792,28 @@ var loadingPromise = null;
 var currentTab = 'home';
 var ticketScope = 'mine';
 var ticketFilter = 'active';
-var deviceStatusFilter = 'all';
+// Devices tab: All/Offline view and the Filter sheet's client + type,
+// remembered on this phone. Site groups the user opened or closed are kept
+// until the context (client filter / search) changes.
+var DEVICE_PREFS_KEY = 'fieldapp_device_prefs';
+var deviceView = 'all';
 var deviceTypeFilter = 'all';
 var clientFilter = 'all';
-var collapsedGroups = {};
+var siteToggles = {};
+var siteTogglesCtx = '';
+(function() {
+  try {
+    var p = JSON.parse(localStorage.getItem(DEVICE_PREFS_KEY) || 'null');
+    if (p) {
+      if (p.view === 'offline' || p.view === 'all') deviceView = p.view;
+      if (typeof p.client === 'string') clientFilter = p.client;
+      if (p.type === 'all' || ASSET_TYPE[p.type]) deviceTypeFilter = p.type;
+    }
+  } catch (e) {}
+})();
+function saveDevicePrefs() {
+  try { localStorage.setItem(DEVICE_PREFS_KEY, JSON.stringify({ view: deviceView, client: clientFilter, type: deviceTypeFilter })); } catch (e) {}
+}
 var timers = [];
 
 function allDevices() {
@@ -910,9 +956,9 @@ function updateSyncBadge() {
   }
 }
 
-// Device updates always go through PATCH /api/assets/:type/:id, which only
-// touches the fields sent. Older queued comments stored the PUT endpoint
-// ('/cameras/12'); the type and id are recovered from it.
+// Device comments go through PATCH /api/assets/:type/:id, which only touches
+// comments. Older queued comments stored the PUT endpoint ('/cameras/12');
+// the type and id are recovered from it.
 function queuedDeviceTarget(action) {
   if (action.assetType && action.deviceId != null) return { type: action.assetType, id: action.deviceId };
   var m = String(action.endpoint || '').match(/^\/([a-z]+)\/(\d+)$/);
@@ -945,11 +991,10 @@ async function processSyncQueue() {
           await apiCall('/service-requests/' + action.ticketId, { method: 'PUT', body: JSON.stringify({ status: 'Resolved' }) });
         } else if (action.type === 'ticket_update') {
           await apiCall('/service-requests/' + action.ticketId, { method: 'PUT', body: JSON.stringify(action.body) });
-        } else if (action.type === 'device_comment' || action.type === 'device_status') {
+        } else if (action.type === 'device_comment') {
           var target = queuedDeviceTarget(action);
           if (!target) throw new Error('unknown device');
-          var patchBody = action.type === 'device_status' ? { status: action.status } : { comments: action.comment };
-          await apiCall('/assets/' + target.type + '/' + target.id, { method: 'PATCH', body: JSON.stringify(patchBody) });
+          await apiCall('/assets/' + target.type + '/' + target.id, { method: 'PATCH', body: JSON.stringify({ comments: action.comment }) });
         }
         succeeded++;
       } catch (err) {
@@ -972,6 +1017,18 @@ async function processSyncQueue() {
     toast(plural(succeeded, 'offline change') + ' synced', 'success');
     await loadData();
   }
+}
+
+// Device status can no longer be changed from the field app. Phones may
+// still hold 'device_status' actions queued by the previous version: drop
+// them unsent, once, at startup.
+function discardQueuedStatusChanges() {
+  var q = getSyncQueue();
+  var keep = q.filter(function(a) { return a.type !== 'device_status'; });
+  var dropped = q.length - keep.length;
+  if (!dropped) return;
+  saveSyncQueue(keep);
+  toast(plural(dropped, 'queued device status change') + (dropped === 1 ? ' was' : ' were') + ' discarded — status can only be changed on the dashboard', 'warning');
 }
 
 window.addEventListener('online', function() {
@@ -1151,7 +1208,9 @@ function checkLogin() {
 // DATA LOADING & FRESHNESS
 // ============================================================
 async function initApp() {
+  discardQueuedStatusChanges();
   updateSyncBadge();
+  renderInstallUI();
   updateProfile();
   renderAll();
   if (!navigator.onLine) {
@@ -1334,7 +1393,6 @@ function switchTab(tab) {
     if (el.dataset.tab === tab) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
   });
   document.getElementById('page-title').textContent = TAB_TITLES[tab];
-  document.getElementById('new-sr-fab').hidden = tab !== 'tickets';
   document.getElementById('field-content').scrollTop = 0;
   renderCurrent();
 }
@@ -1372,6 +1430,7 @@ function emptyState(icon, title, desc, actionLabel, action, extraAttrs) {
 
 // ---------- Home ----------
 function renderHome() {
+  renderInstallUI();
   var summary = document.getElementById('home-summary');
   if (!dataLoaded) {
     summary.innerHTML = '<div class="skeleton" style="height:96px"></div><div class="skeleton" style="height:96px"></div><div class="skeleton" style="height:96px"></div><div class="skeleton" style="height:96px"></div>';
@@ -1392,7 +1451,7 @@ function renderHome() {
   summary.innerHTML =
     card(mine.length, 'My open tickets', 'ti-ticket', 'accent', 'data-action="go-tickets" data-scope="mine" data-filter="active"') +
     card(urgent.length, 'Urgent', 'ti-alert-triangle', 'danger', 'data-action="go-tickets" data-scope="mine" data-filter="urgent"') +
-    card(offline, 'Offline devices', 'ti-plug-connected-x', 'warning', 'data-action="go-devices" data-status="offline"') +
+    card(offline, 'Offline devices', 'ti-plug-connected-x', 'warning', 'data-action="go-devices" data-view="offline"') +
     card(resolved, 'Resolved this week', 'ti-circle-check', 'success', 'data-action="go-tickets" data-scope="mine" data-filter="resolved7"');
   document.getElementById('home-banner').innerHTML = urgent.length
     ? '<button type="button" class="alert-banner" data-action="go-tickets" data-scope="mine" data-filter="urgent"><i class="ti ti-alert-triangle" aria-hidden="true"></i><span class="grow">' +
@@ -1468,7 +1527,7 @@ function renderTickets() {
   var chip = TICKET_CHIPS.find(function(c) { return c.key === ticketFilter; });
   if (q) container.innerHTML = emptyState('ti-search', 'No tickets match “' + q + '”', 'Try a ticket number, client, site or subject.', 'Clear search', 'clear-ticket-search');
   else if (ticketScope === 'mine') container.innerHTML = emptyState('ti-ticket', ticketFilter === 'active' ? 'No tickets assigned to you' : 'No ' + chip.label.toLowerCase() + ' tickets assigned to you', 'Tickets assigned to ' + (getFieldTechName() || 'you') + ' appear here.', 'View all tickets', 'ticket-scope', ' data-scope="all"');
-  else container.innerHTML = emptyState('ti-ticket', 'No ' + chip.label.toLowerCase() + ' tickets', 'Try another filter, or log a new request.', 'New service request', 'new-sr');
+  else container.innerHTML = emptyState('ti-ticket', 'No ' + chip.label.toLowerCase() + ' tickets', 'Try another filter, or refresh to check for new ones.', 'Refresh', 'refresh');
 }
 
 // ---------- Devices ----------
@@ -1477,89 +1536,122 @@ function deviceMatches(d, q) {
   var r = d.raw;
   return [r.name, r.serial, r.zone, r.ip_address, r.model, r.make, getClientFromId(r.client_id), ASSET_TYPE[d.type].label].some(function(v) { return lc(v).indexOf(q) !== -1; });
 }
-function renderDeviceChips(base) {
-  var off = base.filter(function(d) { return !isDeviceOnline(d.raw.status); }).length;
-  var statusRow = document.getElementById('device-status-chips');
-  var statuses = [['offline', 'Offline', off], ['online', 'Online', base.length - off], ['all', 'All', base.length]];
-  statusRow.innerHTML = statuses.map(function(s) {
-    return '<button type="button" class="chip" data-action="device-status" data-filter="' + s[0] + '" aria-pressed="' + (deviceStatusFilter === s[0]) + '">' + esc(s[1]) + ' <span class="count">' + s[2] + '</span></button>';
-  }).join('');
-  var typeRow = document.getElementById('device-type-chips');
-  typeRow.innerHTML = '<button type="button" class="chip" data-action="device-type" data-filter="all" aria-pressed="' + (deviceTypeFilter === 'all') + '">All types</button>' +
-    ASSET_TYPES.map(function(t) {
-      var n = base.filter(function(d) { return d.type === t.key; }).length;
-      return '<button type="button" class="chip" data-action="device-type" data-filter="' + t.key + '" aria-pressed="' + (deviceTypeFilter === t.key) + '"><i class="ti ' + t.icon + '" aria-hidden="true"></i>' + esc(t.plural) + ' <span class="count">' + n + '</span></button>';
-    }).join('');
-  scrollChipIntoView(statusRow);
-  scrollChipIntoView(typeRow);
-}
-function populateClientDropdown() {
-  var dropdown = document.getElementById('client-dropdown');
+function deviceSite(r) { return String(r.zone || '').trim() || 'No site'; }
+function deviceClientNames() {
   var names = {};
   allDevices().forEach(function(d) { names[getClientFromId(d.raw.client_id)] = 1; });
-  var sorted = Object.keys(names).sort();
-  dropdown.innerHTML = '<option value="all">All clients</option>' + sorted.map(function(c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('');
-  if (sorted.indexOf(clientFilter) === -1) clientFilter = 'all';
-  dropdown.value = clientFilter;
+  return Object.keys(names).sort();
 }
+function activeDeviceFilterCount() { return (clientFilter !== 'all' ? 1 : 0) + (deviceTypeFilter !== 'all' ? 1 : 0); }
 
 function renderDevices() {
   var container = document.getElementById('device-list');
-  if (!dataLoaded) { container.innerHTML = skeletons(5, 60); return; }
-  populateClientDropdown();
+  document.querySelectorAll('[data-action="device-view"]').forEach(function(b) { b.setAttribute('aria-pressed', String(b.dataset.view === deviceView)); });
+  if (!dataLoaded) { container.innerHTML = skeletons(5, 52); return; }
+  if (clientFilter !== 'all' && deviceClientNames().indexOf(clientFilter) === -1) { clientFilter = 'all'; saveDevicePrefs(); }
+  var nFilters = activeDeviceFilterCount();
+  var fbtn = document.getElementById('device-filter-btn');
+  fbtn.classList.toggle('active', nFilters > 0);
+  document.getElementById('device-filter-label').textContent = nFilters ? 'Filter · ' + nFilters : 'Filter';
+  fbtn.setAttribute('aria-label', nFilters ? 'Filter, ' + plural(nFilters, 'filter') + ' on' : 'Filter');
+
   var q = lc(document.getElementById('device-search').value).trim();
   var base = allDevices().filter(function(d) {
-    return (clientFilter === 'all' || getClientFromId(d.raw.client_id) === clientFilter) && deviceMatches(d, q);
+    return (clientFilter === 'all' || getClientFromId(d.raw.client_id) === clientFilter) &&
+      (deviceTypeFilter === 'all' || d.type === deviceTypeFilter) && deviceMatches(d, q);
   });
-  renderDeviceChips(base);
-  var list = base.filter(function(d) {
-    var online = isDeviceOnline(d.raw.status);
-    return (deviceTypeFilter === 'all' || d.type === deviceTypeFilter) &&
-      (deviceStatusFilter === 'all' || (deviceStatusFilter === 'online') === online);
-  });
+  var offlineCount = base.filter(function(d) { return !isDeviceOnline(d.raw.status); }).length;
+  document.getElementById('offline-count').textContent = offlineCount ? String(offlineCount) : '';
+  var list = deviceView === 'offline' ? base.filter(function(d) { return !isDeviceOnline(d.raw.status); }) : base;
+
   if (!list.length) {
-    var filtered = q || clientFilter !== 'all' || deviceTypeFilter !== 'all' || deviceStatusFilter !== 'all';
-    container.innerHTML = filtered
-      ? emptyState('ti-filter-off', deviceStatusFilter === 'offline' && !q ? 'No offline devices' : 'No devices match these filters', deviceStatusFilter === 'offline' && !q ? 'Everything here is online.' : 'Clear the filters to see every device.', 'Clear filters', 'clear-device-filters')
-      : emptyState('ti-devices', 'No devices yet', 'Devices added in the CAMS dashboard appear here.', 'Refresh', 'refresh');
+    if (!allDevices().length) container.innerHTML = emptyState('ti-devices', 'No devices yet', 'Devices added on the CAMS dashboard appear here.', 'Refresh', 'refresh');
+    else if (deviceView === 'offline' && !q && base.length) container.innerHTML = emptyState('ti-circle-check', 'Everything\'s online', nFilters ? 'No offline devices for these filters.' : 'No devices are offline right now.', 'Show all devices', 'device-view', ' data-view="all"');
+    else container.innerHTML = emptyState('ti-filter-off', 'No devices match', q ? 'Nothing matches “' + q + '” with these filters.' : 'Nothing matches these filters.', 'Clear filters', 'clear-device-filters');
     return;
   }
-  // client -> site/zone -> devices (offline first)
+
+  // Sites start open only when narrowed to one client or searching.
+  var ctx = clientFilter + '|' + (q ? 'q' : '');
+  if (ctx !== siteTogglesCtx) { siteToggles = {}; siteTogglesCtx = ctx; }
+  var openByDefault = clientFilter !== 'all' || !!q;
   var groups = {};
   list.forEach(function(d) {
-    var c = getClientFromId(d.raw.client_id), z = (d.raw.zone || '').trim() || 'No site';
-    groups[c] = groups[c] || {};
-    (groups[c][z] = groups[c][z] || []).push(d);
+    var key = getClientFromId(d.raw.client_id) + '\u0001' + deviceSite(d.raw);
+    (groups[key] = groups[key] || []).push(d);
   });
-  container.innerHTML = Object.keys(groups).sort().map(function(c) {
-    var zones = groups[c];
-    var all = [].concat.apply([], Object.keys(zones).map(function(z) { return zones[z]; }));
-    var off = all.filter(function(d) { return !isDeviceOnline(d.raw.status); }).length;
-    var ck = 'c:' + c, open = !collapsedGroups[ck];
-    return '<section class="card dev-group">' +
-      '<button type="button" class="group-head" data-action="toggle-group" data-key="' + esc(ck) + '" aria-expanded="' + open + '">' +
-      '<i class="ti ti-chevron-down chev" aria-hidden="true"></i><span class="grow">' + esc(c) + '</span>' +
-      (off ? '<span class="badge off-count">' + off + ' offline</span>' : '') + '<span class="count-muted">' + all.length + '</span></button>' +
-      '<div' + (open ? '' : ' hidden') + '>' + Object.keys(zones).sort().map(function(z) {
-        var devs = zones[z].slice().sort(function(a, b) {
-          var ao = isDeviceOnline(a.raw.status), bo = isDeviceOnline(b.raw.status);
-          return ao === bo ? deviceName(a.raw).localeCompare(deviceName(b.raw)) : ao ? 1 : -1;
-        });
-        var zoff = devs.filter(function(d) { return !isDeviceOnline(d.raw.status); }).length;
-        var zk = 'z:' + c + '|' + z, zopen = !collapsedGroups[zk];
-        return '<button type="button" class="zone-head" data-action="toggle-group" data-key="' + esc(zk) + '" aria-expanded="' + zopen + '">' +
-          '<i class="ti ti-chevron-down chev" aria-hidden="true"></i><span class="grow">' + esc(z) + '</span>' +
-          (zoff ? '<span class="badge off-count">' + zoff + ' offline</span>' : '') + '<span class="count-muted">' + devs.length + '</span></button>' +
-          '<div' + (zopen ? '' : ' hidden') + '>' + devs.map(deviceRow).join('') + '</div>';
-      }).join('') + '</div></section>';
+  container.innerHTML = Object.keys(groups).sort(function(a, b) { return a.localeCompare(b); }).map(function(key) {
+    var parts = key.split('\u0001'), client = parts[0], site = parts[1];
+    var devs = groups[key].slice().sort(function(a, b) {
+      var ao = isDeviceOnline(a.raw.status), bo = isDeviceOnline(b.raw.status);
+      return ao === bo ? deviceName(a.raw).localeCompare(deviceName(b.raw)) : ao ? 1 : -1;
+    });
+    var off = devs.filter(function(d) { return !isDeviceOnline(d.raw.status); }).length;
+    var open = siteToggles.hasOwnProperty(key) ? siteToggles[key] : openByDefault;
+    var title = (clientFilter === 'all' ? client + ' — ' : '') + site;
+    return '<section class="card site-group' + (open ? ' open' : '') + '">' +
+      '<h3 class="site-head-wrap"><button type="button" class="site-head" data-action="toggle-site" data-key="' + esc(key) + '" aria-expanded="' + open + '">' +
+      '<span class="sh-text">' + esc(title) + ' <span class="sh-meta">· ' + esc(plural(devs.length, 'device')) + '</span>' +
+      (off ? ' <span class="sh-off">· ' + off + ' offline</span>' : '') + '</span>' +
+      '<i class="ti ti-chevron-down chev" aria-hidden="true"></i></button></h3>' +
+      '<div' + (open ? '' : ' hidden') + '>' + devs.map(deviceRow).join('') + '</div></section>';
   }).join('');
+  var toolbar = document.getElementById('device-toolbar');
+  document.getElementById('tab-devices').style.setProperty('--toolbar-h', toolbar.offsetHeight + 'px');
 }
 function deviceRow(d) {
   var r = d.raw, t = ASSET_TYPE[d.type], online = isDeviceOnline(r.status);
-  return '<button type="button" class="device-row" data-action="open-device" data-type="' + d.type + '" data-id="' + esc(r.id) + '">' +
-    '<span class="status-dot' + (online ? ' online' : '') + '" aria-hidden="true"></span>' +
-    '<span class="dr-main"><span class="dr-name">' + esc(deviceName(r)) + '</span><span class="dr-sub">' + esc(t.label + (r.ip_address ? ' · ' + r.ip_address : r.model ? ' · ' + r.model : '')) + '</span></span>' +
-    '<span class="dr-status' + (online ? '' : ' offline') + '">' + esc(r.status || 'No status') + '</span><i class="ti ti-chevron-right chev" aria-hidden="true"></i></button>';
+  return '<button type="button" class="dev-row" data-action="open-device" data-type="' + d.type + '" data-id="' + esc(r.id) + '">' +
+    '<i class="ti ' + t.icon + ' dt" aria-hidden="true"></i>' +
+    '<span class="dn">' + esc(deviceName(r)) + '<span class="sr-only">, ' + esc(t.label) + (online ? ', online' : '') + '</span></span>' +
+    (online ? '<span class="status-dot online" aria-hidden="true"></span>'
+            : '<span class="dstate"><span class="status-dot" aria-hidden="true"></span>Offline</span>') +
+    '</button>';
+}
+
+function openDeviceFilters() {
+  var clients = deviceClientNames();
+  function typeOptions(client) {
+    var pool = allDevices().filter(function(d) { return client === 'all' || getClientFromId(d.raw.client_id) === client; });
+    return '<label class="opt"><input type="radio" name="f-type" value="all"' + (deviceTypeFilter === 'all' ? ' checked' : '') + '><span class="opt-label">All types</span><span class="count">' + pool.length + '</span></label>' +
+      ASSET_TYPES.map(function(t) {
+        var n = pool.filter(function(d) { return d.type === t.key; }).length;
+        return '<label class="opt"><input type="radio" name="f-type" value="' + t.key + '"' + (deviceTypeFilter === t.key ? ' checked' : '') + '>' +
+          '<i class="ti ' + t.icon + '" aria-hidden="true"></i><span class="opt-label">' + esc(t.plural) + '</span><span class="count">' + n + '</span></label>';
+      }).join('');
+  }
+  var all = allDevices();
+  var html = '<fieldset class="opt-group"><legend>Client</legend>' +
+      '<label class="opt"><input type="radio" name="f-client" value="all"' + (clientFilter === 'all' ? ' checked' : '') + '><span class="opt-label">All clients</span><span class="count">' + all.length + '</span></label>' +
+      clients.map(function(c) {
+        var n = all.filter(function(d) { return getClientFromId(d.raw.client_id) === c; }).length;
+        return '<label class="opt"><input type="radio" name="f-client" value="' + esc(c) + '"' + (clientFilter === c ? ' checked' : '') + '><span class="opt-label">' + esc(c) + '</span><span class="count">' + n + '</span></label>';
+      }).join('') + '</fieldset>' +
+    '<fieldset class="opt-group"><legend>Type</legend><div id="filter-type-options">' + typeOptions(clientFilter) + '</div></fieldset>';
+  var entry = openSheet({
+    title: 'Filter devices', html: html, kind: 'device-filters', full: true,
+    actions: '<button type="button" class="btn" data-action="filter-clear">Clear</button><button type="button" class="btn primary" data-action="filter-apply">Apply</button>'
+  });
+  // type counts follow the client picked in the sheet
+  entry.layer.addEventListener('change', function(e) {
+    if (e.target.name !== 'f-client') return;
+    var keepType = (entry.layer.querySelector('input[name="f-type"]:checked') || {}).value || 'all';
+    entry.layer.querySelector('#filter-type-options').innerHTML = typeOptions(e.target.value);
+    var again = entry.layer.querySelector('input[name="f-type"][value="' + keepType + '"]');
+    if (again) again.checked = true;
+  });
+}
+function applyDeviceFilters(clear) {
+  var top = topSheet('device-filters');
+  if (!top) return;
+  if (clear) { clientFilter = 'all'; deviceTypeFilter = 'all'; }
+  else {
+    clientFilter = (top.layer.querySelector('input[name="f-client"]:checked') || {}).value || 'all';
+    deviceTypeFilter = (top.layer.querySelector('input[name="f-type"]:checked') || {}).value || 'all';
+  }
+  saveDevicePrefs();
+  closeSheet(top);
+  renderDevices();
 }
 
 // ---------- Profile ----------
@@ -1584,6 +1676,7 @@ function updateProfile() {
     avatar.textContent = name.charAt(0).toUpperCase();
   }
   document.getElementById('about-text').textContent = 'CAMS Field ' + APP_VERSION + ' · E-Tech Systems';
+  renderInstallUI();
   document.querySelectorAll('[data-action="theme"]').forEach(function(b) { b.setAttribute('aria-pressed', String(b.dataset.theme === currentTheme())); });
   updateSyncBadge();
 }
@@ -1610,7 +1703,7 @@ function openSheet(opts) {
     '</div>';
   document.body.appendChild(layer);
   var entry = { layer: layer, opener: opener, onClose: opts.onClose, kind: opts.kind || null, data: opts.data || null };
-  setSheetContent(entry, opts);
+  setSheetContent(entry, Object.assign({ actions: '' }, opts));   // no actions -> no action bar
   // only the top layer is interactive
   sheetStack.forEach(function(s) { s.layer.inert = true; });
   document.getElementById('app-shell').inert = true;
@@ -1864,12 +1957,9 @@ async function changeTicketStatus(select) {
 // DEVICE DETAIL & ACTIONS
 // ============================================================
 function kvRows(rows) {
-  return '<dl class="kv">' + rows.map(function(r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + (r[2] ? r[1] : esc(r[1] || '—')) + '</dd>'; }).join('') + '</dl>';
+  return '<dl class="kv">' + rows.map(function(r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + (r[2] ? r[1] : esc(r[1])) + '</dd>'; }).join('') + '</dl>';
 }
-function dateOrNotRecorded(v) {
-  var f = fmtDate(v);
-  return f ? esc(f) : '<span class="muted">Not recorded</span>';
-}
+function hasValue(v) { return v !== null && v !== undefined && String(v).trim() !== ''; }
 function getWarrantyDisplay(expiryDate) {
   var p = parseDateValue(expiryDate);
   if (!p) return '<span class="muted">Not recorded</span>';
@@ -1880,20 +1970,22 @@ function getWarrantyDisplay(expiryDate) {
   return '<span class="sla-ok">' + when + '</span>';
 }
 
+// Read-only apart from comments; sections only list fields that have values.
+var NETWORK_FIELDS = ['ip_address', 'mac_address'];
 function deviceDetailHtml(type, d) {
   var t = ASSET_TYPE[type], online = isDeviceOnline(d.status);
-  var s = lc(d.status).trim();
   var html = '<div class="detail-summary">' +
-    '<div class="ds-badges"><span class="badge ' + (online ? 'st-resolved' : 'pri-high') + '"><span class="status-dot' + (online ? ' online' : '') + '" aria-hidden="true"></span>' + esc(d.status || 'No status') + '</span>' +
-    '<span class="badge st-retracted"><i class="ti ' + t.icon + '" aria-hidden="true"></i>' + esc(t.label) + '</span></div>' +
-    '<div class="segmented" role="group" aria-label="Set device status" style="margin-top:10px;">' +
-      '<button type="button" data-action="device-set-status" data-status="Online" aria-pressed="' + (s === 'online' || s === 'working') + '"><i class="ti ti-plug-connected" aria-hidden="true"></i> Online</button>' +
-      '<button type="button" data-action="device-set-status" data-status="Offline" aria-pressed="' + (s === 'offline') + '"><i class="ti ti-plug-connected-x" aria-hidden="true"></i> Offline</button>' +
-    '</div></div>';
-  html += '<section class="detail-section"><h3>Location</h3>' + kvRows([['Client', getClientFromId(d.client_id)], ['Site / zone', d.zone]]) + '</section>';
-  html += '<section class="detail-section"><h3>' + esc(t.label) + ' details</h3>' + kvRows(t.fields.map(function(f) { return [f[0], d[f[1]]]; })) + '</section>';
-  html += '<section class="detail-section"><h3>Purchase &amp; warranty</h3>' +
-    kvRows(t.dates.map(function(f) { return [f[0], dateOrNotRecorded(d[f[1]]), true]; }).concat([['Warranty', getWarrantyDisplay(d[t.warranty]), true]])) + '</section>';
+    '<div class="ds-sub"><i class="ti ' + t.icon + '" aria-hidden="true"></i> ' + esc(t.label + ' · ' + deviceSite(d)) + '</div>' +
+    '<div class="ds-badges"><span class="badge ' + (online ? 'st-resolved' : 'pri-high') + '"><span class="status-dot' + (online ? ' online' : '') + '" aria-hidden="true"></span>' + esc(d.status || 'No status') + '</span></div>' +
+    '</div>';
+  var details = [['Client', getClientFromId(d.client_id)]].concat(t.fields.filter(function(f) { return NETWORK_FIELDS.indexOf(f[1]) === -1; }).map(function(f) { return [f[0], d[f[1]]]; }))
+    .filter(function(r) { return hasValue(r[1]); });
+  if (details.length) html += '<section class="detail-section"><h3>Details</h3>' + kvRows(details) + '</section>';
+  var network = [['IP address', d.ip_address], ['MAC address', d.mac_address]].filter(function(r) { return hasValue(r[1]); });
+  if (network.length) html += '<section class="detail-section"><h3>Network</h3>' + kvRows(network) + '</section>';
+  var dates = t.dates.filter(function(f) { return fmtDate(d[f[1]]); }).map(function(f) { return [f[0], esc(fmtDate(d[f[1]])), true]; });
+  if (parseDateValue(d[t.warranty])) dates.push(['Warranty', getWarrantyDisplay(d[t.warranty]), true]);
+  if (dates.length) html += '<section class="detail-section"><h3>Warranty &amp; dates</h3>' + kvRows(dates) + '</section>';
   if (t.comments) {
     html += '<section class="detail-section"><div class="field" style="margin-bottom:8px;"><label for="device-comment-input">Comment</label>' +
       '<textarea id="device-comment-input" placeholder="Add a comment about this device">' + esc(d.comments || '') + '</textarea></div>' +
@@ -1910,10 +2002,7 @@ function openDeviceDetail(id, type) {
   var t = ASSET_TYPE[type];
   var d = t ? findDevice(type, id) : null;
   if (!d) { toast('That device is no longer in the list. Refresh and try again.', 'warning'); return; }
-  openSheet({
-    title: deviceName(d), html: deviceDetailHtml(type, d), full: true, kind: 'device', data: { id: d.id, type: type },
-    actions: '<button type="button" class="btn primary" data-action="report-problem"><i class="ti ti-alert-circle" aria-hidden="true"></i> Report a problem</button>'
-  });
+  openSheet({ title: deviceName(d), html: deviceDetailHtml(type, d), full: true, kind: 'device', data: { id: d.id, type: type } });
 }
 function refreshDeviceSheet() {
   sheetStack.forEach(function(s) {
@@ -1934,51 +2023,37 @@ function currentDevice() {
   return null;
 }
 
-async function patchDevice(type, id, body, doneMsg, queueType) {
-  try {
-    await apiCall('/assets/' + type + '/' + id, { method: 'PATCH', body: JSON.stringify(body) });
-    var dev = findDevice(type, id);
-    if (dev) Object.assign(dev, body);
-    reloadAfterWrite().then(refreshDeviceSheet);
-    renderAll();
-    refreshDeviceSheet();
-    toast(doneMsg, 'success');
-    return true;
-  } catch (err) {
-    if (err.isAuth) return false;
-    if (err.isOffline) {
-      var d = findDevice(type, id);
-      if (d) Object.assign(d, body);
-      var action = { type: queueType, assetType: type, deviceId: id };
-      if (queueType === 'device_status') action.status = body.status; else action.comment = body.comments;
-      queueAction(action);
-      cacheDataLocally();
-      renderAll();
-      refreshDeviceSheet();
-      toast("Offline — saved on this phone and will sync when you're back online", 'warning');
-      return true;
-    }
-    toast("Couldn't save: " + err.message, 'error');
-    return false;
-  }
-}
-async function saveDeviceStatus(btn) {
-  var cur = currentDevice();
-  if (!cur) return;
-  var d = findDevice(cur.type, cur.id);
-  if (!d || d.status === btn.dataset.status) return;
-  btn.disabled = true;
-  await patchDevice(cur.type, cur.id, { status: btn.dataset.status }, deviceName(d) + ' marked ' + btn.dataset.status, 'device_status');
-  btn.disabled = false;
-}
 async function saveDeviceComment(btn) {
   var cur = currentDevice();
   if (!cur) return;
   var input = inTopSheet('#device-comment-input');
   if (!input) return;
+  var type = cur.type, id = cur.id, comments = input.value.trim();
   btn.disabled = true;
-  await patchDevice(cur.type, cur.id, { comments: input.value.trim() }, 'Comment saved', 'device_comment');
-  btn.disabled = false;
+  try {
+    await apiCall('/assets/' + type + '/' + id, { method: 'PATCH', body: JSON.stringify({ comments: comments }) });
+    var dev = findDevice(type, id);
+    if (dev) dev.comments = comments;
+    reloadAfterWrite().then(refreshDeviceSheet);
+    renderAll();
+    refreshDeviceSheet();
+    toast('Comment saved', 'success');
+  } catch (err) {
+    if (err.isAuth) return;
+    if (err.isOffline) {
+      var d = findDevice(type, id);
+      if (d) d.comments = comments;
+      queueAction({ type: 'device_comment', assetType: type, deviceId: id, comment: comments });
+      cacheDataLocally();
+      renderAll();
+      refreshDeviceSheet();
+      toast("Offline — saved on this phone and will sync when you're back online", 'warning');
+    } else {
+      toast("Couldn't save: " + err.message, 'error');
+    }
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 function openController(ip) {
@@ -1987,102 +2062,82 @@ function openController(ip) {
 }
 
 // ============================================================
-// NEW SERVICE REQUEST
+// INSTALL (Android/Chromium prompt; iPhone/iPad steps)
 // ============================================================
-function devicesForClient(clientId) {
-  return allDevices().filter(function(d) { return String(d.raw.client_id) === String(clientId); });
+var installPrompt = null;     // the deferred beforeinstallprompt event
+var installedNow = false;
+var INSTALL_DISMISS_KEY = 'fieldapp_install_dismissed_at';
+
+function isStandalone() {
+  return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
 }
-function openNewSR(prefill) {
-  prefill = prefill || {};
-  if (!CLIENT_LIST.length) { toast('Client list not loaded yet — refresh and try again.', 'warning'); return; }
-  var me = getFieldTechName();
-  var techs = TECHNICIANS.slice();
-  if (me && !techs.some(function(t) { return lc(t) === lc(me); })) techs.unshift(me);
-  var meMatch = techs.find(function(t) { return lc(t) === lc(me); });
-  var html =
-    '<form id="new-sr-form" novalidate>' +
-    '<div class="field"><label for="nsr-client">Client</label><select id="nsr-client" required><option value="">Choose a client</option>' +
-      CLIENT_LIST.map(function(c) { return '<option value="' + esc(c.id) + '"' + (String(c.id) === String(prefill.clientId) ? ' selected' : '') + '>' + esc(c.name) + '</option>'; }).join('') +
-      '</select><span class="err" id="nsr-client-err" hidden>Choose the client this request is for.</span></div>' +
-    '<div class="field"><label for="nsr-site">Site</label><input id="nsr-site" list="nsr-site-list" autocomplete="off" placeholder="Pick or type a site" value="' + esc(prefill.site || '') + '"><datalist id="nsr-site-list"></datalist></div>' +
-    '<div class="field-row">' +
-      '<div class="field"><label for="nsr-category">Category</label><select id="nsr-category">' + SR_CATEGORIES.map(function(c) { return '<option' + (c === (prefill.category || 'Camera') ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join('') + '</select></div>' +
-      '<div class="field"><label for="nsr-priority">Priority</label><select id="nsr-priority"><option>High</option><option selected>Medium</option><option>Low</option></select></div>' +
-    '</div>' +
-    '<div class="field"><label for="nsr-assigned">Assigned to</label><select id="nsr-assigned">' +
-      techs.map(function(t) { return '<option' + (t === meMatch ? ' selected' : '') + '>' + esc(t) + '</option>'; }).join('') + '<option' + (meMatch ? '' : ' selected') + '>Unassigned</option></select></div>' +
-    '<div class="field"><label for="nsr-subject">Subject</label><input id="nsr-subject" required maxlength="200" placeholder="Short summary of the problem" value="' + esc(prefill.subject || '') + '"><span class="err" id="nsr-subject-err" hidden>Add a short subject.</span></div>' +
-    '<div class="field"><label for="nsr-body">Description</label><textarea id="nsr-body" placeholder="What\'s happening, and anything already tried"></textarea></div>' +
-    '<div class="field"><label for="nsr-device">Related device <span class="muted">(optional)</span></label><select id="nsr-device"><option value="">None</option></select></div>' +
-    '</form>';
-  var entry = openSheet({
-    title: 'New service request', html: html, full: true, kind: 'new-sr', focus: prefill.clientId ? '#nsr-subject' : '#nsr-client',
-    actions: '<button type="button" class="btn" data-sheet-close>Cancel</button><button type="button" class="btn primary" data-action="submit-sr"><i class="ti ti-send" aria-hidden="true"></i> Create</button>'
-  });
-  var clientSel = entry.layer.querySelector('#nsr-client');
-  clientSel.addEventListener('change', function() { fillSRClientOptions(entry, null); });
-  fillSRClientOptions(entry, prefill.device || null);
+function isIOS() {
+  var ua = navigator.userAgent || '';
+  return /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 }
-function fillSRClientOptions(entry, device) {
-  var clientId = entry.layer.querySelector('#nsr-client').value;
-  var devs = clientId ? devicesForClient(clientId) : [];
-  var zones = {};
-  devs.forEach(function(d) { if (d.raw.zone && String(d.raw.zone).trim()) zones[String(d.raw.zone).trim()] = 1; });
-  entry.layer.querySelector('#nsr-site-list').innerHTML = Object.keys(zones).sort().map(function(z) { return '<option value="' + esc(z) + '"></option>'; }).join('');
-  var sel = entry.layer.querySelector('#nsr-device');
-  devs.sort(function(a, b) { return deviceName(a.raw).localeCompare(deviceName(b.raw)); });
-  sel.innerHTML = '<option value="">' + (clientId ? 'None' : 'Choose a client first') + '</option>' + devs.map(function(d) {
-    var v = d.type + ':' + d.raw.id;
-    return '<option value="' + esc(v) + '"' + (device && device.type === d.type && String(device.id) === String(d.raw.id) ? ' selected' : '') + '>' +
-      esc(deviceName(d.raw) + ' · ' + ASSET_TYPE[d.type].label + (d.raw.zone ? ' · ' + d.raw.zone : '')) + '</option>';
-  }).join('');
+function isIOSSafari() {
+  var ua = navigator.userAgent || '';
+  return isIOS() && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|GSA\/|DuckDuckGo|YaBrowser|mercury/i.test(ua);
 }
-async function submitNewSR(btn) {
-  var top = topSheet('new-sr');
-  if (!top) return;
-  var L = top.layer;
-  var clientId = L.querySelector('#nsr-client').value;
-  var subject = L.querySelector('#nsr-subject').value.trim();
-  L.querySelector('#nsr-client-err').hidden = !!clientId;
-  L.querySelector('#nsr-subject-err').hidden = !!subject;
-  L.querySelector('#nsr-client').setAttribute('aria-invalid', String(!clientId));
-  L.querySelector('#nsr-subject').setAttribute('aria-invalid', String(!subject));
-  if (!clientId || !subject) { (clientId ? L.querySelector('#nsr-subject') : L.querySelector('#nsr-client')).focus(); return; }
-  var related = [];
-  var dv = L.querySelector('#nsr-device').value;
-  if (dv) {
-    var parts = dv.split(':'), d = findDevice(parts[0], parts[1]);
-    if (d) related.push({ type: ASSET_TYPE[parts[0]].hw, id: d.id, name: deviceName(d) });
-  }
-  var body = {
-    client_id: Number(clientId), client: CLIENT_ID_TO_NAME[clientId] || '',
-    site: L.querySelector('#nsr-site').value.trim(), category: L.querySelector('#nsr-category').value,
-    priority: L.querySelector('#nsr-priority').value, assigned_to: L.querySelector('#nsr-assigned').value,
-    subject: subject, body: L.querySelector('#nsr-body').value.trim(), related_hardware: related
-  };
-  btn.disabled = true;
+function canOfferInstall() {
+  return !isStandalone() && !installedNow && (!!installPrompt || isIOS());
+}
+function installCardDismissed() {
   try {
-    var created = await apiCall('/service-requests', { method: 'POST', body: JSON.stringify(body) });
-    closeAllSheets();
-    toast((created.sr_id || 'Request') + ' created for ' + (created.client || body.client), 'success');
-    await reloadAfterWrite();
-    ticketScope = isMine(created) ? 'mine' : 'all';
-    ticketFilter = 'active';
-    document.getElementById('ticket-search').value = '';
-    switchTab('tickets');
-  } catch (err) {
-    if (err.isAuth) return;
-    toast(err.isOffline ? "You're offline — new requests need a connection. Your form is still open." : "Couldn't create the request: " + err.message, 'error');
-  } finally {
-    btn.disabled = false;
-  }
+    var at = Number(localStorage.getItem(INSTALL_DISMISS_KEY) || 0);
+    return at && Date.now() - at < 30 * 86400000;
+  } catch (e) { return false; }
 }
-function reportProblem() {
-  var cur = currentDevice();
-  var d = cur ? findDevice(cur.type, cur.id) : null;
-  if (!d) return;
-  var category = { cameras: 'Camera', doors: 'Access Control', servers: 'Server', storage: 'Server', switches: 'Network' }[cur.type] || 'Other';
-  openNewSR({ clientId: d.client_id, site: d.zone || '', device: { type: cur.type, id: d.id }, category: category, subject: deviceName(d) + ' — ' });
+function renderInstallUI() {
+  var offer = canOfferInstall();
+  var card = document.getElementById('install-card');
+  if (card) card.hidden = !offer || installCardDismissed();
+  var row = document.getElementById('profile-install');
+  if (row) row.hidden = !offer;
+}
+async function startInstall() {
+  if (installPrompt) {
+    var evt = installPrompt;
+    installPrompt = null;   // a prompt can only be shown once
+    try {
+      evt.prompt();
+      var choice = await evt.userChoice;
+      if (choice && choice.outcome === 'accepted') installedNow = true;
+    } catch (e) {}
+    renderInstallUI();
+    return;
+  }
+  if (isIOS()) openIOSInstallSheet();
+}
+function openIOSInstallSheet() {
+  var safari = isIOSSafari();
+  var html = (safari ? '' : '<p class="note-box" style="margin:0 0 6px;">Use <strong>Safari</strong> for this. If Share doesn\'t offer <strong>Add to Home Screen</strong>, open this page in Safari first.</p>') +
+    '<ol class="steps">' +
+      '<li><i class="ti ti-share-2" aria-hidden="true"></i><span>Tap <strong>Share</strong> in ' + (safari ? 'Safari\'s toolbar' : 'the browser toolbar') + '</span></li>' +
+      '<li><i class="ti ti-square-plus" aria-hidden="true"></i><span>Choose <strong>Add to Home Screen</strong></span></li>' +
+      '<li><i class="ti ti-check" aria-hidden="true"></i><span>Tap <strong>Add</strong></span></li>' +
+    '</ol>' +
+    '<p class="hint">CAMS Field then opens from its own icon, full screen.</p>';
+  openSheet({ title: 'Install CAMS Field', html: html, kind: 'install', actions: '<button type="button" class="btn primary" data-sheet-close>Got it</button>' });
+}
+function dismissInstallCard() {
+  try { localStorage.setItem(INSTALL_DISMISS_KEY, String(Date.now())); } catch (e) {}
+  renderInstallUI();
+}
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  installPrompt = e;
+  renderInstallUI();
+});
+window.addEventListener('appinstalled', function() {
+  installPrompt = null;
+  installedNow = true;
+  renderInstallUI();
+  toast('CAMS Field installed', 'success');
+});
+if (window.matchMedia) {
+  var standaloneQuery = window.matchMedia('(display-mode: standalone)');
+  if (standaloneQuery.addEventListener) standaloneQuery.addEventListener('change', renderInstallUI);
 }
 
 // ============================================================
@@ -2190,43 +2245,46 @@ document.addEventListener('click', function(e) {
       switchTab('tickets');
       break;
     case 'go-devices':
-      deviceStatusFilter = el.dataset.status || 'all';
+      deviceView = el.dataset.view || 'all';
       deviceTypeFilter = 'all'; clientFilter = 'all';
+      saveDevicePrefs();
       document.getElementById('device-search').value = '';
       switchTab('devices');
       break;
     case 'ticket-scope': ticketScope = el.dataset.scope; renderTickets(); break;
     case 'ticket-filter': ticketFilter = el.dataset.filter; renderTickets(); break;
     case 'clear-ticket-search': document.getElementById('ticket-search').value = ''; renderTickets(); break;
-    case 'device-status': deviceStatusFilter = el.dataset.filter; renderDevices(); break;
-    case 'device-type': deviceTypeFilter = el.dataset.filter; renderDevices(); break;
+    case 'device-view': deviceView = el.dataset.view === 'offline' ? 'offline' : 'all'; saveDevicePrefs(); renderDevices(); break;
+    case 'device-filters': openDeviceFilters(); break;
+    case 'filter-apply': applyDeviceFilters(false); break;
+    case 'filter-clear': applyDeviceFilters(true); break;
     case 'clear-device-filters':
-      deviceStatusFilter = 'all'; deviceTypeFilter = 'all'; clientFilter = 'all';
+      deviceView = 'all'; deviceTypeFilter = 'all'; clientFilter = 'all';
+      saveDevicePrefs();
       document.getElementById('device-search').value = '';
       renderDevices();
       break;
-    case 'toggle-group':
-      collapsedGroups[el.dataset.key] = el.getAttribute('aria-expanded') === 'true';
-      el.setAttribute('aria-expanded', String(!collapsedGroups[el.dataset.key]));
-      el.nextElementSibling.hidden = collapsedGroups[el.dataset.key];
+    case 'toggle-site':
+      var nowOpen = el.getAttribute('aria-expanded') !== 'true';
+      siteToggles[el.dataset.key] = nowOpen;
+      el.setAttribute('aria-expanded', String(nowOpen));
+      el.closest('.site-group').classList.toggle('open', nowOpen);
+      el.parentNode.nextElementSibling.hidden = !nowOpen;
       break;
+    case 'install': startInstall(); break;
+    case 'install-dismiss': dismissInstallCard(); break;
     case 'open-ticket': openTicketDetail(el.dataset.id); break;
     case 'open-device': openDeviceDetail(el.dataset.id, el.dataset.type); break;
     case 'ticket-note': openNoteSheet(); break;
     case 'save-note': saveNote(el); break;
     case 'ticket-resolve': openResolveSheet(); break;
     case 'confirm-resolve': confirmResolve(el); break;
-    case 'device-set-status': saveDeviceStatus(el); break;
     case 'save-device-comment': saveDeviceComment(el); break;
     case 'open-controller': openController(el.dataset.ip); break;
-    case 'report-problem': reportProblem(); break;
-    case 'new-sr': openNewSR(); break;
-    case 'submit-sr': submitNewSR(el); break;
   }
 });
 document.addEventListener('change', function(e) {
   if (e.target.matches('[data-action-change="ticket-status"]')) changeTicketStatus(e.target);
-  if (e.target.id === 'client-dropdown') { clientFilter = e.target.value; renderDevices(); }
 });
 var searchTimer = null;
 document.addEventListener('input', function(e) {

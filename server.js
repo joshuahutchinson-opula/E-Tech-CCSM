@@ -1030,21 +1030,23 @@ app.put('/api/intrusion/:id', authMiddleware, blockAssetEdit, async (req, res) =
 // ============================================================
 // FIELD APP DEVICE UPDATES
 // ============================================================
-// Status and/or comments only, nothing else. The full PUT /api/<type>/:id
-// routes write every date column exactly as sent (so the dashboard's edit
-// forms can clear them), which meant a comment-only PUT from the field app
-// set warranty/purchase/install dates to NULL. This route only touches the
-// keys present in the body. E-Tech staff only (admin, technician).
+// Comments only. The full PUT /api/<type>/:id routes write every date
+// column exactly as sent (so the dashboard's edit forms can clear them),
+// which meant a comment-only PUT from the field app set warranty/purchase/
+// install dates to NULL; this route touches nothing but `comments`. Device
+// status is changed on the dashboard only, so a body with `status` is
+// refused outright. Used only by the field app. E-Tech staff only (admin,
+// technician).
 const PATCHABLE_ASSETS = {
-  cameras: { label: 'Camera', fields: ['status', 'comments'] },
-  doors: { label: 'Door', fields: ['status', 'comments'] },
-  servers: { label: 'Server', fields: ['status', 'comments'] },
-  storage: { label: 'Storage device', fields: ['status', 'comments'] },
-  switches: { label: 'Switch', fields: ['status', 'comments'] },
-  intrusion: { label: 'Intrusion point', fields: ['status', 'comments'] },
-  // stations and monitors have no comments column
-  stations: { label: 'Station', fields: ['status'] },
-  monitors: { label: 'Monitor', fields: ['status'] },
+  cameras: { label: 'Camera', comments: true },
+  doors: { label: 'Door', comments: true },
+  servers: { label: 'Server', comments: true },
+  storage: { label: 'Storage device', comments: true },
+  switches: { label: 'Switch', comments: true },
+  intrusion: { label: 'Intrusion point', comments: true },
+  // stations and monitors have no comments column, so nothing to update
+  stations: { label: 'Station', comments: false },
+  monitors: { label: 'Monitor', comments: false },
 };
 
 app.patch('/api/assets/:type/:id', authMiddleware, async (req, res) => {
@@ -1052,34 +1054,25 @@ app.patch('/api/assets/:type/:id', authMiddleware, async (req, res) => {
   const { type, id } = req.params;
   const spec = Object.prototype.hasOwnProperty.call(PATCHABLE_ASSETS, type) ? PATCHABLE_ASSETS[type] : null;
   if (!spec) return res.status(400).json({ error: 'type must be one of: ' + Object.keys(PATCHABLE_ASSETS).join(', ') });
+
+  const body = req.body && typeof req.body === 'object' ? req.body : {};
+  if (Object.prototype.hasOwnProperty.call(body, 'status')) return res.status(400).json({ error: "Device status can't be changed from the field app." });
+  if (!spec.comments) return res.status(400).json({ error: `${spec.label}s don't have comments` });
+  if (!Object.prototype.hasOwnProperty.call(body, 'comments')) return res.status(400).json({ error: 'Send comments' });
+  const comments = body.comments;
+  if (comments !== null && typeof comments !== 'string') return res.status(400).json({ error: 'comments must be a string' });
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   if (!/^\d+$/.test(id) || Number(id) > 2147483647) return res.status(404).json({ error: 'Device not found' });
 
-  const body = req.body && typeof req.body === 'object' ? req.body : {};
-  const sets = [];
-  const params = [];
-  for (const field of ['status', 'comments']) {
-    if (!Object.prototype.hasOwnProperty.call(body, field)) continue;
-    if (!spec.fields.includes(field)) return res.status(400).json({ error: `${spec.label}s don't have ${field}` });
-    const value = body[field];
-    if (field === 'status' && (typeof value !== 'string' || !value.trim())) return res.status(400).json({ error: 'status must be a non-empty string' });
-    if (field === 'comments' && value !== null && typeof value !== 'string') return res.status(400).json({ error: 'comments must be a string' });
-    params.push(field === 'status' ? value.trim() : value);
-    sets.push(`${field} = $${params.length}`);
-  }
-  if (!sets.length) return res.status(400).json({ error: 'Send status and/or comments' });
-
   try {
-    params.push(Number(id));
     const result = await pool.query(
-      `UPDATE ${type} SET ${sets.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = $${params.length} RETURNING *`,
-      params
+      `UPDATE ${type} SET comments = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *`,
+      [comments, Number(id)]
     );
     const asset = result.rows[0];
     if (!asset) return res.status(404).json({ error: 'Device not found' });
     const assetClient = await getClientNameById(asset.client_id);
-    const what = sets.length === 2 ? 'updated' : sets[0].startsWith('status') ? 'status updated' : 'comment updated';
-    await logActivity(asset.client_id || 1, req.user.username, 'Updated', `${spec.label} ${asset.name || id} ${what} (${assetClient})`);
+    await logActivity(asset.client_id || 1, req.user.username, 'Updated', `${spec.label} ${asset.name || id} comment updated (${assetClient})`);
     res.json({ success: true, data: asset });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
