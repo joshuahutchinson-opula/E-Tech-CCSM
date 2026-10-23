@@ -97,54 +97,6 @@ input, select, textarea, button { font-family: var(--font); }
 .import-csv-btn { }
 .client-mode-kftl .import-csv-btn, .client-mode-kwl .import-csv-btn { display: none !important; }
 
-/* Achievement ticker styles - RED VERSION - NO LABEL */
-.achievement-ticker-wrap {
-  width: 100%;
-  overflow: hidden;
-  background: rgba(255, 94, 122, 0.08);
-  border: 1px solid rgba(255, 94, 122, 0.25);
-  border-radius: 8px;
-  margin-bottom: 16px;
-  height: 44px;
-  display: none;
-  align-items: center;
-  transition: opacity 0.3s;
-}
-.achievement-ticker-wrap:hover {
-  opacity: 0.85;
-}
-.achievement-ticker-wrap .ticker-track {
-  flex: 1;
-  overflow: hidden;
-  position: relative;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-}
-.achievement-ticker-wrap .ticker-content {
-  display: flex;
-  gap: 48px;
-  white-space: nowrap;
-  animation: achievementScroll 80s linear infinite;
-  font-size: 13px;
-  color: #fca5a5;
-  font-weight: 500;
-}
-.achievement-ticker-wrap .ticker-content:hover {
-  animation-play-state: paused;
-}
-@keyframes achievementScroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-.achievement-ticker-wrap .ticker-sep {
-  color: rgba(255, 94, 122, 0.3);
-}
-.achievement-ticker-wrap .ticker-sep::before {
-  content: "•";
-}
-
 .ticker-wrap { width:100%;overflow:hidden;background:rgba(229,62,62,0.12);border:1px solid rgba(229,62,62,0.25);border-radius:8px;margin-bottom:16px;height:36px;display:flex;align-items:center; }
 .ticker-wrap .ticker-label { background:#ffffff;padding:4px 8px;flex-shrink:0;z-index:2;border-radius:6px 0 0 6px;display:flex;align-items:center;justify-content:center;height:100%;min-width:44px; }
 .ticker-wrap .ticker-label img { width:22px;height:22px;object-fit:contain; }
@@ -507,12 +459,6 @@ input[type="date"] { color-scheme:dark; }
     <div class="content" id="main-content">
       <div class="ticker-wrap" id="dashboard-ticker" style="display:none;"><div class="ticker-label"><img src="black-logo.png" alt="CAMS" onerror="this.parentElement.innerHTML='📢'"></div><div class="ticker-track"><div class="ticker-content" id="ticker-content"></div></div></div>
       <div class="tab active" id="tab-dashboard">
-        <!-- ACHIEVEMENT TICKER - RED VERSION - NO LABEL -->
-        <div class="achievement-ticker-wrap" id="achievement-ticker">
-          <div class="ticker-track">
-            <div class="ticker-content" id="achievement-content"></div>
-          </div>
-        </div>
         <div class="stats-grid">
           <div class="stat-card"><div class="stat-label">System Health</div><div class="stat-val" style="color:var(--success)" id="dash-health">--%</div><div class="stat-note note-success" id="dash-health-note">All systems operational</div></div>
           <div class="stat-card"><div class="stat-label">Active Alarms</div><div class="stat-val" style="color:var(--warning)" id="dash-alarms">0</div><div class="stat-note note-warn" id="dash-alarms-note">No active alarms</div></div>
@@ -1583,70 +1529,6 @@ function debounceRenderSoftware(){debounce(renderSoftware,'software',250);}
 function debounceRenderIntrusion(){debounce(renderIntrusion,'intrusion',250);}
 function debounceRenderFiles(){debounce(renderFileExplorer,'files',250);}
 function debounceRenderSR(){srPage=1;debounce(renderSR,'sr',250);}
-
-// ========== ACHIEVEMENT TICKER ==========
-async function updateAchievementTicker() {
-  var el = document.getElementById('achievement-content');
-  var wrap = document.getElementById('achievement-ticker');
-  if (!el || !wrap) return;
-  
-  // Hide for admin or if no user client
-  if (isAdmin || !userClient) {
-    wrap.style.display = 'none';
-    return;
-  }
-  
-  try {
-    var data = await apiCall('/achievements');
-    
-    if (!data.has_messages || data.messages.length === 0) {
-      wrap.style.display = 'none';
-      return;
-    }
-    
-    // Show the tape
-    wrap.style.display = 'flex';
-    
-    // Take up to 7 messages
-    var display = data.messages.slice(0, 7);
-    
-    // If less than 3 messages, pad with generic ones
-    if (display.length < 3) {
-      var pad = ['Keep up the great work!', 'Every SR resolved makes a difference', 'Your team is making progress'];
-      for (var i = 0; i < pad.length && display.length < 7; i++) {
-        if (display.indexOf(pad[i]) === -1) {
-          display.push(pad[i]);
-        }
-      }
-    }
-    
-    // Duplicate for seamless looping
-    var doubled = display.concat(display);
-    
-    el.innerHTML = doubled.map(function(x, i) {
-      return '<span>' + x + '</span>' + (i < doubled.length - 1 ? '<span class="ticker-sep"></span>' : '');
-    }).join('');
-    
-  } catch (err) {
-    console.log('Achievement ticker error:', err);
-    wrap.style.display = 'none';
-  }
-}
-
-// Override renderDashboard to include achievement ticker
-var origRenderDashboard = renderDashboard;
-renderDashboard = function() {
-  origRenderDashboard();
-  updateAchievementTicker();
-};
-
-// Override loadData to refresh achievements
-var origLoadData = loadData;
-loadData = function() {
-  return origLoadData().then(function() {
-    updateAchievementTicker();
-  });
-};
 
 document.getElementById('topbar-date').textContent=fullDateTime();
 setInterval(function(){document.getElementById('topbar-date').textContent=fullDateTime();},30000);
