@@ -1082,9 +1082,10 @@ app.get('/api/service-requests/search', authMiddleware, async (req, res) => {
   const add = value => { params.push(value); return '$' + params.length; };
 
   // Client accounts are always pinned to their own client, whatever they ask
-  // for. Staff-created SRs are stored with client_id=1 (or NULL) no matter
-  // which client they're for, so the SR's client name has to match as well —
-  // the same check the dashboard used to apply in the browser.
+  // for. New SRs are now stored with the correct client_id, but older
+  // staff-created SRs were filed with client_id=1 (or NULL) whatever client
+  // they were for, so the SR's client name has to match as well — the same
+  // check the dashboard used to apply in the browser.
   const isStaff = req.user.role === 'admin' || req.user.role === 'technician';
   if (!isStaff) {
     const p = add(req.user.client_id);
@@ -1191,10 +1192,28 @@ app.get('/api/service-requests/search', authMiddleware, async (req, res) => {
 
 app.post('/api/service-requests', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
-  const { subject, client, site, category, priority, assigned_to, body, related_hardware } = req.body;
+  const { subject, site, category, priority, assigned_to, body, related_hardware } = req.body;
   const srId = `SR-${String(Math.floor(Math.random() * 9000) + 1000)}`;
-  const clientId = req.user.role === 'admin' ? 1 : req.user.client_id;
   try {
+    // File the SR under a real client, with client_id and the client name
+    // always agreeing. Client accounts get their own client whatever the body
+    // says; staff pick one on the form (client_id if valid, else its name).
+    let clientRow;
+    if (isClientAccount(req)) {
+      clientRow = (await pool.query('SELECT id, name FROM clients WHERE id = $1', [req.user.client_id])).rows[0];
+    } else {
+      const bodyClientId = Number(req.body.client_id);
+      if (Number.isInteger(bodyClientId) && bodyClientId > 0 && bodyClientId <= 2147483647) {
+        clientRow = (await pool.query('SELECT id, name FROM clients WHERE id = $1', [bodyClientId])).rows[0];
+      }
+      const clientName = typeof req.body.client === 'string' ? req.body.client.trim() : '';
+      if (!clientRow && clientName) {
+        clientRow = (await pool.query('SELECT id, name FROM clients WHERE LOWER(name) = LOWER($1) ORDER BY id LIMIT 1', [clientName])).rows[0];
+      }
+    }
+    if (!clientRow) return res.status(400).json({ error: 'Select a valid client for this service request.' });
+    const clientId = clientRow.id;
+    const client = clientRow.name;
     const result = await pool.query(
       `INSERT INTO service_requests (client_id,sr_id,subject,client,site,category,priority,assigned_to,body,received,created_by,related_hardware) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,CURRENT_DATE,$10,$11) RETURNING *`,
       [clientId, srId, subject, client, site, category, priority, assigned_to, body, req.user.username, JSON.stringify(related_hardware || [])]
@@ -1358,6 +1377,8 @@ const TICKER_ASSET_TABLES = [
   ['monitors', 'monitor', 'controlcenter'],
 ];
 const TICKER_TIME_ZONE = 'America/Jamaica';
+// Shown only when there is nothing live to say — never mixed with live items.
+const TICKER_FALLBACK_LINES = ['24 Hour Support from E-Tech Systems', 'Send us a service request', 'Update asset statuses', 'Visit us at e-techsystemsja.com'];
 
 function tickerJamaicaYMD(date) {
   return new Intl.DateTimeFormat('en-CA', { timeZone: TICKER_TIME_ZONE, year: 'numeric', month: '2-digit', day: '2-digit' }).format(date);
@@ -1379,7 +1400,8 @@ app.get('/api/ticker', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const clientId = req.user.client_id;
   // Same SR scope as the SR list: their client_id, and the SR's client name
-  // must be theirs too (staff-created SRs are stored with client_id=1).
+  // must be theirs too. New SRs are now stored with the correct client_id;
+  // the name check protects older staff-created SRs filed with client_id=1.
   const srScope = `client_id = $1 AND LOWER(COALESCE(client, '')) = (SELECT LOWER(name) FROM clients WHERE id = $1)`;
   const open = `COALESCE(status, '') NOT IN ('Resolved', 'Retracted')`;
   const high = `priority ILIKE '%high%'`;
@@ -1454,7 +1476,9 @@ app.get('/api/ticker', authMiddleware, async (req, res) => {
       items.push({ kind: 'response_time', text: avg + tickerPlural(closed, 'request') + ' closed' + (avg ? '' : ' this month'), priority: 'info' });
     }
 
-    if (!items.length) items.push({ kind: 'fallback', text: '24 Hour Support from E-Tech Systems', priority: 'info' });
+    if (!items.length) {
+      for (const text of TICKER_FALLBACK_LINES) items.push({ kind: 'fallback', text, priority: 'info' });
+    }
     res.json({ items, generated_at: now.toISOString() });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -1976,23 +2000,6 @@ app.post('/api/outlook/delete/:id', authMiddleware, async (req, res) => {
   if (!graphToken) return res.status(503).json({ error: 'No Microsoft Graph token available' });
   try { await axios.post(`https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/messages/${req.params.id}/move`, { destinationId: 'deleteditems' }, { headers: { Authorization: `Bearer ${graphToken}`, 'Content-Type': 'application/json' }, timeout: 8000 }); res.json({ success: true }); }
   catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-app.post('/api/outlook/convert-to-sr/:id', authMiddleware, async (req, res) => {
-  const graphToken = getGraphToken(req);
-  if (!graphToken) return res.status(503).json({ error: 'No Microsoft Graph token available' });
-  try {
-    const response = await axios.get(`https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/messages/${req.params.id}`, { headers: { Authorization: `Bearer ${graphToken}` }, timeout: 8000 });
-    const msg = response.data;
-    const srId = `SR-${String(Math.floor(Math.random() * 9000) + 1000)}`;
-    const subject = msg.subject || 'Converted from email';
-    const body = msg.bodyPreview || msg.body?.content || '';
-    const sender = msg.from?.emailAddress?.name || 'Unknown';
-    await pool.query(`INSERT INTO service_requests (client_id,sr_id,subject,client,site,category,priority,assigned_to,body,received,created_by) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,CURRENT_DATE,$10)`,
-      [req.user.client_id||1,srId,subject,'KFTL','Unknown','Other','Medium','Unassigned',`From: ${sender}\n\n${body}`,req.user.username]);
-    await logActivity(1, req.user.username, 'Converted', 'Email converted to SR ' + srId);
-    res.json({ success: true, sr_id: srId });
-  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // ============================================================
