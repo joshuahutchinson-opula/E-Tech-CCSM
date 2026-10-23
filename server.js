@@ -1041,6 +1041,154 @@ app.get('/api/service-requests', authMiddleware, async (req, res) => {
   } catch (err) { res.json([]); }
 });
 
+// Paged, filtered search for the dashboard's SR tab. The plain GET above is
+// deliberately left alone — field-app.html and several dashboard widgets
+// (urgent list, ticker, related SRs, export) rely on its full response.
+const SR_STATUSES = ['Open', 'In Progress', 'On-Site Review', 'Pending', 'Resolved', 'Retracted'];
+const SR_TIME_ZONE = 'America/Jamaica';
+const SR_SEARCH_COLUMNS = ['sr_id', 'subject', 'client', 'site', 'category', 'assigned_to', 'notes', 'body'];
+const SR_OPEN = `COALESCE(status, '') NOT IN ('Resolved', 'Retracted')`;
+// Age: open SRs count up from creation, resolved SRs show time-to-resolve,
+// and anything closed without a resolved_at (old rows, retractions) has none.
+const SR_AGE = `CASE WHEN status = 'Resolved' THEN resolved_at - created_at WHEN status = 'Retracted' THEN NULL ELSE CURRENT_TIMESTAMP - created_at END`;
+// The only expressions ?sort= can reach — never interpolate the raw value.
+const SR_SORTS = {
+  created_at: 'created_at',
+  sr_id: 'sr_id',
+  client: 'LOWER(client)',
+  site: 'LOWER(site)',
+  priority: `CASE WHEN priority ILIKE '%high%' THEN 3 WHEN priority ILIKE '%medium%' THEN 2 WHEN priority ILIKE '%low%' THEN 1 END`,
+  status: `array_position(ARRAY['Open','In Progress','On-Site Review','Pending','Resolved','Retracted'], status)`,
+  assigned_to: `LOWER(NULLIF(assigned_to, ''))`,
+  age: SR_AGE,
+};
+
+function parseSrSearchDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const [y, m, d] = value.split('-').map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d));
+  return dt.getUTCFullYear() === y && dt.getUTCMonth() === m - 1 && dt.getUTCDate() === d ? value : null;
+}
+
+app.get('/api/service-requests/search', authMiddleware, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  const bad = message => res.status(400).json({ error: message });
+  for (const key of Object.keys(req.query)) {
+    if (typeof req.query[key] !== 'string') return bad(`Query parameter "${key}" may only be given once`);
+  }
+  const val = key => (req.query[key] || '').trim();
+  const where = [];
+  const params = [];
+  const add = value => { params.push(value); return '$' + params.length; };
+
+  // Client accounts are always pinned to their own client, whatever they ask
+  // for. Staff-created SRs are stored with client_id=1 (or NULL) no matter
+  // which client they're for, so the SR's client name has to match as well —
+  // the same check the dashboard used to apply in the browser.
+  const isStaff = req.user.role === 'admin' || req.user.role === 'technician';
+  if (!isStaff) {
+    const p = add(req.user.client_id);
+    where.push(`client_id = ${p}`, `LOWER(COALESCE(client, '')) = (SELECT LOWER(name) FROM clients WHERE id = ${p})`);
+  } else if (val('client_id')) {
+    const clientId = Number(val('client_id'));
+    if (!/^\d+$/.test(val('client_id')) || clientId < 1 || clientId > 2147483647) return bad('client_id must be a positive integer');
+    const p = add(clientId);
+    where.push(`(LOWER(client) = (SELECT LOWER(name) FROM clients WHERE id = ${p}) OR (COALESCE(client, '') = '' AND client_id = ${p}))`);
+  }
+
+  if (val('q')) {
+    const p = add('%' + val('q').replace(/[\\%_]/g, ch => '\\' + ch) + '%');
+    where.push('(' + SR_SEARCH_COLUMNS.map(col => `${col} ILIKE ${p}`).join(' OR ') + ')');
+  }
+  if (val('status')) {
+    if (!SR_STATUSES.includes(val('status'))) return bad('status must be one of: ' + SR_STATUSES.join(', '));
+    where.push(`status = ${add(val('status'))}`);
+  }
+  for (const col of ['site', 'priority', 'category']) {
+    if (val(col)) where.push(`${col} = ${add(val(col))}`);
+  }
+  if (val('assigned_to') === 'Unassigned') {
+    where.push(`(assigned_to IS NULL OR assigned_to IN ('', 'Unassigned'))`);
+  } else if (val('assigned_to')) {
+    where.push(`assigned_to = ${add(val('assigned_to'))}`);
+  }
+
+  // from/to are whole days in Jamaica time, both inclusive.
+  const dateField = val('date_field') || 'created';
+  if (dateField !== 'created' && dateField !== 'resolved') return bad("date_field must be 'created' or 'resolved'");
+  const from = val('from') ? parseSrSearchDate(val('from')) : '';
+  const to = val('to') ? parseSrSearchDate(val('to')) : '';
+  if (from === null) return bad('from must be a valid date in YYYY-MM-DD format');
+  if (to === null) return bad('to must be a valid date in YYYY-MM-DD format');
+  if (from && to && from > to) return bad('from must not be after to');
+  const fromP = from ? add(from) : null;
+  const toP = to ? add(to) : null;
+  const inRange = col => [
+    fromP && `${col} >= (${fromP}::date::timestamp AT TIME ZONE '${SR_TIME_ZONE}')`,
+    toP && `${col} < ((${toP}::date + 1)::timestamp AT TIME ZONE '${SR_TIME_ZONE}')`,
+  ].filter(Boolean);
+  where.push(...inRange(dateField === 'resolved' ? 'resolved_at' : 'created_at'));
+
+  const sort = val('sort') || 'created_at';
+  if (!Object.prototype.hasOwnProperty.call(SR_SORTS, sort)) return bad('sort must be one of: ' + Object.keys(SR_SORTS).join(', '));
+  const dir = (val('dir') || 'desc').toLowerCase();
+  if (dir !== 'asc' && dir !== 'desc') return bad("dir must be 'asc' or 'desc'");
+  const pageRaw = val('page') || '1';
+  const pageSizeRaw = val('page_size') || '50';
+  if (!/^\d+$/.test(pageRaw) || Number(pageRaw) < 1) return bad('page must be a positive integer');
+  if (!/^\d+$/.test(pageSizeRaw) || Number(pageSizeRaw) < 1) return bad('page_size must be a positive integer');
+  const page = Number(pageRaw);
+  const pageSize = Math.min(Number(pageSizeRaw), 200);
+  const offset = (page - 1) * pageSize;
+  if (!Number.isSafeInteger(offset)) return bad('page is too large');
+
+  const whereSql = where.length ? 'WHERE ' + where.join(' AND ') : '';
+  const resolvedInRange = ["status = 'Resolved'", ...inRange('resolved_at')].join(' AND ');
+  try {
+    const summaryResult = await pool.query(
+      `SELECT COUNT(*)::int AS total,
+              COUNT(*) FILTER (WHERE ${SR_OPEN})::int AS open,
+              COUNT(*) FILTER (WHERE ${SR_OPEN} AND priority = 'High')::int AS high_open,
+              COUNT(*) FILTER (WHERE ${resolvedInRange})::int AS resolved_in_range,
+              AVG(EXTRACT(EPOCH FROM (resolved_at - created_at)) / 86400) FILTER (WHERE status = 'Resolved' AND created_at IS NOT NULL AND resolved_at IS NOT NULL) AS avg_resolve_days
+       FROM service_requests ${whereSql}`,
+      params
+    );
+    const s = summaryResult.rows[0];
+    const result = await pool.query(
+      `SELECT * FROM service_requests ${whereSql}
+       ORDER BY ${SR_SORTS[sort]} ${dir.toUpperCase()} NULLS LAST, created_at DESC NULLS LAST, id DESC
+       LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+      [...params, pageSize, offset]
+    );
+    const rows = result.rows;
+    const historyBySr = {};
+    if (rows.length) {
+      const history = await pool.query('SELECT * FROM sr_history WHERE sr_id = ANY($1) ORDER BY created_at', [rows.map(sr => sr.id)]);
+      for (const h of history.rows) (historyBySr[h.sr_id] = historyBySr[h.sr_id] || []).push(h);
+    }
+    for (const sr of rows) {
+      sr.history = historyBySr[sr.id] || [];
+      if (sr.related_hardware && typeof sr.related_hardware === 'string') {
+        try { sr.related_hardware = JSON.parse(sr.related_hardware); } catch (e) { sr.related_hardware = []; }
+      }
+      if (!sr.related_hardware) sr.related_hardware = [];
+    }
+    res.json({
+      rows,
+      total: s.total,
+      page,
+      page_size: pageSize,
+      summary: {
+        open: s.open,
+        high_open: s.high_open,
+        resolved_in_range: s.resolved_in_range,
+        avg_resolve_days: s.avg_resolve_days == null ? null : Math.round(Number(s.avg_resolve_days) * 10) / 10,
+      },
+    });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.post('/api/service-requests', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { subject, client, site, category, priority, assigned_to, body, related_hardware } = req.body;
@@ -1085,7 +1233,7 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
     // with NULL whenever they weren't included in the request body.
     const query = clientId ? `UPDATE service_requests SET priority=COALESCE($1,priority),assigned_to=COALESCE($2,assigned_to),status=COALESCE($3,status),notes=COALESCE($4,notes),updated_at=CURRENT_TIMESTAMP WHERE id=$5 AND client_id=$6` : `UPDATE service_requests SET priority=COALESCE($1,priority),assigned_to=COALESCE($2,assigned_to),status=COALESCE($3,status),notes=COALESCE($4,notes),updated_at=CURRENT_TIMESTAMP WHERE id=$5`;
     const params = clientId ? [priority,assigned_to,status,notes,id,clientId] : [priority,assigned_to,status,notes,id];
-    await pool.query(query, params);
+    const updateResult = await pool.query(query, params);
     
     // Track resolution time for achievements
     if (status === 'Resolved' && oldStatus !== 'Resolved') {
@@ -1102,7 +1250,23 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
       }
     }
     
-    await pool.query('INSERT INTO sr_history (sr_id,time,msg) VALUES ($1,$2,$3)', [id, new Date().toLocaleTimeString(), `Updated: ${status} by ${req.user.username}`]);
+    // One timeline entry per field that actually changed (an assignee change
+    // already got its transfer entry above), and none for a no-op save. A
+    // field left out of the body keeps its old value via the COALESCE above,
+    // so it isn't a change.
+    if (oldSr && updateResult.rowCount > 0) {
+      const by = req.user.username;
+      const after = (value, before) => (value === undefined || value === null ? before : value);
+      const changes = [];
+      const newStatus = after(status, oldSr.status);
+      const newPriority = after(priority, oldSr.priority);
+      if (newStatus !== oldSr.status) changes.push(`Status: ${oldSr.status || '—'} → ${newStatus} by ${by}`);
+      if (newPriority !== oldSr.priority) changes.push(`Priority: ${oldSr.priority || '—'} → ${newPriority} by ${by}`);
+      if ((after(notes, oldSr.notes) || '') !== (oldSr.notes || '')) changes.push(`Notes updated by ${by}`);
+      for (const msg of changes) {
+        await pool.query('INSERT INTO sr_history (sr_id,time,msg) VALUES ($1,$2,$3)', [id, new Date().toLocaleTimeString(), msg]);
+      }
+    }
     const logClientId = clientId || 1;
     await logActivity(logClientId, req.user.username, 'Updated', 'SR ' + id + ' updated to ' + status);
     
