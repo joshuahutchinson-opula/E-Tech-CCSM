@@ -1340,6 +1340,132 @@ app.post('/api/service-requests/:id/transfer', authMiddleware, async (req, res) 
 });
 
 // ============================================================
+// CLIENT TICKER
+// ============================================================
+// Live, client-specific lines for the scrolling ticker on a client's
+// dashboard: what needs attention now, then recent progress. Client
+// accounts only — staff get the achievement ticker (/api/achievements).
+
+// [table, readable type word, dashboard tab the device lives on]
+const TICKER_ASSET_TABLES = [
+  ['cameras', 'camera', 'cameras'],
+  ['doors', 'door', 'doors'],
+  ['servers', 'server', 'compute'],
+  ['storage', 'storage', 'compute'],
+  ['switches', 'switch', 'networking'],
+  ['intrusion', 'intrusion point', 'intrusion'],
+  ['stations', 'workstation', 'controlcenter'],
+  ['monitors', 'monitor', 'controlcenter'],
+];
+const TICKER_TIME_ZONE = 'America/Jamaica';
+const TICKER_MAX_OFFLINE = 5;
+
+function tickerJamaicaYMD(date) {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: TICKER_TIME_ZONE, year: 'numeric', month: '2-digit', day: '2-digit' }).format(date);
+}
+
+// "today", "yesterday", a weekday name within the week, else "15 Oct".
+function tickerRelativeDay(date, now) {
+  const days = Math.round((Date.parse(tickerJamaicaYMD(now)) - Date.parse(tickerJamaicaYMD(date))) / 86400000);
+  if (days <= 0) return 'today';
+  if (days === 1) return 'yesterday';
+  if (days < 7) return new Intl.DateTimeFormat('en-US', { timeZone: TICKER_TIME_ZONE, weekday: 'long' }).format(date);
+  return new Intl.DateTimeFormat('en-GB', { timeZone: TICKER_TIME_ZONE, day: 'numeric', month: 'short' }).format(date);
+}
+
+const tickerPlural = (n, word, many) => `${n} ${n === 1 ? word : (many || word + 's')}`;
+
+app.get('/api/ticker', authMiddleware, async (req, res) => {
+  if (!isClientAccount(req)) return res.status(403).json({ error: 'Not authorized' });
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  const clientId = req.user.client_id;
+  // Same SR scope as the SR list: their client_id, and the SR's client name
+  // must be theirs too (staff-created SRs are stored with client_id=1).
+  const srScope = `client_id = $1 AND LOWER(COALESCE(client, '')) = (SELECT LOWER(name) FROM clients WHERE id = $1)`;
+  const open = `COALESCE(status, '') NOT IN ('Resolved', 'Retracted')`;
+  const high = `priority ILIKE '%high%'`;
+  try {
+    const [assets, openCounts, openTop, recent, month] = await Promise.all([
+      pool.query(
+        TICKER_ASSET_TABLES.map(([table, type, tab], i) =>
+          `SELECT name, zone, status, '${type}' AS type, '${tab}' AS tab, ${i} AS ord FROM ${table} WHERE client_id = $1`
+        ).join(' UNION ALL ') + ' ORDER BY ord, zone, name',
+        [clientId]
+      ),
+      pool.query(`SELECT COUNT(*)::int AS open, COUNT(*) FILTER (WHERE ${high})::int AS high FROM service_requests WHERE ${srScope} AND ${open}`, [clientId]),
+      pool.query(
+        `SELECT sr_id, subject, status, assigned_to FROM service_requests WHERE ${srScope} AND ${open}
+         ORDER BY (${high}) DESC, created_at DESC NULLS LAST, id DESC LIMIT 3`,
+        [clientId]
+      ),
+      pool.query(
+        `SELECT sr_id, subject, assigned_to, resolved_at FROM service_requests
+         WHERE ${srScope} AND status = 'Resolved' AND resolved_at >= CURRENT_TIMESTAMP - INTERVAL '7 days'
+         ORDER BY resolved_at DESC LIMIT 3`,
+        [clientId]
+      ),
+      pool.query(
+        `SELECT COUNT(*)::int AS closed,
+                AVG(EXTRACT(EPOCH FROM (resolved_at - created_at))) FILTER (WHERE created_at IS NOT NULL) AS avg_seconds
+         FROM service_requests
+         WHERE ${srScope} AND status = 'Resolved'
+           AND resolved_at >= (date_trunc('month', CURRENT_TIMESTAMP AT TIME ZONE '${TICKER_TIME_ZONE}') AT TIME ZONE '${TICKER_TIME_ZONE}')`,
+        [clientId]
+      ),
+    ]);
+
+    const items = [];
+    const now = new Date();
+
+    // 1–2. Offline devices by name, or an all-clear when everything is up.
+    const devices = filterByZoneAccess(assets.rows, req);
+    const isOnline = d => ['online', 'working'].includes(String(d.status || '').trim().toLowerCase());
+    const offline = devices.filter(d => !isOnline(d));
+    if (offline.length) {
+      const named = offline.slice(0, TICKER_MAX_OFFLINE).map(d => `${d.name || 'Unnamed'} ${d.type}` + (d.zone ? ` (${d.zone})` : ''));
+      const more = offline.length > TICKER_MAX_OFFLINE ? ` · +${offline.length - TICKER_MAX_OFFLINE} more` : '';
+      items.push({ kind: 'offline', text: 'Offline: ' + named.join(' · ') + more, priority: 'high', link: { type: 'tab', tab: offline[0].tab } });
+    } else if (devices.length) {
+      const sites = new Set(devices.map(d => (d.zone || '').trim()).filter(Boolean)).size;
+      items.push({ kind: 'all_clear', text: `All ${tickerPlural(devices.length, 'device')} online` + (sites ? ` across ${tickerPlural(sites, 'site')}` : ''), priority: 'info' });
+    }
+
+    // 3. Open requests.
+    const { open: openCount, high: highCount } = openCounts.rows[0];
+    if (openCount) {
+      items.push({ kind: 'open_requests', text: tickerPlural(openCount, 'open request') + (highCount ? ` · ${highCount} high priority` : ''), priority: highCount ? 'high' : 'normal' });
+    }
+
+    // 4. Who's handling what.
+    for (const sr of openTop.rows) {
+      const who = sr.assigned_to && sr.assigned_to !== 'Unassigned' ? `${sr.assigned_to} assigned` : 'awaiting assignment';
+      items.push({ kind: 'assignment', text: `${sr.sr_id} ${sr.subject || ''}`.trim() + ` — ${sr.status || 'Open'}, ${who}`, priority: 'normal', link: { type: 'sr', sr_id: sr.sr_id } });
+    }
+
+    // 5. Recently resolved.
+    for (const sr of recent.rows) {
+      const by = sr.assigned_to && sr.assigned_to !== 'Unassigned' ? ` (${sr.assigned_to})` : '';
+      items.push({ kind: 'resolved', text: `Resolved ${tickerRelativeDay(new Date(sr.resolved_at), now)}: ${sr.sr_id} ${sr.subject || ''}`.trim() + by, priority: 'info', link: { type: 'sr', sr_id: sr.sr_id } });
+    }
+
+    // 6. This month's response record.
+    const { closed, avg_seconds } = month.rows[0];
+    if (closed) {
+      let avg = '';
+      if (avg_seconds != null) {
+        const hours = Number(avg_seconds) / 3600;
+        avg = hours < 1 ? 'under an hour' : hours < 24 ? tickerPlural(Math.round(hours), 'hour') : `${(hours / 24).toFixed(1)} days`;
+        avg = `Average resolution this month: ${avg} · `;
+      }
+      items.push({ kind: 'response_time', text: avg + tickerPlural(closed, 'request') + ' closed' + (avg ? '' : ' this month'), priority: 'info' });
+    }
+
+    if (!items.length) items.push({ kind: 'fallback', text: '24 Hour Support from E-Tech Systems', priority: 'info' });
+    res.json({ items, generated_at: now.toISOString() });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ============================================================
 // ACHIEVEMENT TICKER ENDPOINTS
 // ============================================================
 
