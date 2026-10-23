@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>CAMS Field — Mobile</title>
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="manifest" href="/field-manifest.json">
@@ -11,728 +11,494 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="CAMS Field">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+  <link rel="stylesheet" href="/tabler-icons.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: #0b0d15;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      color: var(--text-primary);
-      overflow: hidden;
-      height: 100vh;
-      width: 100vw;
-      position: fixed;
-      top: 0;
-      left: 0;
-    }
+    /* ---------- Theme tokens (same palette as the dashboard; text colours
+       tuned so every pair stays at 4.5:1 or better) ---------- */
     :root {
       --bg: #0b0d15;
-      --card: rgba(255,255,255,0.04);
-      --border: rgba(255,255,255,0.07);
+      --surface: #141724;
+      --surface-2: #1b1f30;
+      --border: #2a2f45;
       --text: #f0f4ff;
-      --text2: rgba(255,255,255,0.6);
-      --text3: rgba(255,255,255,0.25);
+      --text-2: #b9c0d4;
+      --text-3: #8f97ad;
       --accent: #4f8cf7;
-      --accent-glow: rgba(79,140,247,0.25);
-      --danger: #ff5e7a;
-      --warning: #ffb347;
-      --success: #34d399;
-      --font: 'Inter', sans-serif;
-      --nav-height: 64px;
-      --header-height: 52px;
-      --radius: 12px;
+      --accent-fill: #3a6fd8;
+      --on-accent: #ffffff;
+      --accent-soft: rgba(79, 140, 247, 0.16);
+      --focus: #8ab4ff;
+      --danger: #ff8095;
+      --warning: #ffc266;
+      --success: #5ee0a8;
+      --dot-online: #34d399;
+      --dot-offline: #ff5e7a;
+      --banner-bg: rgba(251, 191, 36, 0.14);
+      --banner-text: #fcd34d;
+      --st-open-bg: rgba(255, 179, 71, 0.16);  --st-open: #ffc87a;
+      --st-progress-bg: rgba(96, 165, 250, 0.18); --st-progress: #a5c8ff;
+      --st-onsite-bg: rgba(167, 139, 250, 0.2); --st-onsite: #cdbdff;
+      --st-pending-bg: rgba(250, 204, 21, 0.14); --st-pending: #fde68a;
+      --st-resolved-bg: rgba(52, 211, 153, 0.16); --st-resolved: #7ee2b8;
+      --st-retracted-bg: rgba(148, 163, 184, 0.18); --st-retracted: #cbd5e1;
+      --pri-high-bg: rgba(255, 94, 122, 0.18); --pri-high: #ff9aad;
+      --pri-med-bg: rgba(255, 179, 71, 0.16); --pri-med: #ffc87a;
+      --pri-low-bg: rgba(52, 211, 153, 0.16); --pri-low: #7ee2b8;
+      --skeleton: rgba(255, 255, 255, 0.06);
+      --shadow: 0 -8px 32px rgba(0, 0, 0, 0.45);
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --header-h: 56px;
+      --tabbar-h: 60px;
       --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --radius: 14px;
+      --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+      color-scheme: dark;
     }
-    .light-theme {
-      --bg: #f0f2f5;
-      --card: rgba(255,255,255,0.85);
-      --border: rgba(0,0,0,0.08);
-      --text: #1a1a2e;
-      --text2: rgba(0,0,0,0.6);
-      --text3: rgba(0,0,0,0.35);
+    :root.light-theme {
+      --bg: #eef0f4;
+      --surface: #ffffff;
+      --surface-2: #f5f6f9;
+      --border: #d5d9e2;
+      --text: #161a2b;
+      --text-2: #444b5e;
+      --text-3: #5c6377;
+      --accent: #1f5fd6;
+      --accent-fill: #1f5fd6;
+      --on-accent: #ffffff;
+      --accent-soft: rgba(31, 95, 214, 0.1);
+      --focus: #1f5fd6;
+      --danger: #b4142f;
+      --warning: #8a4b00;
+      --success: #046c4e;
+      --banner-bg: #fff4d6;
+      --banner-text: #6b4600;
+      --st-open-bg: #fff1e0;  --st-open: #8a4b00;
+      --st-progress-bg: #e3eeff; --st-progress: #1d4ed8;
+      --st-onsite-bg: #efe9ff; --st-onsite: #5b21b6;
+      --st-pending-bg: #fdf3c8; --st-pending: #6f5000;
+      --st-resolved-bg: #dcf5ea; --st-resolved: #046c4e;
+      --st-retracted-bg: #eceff3; --st-retracted: #475569;
+      --pri-high-bg: #ffe4e8; --pri-high: #b4142f;
+      --pri-med-bg: #fff1e0; --pri-med: #8a4b00;
+      --pri-low-bg: #dcf5ea; --pri-low: #046c4e;
+      --skeleton: rgba(0, 0, 0, 0.07);
+      --shadow: 0 -8px 32px rgba(15, 23, 42, 0.18);
+      color-scheme: light;
     }
-    .jet-black-theme {
+    :root.jet-black-theme {
       --bg: #000000;
-      --card: rgba(8,8,12,0.98);
-      --border: rgba(255,255,255,0.04);
+      --surface: #0b0b10;
+      --surface-2: #14141c;
+      --border: #26262f;
       --text: #ffffff;
-      --text2: rgba(255,255,255,0.65);
-      --text3: rgba(255,255,255,0.25);
+      --text-2: #c8cbd4;
+      --text-3: #9a9eab;
       --accent: #00d4ff;
+      --accent-fill: #00d4ff;
+      --on-accent: #00131a;
+      --accent-soft: rgba(0, 212, 255, 0.14);
+      --focus: #00d4ff;
     }
 
-    #login-page {
-      position: fixed;
-      inset: 0;
-      background: #0a0a0a;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      flex-direction: column;
-      gap: 16px;
-      padding: 20px;
-    }
-    #login-page .login-box {
-      background: rgba(255,255,255,0.03);
-      backdrop-filter: blur(20px);
-      padding: 32px 28px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.06);
-      width: 100%;
-      max-width: 380px;
-      text-align: center;
-    }
-    #login-page .login-box h2 { color: #f0f4ff; font-size: 22px; margin-bottom: 4px; }
-    #login-page .login-box p { color: rgba(255,255,255,0.25); font-size: 13px; margin-bottom: 20px; }
-    .microsoft-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.04);
-      color: #f0f4ff;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: var(--font);
-    }
-    .microsoft-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
-    .login-divider { display: flex; align-items: center; gap: 12px; margin: 14px 0; color: rgba(255,255,255,0.25); font-size: 11px; }
-    .login-divider::before, .login-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.06); }
-    #login-error { color: #f87171; font-size: 12px; margin-top: 8px; display: none; }
-    .login-loading { display: none; align-items: center; justify-content: center; gap: 8px; color: rgba(255,255,255,0.25); font-size: 13px; margin-top: 8px; }
-    .login-loading.active { display: flex; }
-    .login-loading i { animation: spin 1s linear infinite; }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-    #login-page input { background: rgba(255,255,255,0.04) !important; border: 1px solid rgba(255,255,255,0.1) !important; color: #f0f4ff !important; }
-
-    #app-shell {
-      display: none;
-      flex-direction: column;
-      height: 100vh;
-      height: 100dvh;
-      width: 100vw;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
       background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       overflow: hidden;
-      position: fixed;
-      inset: 0;
+      overscroll-behavior: none;
+      -webkit-tap-highlight-color: transparent;
     }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    button { cursor: pointer; background: none; border: none; touch-action: manipulation; }
+    :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+    .muted { color: var(--text-3); }
+    [hidden] { display: none !important; }
+
+    /* ---------- Sign-in ---------- */
+    #login-page {
+      position: fixed; inset: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px; background: var(--bg);
+    }
+    .login-box {
+      width: 100%; max-width: 380px; text-align: center;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 18px; padding: 32px 24px;
+    }
+    .login-box img { height: 44px; width: auto; margin-bottom: 12px; }
+    .login-box h1 { font-size: 22px; font-weight: 700; }
+    .login-box p { color: var(--text-2); font-size: 14px; margin: 4px 0 24px; }
+    .microsoft-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; min-height: 52px; border-radius: 12px;
+      border: 1px solid var(--border); background: var(--surface-2);
+      font-size: 15px; font-weight: 600;
+    }
+    .microsoft-btn:active { background: var(--accent-soft); }
+    #login-error { color: var(--danger); font-size: 14px; margin-top: 14px; min-height: 20px; }
+    .login-loading { display: none; align-items: center; justify-content: center; gap: 8px; color: var(--text-2); font-size: 14px; margin-top: 10px; }
+    .login-loading.active { display: flex; }
+    .spin { animation: spin 0.9s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ---------- App shell ---------- */
+    #app-shell { position: fixed; inset: 0; display: none; flex-direction: column; background: var(--bg); }
     #app-shell.active { display: flex; }
 
-    .field-header {
-      height: var(--header-height);
-      padding: 0 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--card);
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-      gap: 8px;
+    .app-header {
+      flex-shrink: 0; display: flex; align-items: center; gap: 8px;
+      padding: var(--safe-top) 8px 0 16px; min-height: calc(var(--header-h) + var(--safe-top));
+      background: var(--surface); border-bottom: 1px solid var(--border);
     }
-    .field-header .logo-area {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex: 1;
-      min-width: 0;
+    .app-header .titles { flex: 1; min-width: 0; }
+    .app-header h1 { font-size: 19px; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .updated-ago { display: block; font-size: 12px; color: var(--text-3); }
+    .icon-btn {
+      width: 44px; height: 44px; flex-shrink: 0; border-radius: 12px;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: var(--text-2); font-size: 22px;
     }
-    .field-header .logo-area img {
-      height: 34px;
-      width: auto;
-      max-height: 40px;
-      object-fit: contain;
+    .icon-btn:active { background: var(--accent-soft); color: var(--accent); }
+    .icon-btn.loading i { animation: spin 0.9s linear infinite; }
+    .sync-badge {
+      min-height: 44px; padding: 0 12px; border-radius: 22px;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--st-pending-bg); color: var(--st-pending);
+      font-size: 13px; font-weight: 600; white-space: nowrap;
     }
-    .field-header .logo-area .tech-name {
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 120px;
+
+    .offline-banner {
+      flex-shrink: 0; display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px; font-size: 13px; font-weight: 500;
+      background: var(--banner-bg); color: var(--banner-text); border-bottom: 1px solid var(--border);
     }
-    .field-header .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-shrink: 0;
-    }
-    .field-header .header-actions .theme-btn {
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text2);
-      padding: 4px 8px;
-      font-size: 16px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 36px;
-      height: 36px;
-    }
-    .field-header .header-actions .notif-btn {
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: 50%;
-      color: var(--text2);
-      padding: 4px 8px;
-      font-size: 18px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 36px;
-      height: 36px;
-      position: relative;
-    }
-    .notif-dot {
-      position: absolute;
-      top: 4px;
-      right: 4px;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--danger);
-      display: none;
-    }
-    .notif-dot.active { display: block; }
 
     .field-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 12px 16px;
-      -webkit-overflow-scrolling: touch;
-      scroll-behavior: smooth;
+      flex: 1; overflow-y: auto; overflow-x: hidden; position: relative;
+      -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain;
     }
-    .field-content::-webkit-scrollbar { width: 3px; }
-    .field-content::-webkit-scrollbar-thumb { background: var(--text3); border-radius: 4px; }
+    body.sheet-open .field-content { overflow: hidden; }
+    .ptr {
+      height: 0; overflow: hidden; display: flex; align-items: flex-end; justify-content: center;
+      color: var(--text-2); font-size: 13px; gap: 6px;
+    }
+    .ptr span { padding-bottom: 10px; display: inline-flex; align-items: center; gap: 6px; }
 
-    .field-nav {
-      height: var(--nav-height);
-      padding-bottom: var(--safe-bottom);
-      display: flex;
-      align-items: stretch;
-      background: var(--card);
-      border-top: 1px solid var(--border);
-      flex-shrink: 0;
-      padding-top: 4px;
-    }
-    .field-nav .nav-item {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2px;
-      background: none;
-      border: none;
-      color: var(--text3);
-      font-size: 10px;
-      font-family: var(--font);
-      cursor: pointer;
-      padding: 4px 0;
-      transition: color 0.15s;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-      min-height: 48px;
-      position: relative;
-    }
-    .field-nav .nav-item i { font-size: 22px; transition: transform 0.15s; }
-    .field-nav .nav-item.active { color: var(--accent); }
-    .field-nav .nav-item.active i { transform: scale(1.1); }
-    .field-nav .nav-item .badge-nav {
-      background: var(--danger);
-      color: #fff;
-      font-size: 9px;
-      border-radius: 10px;
-      padding: 1px 6px;
-      font-weight: 600;
-      position: absolute;
-      top: 2px;
-      right: 50%;
-      transform: translateX(14px);
-    }
-    .field-nav .nav-item .icon-wrap {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    .tab-page { display: none; padding: 12px 16px 96px; }
+    .tab-page.active { display: block; animation: pageIn 200ms var(--ease); }
+    @keyframes pageIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-    .tab-page { display: none; animation: fadeUp 0.2s ease; }
-    .tab-page.active { display: block; }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
+    .list-toolbar {
+      position: sticky; top: 0; z-index: 5; margin: -12px -16px 12px; padding: 12px 16px 8px;
+      background: var(--bg); border-bottom: 1px solid var(--border);
     }
+    .search {
+      position: relative; display: block;
+    }
+    .search i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-3); font-size: 18px; pointer-events: none; }
+    .search input {
+      width: 100%; min-height: 46px; padding: 10px 14px 10px 42px; border-radius: 12px;
+      background: var(--surface); border: 1px solid var(--border); font-size: 15px;
+    }
+    .search input::placeholder { color: var(--text-3); }
+    .search input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px 16px;
-      margin-bottom: 12px;
+    .chip-row {
+      display: flex; gap: 8px; overflow-x: auto; overflow-y: hidden; flex-wrap: nowrap;
+      margin: 8px -16px 0; padding: 2px 16px 4px; scrollbar-width: none; scroll-behavior: smooth;
     }
-    .card-title {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text2);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 8px;
+    .chip-row::-webkit-scrollbar { display: none; }
+    .chip {
+      flex-shrink: 0; min-height: 44px; min-width: 44px; padding: 0 16px; border-radius: 22px;
+      border: 1px solid var(--border); background: var(--surface); color: var(--text-2);
+      font-size: 14px; font-weight: 500; white-space: nowrap;
+      display: inline-flex; align-items: center; gap: 6px;
+      transition: background 150ms, color 150ms, border-color 150ms;
     }
+    .chip .count { font-size: 12px; color: var(--text-3); }
+    .chip[aria-pressed="true"] { background: var(--accent-fill); border-color: var(--accent-fill); color: var(--on-accent); }
+    .chip[aria-pressed="true"] .count { color: var(--on-accent); }
 
-    .search-wrap { display: flex; gap: 8px; margin-bottom: 12px; }
-    .search-wrap input {
-      flex: 1;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      padding: 10px 14px;
-      font-size: 14px;
-      font-family: var(--font);
-      min-height: 44px;
+    .segmented {
+      display: flex; padding: 3px; gap: 3px; border-radius: 12px;
+      background: var(--surface-2); border: 1px solid var(--border);
     }
-    .search-wrap input:focus { outline: none; border-color: var(--accent); }
-    .search-wrap input::placeholder { color: var(--text3); }
+    .segmented button {
+      flex: 1; min-height: 44px; border-radius: 9px; font-size: 14px; font-weight: 600; color: var(--text-2);
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .segmented button[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25); }
+    .toolbar-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+    .toolbar-row .segmented { flex: 1; }
+    .select {
+      width: 100%; min-height: 46px; padding: 10px 40px 10px 14px; border-radius: 12px;
+      background-color: var(--surface); border: 1px solid var(--border); font-size: 15px;
+      appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center;
+    }
+    .select:focus, .field input:focus, .field textarea:focus, .field select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 
-    .quick-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-    .quick-btn {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 12px 4px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.15s;
-      color: var(--text2);
-      font-size: 10px;
-      font-family: var(--font);
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-      min-height: 64px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-    }
-    .quick-btn i { font-size: 24px; color: var(--text); }
-    .quick-btn:active { transform: scale(0.95); background: var(--accent-glow); border-color: var(--accent); }
+    /* ---------- Cards, lists ---------- */
+    .section-title { font-size: 13px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.06em; margin: 20px 0 10px; }
+    .section-title:first-child { margin-top: 4px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
 
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 14px;
+    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .summary-card {
+      text-align: left; min-height: 96px; padding: 14px; border-radius: var(--radius);
+      background: var(--surface); border: 1px solid var(--border);
+      display: flex; flex-direction: column; justify-content: space-between; gap: 6px;
+      transition: transform 150ms var(--ease), border-color 150ms;
     }
-    .stat-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px 12px;
-      text-align: center;
-    }
-    .stat-card .stat-number {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--text);
-      line-height: 1.2;
-    }
-    .stat-card .stat-label {
-      font-size: 10px;
-      color: var(--text3);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-top: 2px;
-    }
-    .stat-card .stat-number.accent { color: var(--accent); }
-    .stat-card .stat-number.success { color: var(--success); }
-    .stat-card .stat-number.danger { color: var(--danger); }
+    .summary-card:active { transform: scale(0.98); border-color: var(--accent); }
+    .summary-card .sc-top { display: flex; align-items: center; justify-content: space-between; color: var(--text-2); font-size: 20px; }
+    .summary-card .sc-num { font-size: 30px; font-weight: 800; line-height: 1; color: var(--text); }
+    .summary-card .sc-label { font-size: 14px; font-weight: 600; color: var(--text-2); }
+    .summary-card.tone-danger .sc-top i { color: var(--danger); }
+    .summary-card.tone-warning .sc-top i { color: var(--warning); }
+    .summary-card.tone-success .sc-top i { color: var(--success); }
+    .summary-card.tone-accent .sc-top i { color: var(--accent); }
 
     .alert-banner {
-      background: rgba(255,94,122,0.12);
-      border: 1px solid rgba(255,94,122,0.3);
-      border-radius: var(--radius);
-      padding: 10px 14px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      animation: pulseAlert 2s infinite;
+      display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+      margin-top: 12px; padding: 12px 14px; min-height: 52px; border-radius: var(--radius);
+      background: var(--pri-high-bg); color: var(--pri-high); font-size: 14px; font-weight: 600;
     }
-    .alert-banner i { color: var(--danger); font-size: 18px; flex-shrink: 0; }
-    .alert-banner .alert-text { flex: 1; font-size: 13px; color: var(--text); }
-    .alert-banner .alert-text strong { color: var(--danger); }
-    @keyframes pulseAlert {
-      0%, 100% { border-color: rgba(255,94,122,0.3); }
-      50% { border-color: rgba(255,94,122,0.6); }
-    }
-    .alert-banner.warning {
-      background: rgba(255,179,71,0.12);
-      border-color: rgba(255,179,71,0.3);
-    }
-    .alert-banner.warning i { color: var(--warning); }
-    .alert-banner.warning .alert-text strong { color: var(--warning); }
+    .alert-banner i { font-size: 20px; }
+    .alert-banner .grow { flex: 1; }
 
-    .ticket-item {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
+    .ticket-list, .stack { display: flex; flex-direction: column; gap: 10px; }
+    .ticket-card {
+      display: block; width: 100%; text-align: left; padding: 14px; border-radius: var(--radius);
+      background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--border);
+      transition: transform 150ms var(--ease), border-color 150ms;
     }
-    .ticket-item:last-child { border-bottom: none; }
-    .ticket-item .ticket-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .ticket-item .ticket-id { font-size: 12px; font-weight: 600; color: var(--text2); }
-    .ticket-item .ticket-subject { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; }
-    .ticket-item .ticket-meta {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      font-size: 11px;
-      color: var(--text3);
-      flex-wrap: wrap;
-    }
-    .ticket-item .ticket-meta .sla { font-weight: 600; }
-    .ticket-item .ticket-meta .sla.ok { color: var(--success); }
-    .ticket-item .ticket-meta .sla.warn { color: var(--warning); }
-    .ticket-item .ticket-meta .sla.critical { color: var(--danger); }
+    .ticket-card:active { transform: scale(0.985); }
+    .ticket-card.sla-left-ok { border-left-color: var(--success); }
+    .ticket-card.sla-left-warn { border-left-color: var(--warning); }
+    .ticket-card.sla-left-critical { border-left-color: var(--danger); }
+    .tc-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .tc-id { font-size: 13px; font-weight: 700; color: var(--text-2); margin-right: auto; }
+    .tc-subject { display: block; font-size: 16px; font-weight: 600; color: var(--text); margin: 6px 0 4px; overflow-wrap: anywhere; }
+    .tc-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 13px; color: var(--text-2); }
+    .tc-meta span { display: inline-flex; align-items: center; gap: 4px; }
 
-    .badge {
-      display: inline-block;
-      padding: 2px 10px;
-      border-radius: 12px;
-      font-size: 10px;
-      font-weight: 500;
-      white-space: nowrap;
-    }
-    .b-open { background: rgba(255,179,71,0.15); color: #ffb347; }
-    .b-progress { background: rgba(96,165,250,0.15); color: #93c5fd; }
-    .b-resolved { background: rgba(52,211,153,0.15); color: #34d399; }
-    .b-high { background: rgba(255,94,122,0.15); color: #ff5e7a; }
-    .b-med { background: rgba(255,179,71,0.15); color: #ffb347; }
-    .b-low { background: rgba(52,211,153,0.15); color: #34d399; }
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .st-open { background: var(--st-open-bg); color: var(--st-open); }
+    .st-progress { background: var(--st-progress-bg); color: var(--st-progress); }
+    .st-onsite { background: var(--st-onsite-bg); color: var(--st-onsite); }
+    .st-pending { background: var(--st-pending-bg); color: var(--st-pending); }
+    .st-resolved { background: var(--st-resolved-bg); color: var(--st-resolved); }
+    .st-retracted { background: var(--st-retracted-bg); color: var(--st-retracted); }
+    .pri-high { background: var(--pri-high-bg); color: var(--pri-high); }
+    .pri-med { background: var(--pri-med-bg); color: var(--pri-med); }
+    .pri-low { background: var(--pri-low-bg); color: var(--pri-low); }
+    .sla { font-weight: 600; }
+    .sla-ok { color: var(--success); }
+    .sla-warn { color: var(--warning); }
+    .sla-critical { color: var(--danger); }
 
-    .device-grid { display: flex; flex-direction: column; gap: 8px; }
-    .device-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 12px 14px;
-      cursor: pointer;
-      transition: all 0.15s;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .device-card:active { transform: scale(0.98); border-color: var(--accent); }
-    .device-card .dev-left { flex: 1; min-width: 0; }
-    .device-card .dev-left .dev-name {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .device-card .dev-left .dev-name .dev-type {
-      font-size: 10px;
-      color: var(--text3);
-      font-weight: 400;
-      background: var(--border);
-      padding: 0 8px;
-      border-radius: 10px;
-    }
-    .device-card .dev-left .dev-detail { font-size: 12px; color: var(--text3); margin-top: 2px; }
-    .device-card .dev-left .dev-detail .status-dot {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      margin-right: 4px;
-    }
-    .status-dot.online { background: var(--success); }
-    .status-dot.offline { background: var(--danger); }
-    .status-dot.warning { background: var(--warning); }
-    .device-card .dev-client {
-      font-size: 10px;
-      color: var(--text3);
-      background: var(--border);
-      padding: 2px 10px;
-      border-radius: 10px;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .device-card .dev-arrow { color: var(--text3); font-size: 16px; flex-shrink: 0; }
+    .activity { padding: 4px 14px; }
+    .activity-item { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text-2); }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-item .act-when { display: block; font-size: 12px; color: var(--text-3); margin-bottom: 2px; }
+    .activity-item strong { color: var(--text); font-weight: 600; }
 
-    .filter-section { margin-bottom: 12px; }
-    .filter-section .filter-label {
-      font-size: 10px;
-      color: var(--text3);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 6px;
+    /* ---------- Devices ---------- */
+    .dev-group { margin-bottom: 12px; overflow: hidden; }
+    .group-head, .zone-head {
+      width: 100%; display: flex; align-items: center; gap: 10px; text-align: left;
+      min-height: 52px; padding: 8px 14px; font-weight: 700;
     }
-    .filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
-    .filter-pill {
-      padding: 6px 14px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      color: var(--text2);
-      font-size: 12px;
-      font-family: var(--font);
-      cursor: pointer;
-      transition: all 0.15s;
-      touch-action: manipulation;
-      white-space: nowrap;
+    .group-head { font-size: 16px; }
+    .zone-head { font-size: 14px; min-height: 48px; color: var(--text-2); border-top: 1px solid var(--border); background: var(--surface-2); }
+    .group-head .chev, .zone-head .chev { transition: transform 200ms var(--ease); color: var(--text-3); }
+    .group-head[aria-expanded="false"] .chev, .zone-head[aria-expanded="false"] .chev { transform: rotate(-90deg); }
+    .group-head .grow, .zone-head .grow { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .count-muted { font-size: 13px; font-weight: 500; color: var(--text-3); }
+    .off-count { background: var(--pri-high-bg); color: var(--pri-high); }
+    .device-row {
+      width: 100%; display: flex; align-items: center; gap: 12px; text-align: left;
+      min-height: 60px; padding: 10px 14px; border-top: 1px solid var(--border);
     }
-    .filter-pill:active { transform: scale(0.95); }
-    .filter-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .device-row:active { background: var(--accent-soft); }
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; background: var(--dot-offline); }
+    .status-dot.online { background: var(--dot-online); }
+    .dr-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .dr-name { font-size: 15px; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .dr-sub { font-size: 13px; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .dr-status { font-size: 13px; font-weight: 600; color: var(--text-2); white-space: nowrap; }
+    .dr-status.offline { color: var(--danger); }
+    .device-row .chev { color: var(--text-3); }
 
-    .dropdown-wrap {
-      position: relative;
-      width: 100%;
-      margin-bottom: 8px;
+    /* ---------- States ---------- */
+    .empty-state { text-align: center; padding: 36px 20px; color: var(--text-2); }
+    .empty-state i { font-size: 40px; color: var(--text-3); display: block; margin-bottom: 10px; }
+    .empty-state .empty-title { font-size: 16px; font-weight: 700; color: var(--text); }
+    .empty-state .empty-desc { font-size: 14px; margin: 4px 0 14px; }
+    .empty-state.small { padding: 18px 14px; }
+    .skeleton { border-radius: var(--radius); background: var(--skeleton); position: relative; overflow: hidden; }
+    .skeleton::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+      transform: translateX(-100%); animation: shimmer 1.2s infinite;
     }
-    .dropdown-wrap select {
-      width: 100%;
-      padding: 10px 14px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      color: var(--text);
-      font-size: 14px;
-      font-family: var(--font);
-      appearance: none;
-      -webkit-appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      padding-right: 36px;
-      cursor: pointer;
-      min-height: 44px;
-    }
-    .dropdown-wrap select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
-    .dropdown-wrap select option { background: var(--bg); color: var(--text); }
+    @keyframes shimmer { to { transform: translateX(100%); } }
 
+    .btn {
+      min-height: 48px; padding: 0 18px; border-radius: 12px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      font-size: 15px; font-weight: 600; border: 1px solid var(--border); background: var(--surface-2); color: var(--text);
+      transition: transform 150ms var(--ease), background 150ms;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btn.primary { background: var(--accent-fill); border-color: var(--accent-fill); color: var(--on-accent); }
+    .btn.danger { color: var(--danger); }
+    .btn.block { width: 100%; }
+    .btn.small { min-height: 44px; font-size: 14px; }
+
+    .fab {
+      position: fixed; right: 16px; bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 16px); z-index: 20;
+      width: 58px; height: 58px; border-radius: 18px;
+      display: inline-flex; align-items: center; justify-content: center; font-size: 28px;
+      background: var(--accent-fill); color: var(--on-accent); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      transition: transform 150ms var(--ease);
+    }
+    .fab:active { transform: scale(0.94); }
+
+    /* ---------- Profile ---------- */
+    .profile-head { display: flex; align-items: center; gap: 14px; padding: 16px; }
+    .avatar {
+      width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--accent-fill); color: var(--on-accent); font-size: 26px; font-weight: 700;
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-name { font-size: 18px; font-weight: 700; }
+    .profile-meta { font-size: 14px; color: var(--text-2); overflow-wrap: anywhere; }
+    .settings { padding: 6px 16px 16px; display: flex; flex-direction: column; gap: 10px; }
+    .settings label.lbl { font-size: 13px; font-weight: 600; color: var(--text-2); }
+    .about { font-size: 13px; color: var(--text-2); padding: 14px 16px; }
+
+    /* ---------- Tab bar ---------- */
+    .tabbar {
+      flex-shrink: 0; position: relative; z-index: 30;
+      display: flex; padding-bottom: var(--safe-bottom);
+      background: var(--surface); border-top: 1px solid var(--border);
+    }
+    .tabbar button {
+      flex: 1; min-height: var(--tabbar-h); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+      font-size: 12px; font-weight: 600; color: var(--text-3); position: relative;
+    }
+    .tabbar button i { font-size: 24px; transition: transform 150ms var(--ease); }
+    .tabbar button[aria-current="page"] { color: var(--accent); }
+    .tabbar button[aria-current="page"] i { transform: translateY(-1px) scale(1.06); }
+    .tabbar button[aria-current="page"]::before {
+      content: ''; position: absolute; top: 0; left: 30%; right: 30%; height: 3px; border-radius: 0 0 3px 3px; background: var(--accent);
+    }
+    .tab-badge {
+      position: absolute; top: 6px; left: calc(50% + 6px); min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px;
+      background: #d92d4b; color: #ffffff; font-size: 12px; font-weight: 700; line-height: 20px; text-align: center;
+    }
+
+    /* ---------- Toasts ---------- */
     .toast-container {
-      position: fixed;
-      bottom: calc(var(--nav-height) + 16px + var(--safe-bottom));
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      align-items: center;
-      pointer-events: none;
-      width: 90%;
-      max-width: 380px;
+      position: fixed; left: 50%; transform: translateX(-50%); z-index: 90;
+      bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 16px);
+      width: calc(100% - 32px); max-width: 420px;
+      display: flex; flex-direction: column; gap: 8px; pointer-events: none;
     }
     .toast {
-      padding: 10px 16px;
-      border-radius: 8px;
-      font-size: 12px;
-      color: #fff;
-      background: var(--card);
-      border: 1px solid var(--border);
-      animation: slideUp 0.25s ease;
-      pointer-events: auto;
-      backdrop-filter: blur(10px);
-      width: 100%;
-      text-align: center;
+      display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px;
+      background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-left: 4px solid var(--accent);
+      font-size: 14px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); pointer-events: auto;
+      animation: toastIn 200ms var(--ease);
     }
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .toast.error { background: rgba(255,94,122,0.2); border-color: rgba(255,94,122,0.3); color: #fca5a5; }
-    .toast.success { background: rgba(52,211,153,0.2); border-color: rgba(52,211,153,0.3); color: #6ee7b7; }
-    .toast.warning { background: rgba(255,179,71,0.2); border-color: rgba(255,179,71,0.3); color: #fcd34d; }
+    .toast i { font-size: 18px; color: var(--accent); }
+    .toast.success { border-left-color: var(--success); } .toast.success i { color: var(--success); }
+    .toast.warning { border-left-color: var(--warning); } .toast.warning i { color: var(--warning); }
+    .toast.error { border-left-color: var(--danger); } .toast.error i { color: var(--danger); }
+    .toast.out { opacity: 0; transform: translateY(8px); transition: opacity 200ms, transform 200ms; }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--text3);
+    /* ---------- Sheets ---------- */
+    .sheet-layer { position: fixed; inset: 0; z-index: 60; }
+    .sheet-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.55); opacity: 0; transition: opacity 220ms var(--ease); }
+    .sheet {
+      position: absolute; left: 0; right: 0; bottom: 0; margin: 0 auto; max-width: 560px;
+      max-height: calc(100% - 24px - var(--safe-top)); display: flex; flex-direction: column;
+      background: var(--surface); border-radius: 20px 20px 0 0; border: 1px solid var(--border); border-bottom: none;
+      box-shadow: var(--shadow); transform: translateY(100%); transition: transform 240ms var(--ease);
+      outline: none;
     }
-    .empty-state i { font-size: 48px; opacity: 0.3; display: block; margin-bottom: 12px; }
-    .empty-state .empty-title { font-size: 16px; font-weight: 600; color: var(--text); }
-    .empty-state .empty-desc { font-size: 13px; margin-top: 4px; }
+    .sheet.full { height: calc(100% - 24px - var(--safe-top)); }
+    .sheet-layer.open .sheet-backdrop { opacity: 1; }
+    .sheet-layer.open .sheet { transform: none; }
+    .sheet.dragging { transition: none; }
+    .sheet-grab { display: flex; justify-content: center; padding: 10px 0 2px; touch-action: none; }
+    .sheet-handle { width: 40px; height: 5px; border-radius: 3px; background: var(--border); }
+    .sheet-head { display: flex; align-items: center; gap: 8px; padding: 4px 8px 8px 18px; touch-action: none; }
+    .sheet-title { flex: 1; min-width: 0; font-size: 18px; font-weight: 700; overflow-wrap: anywhere; }
+    .sheet-body { flex: 1; overflow-y: auto; padding: 4px 18px 18px; overscroll-behavior: contain; }
+    .sheet-actions {
+      flex-shrink: 0; display: flex; gap: 8px; align-items: center;
+      padding: 12px 16px calc(12px + var(--safe-bottom)); border-top: 1px solid var(--border); background: var(--surface);
+    }
+    .sheet-actions .btn { flex: 1; }
+    .sheet-actions .select { flex: 1.3; min-height: 48px; }
+    .sheet-actions.stacked { flex-direction: column; align-items: stretch; }
+    .sheet-actions.ticket-bar { display: grid; grid-template-columns: 1fr 1fr; }
+    .sheet-actions.ticket-bar .select { grid-column: 1 / -1; }
 
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.72);
-      z-index: 2000;
-      display: none;
-      align-items: flex-end;
-      justify-content: center;
-      padding: 0 0 var(--safe-bottom) 0;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal-sheet {
-      background: var(--bg);
-      border-radius: 16px 16px 0 0;
-      max-height: 92vh;
-      width: 100%;
-      max-width: 480px;
-      padding: 16px 20px 30px;
-      overflow-y: auto;
-      border: 1px solid var(--border);
-      border-bottom: none;
-      animation: slideUpModal 0.25s ease;
-    }
-    .modal-sheet .modal-close-btn {
-      background: none;
-      border: none;
-      color: var(--text2);
-      font-size: 22px;
-      cursor: pointer;
-      padding: 4px;
-      float: right;
-    }
-    @keyframes slideUpModal {
-      from { transform: translateY(30px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    .modal-sheet .modal-handle {
-      width: 40px;
-      height: 4px;
-      background: var(--border);
-      border-radius: 2px;
-      margin: 0 auto 12px;
-    }
-    .modal-sheet .modal-title { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
-    .modal-sheet .modal-sub { font-size: 12px; color: var(--text3); margin-bottom: 12px; }
-    .modal-sheet .modal-body { font-size: 13px; color: var(--text2); line-height: 1.6; }
-    .modal-sheet .modal-body .detail-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 6px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .modal-sheet .modal-body .detail-row .label { color: var(--text3); }
-    .modal-sheet .modal-body .detail-row .value { color: var(--text); font-weight: 500; }
-    .modal-sheet .modal-body .section-divider {
-      margin: 10px 0 6px;
-      font-weight: 600;
-      color: var(--text2);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-    .modal-sheet .modal-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 16px;
-      flex-wrap: wrap;
-    }
-    .modal-sheet .modal-actions .btn {
-      padding: 10px 16px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      color: var(--text);
-      font-size: 13px;
-      font-family: var(--font);
-      cursor: pointer;
-      flex: 1;
-      text-align: center;
-      touch-action: manipulation;
-      min-height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    .modal-sheet .modal-actions .btn:active { background: var(--accent-glow); border-color: var(--accent); }
-    .modal-sheet .modal-actions .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-    .modal-sheet .modal-actions .btn.success { background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.3); color: var(--success); }
+    .detail-summary { padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+    .ds-subject { font-size: 18px; font-weight: 700; overflow-wrap: anywhere; }
+    .ds-badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 4px; align-items: center; }
+    .kv { display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; margin-top: 12px; font-size: 14px; }
+    .kv dt { color: var(--text-3); }
+    .kv dd { color: var(--text); font-weight: 500; overflow-wrap: anywhere; text-align: right; }
+    .detail-section { padding: 14px 0; border-bottom: 1px solid var(--border); }
+    .detail-section:last-child { border-bottom: none; }
+    .detail-section h3 { font-size: 13px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+    .pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 15px; color: var(--text); }
+    .timeline { list-style: none; position: relative; }
+    .timeline li { position: relative; padding: 0 0 14px 20px; font-size: 14px; color: var(--text); }
+    .timeline li::before { content: ''; position: absolute; left: 4px; top: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+    .timeline li::after { content: ''; position: absolute; left: 7px; top: 18px; bottom: 0; width: 2px; background: var(--border); }
+    .timeline li:last-child::after { display: none; }
+    .timeline .tl-when { display: block; font-size: 12px; color: var(--text-3); }
+    .hw-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; margin: 0 6px 6px 0; border-radius: 16px; background: var(--surface-2); border: 1px solid var(--border); font-size: 14px; }
+    .hint { font-size: 13px; color: var(--text-3); margin-top: 6px; }
 
-    .activity-item {
-      display: flex;
-      gap: 10px;
-      padding: 6px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 12px;
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .field label { font-size: 14px; font-weight: 600; color: var(--text-2); }
+    .field input, .field textarea, .field select {
+      width: 100%; min-height: 48px; padding: 11px 14px; border-radius: 12px;
+      background-color: var(--surface-2); border: 1px solid var(--border); font-size: 16px;
     }
-    .activity-item:last-child { border-bottom: none; }
-    .activity-item .act-time {
-      color: var(--text3);
-      font-weight: 500;
-      min-width: 40px;
-      flex-shrink: 0;
-    }
-    .activity-item .act-msg { color: var(--text2); }
-    .activity-item .act-msg .highlight { color: var(--text); font-weight: 500; }
+    .field select { appearance: none; -webkit-appearance: none; padding-right: 40px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center; }
+    .field textarea { min-height: 110px; resize: vertical; }
+    .field .err { color: var(--danger); font-size: 13px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-    .comment-input-wrap { display: flex; gap: 8px; margin-top: 8px; }
-    .comment-input-wrap input {
-      flex: 1;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      padding: 10px 14px;
-      font-size: 13px;
-      font-family: var(--font);
-      min-height: 44px;
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
     }
-    .comment-input-wrap input:focus { outline: none; border-color: var(--accent); }
-    .comment-input-wrap input::placeholder { color: var(--text3); }
-    .comment-input-wrap .btn {
-      padding: 10px 16px;
-      border-radius: 8px;
-      border: none;
-      background: var(--accent);
-      color: #fff;
-      font-size: 13px;
-      font-family: var(--font);
-      cursor: pointer;
-      min-height: 44px;
-      white-space: nowrap;
-    }
-
-    @media (max-width: 420px) {
-      .quick-grid { grid-template-columns: repeat(4, 1fr); gap: 4px; }
-      .quick-btn { padding: 8px 2px; font-size: 9px; min-height: 56px; }
-      .quick-btn i { font-size: 20px; }
-      .stats-row { gap: 6px; }
-      .stat-card { padding: 10px 8px; }
-      .stat-card .stat-number { font-size: 20px; }
-      .field-header .logo-area .tech-name { max-width: 80px; font-size: 13px; }
+    @media (max-width: 360px) {
+      .summary-card .sc-num { font-size: 26px; }
+      .field-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -740,133 +506,120 @@
 
 <div id="login-page">
   <div class="login-box">
-    <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px;">
-      <img src="logo.png" alt="CAMS" style="height:40px;width:auto;">
-    </div>
-    <h2>CAMS Field</h2>
-    <p>Mobile Service &amp; Maintenance</p>
-    <button class="microsoft-btn" onclick="loginWithMicrosoft()">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 23 23">
+    <img src="logo.png" alt="" id="login-logo">
+    <h1>CAMS Field</h1>
+    <p>Service &amp; maintenance on the go</p>
+    <button type="button" class="microsoft-btn" data-action="login">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 23 23" aria-hidden="true">
         <path fill="#f25022" d="M1 1h10v10H1z"/>
         <path fill="#7fba00" d="M12 1h10v10H12z"/>
         <path fill="#00a4ef" d="M1 12h10v10H1z"/>
         <path fill="#ffb900" d="M12 12h10v10H12z"/>
       </svg> Sign in with Microsoft
     </button>
-    <div id="login-error"></div>
-    <div class="login-loading" id="login-loading"><i class="ti ti-loader"></i> Signing in...</div>
+    <div id="login-error" role="alert"></div>
+    <div class="login-loading" id="login-loading"><i class="ti ti-loader-2 spin" aria-hidden="true"></i> Signing in…</div>
   </div>
 </div>
 
 <div id="app-shell">
-  <header class="field-header">
-    <div class="logo-area">
-      <img src="logo.png" alt="CAMS" id="field-logo" onerror="this.src='logo.png'">
-      <span class="tech-name" id="header-tech-name">Name</span>
+  <header class="app-header">
+    <div class="titles">
+      <h1 id="page-title">Home</h1>
+      <span class="updated-ago" id="updated-ago" aria-live="off">Loading…</span>
     </div>
-    <div class="header-actions">
-      <span id="sync-pending-badge" style="display:none;background:#fbbf24;color:#1a1a1a;font-size:10px;font-weight:600;padding:3px 8px;border-radius:10px;margin-right:4px;white-space:nowrap;"></span>
-      <button class="theme-btn" onclick="toggleTheme()" id="theme-toggle-btn"><i class="ti ti-sun"></i></button>
-      <button class="notif-btn" onclick="viewAlerts()">
-        <i class="ti ti-bell"></i>
-        <span class="notif-dot" id="notif-dot"></span>
-      </button>
-      <button class="theme-btn" onclick="logout()" title="Logout"><i class="ti ti-logout"></i></button>
-    </div>
+    <button type="button" class="sync-badge" id="sync-pending-badge" data-action="sync-now" hidden></button>
+    <button type="button" class="icon-btn" id="refresh-btn" data-action="refresh" aria-label="Refresh"><i class="ti ti-refresh" aria-hidden="true"></i></button>
   </header>
 
-  <div id="offline-banner" style="display:none;background:rgba(251,191,36,0.15);border-bottom:1px solid #fbbf24;color:#fbbf24;padding:8px 16px;font-size:12px;text-align:center;">
-    <i class="ti ti-cloud-off"></i> <span id="offline-banner-text">You're offline — showing saved data</span>
+  <div class="offline-banner" id="offline-banner" role="status" hidden>
+    <i class="ti ti-cloud-off" aria-hidden="true"></i><span id="offline-banner-text">You're offline — showing saved data</span>
   </div>
 
   <main class="field-content" id="field-content">
-    <div class="tab-page active" id="tab-dashboard">
-      <div id="alert-container"></div>
-      <div class="stats-row">
-        <div class="stat-card"><div class="stat-number accent" id="stat-assigned">0</div><div class="stat-label">Assigned</div></div>
-        <div class="stat-card"><div class="stat-number success" id="stat-resolved">0</div><div class="stat-label">Resolved</div></div>
-        <div class="stat-card"><div class="stat-number danger" id="stat-alarms">0</div><div class="stat-label">Alerts</div></div>
-      </div>
-      <div class="card"><div class="card-title">Urgent Service Requests</div><div id="urgent-tickets"></div></div>
-      <div class="card"><div class="card-title">Today's Activity</div><div id="today-activity"></div></div>
-    </div>
+    <div class="ptr" id="ptr" aria-hidden="true"><span><i class="ti ti-arrow-down" id="ptr-icon"></i><span id="ptr-text">Pull to refresh</span></span></div>
 
-    <div class="tab-page" id="tab-tickets">
-      <div class="search-wrap"><input type="text" id="ticket-search" placeholder="Search tickets..." oninput="renderTickets()"></div>
-      <div class="filter-pills" style="margin-bottom:12px;">
-        <button class="filter-pill active" onclick="setTicketFilter('All')">All</button>
-        <button class="filter-pill" onclick="setTicketFilter('Open')">Open</button>
-        <button class="filter-pill" onclick="setTicketFilter('In Progress')">In Progress</button>
-        <button class="filter-pill" onclick="setTicketFilter('On-Site Review')">On-Site Review</button>
-        <button class="filter-pill" onclick="setTicketFilter('Pending')">Pending</button>
-        <button class="filter-pill" onclick="setTicketFilter('Resolved')">Resolved</button>
-        <button class="filter-pill" onclick="setTicketFilter('Retracted')">Retracted</button>
-      </div>
-      <div id="ticket-list"></div>
-    </div>
+    <section class="tab-page active" id="tab-home" aria-labelledby="page-title">
+      <div class="summary-grid" id="home-summary"></div>
+      <div id="home-banner"></div>
+      <h2 class="section-title">My urgent tickets</h2>
+      <div id="home-urgent" class="ticket-list"></div>
+      <h2 class="section-title">Recent activity</h2>
+      <div id="home-activity"></div>
+    </section>
 
-    <div class="tab-page" id="tab-devices">
-      <div class="search-wrap"><input type="text" id="device-search" placeholder="Search devices..." oninput="renderDevices()"></div>
-      <div class="dropdown-wrap">
-        <select id="client-dropdown" onchange="setClientFilter(this.value)"><option value="all">All Clients</option></select>
-      </div>
-      <div class="filter-section">
-        <div class="filter-label">Asset Type</div>
-        <div class="filter-pills" id="device-filter-pills">
-          <button class="filter-pill active" data-filter="all" onclick="setDeviceFilter('all')">All</button>
-          <button class="filter-pill" data-filter="cameras" onclick="setDeviceFilter('cameras')">Cameras</button>
-          <button class="filter-pill" data-filter="doors" onclick="setDeviceFilter('doors')">Doors</button>
-          <button class="filter-pill" data-filter="servers" onclick="setDeviceFilter('servers')">Servers</button>
-          <button class="filter-pill" data-filter="switches" onclick="setDeviceFilter('switches')">Switches</button>
+    <section class="tab-page" id="tab-tickets" aria-labelledby="page-title">
+      <div class="list-toolbar">
+        <label class="search"><span class="sr-only">Search tickets</span><i class="ti ti-search" aria-hidden="true"></i>
+          <input type="search" id="ticket-search" placeholder="Search tickets" autocomplete="off" enterkeyhint="search"></label>
+        <div class="toolbar-row">
+          <div class="segmented" role="group" aria-label="Whose tickets">
+            <button type="button" data-action="ticket-scope" data-scope="mine" aria-pressed="true">Mine</button>
+            <button type="button" data-action="ticket-scope" data-scope="all" aria-pressed="false">All</button>
+          </div>
         </div>
+        <div class="chip-row" id="ticket-chips" role="group" aria-label="Filter tickets by status"></div>
+      </div>
+      <div id="ticket-list" class="ticket-list"></div>
+    </section>
+
+    <section class="tab-page" id="tab-devices" aria-labelledby="page-title">
+      <div class="list-toolbar">
+        <label class="search"><span class="sr-only">Search devices</span><i class="ti ti-search" aria-hidden="true"></i>
+          <input type="search" id="device-search" placeholder="Search name, site, IP, model" autocomplete="off" enterkeyhint="search"></label>
+        <div class="toolbar-row">
+          <label class="sr-only" for="client-dropdown">Client</label>
+          <select class="select" id="client-dropdown"><option value="all">All clients</option></select>
+        </div>
+        <div class="chip-row" id="device-status-chips" role="group" aria-label="Filter devices by status"></div>
+        <div class="chip-row" id="device-type-chips" role="group" aria-label="Filter devices by type"></div>
       </div>
       <div id="device-list"></div>
-    </div>
+    </section>
 
-    <div class="tab-page" id="tab-profile">
+    <section class="tab-page" id="tab-profile" aria-labelledby="page-title">
       <div class="card">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <div style="width:48px;height:48px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;color:#fff;overflow:hidden;" id="profile-avatar">T</div>
+        <div class="profile-head">
+          <div class="avatar" id="profile-avatar" aria-hidden="true">?</div>
           <div>
-            <div style="font-size:18px;font-weight:600;color:var(--text);" id="profile-name">Technician</div>
-            <div style="font-size:12px;color:var(--text3);" id="profile-role">Field Technician</div>
+            <div class="profile-name" id="profile-name">—</div>
+            <div class="profile-meta" id="profile-email"></div>
+            <div class="profile-meta" id="profile-role">E-Tech Staff</div>
           </div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-title">Settings</div>
-        <button class="quick-btn" style="width:100%;flex-direction:row;justify-content:flex-start;gap:12px;min-height:44px;padding:8px 12px;" onclick="toggleTheme()"><i class="ti ti-palette"></i> <span>Toggle Theme</span></button>
-        <button class="quick-btn" style="width:100%;flex-direction:row;justify-content:flex-start;gap:12px;min-height:44px;padding:8px 12px;color:var(--danger);" onclick="logout()"><i class="ti ti-logout"></i> <span>Logout</span></button>
+      <h2 class="section-title">Appearance</h2>
+      <div class="card settings" style="padding-top:16px;">
+        <span class="lbl" id="theme-label">Theme</span>
+        <div class="segmented" role="group" aria-labelledby="theme-label" id="theme-switch">
+          <button type="button" data-action="theme" data-theme="dark" aria-pressed="false">Dark</button>
+          <button type="button" data-action="theme" data-theme="light" aria-pressed="false">Light</button>
+          <button type="button" data-action="theme" data-theme="jet-black" aria-pressed="false">Jet black</button>
+        </div>
       </div>
-      <div class="card">
-        <div class="card-title">About</div>
-        <div style="font-size:12px;color:var(--text3);">CAMS Field v2.0<br>Connected to CAMS Database</div>
+      <h2 class="section-title">Account</h2>
+      <div class="card settings" style="padding-top:16px;">
+        <button type="button" class="btn block" id="profile-sync-btn" data-action="sync-now" hidden><i class="ti ti-cloud-upload" aria-hidden="true"></i> <span id="profile-sync-text">Sync now</span></button>
+        <button type="button" class="btn block danger" data-action="logout"><i class="ti ti-logout" aria-hidden="true"></i> Log out</button>
       </div>
-    </div>
+      <div class="about" id="about-text"></div>
+    </section>
   </main>
 
-  <nav class="field-nav">
-    <button class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard')"><span class="icon-wrap"><i class="ti ti-home"></i></span>Home</button>
-    <button class="nav-item" data-tab="tickets" onclick="switchTab('tickets')"><span class="icon-wrap"><i class="ti ti-ticket"></i><span class="badge-nav" id="ticket-badge">0</span></span>Tickets</button>
-    <button class="nav-item" data-tab="devices" onclick="switchTab('devices')"><span class="icon-wrap"><i class="ti ti-devices"></i></span>Devices</button>
-    <button class="nav-item" data-tab="profile" onclick="switchTab('profile')"><span class="icon-wrap"><i class="ti ti-user"></i></span>Profile</button>
+  <button type="button" class="fab" id="new-sr-fab" data-action="new-sr" aria-label="New service request" hidden><i class="ti ti-plus" aria-hidden="true"></i></button>
+
+  <nav class="tabbar" aria-label="Main">
+    <button type="button" data-action="tab" data-tab="home" aria-current="page"><i class="ti ti-home" aria-hidden="true"></i>Home</button>
+    <button type="button" data-action="tab" data-tab="tickets"><i class="ti ti-ticket" aria-hidden="true"></i>Tickets<span class="tab-badge" id="ticket-badge" hidden></span></button>
+    <button type="button" data-action="tab" data-tab="devices"><i class="ti ti-devices" aria-hidden="true"></i>Devices</button>
+    <button type="button" data-action="tab" data-tab="profile"><i class="ti ti-user-circle" aria-hidden="true"></i>Profile</button>
   </nav>
 </div>
 
-<div class="modal-overlay" id="modal-sheet">
-  <div class="modal-sheet">
-    <button class="modal-close-btn" onclick="closeModal()"><i class="ti ti-x"></i></button>
-    <div class="modal-handle"></div>
-    <div class="modal-title" id="modal-title">Title</div>
-    <div class="modal-sub" id="modal-sub">Subtitle</div>
-    <div class="modal-body" id="modal-body">Content</div>
-    <div class="modal-actions" id="modal-actions"></div>
-  </div>
-</div>
-
-<div class="toast-container" id="toast-container"></div>
+<div class="toast-container" id="toast-container" role="status" aria-live="polite"></div>
 
 <script>
+var APP_VERSION = '3.0';
 var API_URL = window.location.origin;
 var MS_CLIENT_ID = 'e87a6592-aaa5-4a13-9c85-8dbc8e9cd7b2';
 var MS_TENANT_ID = '799ae988-9d3d-40d3-bf5c-93197f5d8d44';
@@ -876,11 +629,11 @@ var msCodeVerifier = '';
 var authToken = localStorage.getItem('token') || null;
 var currentUser = null;
 var isAdmin = false;
-var userClient = null;
-var userClientId = null;
 
 // Same escaping helpers as the main dashboard (index.html) — see there for
 // why esc() alone isn't enough for values embedded inside onclick="...' handlers.
+// This app passes values through data-* attributes read back via dataset,
+// so esc() covers every rendered value; escAttrJs() is kept for parity.
 function esc(v) {
   if (v === null || v === undefined) return '';
   return String(v).replace(/[&<>"']/g, function(c) {
@@ -892,21 +645,149 @@ function escAttrJs(v) {
   return String(v).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n');
 }
 
-var CAMERAS = [];
-var DOORS = [];
-var SERVERS = [];
-var SWITCHES = [];
-var SOFTWARE = [];
+// ============================================================
+// SHARED HELPERS — status, dates, durations
+// ============================================================
+var JM_TZ = 'America/Jamaica';
+
+// One online/offline rule for every device everywhere in the app: online
+// means a status of 'online' or 'working' (any case); anything else,
+// including a missing status, is offline.
+function isDeviceOnline(status) {
+  var s = String(status == null ? '' : status).trim().toLowerCase();
+  return s === 'online' || s === 'working';
+}
+function lc(v) { return String(v == null ? '' : v).toLowerCase(); }
+function plural(n, one, many) { return n + ' ' + (n === 1 ? one : (many || one + 's')); }
+
+// Calendar dates (DATE columns arrive as "2023-06-30" or midnight UTC) are
+// shown as that calendar day; real timestamps are shown in Jamaica time.
+function parseDateValue(v) {
+  if (!v) return null;
+  var s = String(v);
+  var m = s.match(/^(\d{4})-(\d{2})-(\d{2})(T00:00:00(\.000)?Z)?$/);
+  if (m) return { date: new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])), tz: 'UTC' };
+  var d = new Date(s);
+  return isNaN(d.getTime()) ? null : { date: d, tz: JM_TZ };
+}
+var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+function fmtDate(v) {
+  var p = parseDateValue(v);
+  if (!p) return v ? String(v) : '';
+  var q = {};
+  new Intl.DateTimeFormat('en-US', { timeZone: p.tz, day: 'numeric', month: 'numeric', year: 'numeric' }).formatToParts(p.date).forEach(function(x) { q[x.type] = x.value; });
+  return q.day + ' ' + MONTHS[q.month - 1] + ' ' + q.year;
+}
+function fmtDateTime(v) {
+  var d = v ? new Date(v) : null;
+  if (!d || isNaN(d.getTime())) return '';
+  var p = {};
+  new Intl.DateTimeFormat('en-US', { timeZone: JM_TZ, day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })
+    .formatToParts(d).forEach(function(x) { p[x.type] = x.value; });
+  return p.day + ' ' + MONTHS[p.month - 1] + ' ' + p.year + ', ' + p.hour + ':' + p.minute + ' ' + (p.dayPeriod || '').toUpperCase();
+}
+function fmtDuration(ms) {
+  var h = Math.floor(ms / 3600000);
+  if (h < 1) return '<1 h';
+  if (h < 24) return h + ' h';
+  var d = Math.floor(h / 24), r = h % 24;
+  return d + ' d' + (r ? ' ' + r + ' h' : '');
+}
+function timeAgo(dateStr) {
+  if (!dateStr) return 'a while ago';
+  var diff = Date.now() - new Date(dateStr).getTime();
+  var mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return mins + ' min ago';
+  var hrs = Math.floor(mins / 60);
+  if (hrs < 24) return plural(hrs, 'hour') + ' ago';
+  return plural(Math.floor(hrs / 24), 'day') + ' ago';
+}
+
+// ============================================================
+// DEVICE TYPES — all eight, matching the dashboard's field names
+// ============================================================
+var ASSET_TYPES = [
+  { key: 'cameras', label: 'Camera', plural: 'Cameras', hw: 'camera', icon: 'ti-video', warranty: 'warranty', comments: true,
+    fields: [['IP address', 'ip_address'], ['Model', 'model'], ['Manufacturer', 'manufacturer'], ['Resolution', 'resolution'], ['Archiver', 'archiver'], ['MAC address', 'mac_address']],
+    dates: [['Purchased', 'purchase_date'], ['Last cleaned', 'date_cleaned']] },
+  { key: 'doors', label: 'Door', plural: 'Doors', hw: 'door', icon: 'ti-door', warranty: 'warranty_expiry', comments: true,
+    fields: [['IP address', 'ip_address'], ['Reader', 'reader'], ['Lock type', 'lock_type'], ['Controller', 'controller_type'], ['Door swing', 'door_swing'], ['Access type', 'access_type'], ['Anti-passback', 'anti_passback'], ['Technology', 'tech']],
+    dates: [['Installed', 'install_date']] },
+  { key: 'servers', label: 'Server', plural: 'Servers', hw: 'server', icon: 'ti-server', warranty: 'warranty_expiry', comments: true,
+    fields: [['Make', 'make'], ['Model', 'model'], ['Serial', 'serial'], ['Capacity', 'capacity'], ['Used', 'used'], ['Health', 'health'], ['Applications', 'apps']],
+    dates: [['Purchased', 'purchase_date']] },
+  { key: 'storage', label: 'Storage', plural: 'Storage', hw: 'storage', icon: 'ti-database', warranty: 'warranty_expiry', comments: true,
+    fields: [['Type', 'type'], ['Make', 'make'], ['Model', 'model'], ['Serial', 'serial'], ['Capacity', 'capacity'], ['Used', 'used']],
+    dates: [['Purchased', 'purchase_date']] },
+  { key: 'switches', label: 'Switch', plural: 'Switches', hw: 'switch', icon: 'ti-router', warranty: 'warranty_expiry', comments: true,
+    fields: [['IP address', 'ip_address'], ['Model', 'model'], ['Firmware', 'firmware'], ['MAC address', 'mac_address']],
+    dates: [['Purchased', 'purchase_date']] },
+  { key: 'intrusion', label: 'Intrusion point', plural: 'Intrusion', hw: 'intrusion', icon: 'ti-shield', warranty: 'warranty_expiry', comments: true,
+    fields: [['Module', 'module'], ['Sensor type', 'sensor_type'], ['IP address', 'ip_address']],
+    dates: [['Purchased', 'purchase_date']] },
+  { key: 'stations', label: 'Workstation', plural: 'Workstations', hw: 'station', icon: 'ti-device-desktop', warranty: 'warranty_expiry', comments: false,
+    fields: [['Make', 'make'], ['Model', 'model'], ['Applications', 'apps'], ['IP address', 'ip_address']],
+    dates: [['Installed', 'install_date'], ['Purchased', 'purchase_date']] },
+  { key: 'monitors', label: 'Monitor', plural: 'Monitors', hw: 'monitor', icon: 'ti-device-tv', warranty: 'warranty_expiry', comments: false,
+    fields: [['Make', 'make'], ['Model', 'model'], ['Size', 'size']],
+    dates: [['Installed', 'install_date'], ['Purchased', 'purchase_date']] }
+];
+var ASSET_TYPE = {};
+ASSET_TYPES.forEach(function(t) { ASSET_TYPE[t.key] = t; });
+
+var TECHNICIANS = ['Shanice', 'Roger', 'Joshua', 'Rochelle', 'Akeem', 'Marvin', 'Shavene', 'Venessa'];
+var SR_CATEGORIES = ['Camera', 'Access Control', 'Server', 'Network', 'Power', 'Other'];
+var SR_STATUS_OPTIONS = ['Open', 'In Progress', 'On-Site Review', 'Pending', 'Resolved'];
+var STATUS_CLASS = { 'Open': 'st-open', 'In Progress': 'st-progress', 'On-Site Review': 'st-onsite', 'Pending': 'st-pending', 'Resolved': 'st-resolved', 'Retracted': 'st-retracted' };
+var TICKET_CHIPS = [
+  { key: 'active', label: 'Active' }, { key: 'urgent', label: 'Urgent' },
+  { key: 'Open', label: 'Open' }, { key: 'In Progress', label: 'In Progress' }, { key: 'On-Site Review', label: 'On-Site Review' }, { key: 'Pending', label: 'Pending' },
+  { key: 'resolved7', label: 'Resolved this week' }, { key: 'Resolved', label: 'Resolved' }, { key: 'Retracted', label: 'Retracted' }, { key: 'all', label: 'All' }
+];
+
+// ============================================================
+// STATE
+// ============================================================
+var ASSETS = {};
+ASSET_TYPES.forEach(function(t) { ASSETS[t.key] = []; });
 var SERVICE_REQUESTS = [];
 var AUDIT_LOG = [];
-var CLIENTS = [];
+var CLIENT_LIST = [];        // [{id, name}] from /api/client-names
 var CLIENT_ID_TO_NAME = {};
+var dataLoaded = false;
+var lastUpdatedAt = null;
+var lastLoadFailed = false;
+var knownMineIds = null;     // open tickets assigned to me at the last refresh
+var loadingPromise = null;
 
-var currentTab = 'dashboard';
-var ticketFilter = 'All';
-var deviceFilter = 'all';
+var currentTab = 'home';
+var ticketScope = 'mine';
+var ticketFilter = 'active';
+var deviceStatusFilter = 'all';
+var deviceTypeFilter = 'all';
 var clientFilter = 'all';
+var collapsedGroups = {};
+var timers = [];
 
+function allDevices() {
+  var out = [];
+  ASSET_TYPES.forEach(function(t) {
+    (ASSETS[t.key] || []).forEach(function(d) { out.push({ type: t.key, raw: d }); });
+  });
+  return out;
+}
+function findDevice(typeKey, id) { return (ASSETS[typeKey] || []).find(function(d) { return String(d.id) === String(id); }) || null; }
+function findTicket(id) { return SERVICE_REQUESTS.find(function(r) { return String(r.id) === String(id); }) || null; }
+function getClientFromId(clientId) {
+  if (clientId == null) return 'Unknown';
+  return CLIENT_ID_TO_NAME[clientId] || 'Unknown';
+}
+function deviceName(r) { return r.name || r.serial || 'Unnamed device'; }
+
+// ============================================================
+// API
+// ============================================================
 function base64URLEncode(b) {
   var s = '', bytes = new Uint8Array(b);
   for (var i = 0; i < bytes.byteLength; i++) s += String.fromCharCode(bytes[i]);
@@ -928,16 +809,17 @@ async function apiCall(e, o) {
     offlineErr.isOffline = true;
     throw offlineErr;
   }
+  if (r.status === 401 && e.indexOf('/auth/') !== 0) {
+    sessionExpired();
+    var authErr = new Error('Your session expired — sign in again.');
+    authErr.isAuth = true;
+    throw authErr;
+  }
   if (!r.ok) {
     var er = await r.json().catch(function() { return { error: 'Unknown error' }; });
     throw new Error(er.error || 'API call failed: ' + r.status);
   }
   return r.json();
-}
-
-function showLogin() {
-  document.getElementById('login-page').style.display = 'flex';
-  document.getElementById('app-shell').classList.remove('active');
 }
 
 // ============================================================
@@ -947,31 +829,18 @@ function showLogin() {
 // 1. Read side: cache the last successful data fetch in localStorage, and
 //    fall back to it when a fetch fails due to a real connectivity problem
 //    (not a server error — see apiCall's isOffline distinction above).
-// 2. Write side: actions a technician takes while offline (resolving a
-//    ticket, saving a device comment) get queued locally instead of failing,
+// 2. Write side: actions a technician takes while offline (ticket updates,
+//    device comments and status) get queued locally instead of failing,
 //    applied optimistically to the in-memory data so the UI reflects the
 //    change immediately, and replayed against the real API once back online.
-function timeAgo(dateStr) {
-  if (!dateStr) return 'a while ago';
-  var diff = Date.now() - new Date(dateStr).getTime();
-  var mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return mins + ' minute' + (mins === 1 ? '' : 's') + ' ago';
-  var hrs = Math.floor(mins / 60);
-  if (hrs < 24) return hrs + ' hour' + (hrs === 1 ? '' : 's') + ' ago';
-  var days = Math.floor(hrs / 24);
-  return days + ' day' + (days === 1 ? '' : 's') + ' ago';
-}
-
 var CACHE_KEY = 'fieldapp_cache_data';
 var QUEUE_KEY = 'fieldapp_sync_queue';
 
 function cacheDataLocally() {
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify({
-      cameras: CAMERAS, doors: DOORS, servers: SERVERS, switches: SWITCHES,
-      software: SOFTWARE, serviceRequests: SERVICE_REQUESTS, auditLog: AUDIT_LOG,
-      cachedAt: new Date().toISOString()
+      assets: ASSETS, serviceRequests: SERVICE_REQUESTS, auditLog: AUDIT_LOG,
+      clients: CLIENT_LIST, cachedAt: lastUpdatedAt || new Date().toISOString()
     }));
   } catch (e) { /* storage full or unavailable — offline mode just won't have cached data */ }
 }
@@ -981,42 +850,44 @@ function loadCachedData() {
     var raw = localStorage.getItem(CACHE_KEY);
     if (!raw) return null;
     var cached = JSON.parse(raw);
-    CAMERAS = cached.cameras || [];
-    DOORS = cached.doors || [];
-    SERVERS = cached.servers || [];
-    SWITCHES = cached.switches || [];
-    SOFTWARE = cached.software || [];
+    ASSET_TYPES.forEach(function(t) {
+      // older caches stored the four original types as top-level keys
+      ASSETS[t.key] = (cached.assets && cached.assets[t.key]) || cached[t.key] || [];
+    });
     SERVICE_REQUESTS = cached.serviceRequests || [];
     AUDIT_LOG = cached.auditLog || [];
+    setClients(cached.clients || []);
+    lastUpdatedAt = cached.cachedAt || null;
+    dataLoaded = true;
     return cached;
   } catch (e) { return null; }
+}
+
+function setClients(list) {
+  CLIENT_LIST = (list || []).slice().sort(function(a, b) { return String(a.name).localeCompare(String(b.name)); });
+  CLIENT_ID_TO_NAME = {};
+  CLIENT_LIST.forEach(function(c) { CLIENT_ID_TO_NAME[c.id] = c.name; });
 }
 
 function setOfflineBanner(offline, cachedAt) {
   var banner = document.getElementById('offline-banner');
   var text = document.getElementById('offline-banner-text');
   if (!banner) return;
-  if (offline) {
-    banner.style.display = 'block';
-    if (text) {
-      text.textContent = cachedAt
-        ? "You're offline — showing data saved " + timeAgo(cachedAt)
-        : "You're offline — no saved data yet, connect once to load your tickets and devices";
-    }
-  } else {
-    banner.style.display = 'none';
+  banner.hidden = !offline;
+  if (offline && text) {
+    text.textContent = cachedAt
+      ? "You're offline — showing data saved " + timeAgo(cachedAt) + '. Changes will sync when you reconnect.'
+      : "You're offline — no saved data yet. Connect once to load your tickets and devices.";
   }
 }
 
 function getSyncQueue() {
   try { return JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]'); } catch (e) { return []; }
 }
-
 function saveSyncQueue(q) {
   try { localStorage.setItem(QUEUE_KEY, JSON.stringify(q)); } catch (e) {}
   updateSyncBadge();
 }
-
 function queueAction(action) {
   var q = getSyncQueue();
   action.id = Date.now() + '-' + Math.random().toString(36).slice(2);
@@ -1024,17 +895,28 @@ function queueAction(action) {
   q.push(action);
   saveSyncQueue(q);
 }
-
 function updateSyncBadge() {
-  var q = getSyncQueue();
+  var n = getSyncQueue().length;
   var badge = document.getElementById('sync-pending-badge');
-  if (!badge) return;
-  if (q.length > 0) {
-    badge.style.display = 'inline-block';
-    badge.textContent = q.length + ' pending';
-  } else {
-    badge.style.display = 'none';
+  if (badge) {
+    badge.hidden = n === 0;
+    badge.innerHTML = '<i class="ti ti-cloud-upload" aria-hidden="true"></i>' + esc(n + ' pending');
+    badge.setAttribute('aria-label', plural(n, 'change') + ' waiting to sync. Sync now');
   }
+  var pbtn = document.getElementById('profile-sync-btn');
+  if (pbtn) {
+    pbtn.hidden = n === 0;
+    document.getElementById('profile-sync-text').textContent = 'Sync ' + plural(n, 'pending change') + ' now';
+  }
+}
+
+// Device updates always go through PATCH /api/assets/:type/:id, which only
+// touches the fields sent. Older queued comments stored the PUT endpoint
+// ('/cameras/12'); the type and id are recovered from it.
+function queuedDeviceTarget(action) {
+  if (action.assetType && action.deviceId != null) return { type: action.assetType, id: action.deviceId };
+  var m = String(action.endpoint || '').match(/^\/([a-z]+)\/(\d+)$/);
+  return m ? { type: m[1], id: m[2] } : null;
 }
 
 // KNOWN LIMITATION: no conflict detection. If the same ticket/device is
@@ -1045,55 +927,73 @@ function updateSyncBadge() {
 // usage; would need each queued action to capture the record's state (or
 // an updated_at) at queue time and compare it against the server's current
 // state before applying, which isn't in scope for now.
+var syncing = false;
 async function processSyncQueue() {
+  if (syncing) return;
   var q = getSyncQueue();
   if (q.length === 0) return;
+  syncing = true;
   var remaining = [];
   var succeeded = 0;
   var hitOffline = false;
-  for (var i = 0; i < q.length; i++) {
-    if (hitOffline) { remaining.push(q[i]); continue; }
-    var action = q[i];
-    try {
-      if (action.type === 'resolve_ticket') {
-        await apiCall('/service-requests/' + action.ticketId, { method: 'PUT', body: JSON.stringify({ status: 'Resolved' }) });
-      } else if (action.type === 'device_comment') {
-        await apiCall(action.endpoint, { method: 'PUT', body: JSON.stringify({ comments: action.comment }) });
-      }
-      succeeded++;
-    } catch (err) {
-      if (err.isOffline) {
-        hitOffline = true;
-        remaining.push(action);
-      } else {
-        // A real server error (e.g. the ticket was deleted in the meantime) —
-        // drop it rather than retry forever, but let the technician know.
-        toast('Could not sync a queued change: ' + err.message, 'error');
+  try {
+    for (var i = 0; i < q.length; i++) {
+      if (hitOffline) { remaining.push(q[i]); continue; }
+      var action = q[i];
+      try {
+        if (action.type === 'resolve_ticket') {
+          await apiCall('/service-requests/' + action.ticketId, { method: 'PUT', body: JSON.stringify({ status: 'Resolved' }) });
+        } else if (action.type === 'ticket_update') {
+          await apiCall('/service-requests/' + action.ticketId, { method: 'PUT', body: JSON.stringify(action.body) });
+        } else if (action.type === 'device_comment' || action.type === 'device_status') {
+          var target = queuedDeviceTarget(action);
+          if (!target) throw new Error('unknown device');
+          var patchBody = action.type === 'device_status' ? { status: action.status } : { comments: action.comment };
+          await apiCall('/assets/' + target.type + '/' + target.id, { method: 'PATCH', body: JSON.stringify(patchBody) });
+        }
+        succeeded++;
+      } catch (err) {
+        if (err.isAuth) { remaining = remaining.concat(q.slice(i)); break; }
+        if (err.isOffline) {
+          hitOffline = true;
+          remaining.push(action);
+        } else {
+          // A real server error (e.g. the ticket was deleted in the meantime) —
+          // drop it rather than retry forever, but let the technician know.
+          toast('Could not sync a queued change: ' + err.message, 'error');
+        }
       }
     }
+  } finally {
+    syncing = false;
   }
   saveSyncQueue(remaining);
   if (succeeded > 0) {
-    toast(succeeded + ' offline change' + (succeeded > 1 ? 's' : '') + ' synced', 'success');
+    toast(plural(succeeded, 'offline change') + ' synced', 'success');
     await loadData();
-    if (typeof renderDashboard === 'function') renderDashboard();
-    if (typeof renderTickets === 'function') renderTickets();
-    if (typeof renderDevices === 'function') renderDevices();
   }
 }
 
 window.addEventListener('online', function() {
+  if (!authToken) return;
   setOfflineBanner(false);
   toast('Back online — syncing…', 'info');
-  loadData().then(function() { processSyncQueue(); });
+  loadData().then(function() { return processSyncQueue(); });
 });
 window.addEventListener('offline', function() {
-  var cached = null;
-  try { cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); } catch (e) {}
-  setOfflineBanner(true, cached ? cached.cachedAt : null);
+  if (!authToken) return;
+  setOfflineBanner(true, lastUpdatedAt);
   toast("You're offline — changes will be saved and synced once you're back online", 'warning');
 });
 
+// ============================================================
+// SIGN-IN / SIGN-OUT
+// ============================================================
+function showLogin(message) {
+  document.getElementById('login-page').style.display = 'flex';
+  document.getElementById('app-shell').classList.remove('active');
+  document.getElementById('login-error').textContent = message || '';
+}
 function hideLogin() {
   document.getElementById('login-page').style.display = 'none';
   document.getElementById('app-shell').classList.add('active');
@@ -1121,6 +1021,8 @@ function loginWithMicrosoft() {
 async function handleMicrosoftCallback(code) {
   var v = msCodeVerifier || localStorage.getItem('msCodeVerifier') || '';
   localStorage.removeItem('msCodeVerifier');
+  var loading = document.getElementById('login-loading');
+  loading.classList.add('active');
   try {
     var tr = await fetch('https://login.microsoftonline.com/' + MS_TENANT_ID + '/oauth2/v2.0/token', {
       method: 'POST',
@@ -1129,7 +1031,7 @@ async function handleMicrosoftCallback(code) {
     });
     var td = await tr.json();
     if (td.error) {
-      toast('Microsoft auth error: ' + td.error_description, 'error');
+      showLogin('Microsoft sign-in failed: ' + (td.error_description || td.error) + ' Try again.');
       return;
     }
     var accessToken = td.access_token;
@@ -1137,7 +1039,7 @@ async function handleMicrosoftCallback(code) {
     var msUser = await ur.json();
     var email = msUser.mail || msUser.userPrincipalName || '';
     if (!email) {
-      toast('Microsoft login failed: no email provided', 'error');
+      showLogin('Microsoft didn\'t share an email address for this account. Try another account.');
       return;
     }
     var data = await apiCall('/auth/microsoft-callback', {
@@ -1150,27 +1052,72 @@ async function handleMicrosoftCallback(code) {
     if (data.user.photo_url) localStorage.setItem('userPhoto', data.user.photo_url);
     currentUser = data.user;
     isAdmin = data.user.role === 'admin';
-    userClientId = data.user.client_id;
-    userClient = data.user.client_name || null;
     hideLogin();
     initApp();
-    toast('Welcome!', 'success');
+    toast('Welcome, ' + (data.user.username || '') + '!', 'success');
   } catch (err) {
-    toast('Microsoft login failed: ' + err.message, 'error');
+    showLogin('Sign-in failed: ' + err.message + ' Check your connection and try again.');
+  } finally {
+    loading.classList.remove('active');
   }
 }
 
-function logout() {
+function stopTimers() {
+  timers.forEach(function(t) { clearInterval(t); });
+  timers = [];
+}
+function resetState() {
+  ASSET_TYPES.forEach(function(t) { ASSETS[t.key] = []; });
+  SERVICE_REQUESTS = []; AUDIT_LOG = []; setClients([]);
+  dataLoaded = false; lastUpdatedAt = null; knownMineIds = null;
+  currentUser = null; isAdmin = false; authToken = null;
+}
+
+// A 401 from any API call: the token is no longer accepted. End the session
+// on this phone and go back to sign-in (the sync queue is kept so nothing
+// already done is lost if the same person signs straight back in).
+function sessionExpired() {
+  if (!authToken) return;
   localStorage.removeItem('token');
   localStorage.removeItem('user');
   localStorage.removeItem('userPhoto');
-  authToken = null;
-  currentUser = null;
-  isAdmin = false;
-  userClient = null;
-  userClientId = null;
-  document.getElementById('app-shell').classList.remove('active');
-  showLogin();
+  stopTimers();
+  closeAllSheets();
+  resetState();
+  showLogin('Your session expired — sign in again.');
+}
+
+function logout() {
+  var pending = getSyncQueue().length;
+  if (pending === 0) return doLogout();
+  openSheet({
+    title: 'Log out with unsynced changes?',
+    html: '<p class="pre">' + esc(plural(pending, 'change') + ' made offline ' + (pending === 1 ? 'hasn\'t' : 'haven\'t') + ' synced yet. Logging out now clears ' + (pending === 1 ? 'it' : 'them') + ' from this phone and ' + (pending === 1 ? 'it' : 'they') + ' will be lost.') + '</p>',
+    actions:
+      '<button type="button" class="btn primary block" data-action="logout-sync"><i class="ti ti-cloud-upload" aria-hidden="true"></i> Sync now</button>' +
+      '<button type="button" class="btn danger block" data-action="logout-force">Log out anyway</button>' +
+      '<button type="button" class="btn block" data-sheet-close>Cancel</button>',
+    stacked: true
+  });
+}
+async function logoutAfterSync() {
+  if (!navigator.onLine) { toast("You're offline — connect first, then sync.", 'warning'); return; }
+  await processSyncQueue();
+  var left = getSyncQueue().length;
+  if (left === 0) { closeAllSheets(); doLogout(); }
+  else toast(plural(left, 'change') + ' still waiting to sync. Check your connection and try again.', 'warning');
+}
+function doLogout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  localStorage.removeItem('userPhoto');
+  localStorage.removeItem(CACHE_KEY);
+  localStorage.removeItem(QUEUE_KEY);
+  stopTimers();
+  closeAllSheets();
+  resetState();
+  updateSyncBadge();
+  showLogin('');
   toast('Logged out', 'info');
 }
 
@@ -1179,7 +1126,7 @@ function checkLogin() {
   if (urlParams.get('error')) {
     var errDesc = urlParams.get('error_description') || urlParams.get('error');
     window.history.replaceState({}, document.title, window.location.pathname);
-    toast('Microsoft sign-in error: ' + errDesc, 'error');
+    showLogin('Microsoft sign-in error: ' + errDesc);
   }
   if (urlParams.get('code')) {
     window.history.replaceState({}, document.title, window.location.pathname);
@@ -1188,621 +1135,1113 @@ function checkLogin() {
     return;
   }
   authToken = localStorage.getItem('token');
-  currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+  try { currentUser = JSON.parse(localStorage.getItem('user') || 'null'); } catch (e) { currentUser = null; }
   if (authToken && currentUser) {
     var savedPhoto = localStorage.getItem('userPhoto');
-    if (savedPhoto && currentUser) currentUser.photo_url = savedPhoto;
+    if (savedPhoto) currentUser.photo_url = savedPhoto;
     isAdmin = currentUser.role === 'admin';
-    userClientId = currentUser.client_id;
-    userClient = currentUser.client_name || null;
     hideLogin();
     initApp();
   } else {
-    showLogin();
+    showLogin(document.getElementById('login-error').textContent);
   }
 }
 
+// ============================================================
+// DATA LOADING & FRESHNESS
+// ============================================================
 async function initApp() {
   updateSyncBadge();
+  updateProfile();
+  renderAll();
   if (!navigator.onLine) {
     var cached = loadCachedData();
     setOfflineBanner(true, cached ? cached.cachedAt : null);
+    renderAll();
   }
   await loadData();
-  if (navigator.onLine) {
-    await processSyncQueue();
-  }
-  renderAll();
-  updateProfile();
-  checkAlerts();
-  setInterval(checkAlerts, 30000);
+  if (navigator.onLine) await processSyncQueue();
+  stopTimers();
+  // Refresh every minute while the app is on screen; skip while hidden.
+  timers.push(setInterval(function() { if (!document.hidden && authToken) loadData({ quiet: true }); }, 60000));
+  timers.push(setInterval(updateUpdatedAgo, 30000));
 }
 
-async function loadData() {
+document.addEventListener('visibilitychange', function() {
+  if (document.hidden || !authToken) return;
+  if (!lastUpdatedAt || Date.now() - new Date(lastUpdatedAt).getTime() > 60000) loadData({ quiet: true });
+});
+
+function updateUpdatedAgo() {
+  var el = document.getElementById('updated-ago');
+  if (!el) return;
+  if (!lastUpdatedAt) { el.textContent = dataLoaded ? 'Not updated yet' : 'Loading…'; return; }
+  el.textContent = (lastLoadFailed ? 'Last updated ' : 'Updated ') + timeAgo(lastUpdatedAt);
+}
+
+function setRefreshing(on) {
+  var btn = document.getElementById('refresh-btn');
+  if (btn) { btn.classList.toggle('loading', on); btn.setAttribute('aria-busy', on ? 'true' : 'false'); }
+}
+
+// After a write, reload once any refresh already in flight (which may
+// have started before the write) has finished.
+async function reloadAfterWrite() {
+  if (loadingPromise) { try { await loadingPromise; } catch (e) {} }
+  return loadData({ quiet: true });
+}
+
+// Loads everything the app shows. Returns true when fresh data arrived.
+function loadData(opts) {
+  if (loadingPromise) return loadingPromise;
+  loadingPromise = doLoadData(opts || {}).finally(function() { loadingPromise = null; });
+  return loadingPromise;
+}
+async function doLoadData(opts) {
+  setRefreshing(true);
   try {
-    var results = await Promise.all([
-      apiCall('/cameras'),
-      apiCall('/doors'),
-      apiCall('/servers'),
-      apiCall('/switches'),
-      apiCall('/software'),
-      apiCall('/service-requests'),
-      apiCall('/activity-log?limit=50')
-    ]);
-    CAMERAS = results[0] || [];
-    DOORS = results[1] || [];
-    SERVERS = results[2] || [];
-    SWITCHES = results[3] || [];
-    SOFTWARE = results[4] || [];
-    SERVICE_REQUESTS = results[5] || [];
-    AUDIT_LOG = results[6] || [];
+    var results = await Promise.all(
+      ASSET_TYPES.map(function(t) { return apiCall('/' + t.key); }).concat([
+        apiCall('/service-requests'),
+        apiCall('/activity-log?limit=50'),
+        apiCall('/client-names')
+      ])
+    );
+    ASSET_TYPES.forEach(function(t, i) { ASSETS[t.key] = results[i] || []; });
+    var n = ASSET_TYPES.length;
+    SERVICE_REQUESTS = results[n] || [];
+    AUDIT_LOG = results[n + 1] || [];
+    setClients(results[n + 2] || []);
+    dataLoaded = true;
+    lastLoadFailed = false;
+    lastUpdatedAt = new Date().toISOString();
     cacheDataLocally();
     setOfflineBanner(false);
-    if (isAdmin) {
-      try { var clients = await apiCall('/clients'); CLIENTS = (clients || []).map(function(c) { return c.name; }); }
-      catch (e) { CLIENTS = []; }
-    } else {
-      CLIENTS = userClient ? [userClient] : [];
-    }
-    try {
-      var clientNames = await apiCall('/client-names');
-      CLIENT_ID_TO_NAME = {};
-      (clientNames || []).forEach(function(c) { CLIENT_ID_TO_NAME[c.id] = c.name; });
-    } catch (e) { CLIENT_ID_TO_NAME = {}; }
-    populateClientDropdown();
+    announceNewTickets();
+    renderAll();
+    refreshTicketSheet();
+    refreshDeviceSheet();
+    return true;
   } catch (err) {
+    if (err.isAuth) return false;
+    lastLoadFailed = true;
     if (err.isOffline) {
-      var cached = loadCachedData();
+      var cached = dataLoaded ? { cachedAt: lastUpdatedAt } : loadCachedData();
       setOfflineBanner(true, cached ? cached.cachedAt : null);
-      if (!cached) toast("You're offline and no data has been saved yet — connect once to load your tickets and devices", 'error');
-    } else {
-      toast('Failed to load data: ' + err.message, 'error');
+      if (!cached && !opts.quiet) toast("You're offline and nothing is saved on this phone yet. Connect once to load your tickets and devices.", 'error');
+    } else if (!opts.quiet) {
+      toast("Couldn't load the latest data (" + err.message + '). Pull down or tap refresh to try again.', 'error');
     }
+    renderAll();
+    return false;
+  } finally {
+    setRefreshing(false);
+    updateUpdatedAgo();
   }
 }
 
+function myOpenTickets() { return SERVICE_REQUESTS.filter(function(r) { return isMine(r) && isOpenTicket(r); }); }
+
+// Toast when tickets newly assigned to me appear since the last refresh.
+function announceNewTickets() {
+  var mine = myOpenTickets();
+  var ids = mine.map(function(r) { return String(r.id); });
+  if (knownMineIds) {
+    var fresh = mine.filter(function(r) { return knownMineIds.indexOf(String(r.id)) === -1; });
+    if (fresh.length === 1) toast('New ticket assigned to you: ' + (fresh[0].sr_id || '') + ' ' + (fresh[0].subject || ''), 'info');
+    else if (fresh.length > 1) toast(plural(fresh.length, 'new ticket') + ' assigned to you', 'info');
+  }
+  knownMineIds = ids;
+}
+
+async function refreshNow() {
+  var ok = await loadData();
+  if (ok) {
+    if (navigator.onLine) processSyncQueue();
+    toast('Up to date', 'success');
+  }
+}
+
+// ============================================================
+// TICKET HELPERS
+// ============================================================
+function getFieldTechName() { return (currentUser && currentUser.username) || ''; }
+function isMine(r) {
+  var uname = lc(getFieldTechName());
+  return !!uname && lc(r.assigned_to).trim() === uname;
+}
+function isOpenTicket(r) { return r.status !== 'Resolved' && r.status !== 'Retracted'; }
+function isUrgent(r) { return lc(r.priority).indexOf('high') !== -1 && isOpenTicket(r); }
+function resolvedThisWeek(r) {
+  return r.status === 'Resolved' && r.resolved_at && Date.now() - new Date(r.resolved_at).getTime() <= 7 * 86400000;
+}
+// Age/SLA runs from created_at (received is a date only, so it's the
+// fallback). Resolved tickets show how long they took instead.
+function ticketStart(r) {
+  var d = r.created_at ? new Date(r.created_at) : r.received ? new Date(r.received) : null;
+  return d && !isNaN(d.getTime()) ? d : null;
+}
+function getSLAClass(r) {
+  var start = ticketStart(r);
+  if (!start || !isOpenTicket(r)) return 'ok';
+  var hrs = (Date.now() - start.getTime()) / 3600000;
+  if (hrs > 72) return 'critical';
+  if (hrs > 24) return 'warn';
+  return 'ok';
+}
+function getSLAText(r) {
+  var start = ticketStart(r);
+  if (r.status === 'Resolved') {
+    var end = r.resolved_at ? new Date(r.resolved_at) : null;
+    return start && end && !isNaN(end.getTime()) ? 'Resolved in ' + fmtDuration(end - start) : 'Resolved';
+  }
+  if (r.status === 'Retracted') return 'Retracted';
+  if (!start) return 'No date';
+  return fmtDuration(Date.now() - start.getTime());
+}
+function statusBadge(s) { return '<span class="badge ' + (STATUS_CLASS[s] || 'st-retracted') + '">' + esc(s || 'Unknown') + '</span>'; }
+function priorityBadge(p) {
+  var k = lc(p);
+  var cls = k.indexOf('high') !== -1 ? 'pri-high' : k.indexOf('medium') !== -1 ? 'pri-med' : 'pri-low';
+  return p ? '<span class="badge ' + cls + '">' + esc(p) + '</span>' : '';
+}
+function priorityRank(r) { var k = lc(r.priority); return k.indexOf('high') !== -1 ? 3 : k.indexOf('medium') !== -1 ? 2 : k.indexOf('low') !== -1 ? 1 : 0; }
+function ticketMatches(r, q) {
+  if (!q) return true;
+  return [r.sr_id, r.subject, r.client, r.site, r.assigned_to, r.category].some(function(v) { return lc(v).indexOf(q) !== -1; });
+}
+function historyNewestFirst(r) {
+  return (r.history || []).slice().sort(function(a, b) {
+    var ta = a.created_at ? Date.parse(a.created_at) : NaN, tb = b.created_at ? Date.parse(b.created_at) : NaN;
+    if (isNaN(ta) && isNaN(tb)) return (b.id || 0) - (a.id || 0);
+    if (isNaN(ta)) return 1;
+    if (isNaN(tb)) return -1;
+    return tb - ta || (b.id || 0) - (a.id || 0);
+  });
+}
+function historyTime(h) { return fmtDateTime(h.created_at) || h.time || ''; }
+
+// ============================================================
+// RENDERING
+// ============================================================
+var TAB_TITLES = { home: 'Home', tickets: 'Tickets', devices: 'Devices', profile: 'Profile' };
+
+function switchTab(tab) {
+  if (!TAB_TITLES[tab]) return;
+  currentTab = tab;
+  document.querySelectorAll('.tab-page').forEach(function(el) { el.classList.toggle('active', el.id === 'tab-' + tab); });
+  document.querySelectorAll('.tabbar button').forEach(function(el) {
+    if (el.dataset.tab === tab) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
+  });
+  document.getElementById('page-title').textContent = TAB_TITLES[tab];
+  document.getElementById('new-sr-fab').hidden = tab !== 'tickets';
+  document.getElementById('field-content').scrollTop = 0;
+  renderCurrent();
+}
+
+function renderAll() {
+  renderBadges();
+  renderCurrent();
+}
+function renderCurrent() {
+  if (currentTab === 'home') renderHome();
+  else if (currentTab === 'tickets') renderTickets();
+  else if (currentTab === 'devices') renderDevices();
+  else if (currentTab === 'profile') updateProfile();
+  updateUpdatedAgo();
+}
+function renderBadges() {
+  var n = myOpenTickets().length;
+  var b = document.getElementById('ticket-badge');
+  b.hidden = n === 0;
+  b.textContent = n > 99 ? '99+' : String(n);
+  var tabBtn = document.querySelector('.tabbar button[data-tab="tickets"]');
+  tabBtn.setAttribute('aria-label', 'Tickets' + (n ? ', ' + plural(n, 'open ticket') + ' assigned to you' : ''));
+}
+
+function skeletons(n, h) {
+  var out = '';
+  for (var i = 0; i < n; i++) out += '<div class="skeleton" style="height:' + h + 'px"></div>';
+  return '<div class="stack" aria-hidden="true">' + out + '</div>';
+}
+function emptyState(icon, title, desc, actionLabel, action, extraAttrs) {
+  return '<div class="empty-state"><i class="ti ' + icon + '" aria-hidden="true"></i><div class="empty-title">' + esc(title) + '</div>' +
+    (desc ? '<div class="empty-desc">' + esc(desc) + '</div>' : '') +
+    (actionLabel ? '<button type="button" class="btn small" data-action="' + action + '"' + (extraAttrs || '') + '>' + esc(actionLabel) + '</button>' : '') + '</div>';
+}
+
+// ---------- Home ----------
+function renderHome() {
+  var summary = document.getElementById('home-summary');
+  if (!dataLoaded) {
+    summary.innerHTML = '<div class="skeleton" style="height:96px"></div><div class="skeleton" style="height:96px"></div><div class="skeleton" style="height:96px"></div><div class="skeleton" style="height:96px"></div>';
+    document.getElementById('home-urgent').innerHTML = skeletons(2, 96);
+    document.getElementById('home-activity').innerHTML = skeletons(1, 120);
+    document.getElementById('home-banner').innerHTML = '';
+    return;
+  }
+  var mine = myOpenTickets();
+  var urgent = mine.filter(isUrgent);
+  var offline = allDevices().filter(function(d) { return !isDeviceOnline(d.raw.status); }).length;
+  var resolved = SERVICE_REQUESTS.filter(function(r) { return isMine(r) && resolvedThisWeek(r); }).length;
+  function card(num, label, icon, tone, attrs) {
+    return '<button type="button" class="summary-card tone-' + tone + '" ' + attrs + '>' +
+      '<span class="sc-top"><i class="ti ' + icon + '" aria-hidden="true"></i><i class="ti ti-chevron-right" aria-hidden="true"></i></span>' +
+      '<span class="sc-num">' + num + '</span><span class="sc-label">' + esc(label) + '</span></button>';
+  }
+  summary.innerHTML =
+    card(mine.length, 'My open tickets', 'ti-ticket', 'accent', 'data-action="go-tickets" data-scope="mine" data-filter="active"') +
+    card(urgent.length, 'Urgent', 'ti-alert-triangle', 'danger', 'data-action="go-tickets" data-scope="mine" data-filter="urgent"') +
+    card(offline, 'Offline devices', 'ti-plug-connected-x', 'warning', 'data-action="go-devices" data-status="offline"') +
+    card(resolved, 'Resolved this week', 'ti-circle-check', 'success', 'data-action="go-tickets" data-scope="mine" data-filter="resolved7"');
+  document.getElementById('home-banner').innerHTML = urgent.length
+    ? '<button type="button" class="alert-banner" data-action="go-tickets" data-scope="mine" data-filter="urgent"><i class="ti ti-alert-triangle" aria-hidden="true"></i><span class="grow">' +
+      esc(plural(urgent.length, 'urgent ticket') + ' assigned to you') + '</span><i class="ti ti-chevron-right" aria-hidden="true"></i></button>'
+    : '';
+  var urgentSorted = urgent.slice().sort(function(a, b) { return (ticketStart(a) || 0) - (ticketStart(b) || 0); }).slice(0, 5);
+  document.getElementById('home-urgent').innerHTML = urgentSorted.length
+    ? urgentSorted.map(ticketCard).join('')
+    : '<div class="card">' + emptyState('ti-mood-check', 'No urgent tickets assigned to you', 'High-priority tickets assigned to you will show here.', 'View all tickets', 'go-tickets', ' data-scope="all" data-filter="active"') + '</div>';
+  var recent = AUDIT_LOG.slice(0, 8);
+  document.getElementById('home-activity').innerHTML = recent.length
+    ? '<div class="card activity">' + recent.map(function(a) {
+        return '<div class="activity-item"><span class="act-when">' + esc(fmtDateTime(a.created_at)) + (a.username ? ' · ' + esc(a.username) : '') + '</span>' +
+          '<strong>' + esc(a.action || '') + '</strong> — ' + esc(a.detail || '') + '</div>';
+      }).join('') + '</div>'
+    : '<div class="card">' + emptyState('ti-activity', 'No activity in the last 24 hours', 'Updates to tickets and devices will appear here.', 'Refresh', 'refresh') + '</div>';
+}
+
+// ---------- Tickets ----------
+function ticketCard(r) {
+  var sla = getSLAClass(r);
+  var showWho = ticketScope === 'all' || !isMine(r);
+  return '<button type="button" class="ticket-card sla-left-' + (isOpenTicket(r) ? sla : 'none') + '" data-action="open-ticket" data-id="' + esc(r.id) + '">' +
+    '<span class="tc-top"><span class="tc-id">' + esc(r.sr_id || 'No ID') + '</span>' + priorityBadge(r.priority) + statusBadge(r.status) + '</span>' +
+    '<span class="tc-subject">' + esc(r.subject || '(no subject)') + '</span>' +
+    '<span class="tc-meta"><span><i class="ti ti-building" aria-hidden="true"></i>' + esc((r.client || '—') + ' · ' + (r.site || '—')) + '</span>' +
+    '<span class="sla sla-' + sla + '"><i class="ti ti-clock" aria-hidden="true"></i>' + esc(getSLAText(r)) + '</span>' +
+    (showWho ? '<span><i class="ti ti-user" aria-hidden="true"></i>' + esc(r.assigned_to && r.assigned_to !== 'Unassigned' ? r.assigned_to : 'Unassigned') + '</span>' : '') +
+    '</span></button>';
+}
+
+function ticketChipMatches(r, key) {
+  if (key === 'all') return true;
+  if (key === 'active') return isOpenTicket(r);
+  if (key === 'urgent') return isUrgent(r);
+  if (key === 'resolved7') return resolvedThisWeek(r);
+  return r.status === key;
+}
+
+function renderTicketChips() {
+  var pool = SERVICE_REQUESTS.filter(function(r) { return ticketScope === 'all' || isMine(r); });
+  var row = document.getElementById('ticket-chips');
+  row.innerHTML = TICKET_CHIPS.map(function(c) {
+    var n = pool.filter(function(r) { return ticketChipMatches(r, c.key); }).length;
+    return '<button type="button" class="chip" data-action="ticket-filter" data-filter="' + esc(c.key) + '" aria-pressed="' + (c.key === ticketFilter) + '">' +
+      esc(c.label) + ' <span class="count">' + n + '</span></button>';
+  }).join('');
+  scrollChipIntoView(row);
+}
+function scrollChipIntoView(row) {
+  var active = row.querySelector('[aria-pressed="true"]');
+  if (!active) return;
+  var rr = row.getBoundingClientRect(), ar = active.getBoundingClientRect();
+  if (!rr.width) return;
+  row.scrollLeft = Math.max(0, row.scrollLeft + (ar.left - rr.left) - (rr.width - ar.width) / 2);
+}
+
+function renderTickets() {
+  document.querySelectorAll('[data-action="ticket-scope"]').forEach(function(b) { b.setAttribute('aria-pressed', String(b.dataset.scope === ticketScope)); });
+  var container = document.getElementById('ticket-list');
+  if (!dataLoaded) { container.innerHTML = skeletons(4, 104); return; }
+  renderTicketChips();
+  var q = lc(document.getElementById('ticket-search').value).trim();
+  var list = SERVICE_REQUESTS.filter(function(r) {
+    return (ticketScope === 'all' || isMine(r)) && ticketChipMatches(r, ticketFilter) && ticketMatches(r, q);
+  });
+  list.sort(function(a, b) {
+    if (isOpenTicket(a) !== isOpenTicket(b)) return isOpenTicket(a) ? -1 : 1;
+    if (!isOpenTicket(a)) return new Date(b.resolved_at || 0) - new Date(a.resolved_at || 0);
+    return priorityRank(b) - priorityRank(a) || (ticketStart(a) || 0) - (ticketStart(b) || 0);
+  });
+  if (list.length) { container.innerHTML = list.map(ticketCard).join(''); return; }
+  var chip = TICKET_CHIPS.find(function(c) { return c.key === ticketFilter; });
+  if (q) container.innerHTML = emptyState('ti-search', 'No tickets match “' + q + '”', 'Try a ticket number, client, site or subject.', 'Clear search', 'clear-ticket-search');
+  else if (ticketScope === 'mine') container.innerHTML = emptyState('ti-ticket', ticketFilter === 'active' ? 'No tickets assigned to you' : 'No ' + chip.label.toLowerCase() + ' tickets assigned to you', 'Tickets assigned to ' + (getFieldTechName() || 'you') + ' appear here.', 'View all tickets', 'ticket-scope', ' data-scope="all"');
+  else container.innerHTML = emptyState('ti-ticket', 'No ' + chip.label.toLowerCase() + ' tickets', 'Try another filter, or log a new request.', 'New service request', 'new-sr');
+}
+
+// ---------- Devices ----------
+function deviceMatches(d, q) {
+  if (!q) return true;
+  var r = d.raw;
+  return [r.name, r.serial, r.zone, r.ip_address, r.model, r.make, getClientFromId(r.client_id), ASSET_TYPE[d.type].label].some(function(v) { return lc(v).indexOf(q) !== -1; });
+}
+function renderDeviceChips(base) {
+  var off = base.filter(function(d) { return !isDeviceOnline(d.raw.status); }).length;
+  var statusRow = document.getElementById('device-status-chips');
+  var statuses = [['offline', 'Offline', off], ['online', 'Online', base.length - off], ['all', 'All', base.length]];
+  statusRow.innerHTML = statuses.map(function(s) {
+    return '<button type="button" class="chip" data-action="device-status" data-filter="' + s[0] + '" aria-pressed="' + (deviceStatusFilter === s[0]) + '">' + esc(s[1]) + ' <span class="count">' + s[2] + '</span></button>';
+  }).join('');
+  var typeRow = document.getElementById('device-type-chips');
+  typeRow.innerHTML = '<button type="button" class="chip" data-action="device-type" data-filter="all" aria-pressed="' + (deviceTypeFilter === 'all') + '">All types</button>' +
+    ASSET_TYPES.map(function(t) {
+      var n = base.filter(function(d) { return d.type === t.key; }).length;
+      return '<button type="button" class="chip" data-action="device-type" data-filter="' + t.key + '" aria-pressed="' + (deviceTypeFilter === t.key) + '"><i class="ti ' + t.icon + '" aria-hidden="true"></i>' + esc(t.plural) + ' <span class="count">' + n + '</span></button>';
+    }).join('');
+  scrollChipIntoView(statusRow);
+  scrollChipIntoView(typeRow);
+}
 function populateClientDropdown() {
   var dropdown = document.getElementById('client-dropdown');
-  if (!dropdown) return;
-  var allClients = new Set();
-  CAMERAS.forEach(function(c) { allClients.add(getClientFromId(c.client_id)); });
-  DOORS.forEach(function(d) { allClients.add(getClientFromId(d.client_id)); });
-  SERVERS.forEach(function(s) { allClients.add(getClientFromId(s.client_id)); });
-  SWITCHES.forEach(function(s) { allClients.add(getClientFromId(s.client_id)); });
-  CLIENTS.forEach(function(c) { allClients.add(c); });
-  var sorted = Array.from(allClients).sort();
-  var html = '<option value="all">All Clients</option>';
-  sorted.forEach(function(c) { html += '<option value="' + esc(c) + '">' + esc(c) + '</option>'; });
-  dropdown.innerHTML = html;
+  var names = {};
+  allDevices().forEach(function(d) { names[getClientFromId(d.raw.client_id)] = 1; });
+  var sorted = Object.keys(names).sort();
+  dropdown.innerHTML = '<option value="all">All clients</option>' + sorted.map(function(c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('');
+  if (sorted.indexOf(clientFilter) === -1) clientFilter = 'all';
+  dropdown.value = clientFilter;
 }
 
-// Replaces the old zone-name substring guessing (e.g. treating any zone
-// containing "TLF" as KFTL) with the actual client_id already present on
-// every device row — no more guessing, and no more zones getting lumped
-// into the wrong client just because their name happened to contain a
-// matching substring.
-function getClientFromId(clientId) {
-  if (clientId == null) return 'Unknown';
-  return CLIENT_ID_TO_NAME[clientId] || 'Unknown';
-}
-
-function toggleTheme() {
-  var root = document.documentElement;
-  var btn = document.getElementById('theme-toggle-btn');
-  var logo = document.getElementById('field-logo');
-  if (root.classList.contains('light-theme')) {
-    root.classList.remove('light-theme');
-    root.classList.add('jet-black-theme');
-    if (btn) btn.innerHTML = '<i class="ti ti-moon"></i>';
-    if (logo) logo.src = 'logo.png';
-  } else if (root.classList.contains('jet-black-theme')) {
-    root.classList.remove('jet-black-theme');
-    if (btn) btn.innerHTML = '<i class="ti ti-sun"></i>';
-    if (logo) logo.src = 'logo.png';
-  } else {
-    root.classList.add('light-theme');
-    if (btn) btn.innerHTML = '<i class="ti ti-moon"></i>';
-    if (logo) logo.src = 'logo-light.png';
+function renderDevices() {
+  var container = document.getElementById('device-list');
+  if (!dataLoaded) { container.innerHTML = skeletons(5, 60); return; }
+  populateClientDropdown();
+  var q = lc(document.getElementById('device-search').value).trim();
+  var base = allDevices().filter(function(d) {
+    return (clientFilter === 'all' || getClientFromId(d.raw.client_id) === clientFilter) && deviceMatches(d, q);
+  });
+  renderDeviceChips(base);
+  var list = base.filter(function(d) {
+    var online = isDeviceOnline(d.raw.status);
+    return (deviceTypeFilter === 'all' || d.type === deviceTypeFilter) &&
+      (deviceStatusFilter === 'all' || (deviceStatusFilter === 'online') === online);
+  });
+  if (!list.length) {
+    var filtered = q || clientFilter !== 'all' || deviceTypeFilter !== 'all' || deviceStatusFilter !== 'all';
+    container.innerHTML = filtered
+      ? emptyState('ti-filter-off', deviceStatusFilter === 'offline' && !q ? 'No offline devices' : 'No devices match these filters', deviceStatusFilter === 'offline' && !q ? 'Everything here is online.' : 'Clear the filters to see every device.', 'Clear filters', 'clear-device-filters')
+      : emptyState('ti-devices', 'No devices yet', 'Devices added in the CAMS dashboard appear here.', 'Refresh', 'refresh');
+    return;
   }
-  localStorage.setItem('ccsm_theme', root.classList.contains('light-theme') ? 'light' : root.classList.contains('jet-black-theme') ? 'jet-black' : 'dark');
+  // client -> site/zone -> devices (offline first)
+  var groups = {};
+  list.forEach(function(d) {
+    var c = getClientFromId(d.raw.client_id), z = (d.raw.zone || '').trim() || 'No site';
+    groups[c] = groups[c] || {};
+    (groups[c][z] = groups[c][z] || []).push(d);
+  });
+  container.innerHTML = Object.keys(groups).sort().map(function(c) {
+    var zones = groups[c];
+    var all = [].concat.apply([], Object.keys(zones).map(function(z) { return zones[z]; }));
+    var off = all.filter(function(d) { return !isDeviceOnline(d.raw.status); }).length;
+    var ck = 'c:' + c, open = !collapsedGroups[ck];
+    return '<section class="card dev-group">' +
+      '<button type="button" class="group-head" data-action="toggle-group" data-key="' + esc(ck) + '" aria-expanded="' + open + '">' +
+      '<i class="ti ti-chevron-down chev" aria-hidden="true"></i><span class="grow">' + esc(c) + '</span>' +
+      (off ? '<span class="badge off-count">' + off + ' offline</span>' : '') + '<span class="count-muted">' + all.length + '</span></button>' +
+      '<div' + (open ? '' : ' hidden') + '>' + Object.keys(zones).sort().map(function(z) {
+        var devs = zones[z].slice().sort(function(a, b) {
+          var ao = isDeviceOnline(a.raw.status), bo = isDeviceOnline(b.raw.status);
+          return ao === bo ? deviceName(a.raw).localeCompare(deviceName(b.raw)) : ao ? 1 : -1;
+        });
+        var zoff = devs.filter(function(d) { return !isDeviceOnline(d.raw.status); }).length;
+        var zk = 'z:' + c + '|' + z, zopen = !collapsedGroups[zk];
+        return '<button type="button" class="zone-head" data-action="toggle-group" data-key="' + esc(zk) + '" aria-expanded="' + zopen + '">' +
+          '<i class="ti ti-chevron-down chev" aria-hidden="true"></i><span class="grow">' + esc(z) + '</span>' +
+          (zoff ? '<span class="badge off-count">' + zoff + ' offline</span>' : '') + '<span class="count-muted">' + devs.length + '</span></button>' +
+          '<div' + (zopen ? '' : ' hidden') + '>' + devs.map(deviceRow).join('') + '</div>';
+      }).join('') + '</div></section>';
+  }).join('');
+}
+function deviceRow(d) {
+  var r = d.raw, t = ASSET_TYPE[d.type], online = isDeviceOnline(r.status);
+  return '<button type="button" class="device-row" data-action="open-device" data-type="' + d.type + '" data-id="' + esc(r.id) + '">' +
+    '<span class="status-dot' + (online ? ' online' : '') + '" aria-hidden="true"></span>' +
+    '<span class="dr-main"><span class="dr-name">' + esc(deviceName(r)) + '</span><span class="dr-sub">' + esc(t.label + (r.ip_address ? ' · ' + r.ip_address : r.model ? ' · ' + r.model : '')) + '</span></span>' +
+    '<span class="dr-status' + (online ? '' : ' offline') + '">' + esc(r.status || 'No status') + '</span><i class="ti ti-chevron-right chev" aria-hidden="true"></i></button>';
 }
 
+// ---------- Profile ----------
+function updateProfile() {
+  if (!currentUser) return;
+  var name = getFieldTechName() || 'E-Tech staff';
+  document.getElementById('profile-name').textContent = name;
+  var email = currentUser.email || '';
+  var emailEl = document.getElementById('profile-email');
+  emailEl.textContent = email;
+  emailEl.hidden = !email;
+  document.getElementById('profile-role').textContent = 'E-Tech Staff';
+  var avatar = document.getElementById('profile-avatar');
+  var photo = currentUser.photo_url || '';
+  avatar.innerHTML = '';
+  if (/^(data:image\/|https:\/\/)/.test(photo)) {
+    var img = document.createElement('img');
+    img.alt = '';
+    img.src = photo;
+    avatar.appendChild(img);
+  } else {
+    avatar.textContent = name.charAt(0).toUpperCase();
+  }
+  document.getElementById('about-text').textContent = 'CAMS Field ' + APP_VERSION + ' · E-Tech Systems';
+  document.querySelectorAll('[data-action="theme"]').forEach(function(b) { b.setAttribute('aria-pressed', String(b.dataset.theme === currentTheme())); });
+  updateSyncBadge();
+}
+
+// ============================================================
+// SHEETS (bottom sheets: swipe down, backdrop, Esc; focus in and back)
+// ============================================================
+var sheetStack = [];
+var sheetSeq = 0;
+
+function openSheet(opts) {
+  var opener = document.activeElement;
+  var id = 'sheet-' + (++sheetSeq);
+  var layer = document.createElement('div');
+  layer.className = 'sheet-layer';
+  layer.innerHTML =
+    '<div class="sheet-backdrop" data-sheet-close></div>' +
+    '<div class="sheet' + (opts.full ? ' full' : '') + '" role="dialog" aria-modal="true" aria-labelledby="' + id + '-title" tabindex="-1">' +
+      '<div class="sheet-grab" aria-hidden="true"><span class="sheet-handle"></span></div>' +
+      '<div class="sheet-head"><h2 class="sheet-title" id="' + id + '-title"></h2>' +
+        '<button type="button" class="icon-btn" data-sheet-close aria-label="Close"><i class="ti ti-x" aria-hidden="true"></i></button></div>' +
+      '<div class="sheet-body"></div>' +
+      '<div class="sheet-actions' + (opts.stacked ? ' stacked' : '') + '"></div>' +
+    '</div>';
+  document.body.appendChild(layer);
+  var entry = { layer: layer, opener: opener, onClose: opts.onClose, kind: opts.kind || null, data: opts.data || null };
+  setSheetContent(entry, opts);
+  // only the top layer is interactive
+  sheetStack.forEach(function(s) { s.layer.inert = true; });
+  document.getElementById('app-shell').inert = true;
+  sheetStack.push(entry);
+  document.body.classList.add('sheet-open');
+  requestAnimationFrame(function() { requestAnimationFrame(function() { layer.classList.add('open'); }); });
+  var sheet = layer.querySelector('.sheet');
+  var focusTarget = opts.focus ? layer.querySelector(opts.focus) : null;
+  (focusTarget || sheet).focus({ preventScroll: true });
+  enableSwipeToClose(entry);
+  return entry;
+}
+
+function setSheetContent(entry, opts) {
+  var layer = entry.layer;
+  if (opts.title !== undefined) layer.querySelector('.sheet-title').textContent = opts.title;
+  if (opts.html !== undefined) layer.querySelector('.sheet-body').innerHTML = opts.html;
+  if (opts.actions !== undefined) {
+    var a = layer.querySelector('.sheet-actions');
+    a.innerHTML = opts.actions || '';
+    a.hidden = !opts.actions;
+    a.classList.toggle('ticket-bar', !!(opts.actions && opts.actions.indexOf('id="ticket-status"') !== -1));
+  }
+}
+
+function closeSheet(entry) {
+  entry = entry || sheetStack[sheetStack.length - 1];
+  if (!entry) return;
+  var i = sheetStack.indexOf(entry);
+  if (i === -1) return;
+  sheetStack.splice(i, 1);
+  var layer = entry.layer;
+  layer.classList.remove('open');
+  // it stays in the DOM while it slides out: drop its ids so a sheet opened
+  // meanwhile never picks up this one's fields
+  layer.querySelectorAll('[id]').forEach(function(el) { el.removeAttribute('id'); });
+  var done = false;
+  var finish = function() { if (done) return; done = true; if (layer.parentNode) layer.parentNode.removeChild(layer); };
+  layer.querySelector('.sheet').addEventListener('transitionend', finish);
+  setTimeout(finish, 320);
+  var top = sheetStack[sheetStack.length - 1];
+  if (top) top.layer.inert = false;
+  else {
+    document.getElementById('app-shell').inert = false;
+    document.body.classList.remove('sheet-open');
+  }
+  if (entry.onClose) entry.onClose();
+  var back = entry.opener;
+  // the opener may have been re-rendered while the sheet was open (e.g. a
+  // refresh rebuilt the ticket action bar) — focus its replacement instead
+  if (back && !document.contains(back) && back.dataset && back.dataset.action) {
+    var scope = top ? top.layer : document;
+    back = scope.querySelector('[data-action="' + back.dataset.action + '"]' + (back.dataset.id ? '[data-id="' + back.dataset.id + '"]' : ''));
+  }
+  if (back && document.contains(back) && typeof back.focus === 'function') back.focus({ preventScroll: true });
+}
+function closeAllSheets() { while (sheetStack.length) closeSheet(sheetStack[sheetStack.length - 1]); }
+function topSheet(kind) { var t = sheetStack[sheetStack.length - 1]; return t && (!kind || t.kind === kind) ? t : null; }
+function inTopSheet(sel) { var t = sheetStack[sheetStack.length - 1]; return t ? t.layer.querySelector(sel) : null; }
+
+function enableSwipeToClose(entry) {
+  var sheet = entry.layer.querySelector('.sheet');
+  var body = sheet.querySelector('.sheet-body');
+  var startY = null, dy = 0, startT = 0, fromBody = false;
+  function start(e) {
+    var t = e.touches ? e.touches[0] : e;
+    fromBody = body.contains(e.target);
+    if (fromBody && body.scrollTop > 0) { startY = null; return; }
+    if (e.target.closest('input, textarea, select')) { startY = null; return; }
+    startY = t.clientY; dy = 0; startT = Date.now();
+  }
+  function move(e) {
+    if (startY === null) return;
+    var t = e.touches ? e.touches[0] : e;
+    dy = Math.max(0, t.clientY - startY);
+    if (fromBody && dy < 8) return;
+    if (dy > 0) {
+      sheet.classList.add('dragging');
+      sheet.style.transform = 'translateY(' + dy + 'px)';
+      if (e.cancelable) e.preventDefault();
+    }
+  }
+  function end() {
+    if (startY === null) return;
+    startY = null;
+    sheet.classList.remove('dragging');
+    var fast = dy > 40 && dy / Math.max(1, Date.now() - startT) > 0.6;
+    sheet.style.transform = '';
+    if (dy > 110 || fast) closeSheet(entry);
+  }
+  sheet.addEventListener('touchstart', start, { passive: true });
+  sheet.addEventListener('touchmove', move, { passive: false });
+  sheet.addEventListener('touchend', end);
+  sheet.addEventListener('touchcancel', end);
+}
+
+document.addEventListener('keydown', function(e) {
+  var top = sheetStack[sheetStack.length - 1];
+  if (!top) return;
+  if (e.key === 'Escape') { e.preventDefault(); closeSheet(top); return; }
+  if (e.key === 'Tab') {
+    // keep focus inside the open sheet
+    var f = Array.prototype.filter.call(top.layer.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'), function(el) { return !el.disabled && !el.hidden && el.offsetParent !== null; });
+    if (!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && (document.activeElement === first || !top.layer.contains(document.activeElement))) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+});
+
+// ============================================================
+// TICKET DETAIL & ACTIONS
+// ============================================================
+function ticketDetailHtml(r) {
+  var hist = historyNewestFirst(r);
+  var hw = Array.isArray(r.related_hardware) ? r.related_hardware : [];
+  return '<div class="detail-summary">' +
+      '<div class="ds-subject">' + esc(r.subject || '(no subject)') + '</div>' +
+      '<div class="ds-badges">' + statusBadge(r.status) + priorityBadge(r.priority) +
+        '<span class="sla sla-' + getSLAClass(r) + '" style="font-size:14px;"><i class="ti ti-clock" aria-hidden="true"></i> ' + esc(getSLAText(r)) + '</span></div>' +
+      '<dl class="kv">' +
+        '<dt>Client</dt><dd>' + esc(r.client || '—') + '</dd>' +
+        '<dt>Site</dt><dd>' + esc(r.site || '—') + '</dd>' +
+        '<dt>Category</dt><dd>' + esc(r.category || '—') + '</dd>' +
+        '<dt>Assigned</dt><dd>' + esc(r.assigned_to || 'Unassigned') + '</dd>' +
+        '<dt>Created</dt><dd>' + esc(fmtDateTime(r.created_at) || fmtDate(r.received) || '—') + (r.created_by ? ' · ' + esc(r.created_by) : '') + '</dd>' +
+        (r.resolved_at ? '<dt>Resolved</dt><dd>' + esc(fmtDateTime(r.resolved_at)) + '</dd>' : '') +
+      '</dl></div>' +
+    '<section class="detail-section"><h3>Description</h3><p class="pre">' + (r.body ? esc(r.body) : '<span class="muted">No description</span>') + '</p></section>' +
+    '<section class="detail-section"><h3>Notes</h3><p class="pre" id="ticket-notes">' + (r.notes ? esc(r.notes) : '<span class="muted">No notes yet</span>') + '</p></section>' +
+    (hw.length ? '<section class="detail-section"><h3>Related devices</h3>' + hw.map(function(h) { return '<span class="hw-chip"><i class="ti ti-cpu" aria-hidden="true"></i>' + esc(h.name || h.type || 'Device') + '</span>'; }).join('') + '</section>' : '') +
+    '<section class="detail-section"><h3>Timeline</h3>' + (hist.length
+      ? '<ol class="timeline">' + hist.map(function(h) { return '<li><span class="tl-when">' + esc(historyTime(h)) + '</span>' + esc(h.msg || '') + '</li>'; }).join('') + '</ol>'
+      : '<p class="muted">No history recorded</p>') + '</section>';
+}
+function ticketActionsHtml(r) {
+  var note = '<button type="button" class="btn" data-action="ticket-note"><i class="ti ti-message-plus" aria-hidden="true"></i> Add note</button>';
+  if (!isOpenTicket(r)) return note;
+  var options = SR_STATUS_OPTIONS.slice();
+  if (options.indexOf(r.status) === -1 && r.status) options.unshift(r.status);
+  return '<label class="sr-only" for="ticket-status">Status</label><select class="select" id="ticket-status" data-action-change="ticket-status">' +
+    options.map(function(s) { return '<option value="' + esc(s) + '"' + (s === r.status ? ' selected' : '') + '>' + esc(s) + '</option>'; }).join('') + '</select>' +
+    note + '<button type="button" class="btn primary" data-action="ticket-resolve"><i class="ti ti-check" aria-hidden="true"></i> Resolve</button>';
+}
+
+function openTicketDetail(id) {
+  var r = findTicket(id);
+  if (!r) { toast('That ticket is no longer in the list. Refresh and try again.', 'warning'); return; }
+  openSheet({ title: r.sr_id || 'Service request', html: ticketDetailHtml(r), actions: ticketActionsHtml(r), full: true, kind: 'ticket', data: { id: r.id } });
+}
+function refreshTicketSheet() {
+  sheetStack.forEach(function(s) {
+    if (s.kind !== 'ticket') return;
+    var r = findTicket(s.data.id);
+    if (r) setSheetContent(s, { title: r.sr_id || 'Service request', html: ticketDetailHtml(r), actions: ticketActionsHtml(r) });
+  });
+}
+function currentTicket() {
+  for (var i = sheetStack.length - 1; i >= 0; i--) if (sheetStack[i].kind === 'ticket') return findTicket(sheetStack[i].data.id);
+  return null;
+}
+
+// Mirrors the server's append_note stamp for optimistic offline updates.
+function noteStamp() {
+  var p = {};
+  new Intl.DateTimeFormat('en-US', { timeZone: JM_TZ, day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }).formatToParts(new Date()).forEach(function(x) { p[x.type] = x.value; });
+  return p.day + ' ' + MONTHS[p.month - 1] + ' ' + p.year + ' ' + p.hour + ':' + p.minute + ' ' + (p.dayPeriod || '').toUpperCase();
+}
+
+async function updateTicket(r, body, doneMsg) {
+  try {
+    await apiCall('/service-requests/' + r.id, { method: 'PUT', body: JSON.stringify(body) });
+    await reloadAfterWrite();
+    refreshTicketSheet();
+    toast(doneMsg, 'success');
+    return true;
+  } catch (err) {
+    if (err.isAuth) return false;
+    if (err.isOffline) {
+      if (body.status) r.status = body.status;
+      if (body.status === 'Resolved' && !r.resolved_at) r.resolved_at = new Date().toISOString();
+      if (body.append_note) r.notes = (r.notes ? r.notes + '\n' : '') + '[' + noteStamp() + ' · ' + getFieldTechName() + '] ' + body.append_note;
+      queueAction({ type: 'ticket_update', ticketId: r.id, srId: r.sr_id || null, body: body });
+      cacheDataLocally();
+      renderAll();
+      refreshTicketSheet();
+      toast("Offline — saved on this phone and will sync when you're back online", 'warning');
+      return true;
+    }
+    toast("Couldn't update the ticket: " + err.message, 'error');
+    return false;
+  }
+}
+
+function openNoteSheet() {
+  openSheet({
+    title: 'Add a note', kind: 'note', focus: '#note-text',
+    html: '<div class="field"><label for="note-text">Note</label><textarea id="note-text" placeholder="What did you find or do?"></textarea>' +
+      '<span class="hint">Saved with your name and the time.</span></div>',
+    actions: '<button type="button" class="btn" data-sheet-close>Cancel</button><button type="button" class="btn primary" data-action="save-note">Save note</button>'
+  });
+}
+async function saveNote(btn) {
+  var r = currentTicket();
+  var input = inTopSheet('#note-text');
+  if (!r || !input) return;
+  var text = input.value.trim();
+  if (!text) { toast('Type a note first', 'warning'); input.focus(); return; }
+  btn.disabled = true;
+  var ok = await updateTicket(r, { append_note: text }, 'Note added');
+  btn.disabled = false;
+  if (ok) closeSheet(topSheet('note'));
+}
+
+function openResolveSheet() {
+  var r = currentTicket();
+  if (!r) return;
+  openSheet({
+    title: 'Resolve ' + (r.sr_id || 'ticket') + '?', kind: 'resolve', focus: '#resolve-note',
+    html: '<p class="pre" style="margin-bottom:14px;">' + esc(r.subject || '') + '</p>' +
+      '<div class="field"><label for="resolve-note">What was done? <span class="muted">(optional)</span></label><textarea id="resolve-note" placeholder="e.g. Replaced PoE injector, camera back online"></textarea>' +
+      '<span class="hint">Added to the ticket notes and the resolution email.</span></div>',
+    actions: '<button type="button" class="btn" data-sheet-close>Cancel</button><button type="button" class="btn primary" data-action="confirm-resolve"><i class="ti ti-check" aria-hidden="true"></i> Confirm</button>'
+  });
+}
+async function confirmResolve(btn) {
+  var r = currentTicket();
+  if (!r) return;
+  var noteInput = inTopSheet('#resolve-note');
+  var note = noteInput ? noteInput.value.trim() : '';
+  var body = { status: 'Resolved' };
+  if (note) body.append_note = note;
+  btn.disabled = true;
+  var ok = await updateTicket(r, body, (r.sr_id || 'Ticket') + ' resolved');
+  btn.disabled = false;
+  if (ok) closeSheet(topSheet('resolve'));
+}
+async function changeTicketStatus(select) {
+  var r = currentTicket();
+  if (!r) return;
+  var value = select.value;
+  if (value === r.status) return;
+  if (value === 'Resolved') { select.value = r.status; openResolveSheet(); return; }
+  select.disabled = true;
+  var ok = await updateTicket(r, { status: value }, 'Status set to ' + value);
+  if (!ok) select.value = r.status;
+  select.disabled = false;
+}
+
+// ============================================================
+// DEVICE DETAIL & ACTIONS
+// ============================================================
+function kvRows(rows) {
+  return '<dl class="kv">' + rows.map(function(r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + (r[2] ? r[1] : esc(r[1] || '—')) + '</dd>'; }).join('') + '</dl>';
+}
+function dateOrNotRecorded(v) {
+  var f = fmtDate(v);
+  return f ? esc(f) : '<span class="muted">Not recorded</span>';
+}
+function getWarrantyDisplay(expiryDate) {
+  var p = parseDateValue(expiryDate);
+  if (!p) return '<span class="muted">Not recorded</span>';
+  var daysLeft = Math.ceil((p.date - new Date()) / 86400000);
+  var when = esc(fmtDate(expiryDate));
+  if (daysLeft < 0) return '<span class="sla-critical">Expired ' + when + '</span>';
+  if (daysLeft <= 30) return '<span class="sla-warn">' + when + ' (' + plural(daysLeft, 'day') + ' left)</span>';
+  return '<span class="sla-ok">' + when + '</span>';
+}
+
+function deviceDetailHtml(type, d) {
+  var t = ASSET_TYPE[type], online = isDeviceOnline(d.status);
+  var s = lc(d.status).trim();
+  var html = '<div class="detail-summary">' +
+    '<div class="ds-badges"><span class="badge ' + (online ? 'st-resolved' : 'pri-high') + '"><span class="status-dot' + (online ? ' online' : '') + '" aria-hidden="true"></span>' + esc(d.status || 'No status') + '</span>' +
+    '<span class="badge st-retracted"><i class="ti ' + t.icon + '" aria-hidden="true"></i>' + esc(t.label) + '</span></div>' +
+    '<div class="segmented" role="group" aria-label="Set device status" style="margin-top:10px;">' +
+      '<button type="button" data-action="device-set-status" data-status="Online" aria-pressed="' + (s === 'online' || s === 'working') + '"><i class="ti ti-plug-connected" aria-hidden="true"></i> Online</button>' +
+      '<button type="button" data-action="device-set-status" data-status="Offline" aria-pressed="' + (s === 'offline') + '"><i class="ti ti-plug-connected-x" aria-hidden="true"></i> Offline</button>' +
+    '</div></div>';
+  html += '<section class="detail-section"><h3>Location</h3>' + kvRows([['Client', getClientFromId(d.client_id)], ['Site / zone', d.zone]]) + '</section>';
+  html += '<section class="detail-section"><h3>' + esc(t.label) + ' details</h3>' + kvRows(t.fields.map(function(f) { return [f[0], d[f[1]]]; })) + '</section>';
+  html += '<section class="detail-section"><h3>Purchase &amp; warranty</h3>' +
+    kvRows(t.dates.map(function(f) { return [f[0], dateOrNotRecorded(d[f[1]]), true]; }).concat([['Warranty', getWarrantyDisplay(d[t.warranty]), true]])) + '</section>';
+  if (t.comments) {
+    html += '<section class="detail-section"><div class="field" style="margin-bottom:8px;"><label for="device-comment-input">Comment</label>' +
+      '<textarea id="device-comment-input" placeholder="Add a comment about this device">' + esc(d.comments || '') + '</textarea></div>' +
+      '<button type="button" class="btn block" data-action="save-device-comment"><i class="ti ti-device-floppy" aria-hidden="true"></i> Save comment</button></section>';
+  }
+  if (d.ip_address) {
+    html += '<section class="detail-section"><button type="button" class="btn block" data-action="open-controller" data-ip="' + esc(d.ip_address) + '"><i class="ti ti-external-link" aria-hidden="true"></i> Open device page</button>' +
+      '<p class="hint">Works on the site network or VPN</p></section>';
+  }
+  return html;
+}
+
+function openDeviceDetail(id, type) {
+  var t = ASSET_TYPE[type];
+  var d = t ? findDevice(type, id) : null;
+  if (!d) { toast('That device is no longer in the list. Refresh and try again.', 'warning'); return; }
+  openSheet({
+    title: deviceName(d), html: deviceDetailHtml(type, d), full: true, kind: 'device', data: { id: d.id, type: type },
+    actions: '<button type="button" class="btn primary" data-action="report-problem"><i class="ti ti-alert-circle" aria-hidden="true"></i> Report a problem</button>'
+  });
+}
+function refreshDeviceSheet() {
+  sheetStack.forEach(function(s) {
+    if (s.kind !== 'device') return;
+    var d = findDevice(s.data.type, s.data.id);
+    if (!d) return;
+    var body = s.layer.querySelector('.sheet-body'), scroll = body.scrollTop;
+    var draft = s.layer.querySelector('#device-comment-input');
+    var draftValue = draft ? draft.value : null;
+    setSheetContent(s, { title: deviceName(d), html: deviceDetailHtml(s.data.type, d) });
+    var again = s.layer.querySelector('#device-comment-input');
+    if (again && draftValue !== null) again.value = draftValue;
+    body.scrollTop = scroll;
+  });
+}
+function currentDevice() {
+  for (var i = sheetStack.length - 1; i >= 0; i--) if (sheetStack[i].kind === 'device') return sheetStack[i].data;
+  return null;
+}
+
+async function patchDevice(type, id, body, doneMsg, queueType) {
+  try {
+    await apiCall('/assets/' + type + '/' + id, { method: 'PATCH', body: JSON.stringify(body) });
+    var dev = findDevice(type, id);
+    if (dev) Object.assign(dev, body);
+    reloadAfterWrite().then(refreshDeviceSheet);
+    renderAll();
+    refreshDeviceSheet();
+    toast(doneMsg, 'success');
+    return true;
+  } catch (err) {
+    if (err.isAuth) return false;
+    if (err.isOffline) {
+      var d = findDevice(type, id);
+      if (d) Object.assign(d, body);
+      var action = { type: queueType, assetType: type, deviceId: id };
+      if (queueType === 'device_status') action.status = body.status; else action.comment = body.comments;
+      queueAction(action);
+      cacheDataLocally();
+      renderAll();
+      refreshDeviceSheet();
+      toast("Offline — saved on this phone and will sync when you're back online", 'warning');
+      return true;
+    }
+    toast("Couldn't save: " + err.message, 'error');
+    return false;
+  }
+}
+async function saveDeviceStatus(btn) {
+  var cur = currentDevice();
+  if (!cur) return;
+  var d = findDevice(cur.type, cur.id);
+  if (!d || d.status === btn.dataset.status) return;
+  btn.disabled = true;
+  await patchDevice(cur.type, cur.id, { status: btn.dataset.status }, deviceName(d) + ' marked ' + btn.dataset.status, 'device_status');
+  btn.disabled = false;
+}
+async function saveDeviceComment(btn) {
+  var cur = currentDevice();
+  if (!cur) return;
+  var input = inTopSheet('#device-comment-input');
+  if (!input) return;
+  btn.disabled = true;
+  await patchDevice(cur.type, cur.id, { comments: input.value.trim() }, 'Comment saved', 'device_comment');
+  btn.disabled = false;
+}
+
+function openController(ip) {
+  if (!ip) { toast('No IP address recorded for this device', 'warning'); return; }
+  window.open('http://' + ip, '_blank', 'noopener');
+}
+
+// ============================================================
+// NEW SERVICE REQUEST
+// ============================================================
+function devicesForClient(clientId) {
+  return allDevices().filter(function(d) { return String(d.raw.client_id) === String(clientId); });
+}
+function openNewSR(prefill) {
+  prefill = prefill || {};
+  if (!CLIENT_LIST.length) { toast('Client list not loaded yet — refresh and try again.', 'warning'); return; }
+  var me = getFieldTechName();
+  var techs = TECHNICIANS.slice();
+  if (me && !techs.some(function(t) { return lc(t) === lc(me); })) techs.unshift(me);
+  var meMatch = techs.find(function(t) { return lc(t) === lc(me); });
+  var html =
+    '<form id="new-sr-form" novalidate>' +
+    '<div class="field"><label for="nsr-client">Client</label><select id="nsr-client" required><option value="">Choose a client</option>' +
+      CLIENT_LIST.map(function(c) { return '<option value="' + esc(c.id) + '"' + (String(c.id) === String(prefill.clientId) ? ' selected' : '') + '>' + esc(c.name) + '</option>'; }).join('') +
+      '</select><span class="err" id="nsr-client-err" hidden>Choose the client this request is for.</span></div>' +
+    '<div class="field"><label for="nsr-site">Site</label><input id="nsr-site" list="nsr-site-list" autocomplete="off" placeholder="Pick or type a site" value="' + esc(prefill.site || '') + '"><datalist id="nsr-site-list"></datalist></div>' +
+    '<div class="field-row">' +
+      '<div class="field"><label for="nsr-category">Category</label><select id="nsr-category">' + SR_CATEGORIES.map(function(c) { return '<option' + (c === (prefill.category || 'Camera') ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join('') + '</select></div>' +
+      '<div class="field"><label for="nsr-priority">Priority</label><select id="nsr-priority"><option>High</option><option selected>Medium</option><option>Low</option></select></div>' +
+    '</div>' +
+    '<div class="field"><label for="nsr-assigned">Assigned to</label><select id="nsr-assigned">' +
+      techs.map(function(t) { return '<option' + (t === meMatch ? ' selected' : '') + '>' + esc(t) + '</option>'; }).join('') + '<option' + (meMatch ? '' : ' selected') + '>Unassigned</option></select></div>' +
+    '<div class="field"><label for="nsr-subject">Subject</label><input id="nsr-subject" required maxlength="200" placeholder="Short summary of the problem" value="' + esc(prefill.subject || '') + '"><span class="err" id="nsr-subject-err" hidden>Add a short subject.</span></div>' +
+    '<div class="field"><label for="nsr-body">Description</label><textarea id="nsr-body" placeholder="What\'s happening, and anything already tried"></textarea></div>' +
+    '<div class="field"><label for="nsr-device">Related device <span class="muted">(optional)</span></label><select id="nsr-device"><option value="">None</option></select></div>' +
+    '</form>';
+  var entry = openSheet({
+    title: 'New service request', html: html, full: true, kind: 'new-sr', focus: prefill.clientId ? '#nsr-subject' : '#nsr-client',
+    actions: '<button type="button" class="btn" data-sheet-close>Cancel</button><button type="button" class="btn primary" data-action="submit-sr"><i class="ti ti-send" aria-hidden="true"></i> Create</button>'
+  });
+  var clientSel = entry.layer.querySelector('#nsr-client');
+  clientSel.addEventListener('change', function() { fillSRClientOptions(entry, null); });
+  fillSRClientOptions(entry, prefill.device || null);
+}
+function fillSRClientOptions(entry, device) {
+  var clientId = entry.layer.querySelector('#nsr-client').value;
+  var devs = clientId ? devicesForClient(clientId) : [];
+  var zones = {};
+  devs.forEach(function(d) { if (d.raw.zone && String(d.raw.zone).trim()) zones[String(d.raw.zone).trim()] = 1; });
+  entry.layer.querySelector('#nsr-site-list').innerHTML = Object.keys(zones).sort().map(function(z) { return '<option value="' + esc(z) + '"></option>'; }).join('');
+  var sel = entry.layer.querySelector('#nsr-device');
+  devs.sort(function(a, b) { return deviceName(a.raw).localeCompare(deviceName(b.raw)); });
+  sel.innerHTML = '<option value="">' + (clientId ? 'None' : 'Choose a client first') + '</option>' + devs.map(function(d) {
+    var v = d.type + ':' + d.raw.id;
+    return '<option value="' + esc(v) + '"' + (device && device.type === d.type && String(device.id) === String(d.raw.id) ? ' selected' : '') + '>' +
+      esc(deviceName(d.raw) + ' · ' + ASSET_TYPE[d.type].label + (d.raw.zone ? ' · ' + d.raw.zone : '')) + '</option>';
+  }).join('');
+}
+async function submitNewSR(btn) {
+  var top = topSheet('new-sr');
+  if (!top) return;
+  var L = top.layer;
+  var clientId = L.querySelector('#nsr-client').value;
+  var subject = L.querySelector('#nsr-subject').value.trim();
+  L.querySelector('#nsr-client-err').hidden = !!clientId;
+  L.querySelector('#nsr-subject-err').hidden = !!subject;
+  L.querySelector('#nsr-client').setAttribute('aria-invalid', String(!clientId));
+  L.querySelector('#nsr-subject').setAttribute('aria-invalid', String(!subject));
+  if (!clientId || !subject) { (clientId ? L.querySelector('#nsr-subject') : L.querySelector('#nsr-client')).focus(); return; }
+  var related = [];
+  var dv = L.querySelector('#nsr-device').value;
+  if (dv) {
+    var parts = dv.split(':'), d = findDevice(parts[0], parts[1]);
+    if (d) related.push({ type: ASSET_TYPE[parts[0]].hw, id: d.id, name: deviceName(d) });
+  }
+  var body = {
+    client_id: Number(clientId), client: CLIENT_ID_TO_NAME[clientId] || '',
+    site: L.querySelector('#nsr-site').value.trim(), category: L.querySelector('#nsr-category').value,
+    priority: L.querySelector('#nsr-priority').value, assigned_to: L.querySelector('#nsr-assigned').value,
+    subject: subject, body: L.querySelector('#nsr-body').value.trim(), related_hardware: related
+  };
+  btn.disabled = true;
+  try {
+    var created = await apiCall('/service-requests', { method: 'POST', body: JSON.stringify(body) });
+    closeAllSheets();
+    toast((created.sr_id || 'Request') + ' created for ' + (created.client || body.client), 'success');
+    await reloadAfterWrite();
+    ticketScope = isMine(created) ? 'mine' : 'all';
+    ticketFilter = 'active';
+    document.getElementById('ticket-search').value = '';
+    switchTab('tickets');
+  } catch (err) {
+    if (err.isAuth) return;
+    toast(err.isOffline ? "You're offline — new requests need a connection. Your form is still open." : "Couldn't create the request: " + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+  }
+}
+function reportProblem() {
+  var cur = currentDevice();
+  var d = cur ? findDevice(cur.type, cur.id) : null;
+  if (!d) return;
+  var category = { cameras: 'Camera', doors: 'Access Control', servers: 'Server', storage: 'Server', switches: 'Network' }[cur.type] || 'Other';
+  openNewSR({ clientId: d.client_id, site: d.zone || '', device: { type: cur.type, id: d.id }, category: category, subject: deviceName(d) + ' — ' });
+}
+
+// ============================================================
+// THEME
+// ============================================================
+function currentTheme() {
+  var root = document.documentElement;
+  return root.classList.contains('light-theme') ? 'light' : root.classList.contains('jet-black-theme') ? 'jet-black' : 'dark';
+}
+function setTheme(theme) {
+  var root = document.documentElement;
+  root.classList.remove('light-theme', 'jet-black-theme');
+  if (theme === 'light') root.classList.add('light-theme');
+  if (theme === 'jet-black') root.classList.add('jet-black-theme');
+  localStorage.setItem('ccsm_theme', theme);
+  var meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', theme === 'light' ? '#ffffff' : theme === 'jet-black' ? '#000000' : '#141724');
+  var logo = document.getElementById('login-logo');
+  if (logo) logo.src = theme === 'light' ? 'logo-light.png' : 'logo.png';
+  document.querySelectorAll('[data-action="theme"]').forEach(function(b) { b.setAttribute('aria-pressed', String(b.dataset.theme === theme)); });
+}
+
+// ============================================================
+// TOASTS
+// ============================================================
 function toast(m, type) {
   type = type || 'info';
   var c = document.getElementById('toast-container');
   if (!c) return;
   var t = document.createElement('div');
   t.className = 'toast ' + type;
-  var icons = { info: 'ti ti-info-circle', success: 'ti ti-check', warning: 'ti ti-alert-triangle', error: 'ti ti-x' };
-  t.innerHTML = '<i class="' + (icons[type] || icons.info) + '"></i> ' + esc(m);
+  var icons = { info: 'ti ti-info-circle', success: 'ti ti-circle-check', warning: 'ti ti-alert-triangle', error: 'ti ti-alert-circle' };
+  t.innerHTML = '<i class="' + (icons[type] || icons.info) + '" aria-hidden="true"></i><span>' + esc(m) + '</span>';
   c.appendChild(t);
+  while (c.children.length > 3) c.removeChild(c.firstChild);
   setTimeout(function() {
-    t.style.opacity = '0';
-    t.style.transition = 'opacity 0.3s';
-    setTimeout(function() { if (t.parentNode) t.remove(); }, 300);
-  }, 3000);
+    t.classList.add('out');
+    setTimeout(function() { if (t.parentNode) t.remove(); }, 220);
+  }, type === 'error' ? 5000 : 3200);
 }
 
-function switchTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll('.tab-page').forEach(function(el) { el.classList.remove('active'); });
-  var target = document.getElementById('tab-' + tab);
-  if (target) target.classList.add('active');
-  document.querySelectorAll('.field-nav .nav-item').forEach(function(el) {
-    el.classList.remove('active');
-    if (el.dataset.tab === tab) el.classList.add('active');
+// ============================================================
+// PULL TO REFRESH
+// ============================================================
+(function() {
+  var scroller = document.getElementById('field-content');
+  var ptr = document.getElementById('ptr'), icon = document.getElementById('ptr-icon'), text = document.getElementById('ptr-text');
+  var startY = null, pull = 0, THRESHOLD = 70;
+  scroller.addEventListener('touchstart', function(e) {
+    if (scroller.scrollTop > 0 || sheetStack.length || currentTab === 'profile') { startY = null; return; }
+    startY = e.touches[0].clientY; pull = 0;
+  }, { passive: true });
+  scroller.addEventListener('touchmove', function(e) {
+    if (startY === null) return;
+    pull = Math.max(0, e.touches[0].clientY - startY) * 0.5;
+    if (pull <= 0) return;
+    ptr.style.height = Math.min(pull, 90) + 'px';
+    icon.style.transform = pull > THRESHOLD ? 'rotate(180deg)' : '';
+    text.textContent = pull > THRESHOLD ? 'Release to refresh' : 'Pull to refresh';
+  }, { passive: true });
+  scroller.addEventListener('touchend', function() {
+    if (startY === null) return;
+    startY = null;
+    if (pull > THRESHOLD) {
+      text.textContent = 'Refreshing…';
+      icon.className = 'ti ti-loader-2 spin';
+      refreshNow().finally(function() { ptr.style.height = '0'; icon.className = 'ti ti-arrow-down'; icon.style.transform = ''; });
+    } else {
+      ptr.style.height = '0';
+    }
+    pull = 0;
   });
-  if (tab === 'tickets') renderTickets();
-  if (tab === 'devices') renderDevices();
-  if (tab === 'dashboard') renderDashboard();
-}
+})();
 
-function renderDashboard() {
-  renderUrgentTickets();
-  renderActivity();
-  updateStats();
-  checkAlerts();
-}
-
-function renderUrgentTickets() {
-  var container = document.getElementById('urgent-tickets');
-  var uname = getFieldTechName();
-  var urgent = SERVICE_REQUESTS.filter(function(r) {
-    if (r.priority !== 'High' || r.status === 'Resolved') return false;
-    if (!isAdmin && currentUser) return (r.assigned_to || '').toLowerCase() === uname.toLowerCase();
-    return true;
-  }).slice(0, 3);
-  if (!urgent.length) {
-    container.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px 0;">No urgent tickets</div>';
+// ============================================================
+// EVENTS (one delegated handler; values come from data-* attributes)
+// ============================================================
+document.addEventListener('click', function(e) {
+  var closer = e.target.closest('[data-sheet-close]');
+  if (closer) {
+    var layer = closer.closest('.sheet-layer');
+    var entry = sheetStack.find(function(s) { return s.layer === layer; });
+    if (entry) closeSheet(entry);
     return;
   }
-  container.innerHTML = urgent.map(function(r) {
-    var sid = escAttrJs(r.sr_id);
-    return '<div class="ticket-item" onclick="openTicketDetail(\'' + sid + '\')">' +
-      '<div class="ticket-top"><span class="ticket-id">' + esc(r.sr_id) + '</span><span class="badge b-high">' + esc(r.priority || '—') + '</span></div>' +
-      '<div class="ticket-subject">' + esc(r.subject) + '</div>' +
-      '<div class="ticket-meta"><span>' + esc(r.client || '—') + ' · ' + esc(r.site || '—') + '</span><span>👤 ' + esc(r.assigned_to || 'Unassigned') + '</span><span class="sla ' + getSLAClass(r) + '">⏱ ' + getSLAText(r) + '</span></div>' +
-      '</div>';
-  }).join('');
-}
-
-function renderActivity() {
-  var container = document.getElementById('today-activity');
-  var recent = AUDIT_LOG.slice(0, 5);
-  if (!recent.length) {
-    container.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px 0;">No recent activity</div>';
-    return;
-  }
-  container.innerHTML = recent.map(function(a) {
-    var t = new Date(a.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-    return '<div class="activity-item"><span class="act-time">' + t + '</span><span class="act-msg">' + esc(a.action || '') + ' — ' + esc(a.detail || '') + '</span></div>';
-  }).join('');
-}
-
-function getSLAClass(r) {
-  if (!r.received) return 'ok';
-  var days = Math.ceil((new Date() - new Date(r.received)) / (1000 * 60 * 60 * 24));
-  if (days > 3) return 'critical';
-  if (days > 1) return 'warn';
-  return 'ok';
-}
-
-function getSLAText(r) {
-  if (!r.received) return 'No SLA';
-  var hrs = Math.round((new Date() - new Date(r.received)) / 3600000);
-  if (hrs < 1) return '<1h';
-  if (hrs < 24) return hrs + 'h';
-  return Math.floor(hrs / 24) + 'd ' + (hrs % 24) + 'h';
-}
-
-function updateStats() {
-  if (!currentUser) return;
-  var uname = getFieldTechName();
-  var assigned = SERVICE_REQUESTS.filter(function(r) {
-    return (r.assigned_to || '').toLowerCase() === uname.toLowerCase() && r.status !== 'Resolved';
-  });
-  document.getElementById('stat-assigned').textContent = assigned.length;
-  var sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  var resolved = SERVICE_REQUESTS.filter(function(r) {
-    return (r.assigned_to || '').toLowerCase() === uname.toLowerCase() && r.status === 'Resolved' && r.resolved_at && new Date(r.resolved_at) >= sevenDaysAgo;
-  });
-  document.getElementById('stat-resolved').textContent = resolved.length;
-  var alarms = 0;
-  CAMERAS.forEach(function(c) { if (c.status === 'Defective' || c.status === 'Not Working' || c.status === 'No Power') alarms++; });
-  DOORS.forEach(function(d) { if (d.status === 'Offline') alarms++; });
-  document.getElementById('stat-alarms').textContent = alarms;
-}
-
-// Everyone signs in with their own Microsoft account (see the login flow),
-// so currentUser.username is already each person's real name — nothing
-// further to resolve here.
-function getFieldTechName() {
-  return (currentUser && currentUser.username) || '';
-}
-
-function checkAlerts() {
-  var container = document.getElementById('alert-container');
-  if (!currentUser) return;
-  var uname = getFieldTechName();
-  var urgent = SERVICE_REQUESTS.filter(function(r) {
-    if (r.priority !== 'High' || r.status === 'Resolved') return false;
-    return isAdmin ? true : (r.assigned_to || '').toLowerCase() === uname.toLowerCase();
-  });
-  var dot = document.getElementById('notif-dot');
-  if (!urgent.length) {
-    container.innerHTML = '';
-    if (dot) dot.classList.remove('active');
-    return;
-  }
-  if (dot) dot.classList.add('active');
-  container.innerHTML = '<div class="alert-banner"><i class="ti ti-alert-triangle"></i><div class="alert-text"><strong>' + urgent.length + '</strong> urgent ticket' + (urgent.length > 1 ? 's' : '') + ' assigned to you</div></div>';
-}
-
-function viewAlerts() {
-  switchTab('tickets');
-  toast('Showing your tickets', 'warning');
-}
-
-function renderTickets() {
-  var q = document.getElementById('ticket-search') ? document.getElementById('ticket-search').value.toLowerCase() : '';
-  var uname = getFieldTechName();
-  var filtered = SERVICE_REQUESTS.filter(function(r) {
-    var matchAssigned = isAdmin ? true : (r.assigned_to || '').toLowerCase() === uname.toLowerCase();
-    var matchSearch = r.sr_id.toLowerCase().indexOf(q) !== -1 || r.subject.toLowerCase().indexOf(q) !== -1 || (r.client || '').toLowerCase().indexOf(q) !== -1 || (r.site || '').toLowerCase().indexOf(q) !== -1;
-    var statusMatch = ticketFilter === 'All' || r.status === ticketFilter;
-    return matchAssigned && matchSearch && statusMatch;
-  });
-  var totalAssigned = SERVICE_REQUESTS.filter(function(r) {
-    return (r.assigned_to || '').toLowerCase() === uname.toLowerCase() && r.status !== 'Resolved';
-  }).length;
-  document.getElementById('ticket-badge').textContent = totalAssigned;
-  var container = document.getElementById('ticket-list');
-  if (!filtered.length) {
-    container.innerHTML = '<div class="empty-state"><i class="ti ti-ticket"></i><div class="empty-title">No tickets assigned</div></div>';
-    return;
-  }
-  container.innerHTML = filtered.map(function(r) {
-    var sid = escAttrJs(r.sr_id);
-    return '<div class="ticket-item" onclick="openTicketDetail(\'' + sid + '\')">' +
-      '<div class="ticket-top">' +
-      '<span class="ticket-id">' + esc(r.sr_id) + '</span>' +
-      '<span class="badge ' + (r.priority === 'High' ? 'b-high' : r.priority === 'Medium' ? 'b-med' : 'b-low') + '">' + esc(r.priority || '—') + '</span>' +
-      '<span class="badge ' + (r.status === 'Open' ? 'b-open' : r.status === 'In Progress' ? 'b-progress' : r.status === 'Resolved' ? 'b-resolved' : 'b-open') + '">' + esc(r.status || '—') + '</span>' +
-      '</div>' +
-      '<div class="ticket-subject">' + esc(r.subject) + '</div>' +
-      '<div class="ticket-meta"><span>' + esc(r.client || '—') + ' · ' + esc(r.site || '—') + '</span><span class="sla ' + getSLAClass(r) + '">⏱ ' + getSLAText(r) + '</span></div>' +
-      '</div>';
-  }).join('');
-}
-
-function setTicketFilter(f) {
-  ticketFilter = f;
-  document.querySelectorAll('#tab-tickets .filter-pill').forEach(function(el) {
-    el.classList.remove('active');
-    if (el.textContent === f || (f === 'All' && el.textContent === 'All')) el.classList.add('active');
-  });
-  renderTickets();
-}
-
-function renderDevices() {
-  var q = document.getElementById('device-search') ? document.getElementById('device-search').value.toLowerCase() : '';
-  var allDevices = [];
-  CAMERAS.forEach(function(c) {
-    allDevices.push({ type: 'camera', name: c.name, zone: c.zone, status: c.status, ip: c.ip_address || '', model: c.model || '', manufacturer: c.manufacturer || '', archiver: c.archiver || '', resolution: c.resolution || '', mac_address: c.mac_address || '', purchase_date: c.purchase_date || '', warranty_expiry: c.warranty || '', comments: c.comments || '', client: getClientFromId(c.client_id), id: c.id, raw: c });
-  });
-  DOORS.forEach(function(d) {
-    allDevices.push({ type: 'door', name: d.name, zone: d.zone || '', status: d.status, ip: d.ip_address || '', model: d.reader || '', manufacturer: d.lock_type || '', controllerType: d.controller_type || '', doorSwing: d.door_swing || '', accessType: d.access_type || '', antiPassback: d.anti_passback || '', tech: d.tech || '', purchase_date: d.install_date || '', warranty_expiry: d.warranty_expiry || '', comments: d.comments || '', client: getClientFromId(d.client_id), id: d.id, raw: d });
-  });
-  SERVERS.forEach(function(s) {
-    allDevices.push({ type: 'server', name: s.name || s.serial, zone: s.zone || '', status: s.status, ip: s.ip_address || '', model: s.make + ' ' + s.model, manufacturer: s.make || '', capacity: s.capacity || '', used: s.used || '', health: s.health || '', apps: s.apps || '', serial: s.serial || '', purchase_date: s.purchase_date || '', warranty_expiry: s.warranty_expiry || '', comments: s.comments || '', client: getClientFromId(s.client_id), id: s.id, raw: s });
-  });
-  SWITCHES.forEach(function(s) {
-    allDevices.push({ type: 'switch', name: s.name, zone: s.zone || '', status: s.status || 'Online', ip: s.ip_address || '', model: s.model || '', manufacturer: s.model || '', firmware: s.firmware || '', mac: s.mac_address || s.mac || '', purchase_date: s.purchase_date || '', warranty_expiry: s.warranty_expiry || '', comments: s.comments || '', client: getClientFromId(s.client_id), id: s.id, raw: s });
-  });
-
-  var filtered = allDevices.filter(function(d) {
-    var match = d.name.toLowerCase().indexOf(q) !== -1 || d.zone.toLowerCase().indexOf(q) !== -1 || d.ip.toLowerCase().indexOf(q) !== -1 || d.model.toLowerCase().indexOf(q) !== -1 || d.client.toLowerCase().indexOf(q) !== -1;
-    var pluralOf = { camera: 'cameras', door: 'doors', server: 'servers', switch: 'switches' };
-    var typeMatch = deviceFilter === 'all' || deviceFilter === pluralOf[d.type] || deviceFilter === d.type;
-    var clientMatch = clientFilter === 'all' || d.client === clientFilter;
-    return match && typeMatch && clientMatch;
-  });
-  filtered.sort(function(a, b) { return a.name.localeCompare(b.name); });
-
-  var container = document.getElementById('device-list');
-  if (!filtered.length) {
-    container.innerHTML = '<div class="empty-state"><i class="ti ti-devices"></i><div class="empty-title">No devices found</div></div>';
-    return;
-  }
-  container.innerHTML = '<div class="device-grid">' + filtered.map(function(d) {
-    var statusDot = d.status === 'Online' || d.status === 'Working' || d.status === 'ONLINE' ? 'online' : d.status === 'Offline' || d.status === 'OFFLINE' ? 'offline' : 'warning';
-    var typeIcon = d.type === 'camera' ? '📷' : d.type === 'door' ? '🚪' : d.type === 'server' ? '🖥' : '🔌';
-    var typeLabel = d.type.charAt(0).toUpperCase() + d.type.slice(1);
-    return '<div class="device-card" onclick="openDeviceDetail(' + d.id + ', \'' + d.type + '\')">' +
-      '<div class="dev-left">' +
-      '<div class="dev-name">' + typeIcon + ' ' + esc(d.name) + '<span class="dev-type">' + typeLabel + '</span></div>' +
-      '<div class="dev-detail"><span class="status-dot ' + statusDot + '"></span> ' + esc(d.status || 'Unknown') + ' · ' + esc(d.zone) + (d.ip ? ' · ' + esc(d.ip) : '') + '</div>' +
-      '</div>' +
-      '<span class="dev-client">' + esc(d.client) + '</span>' +
-      '<span class="dev-arrow"><i class="ti ti-chevron-right"></i></span>' +
-      '</div>';
-  }).join('') + '</div>';
-}
-
-function setClientFilter(client) {
-  clientFilter = client;
-  document.getElementById('client-dropdown').value = client;
-  renderDevices();
-}
-
-function setDeviceFilter(f) {
-  deviceFilter = f;
-  document.querySelectorAll('#device-filter-pills .filter-pill').forEach(function(el) {
-    el.classList.remove('active');
-    if (el.getAttribute('data-filter') === f) el.classList.add('active');
-  });
-  renderDevices();
-}
-
-function openDeviceDetail(id, type) {
-  var device = null;
-  if (type === 'camera') device = CAMERAS.find(function(c) { return c.id == id; });
-  else if (type === 'door') device = DOORS.find(function(d) { return d.id == id; });
-  else if (type === 'server') device = SERVERS.find(function(s) { return s.id == id; });
-  else if (type === 'switch') device = SWITCHES.find(function(s) { return s.id == id; });
-  if (!device) { toast('Device not found', 'error'); return; }
-
-  var d = device;
-  var typeLabel = type.charAt(0).toUpperCase() + type.slice(1);
-  var client = getClientFromId(d.client_id);
-  var typeIcon = type === 'camera' ? '📷' : type === 'door' ? '🚪' : type === 'server' ? '🖥' : '🔌';
-
-  document.getElementById('modal-title').textContent = typeIcon + ' ' + (d.name || 'Unknown');
-  document.getElementById('modal-sub').textContent = typeLabel + ' · ' + client + ' · ' + (d.status || '—');
-
-  var body = '';
-  body += '<div class="detail-row"><span class="label">Name</span><span class="value">' + esc(d.name || '—') + '</span></div>';
-  body += '<div class="detail-row"><span class="label">Status</span><span class="value">' + esc(d.status || '—') + '</span></div>';
-  body += '<div class="detail-row"><span class="label">Client</span><span class="value">' + esc(client) + '</span></div>';
-  body += '<div class="detail-row"><span class="label">Zone</span><span class="value">' + esc(d.zone || '—') + '</span></div>';
-
-  if (type === 'camera') {
-    body += '<div class="section-divider">Camera Details</div>';
-    body += '<div class="detail-row"><span class="label">IP Address</span><span class="value">' + esc(d.ip_address || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Model</span><span class="value">' + esc(d.model || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Manufacturer</span><span class="value">' + esc(d.manufacturer || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Resolution</span><span class="value">' + esc(d.resolution || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Archiver</span><span class="value">' + esc(d.archiver || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">MAC Address</span><span class="value">' + esc(d.mac_address || '—') + '</span></div>';
-  } else if (type === 'door') {
-    body += '<div class="section-divider">Access Control Details</div>';
-    body += '<div class="detail-row"><span class="label">IP Address</span><span class="value">' + esc(d.ip_address || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Reader</span><span class="value">' + esc(d.reader || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Lock Type</span><span class="value">' + esc(d.lock_type || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Controller Type</span><span class="value">' + esc(d.controller_type || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Door Swing</span><span class="value">' + esc(d.door_swing || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Access Type</span><span class="value">' + esc(d.access_type || '—') + '</span></div>';
-  } else if (type === 'server') {
-    body += '<div class="section-divider">Server Details</div>';
-    body += '<div class="detail-row"><span class="label">Serial</span><span class="value">' + esc(d.serial || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Make/Model</span><span class="value">' + esc((d.make || '') + ' ' + (d.model || '')) + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Capacity</span><span class="value">' + esc(d.capacity || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Used</span><span class="value">' + esc(d.used || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Health</span><span class="value">' + esc(d.health || '—') + '</span></div>';
-  } else if (type === 'switch') {
-    body += '<div class="section-divider">Switch Details</div>';
-    body += '<div class="detail-row"><span class="label">IP Address</span><span class="value">' + esc(d.ip_address || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Model</span><span class="value">' + esc(d.model || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">Firmware</span><span class="value">' + esc(d.firmware || '—') + '</span></div>';
-    body += '<div class="detail-row"><span class="label">MAC</span><span class="value">' + esc(d.mac_address || d.mac || '—') + '</span></div>';
-  }
-
-  body += '<div class="section-divider">Purchase & Warranty</div>';
-  body += '<div class="detail-row"><span class="label">Purchase Date</span><span class="value">' + esc(d.purchase_date || d.install_date || '—') + '</span></div>';
-  body += '<div class="detail-row"><span class="label">Warranty</span><span class="value">' + getWarrantyDisplay(d.warranty_expiry) + '</span></div>';
-
-  body += '<div class="section-divider">Comments</div>';
-  body += '<div id="device-comment-display" style="padding:6px 0;font-size:12px;color:var(--text2);">' + esc(d.comments || 'No comments') + '</div>';
-  body += '<div class="comment-input-wrap">';
-  body += '<input type="text" id="device-comment-input" placeholder="Add a comment..." value="' + esc(d.comments || '') + '">';
-  body += '<button class="btn" onclick="saveDeviceComment(' + d.id + ', \'' + type + '\')">Save</button>';
-  body += '</div>';
-
-  document.getElementById('modal-body').innerHTML = body;
-
-  var actions = document.getElementById('modal-actions');
-  actions.innerHTML = '';
-  var ip = d.ip_address || d.ip || '';
-  if (ip) {
-    var openBtn = document.createElement('button');
-    openBtn.className = 'btn';
-    openBtn.textContent = 'Open';
-    openBtn.onclick = function() { openController(ip); };
-    actions.appendChild(openBtn);
-  }
-  var closeBtn = document.createElement('button');
-  closeBtn.className = 'btn';
-  closeBtn.textContent = 'Close';
-  closeBtn.onclick = function() { closeModal(); };
-  actions.appendChild(closeBtn);
-
-  document.getElementById('modal-sheet').classList.add('open');
-}
-
-async function saveDeviceComment(id, type) {
-  var input = document.getElementById('device-comment-input');
-  if (!input) return;
-  var newComment = input.value.trim();
-  var endpoint = '';
-  if (type === 'camera') endpoint = '/cameras/' + id;
-  else if (type === 'door') endpoint = '/doors/' + id;
-  else if (type === 'server') endpoint = '/servers/' + id;
-  else if (type === 'switch') endpoint = '/switches/' + id;
-  if (!endpoint) { toast('Unknown device type', 'error'); return; }
-  try {
-    await apiCall(endpoint, { method: 'PUT', body: JSON.stringify({ comments: newComment }) });
-    toast('Comment saved!', 'success');
-    closeModal();
-    await loadData();
-    renderDevices();
-  } catch (err) {
-    if (err.isOffline) {
-      var arr = type === 'camera' ? CAMERAS : type === 'door' ? DOORS : type === 'server' ? SERVERS : SWITCHES;
-      var dev = arr.find(function(d) { return d.id == id; });
-      if (dev) dev.comments = newComment;
-      queueAction({ type: 'device_comment', endpoint: endpoint, comment: newComment, deviceId: id });
-      cacheDataLocally();
-      closeModal();
+  var el = e.target.closest('[data-action]');
+  if (!el) return;
+  var a = el.dataset.action;
+  switch (a) {
+    case 'login': loginWithMicrosoft(); break;
+    case 'tab': switchTab(el.dataset.tab); break;
+    case 'refresh': refreshNow(); break;
+    case 'sync-now':
+      if (!navigator.onLine) toast("You're offline — changes will sync once you reconnect.", 'warning');
+      else processSyncQueue();
+      break;
+    case 'logout': logout(); break;
+    case 'logout-sync': logoutAfterSync(); break;
+    case 'logout-force': closeAllSheets(); doLogout(); break;
+    case 'theme': setTheme(el.dataset.theme); break;
+    case 'go-tickets':
+      ticketScope = el.dataset.scope || ticketScope;
+      ticketFilter = el.dataset.filter || 'active';
+      document.getElementById('ticket-search').value = '';
+      switchTab('tickets');
+      break;
+    case 'go-devices':
+      deviceStatusFilter = el.dataset.status || 'all';
+      deviceTypeFilter = 'all'; clientFilter = 'all';
+      document.getElementById('device-search').value = '';
+      switchTab('devices');
+      break;
+    case 'ticket-scope': ticketScope = el.dataset.scope; renderTickets(); break;
+    case 'ticket-filter': ticketFilter = el.dataset.filter; renderTickets(); break;
+    case 'clear-ticket-search': document.getElementById('ticket-search').value = ''; renderTickets(); break;
+    case 'device-status': deviceStatusFilter = el.dataset.filter; renderDevices(); break;
+    case 'device-type': deviceTypeFilter = el.dataset.filter; renderDevices(); break;
+    case 'clear-device-filters':
+      deviceStatusFilter = 'all'; deviceTypeFilter = 'all'; clientFilter = 'all';
+      document.getElementById('device-search').value = '';
       renderDevices();
-      toast("Offline — this comment will sync once you're back online", 'warning');
-    } else {
-      toast('Failed: ' + err.message, 'error');
-    }
+      break;
+    case 'toggle-group':
+      collapsedGroups[el.dataset.key] = el.getAttribute('aria-expanded') === 'true';
+      el.setAttribute('aria-expanded', String(!collapsedGroups[el.dataset.key]));
+      el.nextElementSibling.hidden = collapsedGroups[el.dataset.key];
+      break;
+    case 'open-ticket': openTicketDetail(el.dataset.id); break;
+    case 'open-device': openDeviceDetail(el.dataset.id, el.dataset.type); break;
+    case 'ticket-note': openNoteSheet(); break;
+    case 'save-note': saveNote(el); break;
+    case 'ticket-resolve': openResolveSheet(); break;
+    case 'confirm-resolve': confirmResolve(el); break;
+    case 'device-set-status': saveDeviceStatus(el); break;
+    case 'save-device-comment': saveDeviceComment(el); break;
+    case 'open-controller': openController(el.dataset.ip); break;
+    case 'report-problem': reportProblem(); break;
+    case 'new-sr': openNewSR(); break;
+    case 'submit-sr': submitNewSR(el); break;
   }
-}
+});
+document.addEventListener('change', function(e) {
+  if (e.target.matches('[data-action-change="ticket-status"]')) changeTicketStatus(e.target);
+  if (e.target.id === 'client-dropdown') { clientFilter = e.target.value; renderDevices(); }
+});
+var searchTimer = null;
+document.addEventListener('input', function(e) {
+  if (e.target.id !== 'ticket-search' && e.target.id !== 'device-search') return;
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(function() { if (e.target.id === 'ticket-search') renderTickets(); else renderDevices(); }, 120);
+});
 
-function getWarrantyDisplay(expiryDate) {
-  if (!expiryDate) return '<span style="color:#4ade80;">N/A</span>';
-  try {
-    var daysLeft = Math.ceil((new Date(expiryDate) - new Date()) / (1000 * 60 * 60 * 24));
-    if (daysLeft < 0) return '<span style="color:#f87171;">Expired</span>';
-    if (daysLeft <= 30) return '<span style="color:#fbbf24;">' + daysLeft + 'd</span>';
-    return '<span style="color:#4ade80;">' + daysLeft + 'd</span>';
-  } catch (e) { return '<span style="color:#4ade80;">N/A</span>'; }
-}
-
-function openTicketDetail(srId) {
-  var r = SERVICE_REQUESTS.find(function(x) { return x.sr_id === srId; });
-  if (!r) return;
-  document.getElementById('modal-title').textContent = r.sr_id + ' — ' + r.subject;
-  document.getElementById('modal-sub').textContent = (r.client || '—') + ' · ' + (r.site || '—') + ' · ' + r.status;
-
-  var body = '<div class="detail-row"><span class="label">Priority</span><span class="value">' + esc(r.priority || '—') + '</span></div>';
-  body += '<div class="detail-row"><span class="label">Assigned</span><span class="value">' + esc(r.assigned_to || 'Unassigned') + '</span></div>';
-  body += '<div class="detail-row"><span class="label">Received</span><span class="value">' + esc(r.received || '—') + '</span></div>';
-  body += '<div class="detail-row"><span class="label">SLA</span><span class="value sla ' + getSLAClass(r) + '">' + getSLAText(r) + '</span></div>';
-  body += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);"><strong>Description:</strong><br>' + esc(r.body || 'No description') + '</div>';
-  if (r.notes) body += '<div style="margin-top:6px;color:var(--text3);"><strong>Notes:</strong> ' + esc(r.notes) + '</div>';
-  if (r.history && r.history.length) {
-    body += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);"><strong>History:</strong><br>';
-    r.history.slice(-5).forEach(function(h) {
-      body += '<div style="font-size:11px;color:var(--text3);">' + esc(h.time) + ' — ' + esc(h.msg) + '</div>';
-    });
-    body += '</div>';
-  }
-  document.getElementById('modal-body').innerHTML = body;
-
-  var actions = document.getElementById('modal-actions');
-  actions.innerHTML = '';
-  var resolveBtn = document.createElement('button');
-  resolveBtn.className = 'btn success';
-  resolveBtn.textContent = 'Resolve';
-  resolveBtn.onclick = function() { resolveTicket(r.id); };
-  actions.appendChild(resolveBtn);
-  var closeBtn = document.createElement('button');
-  closeBtn.className = 'btn';
-  closeBtn.textContent = 'Close';
-  closeBtn.onclick = function() { closeModal(); };
-  actions.appendChild(closeBtn);
-
-  document.getElementById('modal-sheet').classList.add('open');
-}
-
-function closeModal() {
-  document.getElementById('modal-sheet').classList.remove('open');
-}
-
-async function resolveTicket(id) {
-  var r = SERVICE_REQUESTS.find(function(x) { return x.id === id; });
-  try {
-    await apiCall('/service-requests/' + id, { method: 'PUT', body: JSON.stringify({ status: 'Resolved' }) });
-    closeModal();
-    await loadData();
-    renderTickets();
-    renderDashboard();
-    toast('Ticket resolved', 'success');
-  } catch (err) {
-    if (err.isOffline) {
-      if (r) r.status = 'Resolved';
-      queueAction({ type: 'resolve_ticket', ticketId: id, srId: r ? r.sr_id : null });
-      cacheDataLocally();
-      closeModal();
-      renderTickets();
-      renderDashboard();
-      toast("Offline — this ticket will be marked resolved once you're back online", 'warning');
-    } else {
-      toast('Failed: ' + err.message, 'error');
-    }
-  }
-}
-
-function openController(ip) {
-  if (!ip || ip === 'N/A') { toast('No IP address', 'warning'); return; }
-  window.open('http://' + ip, '_blank');
-  toast('Opening ' + ip, 'info');
-}
-
-
-function updateProfile() {
-  if (!currentUser) return;
-  var name = getFieldTechName() || 'Technician';
-  document.getElementById('profile-name').textContent = name;
-  document.getElementById('profile-role').textContent = isAdmin ? 'Administrator' : (userClient ? userClient + ' Technician' : 'Field Technician');
-  var avatar = document.getElementById('profile-avatar');
-  var photoUrl = currentUser && currentUser.photo_url;
-  if (photoUrl) {
-    avatar.innerHTML = '<img src="' + photoUrl + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
-    avatar.style.background = 'none';
-  } else {
-    avatar.textContent = name.charAt(0).toUpperCase();
-  }
-  document.getElementById('header-tech-name').textContent = name;
-}
-
-function renderAll() {
-  renderDashboard();
-  renderTickets();
-  renderDevices();
-  updateProfile();
-  checkAlerts();
-}
-
-window.loginWithMicrosoft = loginWithMicrosoft;
-window.logout = logout;
-window.switchTab = switchTab;
-window.toggleTheme = toggleTheme;
-window.toast = toast;
-window.renderTickets = renderTickets;
-window.renderDevices = renderDevices;
-window.setTicketFilter = setTicketFilter;
-window.setDeviceFilter = setDeviceFilter;
-window.setClientFilter = setClientFilter;
-window.openTicketDetail = openTicketDetail;
-window.openDeviceDetail = openDeviceDetail;
-window.closeModal = closeModal;
-window.resolveTicket = resolveTicket;
-window.openController = openController;
-window.viewAlerts = viewAlerts;
-window.saveDeviceComment = saveDeviceComment;
-
-var savedTheme = localStorage.getItem('ccsm_theme') || 'dark';
-if (savedTheme === 'light') document.documentElement.classList.add('light-theme');
-if (savedTheme === 'jet-black') document.documentElement.classList.add('jet-black-theme');
-
-var logo = document.getElementById('field-logo');
-if (logo && savedTheme === 'jet-black') {
-  logo.src = 'logo.png';
-  logo.onerror = function() { this.src = 'logo.png'; };
-}
-
+// ============================================================
+// START
+// ============================================================
+setTheme(localStorage.getItem('ccsm_theme') || 'dark');
 checkLogin();
-console.log('📱 CAMS Field App v2.0 — Live API Mode');
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').then(function(reg) {
-    console.log('Service Worker registered');
-  }).catch(function(err) {
-    console.log('Service Worker failed:', err);
-  });
+  navigator.serviceWorker.register('/sw.js').catch(function(err) { console.log('Service worker not registered:', err.message); });
 }
 </script>
 </body>

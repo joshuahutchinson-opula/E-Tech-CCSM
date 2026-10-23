@@ -1019,6 +1019,63 @@ app.put('/api/intrusion/:id', authMiddleware, blockAssetEdit, async (req, res) =
 });
 
 // ============================================================
+// FIELD APP DEVICE UPDATES
+// ============================================================
+// Status and/or comments only, nothing else. The full PUT /api/<type>/:id
+// routes write every date column exactly as sent (so the dashboard's edit
+// forms can clear them), which meant a comment-only PUT from the field app
+// set warranty/purchase/install dates to NULL. This route only touches the
+// keys present in the body. E-Tech staff only (admin, technician).
+const PATCHABLE_ASSETS = {
+  cameras: { label: 'Camera', fields: ['status', 'comments'] },
+  doors: { label: 'Door', fields: ['status', 'comments'] },
+  servers: { label: 'Server', fields: ['status', 'comments'] },
+  storage: { label: 'Storage device', fields: ['status', 'comments'] },
+  switches: { label: 'Switch', fields: ['status', 'comments'] },
+  intrusion: { label: 'Intrusion point', fields: ['status', 'comments'] },
+  // stations and monitors have no comments column
+  stations: { label: 'Station', fields: ['status'] },
+  monitors: { label: 'Monitor', fields: ['status'] },
+};
+
+app.patch('/api/assets/:type/:id', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'admin' && req.user.role !== 'technician') return res.status(403).json({ error: 'Not authorized' });
+  const { type, id } = req.params;
+  const spec = Object.prototype.hasOwnProperty.call(PATCHABLE_ASSETS, type) ? PATCHABLE_ASSETS[type] : null;
+  if (!spec) return res.status(400).json({ error: 'type must be one of: ' + Object.keys(PATCHABLE_ASSETS).join(', ') });
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  if (!/^\d+$/.test(id) || Number(id) > 2147483647) return res.status(404).json({ error: 'Device not found' });
+
+  const body = req.body && typeof req.body === 'object' ? req.body : {};
+  const sets = [];
+  const params = [];
+  for (const field of ['status', 'comments']) {
+    if (!Object.prototype.hasOwnProperty.call(body, field)) continue;
+    if (!spec.fields.includes(field)) return res.status(400).json({ error: `${spec.label}s don't have ${field}` });
+    const value = body[field];
+    if (field === 'status' && (typeof value !== 'string' || !value.trim())) return res.status(400).json({ error: 'status must be a non-empty string' });
+    if (field === 'comments' && value !== null && typeof value !== 'string') return res.status(400).json({ error: 'comments must be a string' });
+    params.push(field === 'status' ? value.trim() : value);
+    sets.push(`${field} = $${params.length}`);
+  }
+  if (!sets.length) return res.status(400).json({ error: 'Send status and/or comments' });
+
+  try {
+    params.push(Number(id));
+    const result = await pool.query(
+      `UPDATE ${type} SET ${sets.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = $${params.length} RETURNING *`,
+      params
+    );
+    const asset = result.rows[0];
+    if (!asset) return res.status(404).json({ error: 'Device not found' });
+    const assetClient = await getClientNameById(asset.client_id);
+    const what = sets.length === 2 ? 'updated' : sets[0].startsWith('status') ? 'status updated' : 'comment updated';
+    await logActivity(asset.client_id || 1, req.user.username, 'Updated', `${spec.label} ${asset.name || id} ${what} (${assetClient})`);
+    res.json({ success: true, data: asset });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ============================================================
 // SERVICE REQUESTS
 // ============================================================
 
@@ -1236,16 +1293,36 @@ app.post('/api/service-requests', authMiddleware, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// "22 Oct 2026 2:14 PM" in Jamaica time, for stamped SR note lines.
+const SR_NOTE_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+function srNoteStamp(date) {
+  const p = {};
+  new Intl.DateTimeFormat('en-US', { timeZone: 'America/Jamaica', day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })
+    .formatToParts(date).forEach(x => { p[x.type] = x.value; });
+  return `${p.day} ${SR_NOTE_MONTHS[p.month - 1]} ${p.year} ${p.hour}:${p.minute} ${(p.dayPeriod || '').toUpperCase()}`;
+}
+
 app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
-  const { priority, assigned_to, status, notes } = req.body;
+  const { priority, assigned_to, status } = req.body;
+  let { notes } = req.body;
   const clientId = req.user.role === 'admin' ? null : req.user.client_id;
   try {
     const current = await pool.query('SELECT * FROM service_requests WHERE id=$1', [id]);
     const oldSr = current.rows[0];
     const oldAssigned = oldSr?.assigned_to;
     const oldStatus = oldSr?.status;
+    // append_note (field app) adds one stamped line to the existing notes
+    // instead of replacing them. A full `notes` value sent in the same
+    // request wins and append_note is ignored.
+    let noteAdded = false;
+    const appendNote = typeof req.body.append_note === 'string' ? req.body.append_note.trim() : '';
+    if (notes === undefined && appendNote && oldSr) {
+      const line = `[${srNoteStamp(new Date())} · ${req.user.username}] ${appendNote}`;
+      notes = oldSr.notes ? `${oldSr.notes}\n${line}` : line;
+      noteAdded = true;
+    }
     // COALESCE so a partial update (e.g. the field app's "Resolve" button,
     // which only sends {status:'Resolved'}) doesn't wipe out the other
     // fields — this route previously overwrote priority/assigned_to/notes
@@ -1281,13 +1358,13 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
       const newPriority = after(priority, oldSr.priority);
       if (newStatus !== oldSr.status) changes.push(`Status: ${oldSr.status || '—'} → ${newStatus} by ${by}`);
       if (newPriority !== oldSr.priority) changes.push(`Priority: ${oldSr.priority || '—'} → ${newPriority} by ${by}`);
-      if ((after(notes, oldSr.notes) || '') !== (oldSr.notes || '')) changes.push(`Notes updated by ${by}`);
+      if ((after(notes, oldSr.notes) || '') !== (oldSr.notes || '')) changes.push(noteAdded ? `Note added by ${by}` : `Notes updated by ${by}`);
       for (const msg of changes) {
         await pool.query('INSERT INTO sr_history (sr_id,time,msg) VALUES ($1,$2,$3)', [id, new Date().toLocaleTimeString(), msg]);
       }
     }
     const logClientId = clientId || 1;
-    await logActivity(logClientId, req.user.username, 'Updated', 'SR ' + id + ' updated to ' + status);
+    await logActivity(logClientId, req.user.username, 'Updated', 'SR ' + id + (status ? ' updated to ' + status : noteAdded ? ' note added' : ' updated'));
     
     if (status === 'Resolved' && oldStatus !== 'Resolved') {
       const updated = await pool.query('SELECT * FROM service_requests WHERE id=$1', [id]);
