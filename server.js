@@ -141,6 +141,15 @@ const pool = new Pool({
   connectionTimeoutMillis: 10000,
 });
 
+// The database can drop an idle pooled connection (restart, failover, an
+// admin terminating sessions). pg reports that as an error event on the
+// pool; with no listener Node treats it as unhandled and the whole server
+// exits. Log it instead: the pool discards that client and opens a fresh
+// connection on the next query.
+pool.on('error', (err) => {
+  console.error('⚠️ Idle DB connection lost:', err.message);
+});
+
 let dbConnected = false;
 
 pool.connect((err, client, release) => {
