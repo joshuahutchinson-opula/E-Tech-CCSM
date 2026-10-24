@@ -2192,28 +2192,142 @@ app.get('/api/outlook/message/:id', authMiddleware, requireStaff, async (req, re
   }
 });
 
+// ---- Composing from the support mailbox (new, reply, reply all, forward) ----
+// The browser sends plain text. It is HTML-escaped here, line breaks become
+// <br>, and the signature is added here from the signed-in user, so nothing
+// typed can inject HTML and the signature can't be edited or spoofed.
+const EMAIL_ADDRESS_RE = /^[^\s@<>()[\]\\,;:"]+@[^\s@<>()[\]\\,;:"]+\.[a-z]{2,}$/i;
+const MAX_RECIPIENTS = 20;
+const MAX_EMAIL_TEXT = 20000;
+const MAX_SUBJECT = 255;
+
+function escapeHtml(v) {
+  return String(v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// Accepts an array or a comma/semicolon separated string.
+function parseRecipients(v) {
+  if (v == null || v === '') return [];
+  const list = Array.isArray(v) ? v : String(v).split(/[,;]/);
+  return list.map(a => String(a).trim()).filter(Boolean);
+}
+
+function emailSignature(req) {
+  return `${req.user.username || 'E-Tech'} · E-Tech Systems Support`;
+}
+
+function composeEmailHtml(text, req) {
+  const typed = escapeHtml(text).replace(/\r\n|\r|\n/g, '<br>');
+  return `<div>${typed}</div><br><div>— ${escapeHtml(emailSignature(req))}</div>`;
+}
+
+// Returns an error message for bad input, or null.
+function validateCompose({ to, cc, text, subject, toRequired, textRequired }) {
+  if (toRequired && to.length === 0) return 'Add at least one recipient in To.';
+  if (to.length + cc.length > MAX_RECIPIENTS) return `Too many recipients — the limit is ${MAX_RECIPIENTS}.`;
+  const bad = [...to, ...cc].filter(a => !EMAIL_ADDRESS_RE.test(a));
+  if (bad.length) return `Not a valid email address: ${bad.join(', ')}`;
+  if (typeof text !== 'string') return 'The message text is missing.';
+  if (textRequired && !text.trim()) return 'Write a message before sending.';
+  if (text.length > MAX_EMAIL_TEXT) return `The message is too long — the limit is ${MAX_EMAIL_TEXT.toLocaleString('en-US')} characters.`;
+  if (subject != null && (typeof subject !== 'string' || subject.length > MAX_SUBJECT)) return `The subject is too long — the limit is ${MAX_SUBJECT} characters.`;
+  return null;
+}
+
+const toGraphRecipients = list => list.map(address => ({ emailAddress: { address } }));
+
 app.post('/api/outlook/send', authMiddleware, requireStaff, async (req, res) => {
-  const { to, cc, subject, body } = req.body;
+  const to = parseRecipients(req.body.to), cc = parseRecipients(req.body.cc);
+  const subject = typeof req.body.subject === 'string' ? req.body.subject.trim() : '';
+  const text = req.body.body;
+  const invalid = validateCompose({ to, cc, text, subject, toRequired: true, textRequired: true });
+  if (invalid) return res.status(400).json({ error: invalid });
   const graphToken = await getGraphToken(req);
-  if (!graphToken) console.error('Outlook send: no Graph token available for the shared mailbox');
+  if (!graphToken) {
+    console.error('Outlook send: no Graph token available for the shared mailbox');
+    return res.status(503).json({ error: MAILBOX_DISCONNECTED });
+  }
+  const html = composeEmailHtml(text, req);
+  const emailData = { message: { subject, body: { contentType: 'HTML', content: html }, toRecipients: toGraphRecipients(to) } };
+  if (cc.length) emailData.message.ccRecipients = toGraphRecipients(cc);
   try {
-    if (!graphToken) throw new Error('No Microsoft Graph token available');
-    const emailData = { message: { subject, body: { contentType: 'HTML', content: body }, toRecipients: to.split(',').map(email => ({ emailAddress: { address: email.trim() } })) } };
-    if (cc) { emailData.message.ccRecipients = cc.split(',').map(email => ({ emailAddress: { address: email.trim() } })); }
     await axios.post(`https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/sendMail`, emailData, {
       headers: { Authorization: `Bearer ${graphToken}`, 'Content-Type': 'application/json' },
-      timeout: 8000
+      timeout: 20000
     });
-    try {
-      await pool.query('INSERT INTO emails (client_id,sender,recipient,subject,body,folder) VALUES ($1,$2,$3,$4,$5,$6)', [req.user.client_id||1,req.user.username,to,subject,body,'sent']);
-    } catch (dbErr) { console.error('Failed to save sent email locally:', dbErr.message); }
+  } catch (err) {
+    // Not saved locally: a copy in `emails` would look sent when it wasn't.
+    return sendMailboxError(res, err, 'Outlook send error');
+  }
+  try {
+    await pool.query('INSERT INTO emails (client_id,sender,recipient,subject,body,folder) VALUES ($1,$2,$3,$4,$5,$6)', [req.user.client_id||1,req.user.username,to.join(', '),subject,html,'sent']);
+  } catch (dbErr) { console.error('Failed to save sent email locally:', dbErr.message); }
+  await logActivity(1, req.user.username, 'Email', `Sent email to ${[...to, ...cc].join(', ')} — "${subject || '(no subject)'}"`);
+  res.json({ success: true });
+});
+
+// Reply / reply all. Microsoft threads it, sets "RE:" and quotes the original.
+// The original is read first for the activity log (recipient and subject).
+app.post('/api/outlook/reply/:id', authMiddleware, requireStaff, async (req, res) => {
+  const replyAll = req.body.replyAll === true;
+  const cc = parseRecipients(req.body.cc);
+  const subject = typeof req.body.subject === 'string' && req.body.subject.trim() ? req.body.subject.trim() : null;
+  const text = req.body.comment;
+  const invalid = validateCompose({ to: [], cc, text, subject, toRequired: false, textRequired: true });
+  if (invalid) return res.status(400).json({ error: invalid });
+  const graphToken = await getGraphToken(req);
+  if (!graphToken) {
+    console.error('Outlook reply: no Graph token available for the shared mailbox');
+    return res.status(503).json({ error: MAILBOX_DISCONNECTED });
+  }
+  const messageUrl = `https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/messages/${encodeURIComponent(req.params.id)}`;
+  const headers = { Authorization: `Bearer ${graphToken}`, 'Content-Type': 'application/json' };
+  try {
+    const { data: original } = await axios.get(messageUrl, { headers, timeout: 20000, params: { $select: 'subject,from,toRecipients,ccRecipients' } });
+    const payload = { comment: composeEmailHtml(text, req) };
+    if (subject || cc.length) {
+      payload.message = {};
+      if (subject) payload.message.subject = subject;
+      if (cc.length) payload.message.ccRecipients = toGraphRecipients(cc);
+    }
+    await axios.post(`${messageUrl}/${replyAll ? 'replyAll' : 'reply'}`, payload, { headers, timeout: 20000 });
+    const addr = r => r?.emailAddress?.address;
+    let recipients = [addr(original.from)];
+    if (replyAll) recipients = recipients.concat((original.toRecipients || []).map(addr), (original.ccRecipients || []).map(addr));
+    recipients = [...new Set(recipients.concat(cc).filter(a => a && a.toLowerCase() !== SHARED_MAILBOX))];
+    await logActivity(1, req.user.username, 'Email', `${replyAll ? 'Replied all' : 'Replied'} to ${recipients.join(', ') || 'unknown'} — "${subject || original.subject || '(no subject)'}"`);
     res.json({ success: true });
   } catch (err) {
-    console.error('Outlook send error:', err.message);
-    try {
-      await pool.query('INSERT INTO emails (client_id,sender,recipient,subject,body,folder) VALUES ($1,$2,$3,$4,$5,$6)', [req.user.client_id||1,req.user.username,to,subject,body,'sent']);
-      res.json({ success: true, local_only: true });
-    } catch (dbErr) { res.status(500).json({ error: 'Failed to send email' }); }
+    sendMailboxError(res, err, 'Outlook reply error');
+  }
+});
+
+app.post('/api/outlook/forward/:id', authMiddleware, requireStaff, async (req, res) => {
+  const to = parseRecipients(req.body.to), cc = parseRecipients(req.body.cc);
+  const subject = typeof req.body.subject === 'string' && req.body.subject.trim() ? req.body.subject.trim() : null;
+  const text = req.body.comment == null ? '' : req.body.comment;
+  const invalid = validateCompose({ to, cc, text, subject, toRequired: true, textRequired: false });
+  if (invalid) return res.status(400).json({ error: invalid });
+  const graphToken = await getGraphToken(req);
+  if (!graphToken) {
+    console.error('Outlook forward: no Graph token available for the shared mailbox');
+    return res.status(503).json({ error: MAILBOX_DISCONNECTED });
+  }
+  const messageUrl = `https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/messages/${encodeURIComponent(req.params.id)}`;
+  const headers = { Authorization: `Bearer ${graphToken}`, 'Content-Type': 'application/json' };
+  try {
+    const { data: original } = await axios.get(messageUrl, { headers, timeout: 20000, params: { $select: 'subject' } });
+    const payload = { comment: composeEmailHtml(text, req), toRecipients: toGraphRecipients(to) };
+    if (subject || cc.length) {
+      payload.message = {};
+      if (subject) payload.message.subject = subject;
+      if (cc.length) payload.message.ccRecipients = toGraphRecipients(cc);
+    }
+    await axios.post(`${messageUrl}/forward`, payload, { headers, timeout: 20000 });
+    await logActivity(1, req.user.username, 'Email', `Forwarded "${subject || original.subject || '(no subject)'}" to ${[...to, ...cc].join(', ')}`);
+    res.json({ success: true });
+  } catch (err) {
+    sendMailboxError(res, err, 'Outlook forward error');
   }
 });
 
