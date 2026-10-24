@@ -1078,6 +1078,96 @@ app.patch('/api/assets/:type/:id', authMiddleware, async (req, res) => {
 });
 
 // ============================================================
+// INSTALLATION (field app ↔ EEST)
+// ============================================================
+// The field app's Installation tab. Each route forwards to EEST's CAMS
+// integration API (contract: "CAMS integration" in the EEST README) with the
+// shared X-Integration-Key and the signed-in tech's email. The key stays on
+// this server; the phone only ever talks to CAMS.
+//
+// Only E-Tech staff signed in with Microsoft can use it: their token carries
+// their email. The shared admin/tech password logins have no email, and
+// client accounts aren't staff, so both get 403.
+const installPhotoUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024, files: 1 } });
+
+// EEST's origin. Tolerates a trailing slash or /api so either form of the URL works.
+function eestOrigin() {
+  return String(process.env.EEST_API_URL || '').trim().replace(/\/+$/, '').replace(/\/api$/, '');
+}
+
+function requireInstallationAccess(req, res, next) {
+  if (isClientAccount(req) || !req.user.email) {
+    return res.status(403).json({ error: 'Installation jobs are only available to E-Tech staff signed in with Microsoft.' });
+  }
+  if (!eestOrigin() || !process.env.CAMS_INTEGRATION_KEY) {
+    return res.status(503).json({ error: "The EEST link isn't set up on the CAMS server yet (EEST_API_URL and CAMS_INTEGRATION_KEY). Ask an admin." });
+  }
+  next();
+}
+
+// Photo links come back relative to EEST's origin; the phone needs them absolute.
+function withEestPhotoLinks(device) {
+  if (device && Array.isArray(device.photos)) {
+    device.photos = device.photos.map(p => (typeof p === 'string' && p.startsWith('/') ? eestOrigin() + p : p));
+  }
+  return device;
+}
+
+async function forwardToEest(req, res, method, eestPath, body) {
+  const headers = { 'X-Integration-Key': process.env.CAMS_INTEGRATION_KEY, 'X-User-Email': req.user.email };
+  if (body !== undefined && !(body instanceof FormData)) headers['Content-Type'] = 'application/json';
+  let response;
+  try {
+    response = await fetch(eestOrigin() + '/api/integrations/cams' + eestPath, {
+      method,
+      headers,
+      body: body === undefined || body instanceof FormData ? body : JSON.stringify(body),
+      signal: AbortSignal.timeout(60000)
+    });
+  } catch (err) {
+    console.error(`EEST ${method} ${eestPath} failed:`, err.message);
+    return res.status(502).json({ error: "Couldn't reach EEST. Try again in a minute." });
+  }
+  let data;
+  try { data = JSON.parse(await response.text()); } catch (e) { data = { error: `EEST returned an unexpected response (${response.status})` }; }
+  // A 401 from EEST means CAMS's integration key is wrong — not the tech's
+  // session. Passing 401 on would sign them out of the field app, so it goes
+  // back as 502 with EEST's message instead. Every other status passes through.
+  if (response.status === 401) {
+    console.error('EEST rejected the integration key:', data && data.error);
+    return res.status(502).json({ error: 'EEST refused the CAMS integration key (' + ((data && data.error) || 'unauthorized') + '). Ask an admin to check CAMS_INTEGRATION_KEY.' });
+  }
+  if (response.ok && data) {
+    if (Array.isArray(data.projects)) {
+      data.projects.forEach(p => (p.zones || []).forEach(z => (z.devices || []).forEach(withEestPhotoLinks)));
+    } else {
+      withEestPhotoLinks(data);
+    }
+  }
+  res.status(response.status).json(data);
+}
+
+app.get('/api/installation/jobs', authMiddleware, requireInstallationAccess, (req, res) => {
+  forwardToEest(req, res, 'GET', '/jobs');
+});
+
+app.patch('/api/installation/devices/:id', authMiddleware, requireInstallationAccess, (req, res) => {
+  forwardToEest(req, res, 'PATCH', '/devices/' + encodeURIComponent(req.params.id), req.body || {});
+});
+
+app.post('/api/installation/devices/:id/photos', authMiddleware, requireInstallationAccess, (req, res) => {
+  installPhotoUpload.single('file')(req, res, (err) => {
+    if (err) {
+      const tooBig = err.code === 'LIMIT_FILE_SIZE';
+      return res.status(tooBig ? 413 : 400).json({ error: tooBig ? 'Photos can be up to 50 MB' : err.message });
+    }
+    const form = new FormData();
+    if (req.file) form.append('file', new Blob([req.file.buffer], { type: req.file.mimetype }), req.file.originalname || 'photo.jpg');
+    forwardToEest(req, res, 'POST', '/devices/' + encodeURIComponent(req.params.id) + '/photos', form);
+  });
+});
+
+// ============================================================
 // SERVICE REQUESTS
 // ============================================================
 

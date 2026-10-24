@@ -368,6 +368,29 @@
     .status-dot.online { background: var(--dot-online); }
     .ds-sub { font-size: 14px; color: var(--text-2); margin-bottom: 8px; }
 
+    /* ---------- Installation (EEST jobs: Projects → Zones → Devices) ---------- */
+    .progress { display: block; height: 6px; margin-top: 8px; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
+    .progress > span { display: block; height: 100%; border-radius: 3px; background: var(--success); }
+    .inst-count { flex-shrink: 0; font-size: 14px; font-weight: 700; color: var(--text-2); }
+    .inst-summary { padding: 12px 14px; margin-bottom: 12px; font-size: 14px; font-weight: 600; }
+    .inst-summary .progress { margin-top: 10px; }
+    .type-head.inst-zone { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    .inst-zone .zc { flex-shrink: 0; text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--text-3); }
+    .dev-row > .badge { flex-shrink: 0; }
+    .inst-queued { flex-shrink: 0; font-size: 18px; color: var(--st-pending); }
+    .inst-stale { margin: 0 0 12px; }
+    .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .photo-tile {
+      aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: var(--surface-2); border: 1px solid var(--border);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      font-size: 12px; color: var(--text-3); text-align: center;
+    }
+    .photo-tile.ph { padding: 6px; }
+    .photo-tile img { width: 100%; height: 100%; object-fit: cover; }
+    .photo-tile i { font-size: 22px; }
+    label.btn { cursor: pointer; }
+    label.btn:focus-within { outline: 2px solid var(--focus); outline-offset: 2px; }
+
     /* ---------- Install ---------- */
     .install-card { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; padding: 14px; margin-bottom: 12px; }
     .install-card > .ti { font-size: 26px; color: var(--accent); }
@@ -430,7 +453,7 @@
     }
     .tabbar button {
       flex: 1; min-height: var(--tabbar-h); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-      font-size: 12px; font-weight: 600; color: var(--text-3); position: relative;
+      font-size: 12px; font-weight: 600; color: var(--text-3); position: relative; white-space: nowrap; min-width: 0;
     }
     .tabbar button i { font-size: 24px; transition: transform 150ms var(--ease); }
     .tabbar button[aria-current="page"] { color: var(--accent); }
@@ -517,12 +540,19 @@
       width: 100%; min-height: 110px; padding: 11px 14px; border-radius: 12px; resize: vertical;
       background-color: var(--surface-2); border: 1px solid var(--border); font-size: 16px;
     }
+    .field .input {
+      width: 100%; min-height: 46px; padding: 10px 14px; border-radius: 12px;
+      background-color: var(--surface-2); border: 1px solid var(--border); font-size: 16px;
+    }
+    .field .input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+    .field .select { font-size: 16px; }
 
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
     }
     @media (max-width: 360px) {
       .summary-card .sc-num { font-size: 26px; }
+      .tabbar button { font-size: 11px; }
     }
   </style>
 </head>
@@ -603,6 +633,10 @@
       <div id="device-list"></div>
     </section>
 
+    <section class="tab-page" id="tab-installation" aria-labelledby="page-title">
+      <div id="inst-list"></div>
+    </section>
+
     <section class="tab-page" id="tab-profile" aria-labelledby="page-title">
       <div class="card">
         <div class="profile-head">
@@ -643,6 +677,7 @@
     <button type="button" data-action="tab" data-tab="home" aria-current="page"><i class="ti ti-home" aria-hidden="true"></i>Home</button>
     <button type="button" data-action="tab" data-tab="tickets"><i class="ti ti-ticket" aria-hidden="true"></i>Tickets<span class="tab-badge" id="ticket-badge" hidden></span></button>
     <button type="button" data-action="tab" data-tab="devices"><i class="ti ti-devices" aria-hidden="true"></i>Devices</button>
+    <button type="button" data-action="tab" data-tab="installation"><i class="ti ti-checklist" aria-hidden="true"></i>Installation</button>
     <button type="button" data-action="tab" data-tab="profile"><i class="ti ti-user-circle" aria-hidden="true"></i>Profile</button>
   </nav>
 </div>
@@ -650,7 +685,7 @@
 <div class="toast-container" id="toast-container" role="status" aria-live="polite"></div>
 
 <script>
-var APP_VERSION = '3.0';
+var APP_VERSION = '3.1';
 var API_URL = window.location.origin;
 var MS_CLIENT_ID = 'e87a6592-aaa5-4a13-9c85-8dbc8e9cd7b2';
 var MS_TENANT_ID = '799ae988-9d3d-40d3-bf5c-93197f5d8d44';
@@ -807,6 +842,16 @@ var devOfflineOnly = false; // Level 3 "Offline only" chip, not remembered
 var devScrolls = {};
 var devPending = null;      // 'fwd' | 'back' | null — animation/focus for the next render
 try { localStorage.removeItem('fieldapp_device_prefs'); } catch (e) {}   // old All/Offline + filter prefs
+// Installation tab: the tech's EEST jobs, Projects → (Zones → Devices). Opening
+// a project pushes one history entry so back returns to the job list.
+var INSTALL_JOBS = null;    // { tech, projects } from /api/installation/jobs
+var installProblem = null;  // { status, message } when the last jobs load failed
+var installLoaded = false;  // a jobs load (or the cache) has answered at least once
+var instProjectId = null;   // project open in the tab; null = the job list
+var instDepth = 0;          // history entries pushed above the tab's base entry (0 or 1)
+var instMineOnly = false;   // "Assigned to me" chip, not remembered
+var instListScroll = 0;
+var instPending = null;     // 'fwd' | 'back' | null — animation/focus for the next render
 
 var timers = [];
 
@@ -836,7 +881,8 @@ function base64URLEncode(b) {
 
 async function apiCall(e, o) {
   o = o || {};
-  var h = { 'Content-Type': 'application/json', Authorization: 'Bearer ' + authToken };
+  var h = { Authorization: 'Bearer ' + authToken };
+  if (!(o.body instanceof FormData)) h['Content-Type'] = 'application/json';   // FormData sets its own
   var r;
   try {
     r = await fetch(API_URL + '/api' + e, Object.assign({}, o, { headers: Object.assign({}, h, o.headers || {}) }));
@@ -857,7 +903,9 @@ async function apiCall(e, o) {
   }
   if (!r.ok) {
     var er = await r.json().catch(function() { return { error: 'Unknown error' }; });
-    throw new Error(er.error || 'API call failed: ' + r.status);
+    var apiErr = new Error(er.error || 'API call failed: ' + r.status);
+    apiErr.status = r.status;
+    throw apiErr;
   }
   return r.json();
 }
@@ -870,17 +918,20 @@ async function apiCall(e, o) {
 //    fall back to it when a fetch fails due to a real connectivity problem
 //    (not a server error — see apiCall's isOffline distinction above).
 // 2. Write side: actions a technician takes while offline (ticket updates,
-//    device comments and status) get queued locally instead of failing,
-//    applied optimistically to the in-memory data so the UI reflects the
-//    change immediately, and replayed against the real API once back online.
+//    device comments, installation updates and photos) get queued locally
+//    instead of failing, applied optimistically to the in-memory data so the
+//    UI reflects the change immediately, and replayed in order against the
+//    real API once back online. Queued photos are too big for localStorage:
+//    the queue entry holds a key, the image itself waits in IndexedDB.
 var CACHE_KEY = 'fieldapp_cache_data';
 var QUEUE_KEY = 'fieldapp_sync_queue';
+var PHOTO_DB = 'fieldapp_queued_photos';
 
 function cacheDataLocally() {
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify({
       assets: ASSETS, serviceRequests: SERVICE_REQUESTS, auditLog: AUDIT_LOG,
-      clients: CLIENT_LIST, cachedAt: lastUpdatedAt || new Date().toISOString()
+      clients: CLIENT_LIST, installJobs: INSTALL_JOBS, cachedAt: lastUpdatedAt || new Date().toISOString()
     }));
   } catch (e) { /* storage full or unavailable — offline mode just won't have cached data */ }
 }
@@ -897,11 +948,28 @@ function loadCachedData() {
     SERVICE_REQUESTS = cached.serviceRequests || [];
     AUDIT_LOG = cached.auditLog || [];
     setClients(cached.clients || []);
+    INSTALL_JOBS = cached.installJobs || null;
+    installLoaded = true;
     lastUpdatedAt = cached.cachedAt || null;
     dataLoaded = true;
     return cached;
   } catch (e) { return null; }
 }
+
+// op(store) returns an IDBRequest; resolves with its result once committed.
+function queuedPhotos(mode, op) {
+  return new Promise(function(resolve, reject) {
+    var open = indexedDB.open(PHOTO_DB, 1);
+    open.onupgradeneeded = function() { open.result.createObjectStore('photos'); };
+    open.onerror = function() { reject(open.error); };
+    open.onsuccess = function() {
+      var db = open.result, tx = db.transaction('photos', mode), req = op(tx.objectStore('photos'));
+      tx.oncomplete = function() { db.close(); resolve(req.result); };
+      tx.onerror = tx.onabort = function() { db.close(); reject(tx.error || new Error('Photo storage failed')); };
+    };
+  });
+}
+function dropQueuedPhoto(key) { return queuedPhotos('readwrite', function(s) { return s.delete(key); }).catch(function() {}); }
 
 function setClients(list) {
   CLIENT_LIST = (list || []).slice().sort(function(a, b) { return String(a.name).localeCompare(String(b.name)); });
@@ -968,6 +1036,7 @@ function queuedDeviceTarget(action) {
 // an updated_at) at queue time and compare it against the server's current
 // state before applying, which isn't in scope for now.
 var syncing = false;
+function isInstallAction(a) { return a.type === 'install_update' || a.type === 'install_photo'; }
 async function processSyncQueue() {
   if (syncing) return;
   var q = getSyncQueue();
@@ -976,9 +1045,10 @@ async function processSyncQueue() {
   var remaining = [];
   var succeeded = 0;
   var hitOffline = false;
+  var eestDown = false;   // CAMS answered but EEST didn't: hold installation changes, keep their order
   try {
     for (var i = 0; i < q.length; i++) {
-      if (hitOffline) { remaining.push(q[i]); continue; }
+      if (hitOffline || (eestDown && isInstallAction(q[i]))) { remaining.push(q[i]); continue; }
       var action = q[i];
       try {
         if (action.type === 'resolve_ticket') {
@@ -989,6 +1059,15 @@ async function processSyncQueue() {
           var target = queuedDeviceTarget(action);
           if (!target) throw new Error('unknown device');
           await apiCall('/assets/' + target.type + '/' + target.id, { method: 'PATCH', body: JSON.stringify({ comments: action.comment }) });
+        } else if (action.type === 'install_update') {
+          await apiCall('/installation/devices/' + encodeURIComponent(action.deviceId), { method: 'PATCH', body: JSON.stringify(action.body) });
+        } else if (action.type === 'install_photo') {
+          var photo = await queuedPhotos('readonly', function(s) { return s.get(action.photoKey); });
+          if (!photo) throw new Error('the photo is no longer stored on this phone');
+          var form = new FormData();
+          form.append('file', new Blob([photo.data], { type: photo.type }), photo.name);
+          await apiCall('/installation/devices/' + encodeURIComponent(action.deviceId) + '/photos', { method: 'POST', body: form });
+          dropQueuedPhoto(action.photoKey);
         }
         succeeded++;
       } catch (err) {
@@ -996,10 +1075,14 @@ async function processSyncQueue() {
         if (err.isOffline) {
           hitOffline = true;
           remaining.push(action);
+        } else if (isInstallAction(action) && (err.status === 502 || err.status === 503 || err.status === 504)) {
+          eestDown = true;
+          remaining.push(action);
         } else {
           // A real server error (e.g. the ticket was deleted in the meantime) —
           // drop it rather than retry forever, but let the technician know.
-          toast('Could not sync a queued change: ' + err.message, 'error');
+          if (action.type === 'install_photo') dropQueuedPhoto(action.photoKey);
+          toast('Could not sync a queued change' + (action.deviceName ? ' to ' + action.deviceName : '') + ': ' + err.message, 'error');
         }
       }
     }
@@ -1007,6 +1090,7 @@ async function processSyncQueue() {
     syncing = false;
   }
   saveSyncQueue(remaining);
+  if (eestDown) toast("EEST isn't reachable right now — installation changes stay on this phone and sync next time", 'warning');
   if (succeeded > 0) {
     toast(plural(succeeded, 'offline change') + ' synced', 'success');
     await loadData();
@@ -1120,6 +1204,7 @@ function stopTimers() {
 function resetState() {
   ASSET_TYPES.forEach(function(t) { ASSETS[t.key] = []; });
   SERVICE_REQUESTS = []; AUDIT_LOG = []; setClients([]);
+  INSTALL_JOBS = null; installProblem = null; installLoaded = false; instProjectId = null; instDepth = 0;
   dataLoaded = false; lastUpdatedAt = null; knownMineIds = null;
   currentUser = null; isAdmin = false; authToken = null;
 }
@@ -1164,6 +1249,7 @@ function doLogout() {
   localStorage.removeItem('userPhoto');
   localStorage.removeItem(CACHE_KEY);
   localStorage.removeItem(QUEUE_KEY);
+  queuedPhotos('readwrite', function(s) { return s.clear(); }).catch(function() {});
   stopTimers();
   closeAllSheets();
   resetState();
@@ -1257,7 +1343,8 @@ async function doLoadData(opts) {
       ASSET_TYPES.map(function(t) { return apiCall('/' + t.key); }).concat([
         apiCall('/service-requests'),
         apiCall('/activity-log?limit=50'),
-        apiCall('/client-names')
+        apiCall('/client-names'),
+        loadInstallJobs()
       ])
     );
     ASSET_TYPES.forEach(function(t, i) { ASSETS[t.key] = results[i] || []; });
@@ -1274,6 +1361,7 @@ async function doLoadData(opts) {
     renderAll();
     refreshTicketSheet();
     refreshDeviceSheet();
+    refreshInstallSheet();
     return true;
   } catch (err) {
     if (err.isAuth) return false;
@@ -1377,14 +1465,16 @@ function historyTime(h) { return fmtDateTime(h.created_at) || h.time || ''; }
 // ============================================================
 // RENDERING
 // ============================================================
-var TAB_TITLES = { home: 'Home', tickets: 'Tickets', devices: 'Devices', profile: 'Profile' };
+var TAB_TITLES = { home: 'Home', tickets: 'Tickets', devices: 'Devices', installation: 'Installation', profile: 'Profile' };
 
 function switchTab(tab) {
   if (!TAB_TITLES[tab]) return;
   var prevTab = currentTab;
   if (prevTab === 'devices' && tab !== 'devices') devUnwind();
+  if (prevTab === 'installation' && tab !== 'installation') instUnwind();
   currentTab = tab;
   if (tab === 'devices' && prevTab !== 'devices') devOnShow();
+  if (tab === 'installation' && prevTab !== 'installation') instOnShow();
   document.querySelectorAll('.tab-page').forEach(function(el) { el.classList.toggle('active', el.id === 'tab-' + tab); });
   document.querySelectorAll('.tabbar button').forEach(function(el) {
     if (el.dataset.tab === tab) el.setAttribute('aria-current', 'page'); else el.removeAttribute('aria-current');
@@ -1402,6 +1492,7 @@ function renderCurrent() {
   if (currentTab === 'home') renderHome();
   else if (currentTab === 'tickets') renderTickets();
   else if (currentTab === 'devices') renderDevices();
+  else if (currentTab === 'installation') renderInstallation();
   else if (currentTab === 'profile') updateProfile();
   updateUpdatedAgo();
 }
@@ -1641,6 +1732,12 @@ window.addEventListener('popstate', function(e) {
   if (sheetStack.length) {
     closeSheet(sheetStack[sheetStack.length - 1]);
     if (currentTab === 'devices' && devDepth > 0) history.pushState({ fa: 'dev', nav: devNav, depth: devDepth }, '');
+    if (currentTab === 'installation' && instDepth > 0) history.pushState({ fa: 'inst' }, '');
+    return;
+  }
+  if (currentTab === 'installation') {
+    instDepth = 0;
+    if (instProjectId) { instProjectId = null; instPending = 'back'; renderInstallation(); }
     return;
   }
   if (currentTab !== 'devices') return;
@@ -1681,9 +1778,18 @@ function clientBadge(name) {
   var file = 'logo-' + name.toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9_-]/g, '') + '.png';
   return '<img class="client-logo" alt="" src="' + esc(file) + '" data-initials="' + esc(initials) + '" data-colour="' + INITIAL_COLOURS[h % INITIAL_COLOURS.length] + '">';
 }
-// logo file missing -> coloured initials badge
+// logo file missing -> coloured initials badge; an EEST photo that won't load
+// (offline, or its signed link expired) -> a placeholder tile
 document.addEventListener('error', function(e) {
   var img = e.target;
+  if (img && img.classList && img.classList.contains('inst-photo')) {
+    var tile = img.closest('.photo-tile');
+    if (tile) {
+      tile.classList.add('ph');
+      tile.innerHTML = '<i class="ti ti-photo-off" aria-hidden="true"></i>' + (navigator.onLine ? 'Couldn\'t load' : 'Not available offline');
+    }
+    return;
+  }
   if (!img || !img.classList || !img.classList.contains('client-logo')) return;
   var b = document.createElement('span');
   b.className = 'initials';
@@ -1823,6 +1929,370 @@ function devSearchHtml(q) {
   return html + '<div class="card dev-group-card">' + found.map(function(d) {
     return devRow(d, ASSET_TYPE[d.type].label + ' · ' + getClientFromId(d.raw.client_id) + ' › ' + deviceSite(d.raw));
   }).join('') + '</div>';
+}
+
+// ---------- Installation (EEST jobs) ----------
+var INSTALL_STATUSES = [
+  { key: 'pending', label: 'Pending', cls: 'st-retracted' },
+  { key: 'in-progress', label: 'In progress', cls: 'st-progress' },
+  { key: 'complete', label: 'Complete', cls: 'st-resolved' },
+  { key: 'failed', label: 'Failed', cls: 'pri-high' }
+];
+var INSTALL_TYPES = {
+  camera: { label: 'Camera', icon: 'ti-video' }, access: { label: 'Access control', icon: 'ti-id-badge-2' },
+  door: { label: 'Door', icon: 'ti-door' }, nvr: { label: 'NVR', icon: 'ti-device-cctv' },
+  server: { label: 'Server', icon: 'ti-server' }, panel: { label: 'Panel', icon: 'ti-layout-board' },
+  power: { label: 'Power', icon: 'ti-plug' }, intercom: { label: 'Intercom', icon: 'ti-bell-ringing' },
+  software: { label: 'Software', icon: 'ti-apps' }
+};
+var NO_AUTOFIX = 'autocomplete="off" autocorrect="off" spellcheck="false"';
+var AS_BUILT_FIELDS = [
+  { key: 'serialNumber', label: 'Serial number', type: 'text', attrs: NO_AUTOFIX + ' autocapitalize="characters"' },
+  { key: 'macAddress', label: 'MAC address', type: 'text', attrs: NO_AUTOFIX + ' autocapitalize="characters" placeholder="AA:BB:CC:DD:EE:FF"' },
+  { key: 'ipAddress', label: 'IP address', type: 'text', attrs: NO_AUTOFIX + ' autocapitalize="off" placeholder="10.0.0.11"' },
+  { key: 'firmware', label: 'Firmware', type: 'text', attrs: NO_AUTOFIX + ' autocapitalize="off"' },
+  { key: 'warrantyExpiry', label: 'Warranty expiry', type: 'date', attrs: '' }
+];
+
+// EEST problems are kept in installProblem so the rest of the app still
+// loads; only offline and signed-out errors propagate.
+async function loadInstallJobs() {
+  try {
+    INSTALL_JOBS = await apiCall('/installation/jobs');
+    installProblem = null;
+  } catch (err) {
+    if (err.isOffline || err.isAuth) throw err;
+    installProblem = { status: err.status || 0, message: err.message };
+    if (err.status === 403 || err.status === 503) INSTALL_JOBS = null;
+  }
+  installLoaded = true;
+}
+
+function instProjects() { return (INSTALL_JOBS && INSTALL_JOBS.projects) || []; }
+function instFindProject(id) { return instProjects().find(function(p) { return p.id === id; }) || null; }
+function instDevicesOf(p) { return [].concat.apply([], (p.zones || []).map(function(z) { return z.devices || []; })); }
+function instDone(list) { return list.filter(function(d) { return d.status === 'complete'; }).length; }
+function instStatus(s) { return INSTALL_STATUSES.find(function(x) { return x.key === s; }) || { key: s, label: s || 'Unknown', cls: 'st-retracted' }; }
+function instStatusBadge(s) { var st = instStatus(s); return '<span class="badge ' + st.cls + '">' + esc(st.label) + '</span>'; }
+function instType(t) { return INSTALL_TYPES[t] || { label: t || 'Device', icon: 'ti-cpu' }; }
+function instIsMine(d) {
+  var me = lc(INSTALL_JOBS && INSTALL_JOBS.tech && INSTALL_JOBS.tech.name).trim(), a = lc(d.assignee).trim();
+  return !!me && (a === me || a.indexOf(me + ' ') === 0);
+}
+function findInstallDevice(id) {
+  var ps = instProjects();
+  for (var i = 0; i < ps.length; i++) {
+    var zs = ps[i].zones || [];
+    for (var j = 0; j < zs.length; j++) {
+      var ds = zs[j].devices || [];
+      for (var k = 0; k < ds.length; k++) if (String(ds[k].id) === String(id)) return { device: ds[k], zone: zs[j], project: ps[i] };
+    }
+  }
+  return null;
+}
+function replaceInstallDevice(updated) {
+  var f = updated && findInstallDevice(updated.id);
+  if (f) f.zone.devices[f.zone.devices.indexOf(f.device)] = updated;
+}
+// Queued (not yet synced) installation changes per device id.
+function instQueuedCounts() {
+  var out = {};
+  getSyncQueue().forEach(function(a) {
+    if (!isInstallAction(a)) return;
+    var c = out[a.deviceId] = out[a.deviceId] || { updates: 0, photos: 0 };
+    if (a.type === 'install_photo') c.photos++; else c.updates++;
+  });
+  return out;
+}
+// A lone project has no job-list level.
+function instTop() { var ps = instProjects(); return ps.length === 1 ? ps[0].id : null; }
+function instProjectSub(p) {
+  return [p.client, p.stage === 'commissioning' ? 'Commissioning' : 'Installation', p.dueDate ? 'Due ' + fmtDate(p.dueDate) : ''].filter(Boolean).join(' · ');
+}
+function progressBar(done, total) {
+  return '<span class="progress" aria-hidden="true"><span style="width:' + (total ? Math.round(done / total * 100) : 0) + '%"></span></span>';
+}
+function doneCount(done, total) {
+  return '<span aria-hidden="true">' + done + '/' + total + '</span><span class="sr-only">' + done + ' of ' + total + ' complete</span>';
+}
+
+function instOpenProject(id) {
+  if (instProjectId === id) return;
+  instListScroll = document.getElementById('field-content').scrollTop;
+  history.pushState({ fa: 'inst' }, '');
+  instDepth = 1;
+  instProjectId = id;
+  instMineOnly = false;
+  instPending = 'fwd';
+  renderInstallation();
+}
+function instUnwind() {
+  if (instDepth > 0) { devIgnorePops++; history.go(-instDepth); instDepth = 0; }
+}
+function instGoTop() {
+  instUnwind();
+  if (instProjectId) { instProjectId = null; instPending = 'back'; }
+  renderInstallation();
+}
+// Coming back to the tab with a project still open: restore its back entry.
+function instOnShow() {
+  if (instProjectId && instFindProject(instProjectId)) { history.pushState({ fa: 'inst' }, ''); instDepth = 1; }
+  else instProjectId = null;
+}
+
+function renderInstallation() {
+  var container = document.getElementById('inst-list');
+  if (!installLoaded) { container.innerHTML = skeletons(3, 88); return; }
+  var dir = instPending;
+  instPending = null;
+  if (instProjectId && !instFindProject(instProjectId)) {
+    if (INSTALL_JOBS) toast('That project is no longer in your installation jobs — showing all your jobs.', 'warning');
+    instUnwind();
+    instProjectId = null;
+    dir = 'back';
+  }
+  var ps = instProjects(), openId = instProjectId || instTop();
+  var html;
+  if (!INSTALL_JOBS) html = instProblemHtml();
+  else if (!ps.length) html = emptyState('ti-clipboard-check', 'No installation jobs right now', 'Projects in Installation or Commissioning that you\'re on in EEST show up here.', 'Refresh', 'refresh');
+  else if (openId) html = instProjectHtml(instFindProject(openId), !instProjectId);
+  else html = instListHtml(ps);
+  // Jobs on screen are from an earlier load; say why they may be out of date.
+  if (INSTALL_JOBS && installProblem) html = '<p class="note-box inst-stale"><i class="ti ti-alert-triangle" aria-hidden="true"></i> Couldn\'t refresh from EEST (' + esc(installProblem.message) + '). Showing your jobs as last loaded.</p>' + html;
+  container.innerHTML = '<div class="level' + (dir === 'fwd' ? ' slide-fwd' : dir === 'back' ? ' slide-back' : '') + '">' + html + '</div>';
+  if (dir) {
+    document.getElementById('field-content').scrollTop = dir === 'back' ? instListScroll : 0;
+    var heading = container.querySelector('.level-title');
+    if (heading) heading.focus({ preventScroll: true });
+  }
+}
+function instProblemHtml() {
+  var p = installProblem;
+  if (!p) return emptyState('ti-cloud-off', 'No saved installation jobs', 'Connect once to load your jobs from EEST.', 'Refresh', 'refresh');
+  if (p.status === 403) {
+    var desc = /X-User-Email/.test(p.message)
+      ? 'EEST doesn\'t have ' + ((currentUser && currentUser.email) || 'your email') + ' on its team list. Ask an admin to add you.'
+      : p.message;
+    return emptyState('ti-link-off', 'Your account isn\'t linked to EEST', desc, 'Refresh', 'refresh');
+  }
+  if (p.status === 503) return emptyState('ti-plug-off', 'Installation isn\'t available right now', p.message, 'Refresh', 'refresh');
+  return emptyState('ti-alert-circle', 'Couldn\'t load your installation jobs', p.message, 'Try again', 'refresh');
+}
+function instListHtml(ps) {
+  var all = [].concat.apply([], ps.map(instDevicesOf));
+  var html = levelHead('My jobs', '', true) +
+    '<p class="level-meta">' + esc(plural(ps.length, 'project') + ' · ' + instDone(all) + ' of ' + plural(all.length, 'device') + ' complete') + '</p>';
+  return html + '<div class="nav-list">' + ps.map(function(p) {
+    var list = instDevicesOf(p), done = instDone(list);
+    return '<button type="button" class="nav-row" data-action="inst-project" data-id="' + esc(p.id) + '">' +
+      '<span class="nr-icon"><i class="ti ti-building" aria-hidden="true"></i></span>' +
+      '<span class="nr-main"><span class="nr-name">' + esc(p.name) + '</span><span class="nr-sub">' + esc(instProjectSub(p)) + '</span>' + progressBar(done, list.length) + '</span>' +
+      '<span class="inst-count">' + doneCount(done, list.length) + '</span><i class="ti ti-chevron-right chev" aria-hidden="true"></i></button>';
+  }).join('') + '</div>';
+}
+function instProjectHtml(p, top) {
+  var list = instDevicesOf(p), done = instDone(list);
+  var mine = list.filter(instIsMine).length;
+  if (!mine) instMineOnly = false;
+  var queued = instQueuedCounts();
+  var html = levelHead(esc(p.name), 'Back to my jobs', top) +
+    '<p class="level-meta">' + esc(instProjectSub(p)) + '</p>' +
+    '<div class="card inst-summary">' + esc(done + ' of ' + plural(list.length, 'device') + ' complete') + progressBar(done, list.length) + '</div>';
+  if (mine && mine < list.length) html += '<button type="button" class="chip" data-action="inst-mine" aria-pressed="' + instMineOnly + '">Assigned to me (' + mine + ')</button>';
+  (p.zones || []).forEach(function(z) {
+    var devs = z.devices || [];
+    var shown = instMineOnly ? devs.filter(instIsMine) : devs;
+    if (!shown.length) return;
+    html += '<h3 class="type-head inst-zone"><span>' + esc(z.name) + '</span><span class="zc">' + doneCount(instDone(devs), devs.length) + '</span></h3>' +
+      '<div class="card dev-group-card">' + shown.map(function(d) { return instDeviceRow(d, queued[d.id]); }).join('') + '</div>';
+  });
+  return html;
+}
+function instDeviceRow(d, queued) {
+  var t = instType(d.type);
+  var who = d.assignee ? (instIsMine(d) ? 'You' : d.assignee) : 'Unassigned';
+  return '<button type="button" class="dev-row" data-action="open-inst-device" data-id="' + esc(d.id) + '">' +
+    '<i class="ti ' + t.icon + ' dt" aria-hidden="true"></i>' +
+    '<span class="dr-main"><span class="dn">' + esc(d.name) + '</span><span class="dsub">' + esc([t.label, d.location, who].filter(Boolean).join(' · ')) + '</span></span>' +
+    (queued ? '<i class="ti ti-cloud-upload inst-queued" aria-hidden="true"></i><span class="sr-only">Changes waiting to sync.</span>' : '') +
+    instStatusBadge(d.status) + '<i class="ti ti-chevron-right chev" aria-hidden="true"></i></button>';
+}
+
+// ---------- Installation device sheet ----------
+function instDetailHtml(f) {
+  var d = f.device, t = instType(d.type), ab = d.asBuilt || {};
+  var queued = instQueuedCounts()[d.id] || { updates: 0, photos: 0 };
+  var html = '<div class="detail-summary">' +
+      '<div class="ds-sub"><i class="ti ' + t.icon + '" aria-hidden="true"></i> ' + esc([t.label, f.zone.name, f.project.name].join(' · ')) + '</div>' +
+      '<div class="ds-badges">' + instStatusBadge(d.status) +
+        (queued.updates ? '<span class="badge st-pending"><i class="ti ti-cloud-upload" aria-hidden="true"></i>Waiting to sync</span>' : '') + '</div>' +
+      '<dl class="kv"><dt>Assigned</dt><dd>' + esc(d.assignee || 'Unassigned') + '</dd>' +
+        (d.location ? '<dt>Location</dt><dd>' + esc(d.location) + '</dd>' : '') +
+        (d.completedAt ? '<dt>Completed</dt><dd>' + esc(fmtDateTime(d.completedAt)) + '</dd>' : '') +
+      '</dl></div>';
+  html += '<section class="detail-section">' +
+    '<div class="field"><label for="inst-status">Status</label><select class="select" id="inst-status" data-inst-field="status">' +
+      INSTALL_STATUSES.map(function(s) { return '<option value="' + s.key + '"' + (s.key === d.status ? ' selected' : '') + '>' + esc(s.label) + '</option>'; }).join('') + '</select></div>' +
+    '<div class="field" style="margin-bottom:0;"><label for="inst-notes">Notes</label><textarea id="inst-notes" data-inst-field="notes" maxlength="2000" placeholder="Where it\'s mounted, anything the next person should know">' + esc(d.notes || '') + '</textarea></div>' +
+    '</section>';
+  html += '<section class="detail-section"><h3>As-built</h3>' + AS_BUILT_FIELDS.map(function(fl) {
+    return '<div class="field"><label for="inst-' + fl.key + '">' + esc(fl.label) + '</label>' +
+      '<input class="input" type="' + fl.type + '" id="inst-' + fl.key + '" data-inst-field="' + fl.key + '" value="' + esc(ab[fl.key] || '') + '" ' + fl.attrs + '></div>';
+  }).join('') + '</section>';
+  var photos = (d.photos || []).filter(function(src) { return /^https?:\/\//.test(src); });
+  var tiles = photos.map(function(src, i) {
+    return '<a class="photo-tile" href="' + esc(src) + '" target="_blank" rel="noopener"><img class="inst-photo" src="' + esc(src) + '" alt="' + esc('Photo ' + (i + 1) + ' of ' + d.name) + '" loading="lazy"></a>';
+  });
+  for (var i = 0; i < queued.photos; i++) tiles.push('<span class="photo-tile ph"><i class="ti ti-cloud-upload" aria-hidden="true"></i>Waiting to upload</span>');
+  html += '<section class="detail-section"><h3>Photos</h3>' +
+    (tiles.length ? '<div class="photo-grid">' + tiles.join('') + '</div>' : '<p class="muted">No photos yet</p>') +
+    '<label class="btn block" style="margin-top:12px;"><i class="ti ti-camera-plus" aria-hidden="true"></i> Take photo' +
+      '<input type="file" class="sr-only" accept="image/*" capture="environment" data-action-change="inst-photo"></label>' +
+    '</section>';
+  return html;
+}
+var INST_SHEET_ACTIONS = '<button type="button" class="btn primary" data-action="inst-save"><i class="ti ti-device-floppy" aria-hidden="true"></i> Save changes</button>';
+
+function openInstallDevice(id) {
+  var f = findInstallDevice(id);
+  if (!f) { toast('That device is no longer in your jobs. Refresh and try again.', 'warning'); return; }
+  openSheet({ title: f.device.name, html: instDetailHtml(f), actions: INST_SHEET_ACTIONS, full: true, kind: 'inst-device', data: { id: f.device.id } });
+}
+// Re-renders open device sheets from the latest data, keeping whatever the
+// tech has typed but not saved (fields marked data-dirty) and their focus.
+function refreshInstallSheet() {
+  sheetStack.forEach(function(s) {
+    if (s.kind !== 'inst-device') return;
+    var f = findInstallDevice(s.data.id);
+    if (!f) return;
+    var body = s.layer.querySelector('.sheet-body'), scroll = body.scrollTop;
+    var drafts = {};
+    s.layer.querySelectorAll('[data-inst-field][data-dirty]').forEach(function(el) { drafts[el.dataset.instField] = el.value; });
+    var focused = s.layer.contains(document.activeElement) && document.activeElement.dataset ? document.activeElement.dataset.instField : null;
+    setSheetContent(s, { title: f.device.name, html: instDetailHtml(f) });
+    Object.keys(drafts).forEach(function(k) {
+      var el = s.layer.querySelector('[data-inst-field="' + k + '"]');
+      if (el) { el.value = drafts[k]; el.dataset.dirty = '1'; }
+    });
+    if (focused) { var again = s.layer.querySelector('[data-inst-field="' + focused + '"]'); if (again) again.focus({ preventScroll: true }); }
+    body.scrollTop = scroll;
+  });
+}
+
+// Only what changed is sent; inside asBuilt only the fields that changed.
+function instFormChanges(layer, d) {
+  var body = {}, ab = {}, cur = d.asBuilt || {};
+  var status = layer.querySelector('#inst-status').value;
+  if (status !== d.status) body.status = status;
+  var notes = layer.querySelector('#inst-notes').value.trim();
+  if (notes !== (d.notes || '').trim()) body.notes = notes;
+  AS_BUILT_FIELDS.forEach(function(fl) {
+    var v = layer.querySelector('#inst-' + fl.key).value.trim();
+    if (v !== (cur[fl.key] || '')) ab[fl.key] = v;
+  });
+  if (Object.keys(ab).length) body.asBuilt = ab;
+  return body;
+}
+// Same rules as EEST, checked here so a change saved offline can't be
+// rejected (and dropped) when it syncs later.
+function instIpValid(ip) {
+  var v4 = ip.split('.');
+  if (v4.length === 4 && v4.every(function(p) { return /^\d{1,3}$/.test(p) && Number(p) <= 255; })) return true;
+  return ip.indexOf(':') !== -1 && /^[0-9a-fA-F:.]+$/.test(ip) && ip.length <= 45;
+}
+function instValidate(body) {
+  var ab = body.asBuilt || {};
+  if (ab.macAddress && !/^([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}$/.test(ab.macAddress)) return { field: 'macAddress', msg: 'MAC address must look like AA:BB:CC:DD:EE:FF' };
+  if (ab.ipAddress && !instIpValid(ab.ipAddress)) return { field: 'ipAddress', msg: 'That IP address isn\'t valid' };
+  if (ab.warrantyExpiry && (!/^\d{4}-\d{2}-\d{2}$/.test(ab.warrantyExpiry) || isNaN(Date.parse(ab.warrantyExpiry)))) return { field: 'warrantyExpiry', msg: 'Warranty expiry must be a date' };
+  return null;
+}
+// Mirrors what EEST does with the change, for offline saves.
+function instApplyLocally(d, body) {
+  if (body.status) {
+    d.status = body.status;
+    d.completedAt = body.status === 'complete' ? (d.completedAt || new Date().toISOString()) : null;
+  }
+  if (body.notes !== undefined) d.notes = body.notes;
+  if (body.asBuilt) {
+    d.asBuilt = Object.assign({}, d.asBuilt);
+    Object.keys(body.asBuilt).forEach(function(k) {
+      var v = body.asBuilt[k] || null;
+      d.asBuilt[k] = v && k === 'macAddress' ? v.toUpperCase().replace(/-/g, ':') : v;
+    });
+  }
+}
+function instAfterChange(sheet, saved) {
+  if (saved && sheet) sheet.layer.querySelectorAll('[data-dirty]').forEach(function(el) { delete el.dataset.dirty; });
+  cacheDataLocally();
+  renderAll();
+  refreshInstallSheet();
+}
+
+async function saveInstallDevice(btn) {
+  var sheet = topSheet('inst-device');
+  if (!sheet) return;
+  var f = findInstallDevice(sheet.data.id);
+  if (!f) { toast('That device is no longer in your jobs. Refresh and try again.', 'warning'); return; }
+  var body = instFormChanges(sheet.layer, f.device);
+  if (!Object.keys(body).length) { toast('Nothing to save — no changes made', 'info'); return; }
+  var bad = instValidate(body);
+  if (bad) {
+    toast(bad.msg, 'warning');
+    var input = sheet.layer.querySelector('#inst-' + bad.field);
+    if (input) input.focus();
+    return;
+  }
+  btn.disabled = true;
+  try {
+    var updated = await apiCall('/installation/devices/' + encodeURIComponent(f.device.id), { method: 'PATCH', body: JSON.stringify(body) });
+    replaceInstallDevice(updated);
+    instAfterChange(sheet, true);
+    toast('Saved to EEST', 'success');
+  } catch (err) {
+    if (err.isAuth) return;
+    if (err.isOffline) {
+      instApplyLocally(f.device, body);
+      queueAction({ type: 'install_update', deviceId: f.device.id, deviceName: f.device.name, body: body });
+      instAfterChange(sheet, true);
+      toast("Offline — saved on this phone and will sync when you're back online", 'warning');
+    } else {
+      toast("Couldn't save: " + err.message, 'error');
+    }
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function addInstallPhoto(input) {
+  var file = input.files && input.files[0];
+  input.value = '';
+  var sheet = topSheet('inst-device');
+  if (!file || !sheet) return;
+  if (!/^image\//.test(file.type)) { toast('That file isn\'t a photo', 'warning'); return; }
+  var id = sheet.data.id, f = findInstallDevice(id);
+  var name = file.name || 'photo.jpg';
+  toast('Uploading photo…', 'info');
+  try {
+    var form = new FormData();
+    form.append('file', file, name);
+    replaceInstallDevice(await apiCall('/installation/devices/' + encodeURIComponent(id) + '/photos', { method: 'POST', body: form }));
+    instAfterChange(sheet, false);
+    toast('Photo added', 'success');
+  } catch (err) {
+    if (err.isAuth) return;
+    if (!err.isOffline) { toast("Couldn't upload the photo: " + err.message, 'error'); return; }
+    try {
+      var key = 'photo-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+      var data = await file.arrayBuffer();
+      await queuedPhotos('readwrite', function(s) { return s.put({ data: data, type: file.type, name: name }, key); });
+      queueAction({ type: 'install_photo', deviceId: id, deviceName: f ? f.device.name : '', photoKey: key });
+      instAfterChange(sheet, false);
+      toast("Offline — photo saved on this phone and will upload when you're back online", 'warning');
+    } catch (storeErr) {
+      toast("You're offline and this phone couldn't keep the photo to upload later. Take it again once you're back online.", 'error');
+    }
+  }
 }
 
 // ---------- Profile ----------
@@ -2401,6 +2871,7 @@ document.addEventListener('click', function(e) {
     case 'login': loginWithMicrosoft(); break;
     case 'tab':
       if (el.dataset.tab === 'devices' && currentTab === 'devices') devGoTop();
+      else if (el.dataset.tab === 'installation' && currentTab === 'installation') instGoTop();
       else switchTab(el.dataset.tab);
       break;
     case 'refresh': refreshNow(); break;
@@ -2426,7 +2897,11 @@ document.addEventListener('click', function(e) {
     case 'dev-site': devGo({ level: 'devices', client: el.dataset.client, site: el.dataset.all ? ALL_SITES : el.dataset.site }); break;
     case 'dev-continue': devGo({ level: 'devices', client: el.dataset.client, site: el.dataset.site }); break;
     case 'dev-crumb': devGo({ level: 'sites', client: el.dataset.client }); break;
-    case 'dev-back': if (devDepth > 0) history.back(); else switchTab('home'); break;
+    case 'dev-back':
+      if (currentTab === 'installation') { if (instDepth > 0) history.back(); else instGoTop(); }
+      else if (devDepth > 0) history.back();
+      else switchTab('home');
+      break;
     case 'dev-offline-only': devOfflineOnly = !devOfflineOnly; renderDevices(); break;
     case 'dev-clear-search': document.getElementById('device-search').value = ''; renderDevices(); document.getElementById('device-search').focus(); break;
     case 'install': startInstall(); break;
@@ -2439,13 +2914,20 @@ document.addEventListener('click', function(e) {
     case 'confirm-resolve': confirmResolve(el); break;
     case 'save-device-comment': saveDeviceComment(el); break;
     case 'open-controller': openController(el.dataset.ip); break;
+    case 'inst-project': instOpenProject(el.dataset.id); break;
+    case 'inst-mine': instMineOnly = !instMineOnly; renderInstallation(); break;
+    case 'open-inst-device': openInstallDevice(el.dataset.id); break;
+    case 'inst-save': saveInstallDevice(el); break;
   }
 });
 document.addEventListener('change', function(e) {
+  if (e.target.dataset && e.target.dataset.instField) e.target.dataset.dirty = '1';
   if (e.target.matches('[data-action-change="ticket-status"]')) changeTicketStatus(e.target);
+  else if (e.target.matches('[data-action-change="inst-photo"]')) addInstallPhoto(e.target);
 });
 var searchTimer = null;
 document.addEventListener('input', function(e) {
+  if (e.target.dataset && e.target.dataset.instField) { e.target.dataset.dirty = '1'; return; }
   if (e.target.id !== 'ticket-search' && e.target.id !== 'device-search') return;
   clearTimeout(searchTimer);
   searchTimer = setTimeout(function() { if (e.target.id === 'ticket-search') renderTickets(); else renderDevices(); }, 120);
