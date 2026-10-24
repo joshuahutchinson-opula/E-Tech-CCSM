@@ -2092,6 +2092,17 @@ function requireStaff(req, res, next) {
 
 const MAILBOX_DISCONNECTED = 'The support mailbox is disconnected — an admin needs to reconnect it.';
 
+// Turns a failed Graph call into an honest response: disconnected (401/403),
+// too slow (timeout or network error, so no response at all), or a
+// Microsoft error.
+function sendMailboxError(res, err, label) {
+  const status = err.response?.status;
+  console.error(label + ':', status || err.code || '', err.response?.data?.error?.message || err.message);
+  if (status === 401 || status === 403) return res.status(503).json({ error: MAILBOX_DISCONNECTED });
+  if (!err.response && (err.request || err.code)) return res.status(504).json({ error: 'The support mailbox took too long to respond — try again.' });
+  res.status(502).json({ error: `Couldn't load the support mailbox (Microsoft error ${status || 'unknown'}).` });
+}
+
 app.get('/api/outlook/emails', authMiddleware, requireStaff, async (req, res) => {
   const graphToken = await getGraphToken(req);
   // No local `emails` fallback here: a broken connection should show as
@@ -2112,24 +2123,72 @@ app.get('/api/outlook/emails', authMiddleware, requireStaff, async (req, res) =>
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
     const response = await axios.get(endpoint, {
       headers: { Authorization: `Bearer ${graphToken}` },
-      timeout: 8000,
-      params: { 
-        $top: 50, 
-        $orderby: 'receivedDateTime desc', 
+      timeout: 20000,
+      params: {
+        $top: 50,
+        $orderby: 'receivedDateTime desc',
         $filter: `receivedDateTime ge ${thirtyDaysAgo}`,
-        $select: 'id,subject,from,toRecipients,receivedDateTime,bodyPreview,body,isRead,flag,hasAttachments,webLink' 
+        // No body: the list only needs the preview. Opening an email loads
+        // the full body from /api/outlook/message/:id.
+        $select: 'id,subject,from,toRecipients,receivedDateTime,bodyPreview,isRead,flag,hasAttachments,webLink'
       }
     });
     const emails = response.data.value.map(msg => ({
       id: msg.id, sender: msg.from?.emailAddress?.name || 'Unknown', sender_email: msg.from?.emailAddress?.address || '',
       recipient: msg.toRecipients?.map(r => r.emailAddress?.name).join(', ') || '', subject: msg.subject || '(no subject)',
-      body: msg.bodyPreview || '', fullBody: msg.body?.content || '', is_read: msg.isRead, is_flagged: !!msg.flag?.flagStatus,
+      body: msg.bodyPreview || '', is_read: msg.isRead, is_flagged: !!msg.flag?.flagStatus,
       folder: folder, created_at: msg.receivedDateTime, has_attachments: msg.hasAttachments, webLink: msg.webLink
     }));
     res.json(emails);
   } catch (err) {
-    console.error('Outlook fetch error:', err.response?.status || '', err.response?.data?.error?.message || err.message);
-    res.status(503).json({ error: MAILBOX_DISCONNECTED });
+    sendMailboxError(res, err, 'Outlook fetch error');
+  }
+});
+
+const INLINE_IMAGE_MAX_BYTES = 2 * 1024 * 1024;
+
+// One message with its full body. Inline images (src="cid:...") are swapped
+// for data: URLs so they show without the browser needing Graph access.
+app.get('/api/outlook/message/:id', authMiddleware, requireStaff, async (req, res) => {
+  const graphToken = await getGraphToken(req);
+  if (!graphToken) {
+    console.error('Outlook message: no Graph token available for the shared mailbox');
+    return res.status(503).json({ error: MAILBOX_DISCONNECTED });
+  }
+  const messageUrl = `https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/messages/${encodeURIComponent(req.params.id)}`;
+  const headers = { Authorization: `Bearer ${graphToken}` };
+  try {
+    const { data: msg } = await axios.get(messageUrl, {
+      headers, timeout: 20000,
+      params: { $select: 'id,subject,from,toRecipients,receivedDateTime,body,hasAttachments,webLink' }
+    });
+    let fullBody = msg.body?.content || '';
+    if (/cid:/i.test(fullBody)) {
+      // No $select: contentId and contentBytes only exist on fileAttachment,
+      // and Graph rejects selecting them on the base attachment type.
+      const { data: atts } = await axios.get(`${messageUrl}/attachments`, {
+        headers, timeout: 20000,
+        params: { $filter: 'isInline eq true' }
+      });
+      const stripCid = (cid) => cid.trim().replace(/^<|>$/g, '').toLowerCase();
+      const images = {};
+      for (const a of atts.value || []) {
+        if (!a.contentId || !a.contentBytes) continue;
+        if (Math.floor(a.contentBytes.length * 3 / 4) > INLINE_IMAGE_MAX_BYTES) continue; // decoded size
+        images[stripCid(a.contentId)] = `data:${a.contentType || 'application/octet-stream'};base64,${a.contentBytes}`;
+      }
+      fullBody = fullBody.replace(/src\s*=\s*(["'])cid:([^"']+)\1/gi, (match, quote, cid) => {
+        const dataUrl = images[stripCid(cid)];
+        return dataUrl ? `src=${quote}${dataUrl}${quote}` : match;
+      });
+    }
+    res.json({
+      id: msg.id, subject: msg.subject || '(no subject)', sender: msg.from?.emailAddress?.name || 'Unknown',
+      sender_email: msg.from?.emailAddress?.address || '', recipient: msg.toRecipients?.map(r => r.emailAddress?.name).join(', ') || '',
+      created_at: msg.receivedDateTime, fullBody, has_attachments: msg.hasAttachments, webLink: msg.webLink
+    });
+  } catch (err) {
+    sendMailboxError(res, err, 'Outlook message error');
   }
 });
 
