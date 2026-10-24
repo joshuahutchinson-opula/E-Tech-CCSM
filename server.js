@@ -164,6 +164,10 @@ pool.connect((err, client, release) => {
     pool.query('ALTER TABLE clients ADD COLUMN IF NOT EXISTS logo_full_url TEXT')
       .then(() => console.log('✅ clients.logo_full_url column ready'))
       .catch(e => console.error('❌ Could not add clients.logo_full_url:', e.message));
+    // First-login walkthrough (also in migrations/005). NULL = not done yet.
+    pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarded_at TIMESTAMP')
+      .then(() => console.log('✅ users.onboarded_at column ready'))
+      .catch(e => console.error('❌ Could not add users.onboarded_at:', e.message));
   }
 });
 
@@ -435,7 +439,7 @@ app.post('/api/auth/login', loginRateLimit, async (req, res) => {
   // KFTL/KWL/PAJ logins have been retired.
   if (dbConnected && username && username.includes('@')) {
     try {
-      const result = await pool.query('SELECT id,client_id,email,password_hash,role,status FROM users WHERE email=$1', [username.toLowerCase()]);
+      const result = await pool.query('SELECT * FROM users WHERE email=$1', [username.toLowerCase()]);
       const u = result.rows[0];
       if (u && u.status === 'active') {
         const match = await bcrypt.compare(password || '', u.password_hash);
@@ -443,7 +447,7 @@ app.post('/api/auth/login', loginRateLimit, async (req, res) => {
           const token = jwt.sign({ id: u.id, role: u.role }, process.env.JWT_SECRET, { expiresIn: '42d' });
           const clientName = await getClientNameById(u.client_id);
           await logActivity(u.client_id, u.email, 'Login', `${u.role === 'client_admin' ? 'Client admin' : 'Client user'} logged in`);
-          return res.json({ token, user: { id: u.id, username: u.email, email: u.email, client_id: u.client_id, client_name: clientName, role: u.role, photo_url: null } });
+          return res.json({ token, onboarding_required: onboardingRequired(u), user: { id: u.id, username: u.email, email: u.email, client_id: u.client_id, client_name: clientName, role: u.role, photo_url: null } });
         }
       }
     } catch (err) {
@@ -1689,7 +1693,40 @@ app.get('/api/my-client', authMiddleware, async (req, res) => {
   try {
     const result = await pool.query('SELECT id,name,logo_url,logo_full_url FROM clients WHERE id=$1', [req.user.client_id]);
     if (!result.rows[0]) return res.status(404).json({ error: 'Client not found' });
-    res.json(result.rows[0]);
+    // The dashboard checks this on every load to decide on the walkthrough.
+    const me = await pool.query('SELECT * FROM users WHERE id=$1', [req.user.id]);
+    res.json({ ...result.rows[0], onboarding_required: onboardingRequired(me.rows[0] || req.user) });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ---- First-login walkthrough ----
+// Client users (client_admin / client_user) see it until onboarded_at is set.
+function onboardingRequired(u) {
+  return (u.role === 'client_admin' || u.role === 'client_user') && !u.onboarded_at;
+}
+
+app.post('/api/onboarding/complete', authMiddleware, async (req, res) => {
+  if (!isClientAccount(req)) return res.status(403).json({ error: 'Client accounts only' });
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  if (!req.body || req.body.acknowledged !== true) return res.status(400).json({ error: 'Please confirm you understand how to use CAMS (acknowledged: true).' });
+  try {
+    // Only the first completion sets the time (and is logged).
+    const result = await pool.query('UPDATE users SET onboarded_at=CURRENT_TIMESTAMP WHERE id=$1 AND onboarded_at IS NULL', [req.user.id]);
+    if (result.rowCount) await logActivity(req.user.client_id, req.user.email, 'Onboarding', 'Completed CAMS walkthrough');
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/users/:id/reset-onboarding', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id < 1 || id > 2147483647) return res.status(404).json({ error: 'User not found' });
+  try {
+    const result = await pool.query('UPDATE users SET onboarded_at=NULL WHERE id=$1 RETURNING email,client_id', [id]);
+    if (!result.rows[0]) return res.status(404).json({ error: 'User not found' });
+    await logActivity(result.rows[0].client_id, req.user.username, 'Onboarding', `Walkthrough reset for ${result.rows[0].email}`);
+    res.json({ success: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -1896,7 +1933,8 @@ app.post('/api/auth/invite/:token/accept', inviteRateLimit, async (req, res) => 
 
     const token = jwt.sign({ id: userId, role: invite.role }, process.env.JWT_SECRET, { expiresIn: '42d' });
     const clientName = await getClientNameById(invite.client_id);
-    res.json({ token, user: { id: userId, username: invite.email, email: invite.email, client_id: invite.client_id, client_name: clientName, role: invite.role, photo_url: null } });
+    const activated = await pool.query('SELECT * FROM users WHERE id=$1', [userId]);
+    res.json({ token, onboarding_required: onboardingRequired(activated.rows[0]), user: { id: userId, username: invite.email, email: invite.email, client_id: invite.client_id, client_name: clientName, role: invite.role, photo_url: null } });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -1907,7 +1945,7 @@ app.get('/api/users', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.json([]);
   try {
     const users = await pool.query(
-      `SELECT u.id,u.email,u.role,u.status,u.created_at,u.client_id,c.name AS client_name,
+      `SELECT u.id,u.email,u.role,u.status,u.created_at,u.onboarded_at,u.client_id,c.name AS client_name,
               COALESCE(array_agg(z.name) FILTER (WHERE z.name IS NOT NULL), '{}') AS zones
        FROM users u
        JOIN clients c ON c.id = u.client_id
