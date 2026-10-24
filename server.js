@@ -1370,7 +1370,9 @@ app.post('/api/service-requests', authMiddleware, async (req, res) => {
     await pool.query('INSERT INTO sr_history (sr_id,time,msg) VALUES ($1,$2,$3)', [result.rows[0].id, new Date().toLocaleTimeString(), 'Created by ' + req.user.username]);
     await logActivity(clientId, req.user.username, 'Created', 'SR ' + srId + ' created for ' + client);
     
-    const msToken = req.user.msToken;
+    // Shared-mailbox token, not req.user.msToken (which expires after ~1h).
+    const msToken = await getValidGraphToken();
+    if (!msToken) console.error('Cannot send new-SR email — no Graph token available for the shared mailbox');
     if (msToken) {
       const emailBody = `<h2>New Service Request: ${srId}</h2><p><strong>Client:</strong> ${client}</p><p><strong>Site:</strong> ${site}</p><p><strong>Category:</strong> ${category}</p><p><strong>Priority:</strong> ${priority}</p><p><strong>Assigned To:</strong> ${assigned_to}</p><p><strong>Subject:</strong> ${subject}</p><p><strong>Description:</strong> ${body || 'No description'}</p><hr><p>View in CAMS: <a href="${process.env.APP_URL || "https://e-tech-cams.up.railway.app"}">Open Dashboard</a></p>`;
       await sendEmailNotification('support@e-techsystemsja.com', `[CAMS] New SR: ${srId} — ${subject}`, emailBody, `Bearer ${msToken}`);
@@ -1431,7 +1433,8 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
     if (assigned_to && assigned_to !== oldAssigned) {
       await pool.query('INSERT INTO sr_history (sr_id,time,msg) VALUES ($1,$2,$3)', [id, new Date().toLocaleTimeString(), `Transferred from ${oldAssigned||'Unassigned'} to ${assigned_to} by ${req.user.username}`]);
       
-      const msToken = req.user.msToken;
+      const msToken = await getValidGraphToken();
+      if (!msToken) console.error('Cannot send assigned email — no Graph token available for the shared mailbox');
       if (msToken && assigned_to !== 'Unassigned' && TECH_EMAILS[assigned_to]) {
         const techEmailBody = `<h2>You've been assigned a Service Request</h2><p><strong>SR ID:</strong> ${oldSr.sr_id}</p><p><strong>Subject:</strong> ${oldSr.subject}</p><p><strong>Client:</strong> ${oldSr.client}</p><p><strong>Site:</strong> ${oldSr.site}</p><p><strong>Priority:</strong> ${priority || oldSr.priority}</p><hr><p>View in CAMS: <a href="${process.env.APP_URL || "https://e-tech-cams.up.railway.app"}">Open Dashboard</a></p>`;
         await sendEmailNotification(TECH_EMAILS[assigned_to], `[CAMS] Assigned: ${oldSr.sr_id} — ${oldSr.subject}`, techEmailBody, `Bearer ${msToken}`);
@@ -1515,7 +1518,8 @@ app.post('/api/service-requests/:id/transfer', authMiddleware, async (req, res) 
     await pool.query('INSERT INTO sr_history (sr_id,time,msg) VALUES ($1,$2,$3)', [id, new Date().toLocaleTimeString(), `Transferred from ${oldAssigned||'Unassigned'} to ${assigned_to} by ${req.user.username}`]);
     await logActivity(1, req.user.username, 'Assigned', 'SR ' + id + ' transferred to ' + assigned_to);
     
-    const msToken = req.user.msToken;
+    const msToken = await getValidGraphToken();
+    if (!msToken) console.error('Cannot send assigned email — no Graph token available for the shared mailbox');
     if (msToken && assigned_to !== 'Unassigned' && TECH_EMAILS[assigned_to]) {
       const sr = current.rows[0];
       const techEmailBody = `<h2>You've been assigned a Service Request</h2><p><strong>SR ID:</strong> ${sr.sr_id}</p><p><strong>Subject:</strong> ${sr.subject}</p><p><strong>Client:</strong> ${sr.client}</p><p><strong>Site:</strong> ${sr.site}</p><p><strong>Priority:</strong> ${sr.priority}</p><hr><p>View in CAMS: <a href="${process.env.APP_URL || "https://e-tech-cams.up.railway.app"}">Open Dashboard</a></p>`;
@@ -2071,22 +2075,30 @@ app.post('/api/activity-log', authMiddleware, async (req, res) => {
 // OUTLOOK — SHARED MAILBOX support@e-techsystemsja.com
 // ============================================================
 
-// Shared mailbox access requires the current user to have personally signed in
-// via Microsoft SSO (req.user.msToken) — by design, only Microsoft-login users
-// can see the support inbox. No app-level fallback token here on purpose.
-// (The scheduled monthly reports are separate and still use MS_GRAPH_TOKEN.)
-function getGraphToken(req) {
-  return req.user.msToken || null;
+// The inbox uses the self-refreshing shared-mailbox token (graph_auth,
+// connected via /api/admin/graph-auth/start), not req.user.msToken. The
+// msToken in the CAMS JWT is a Microsoft access token that expires after
+// about an hour, while the JWT lasts 42 days, so the inbox used to go
+// stale until the person logged out and back in.
+async function getGraphToken(req) {
+  return await getValidGraphToken();
 }
 
-app.get('/api/outlook/emails', authMiddleware, async (req, res) => {
-  const graphToken = getGraphToken(req);
+// Staff only. Clients must never reach the support inbox.
+function requireStaff(req, res, next) {
+  if (req.user.role !== 'admin' && req.user.role !== 'technician') return res.status(403).json({ error: 'Not authorized' });
+  next();
+}
+
+const MAILBOX_DISCONNECTED = 'The support mailbox is disconnected — an admin needs to reconnect it.';
+
+app.get('/api/outlook/emails', authMiddleware, requireStaff, async (req, res) => {
+  const graphToken = await getGraphToken(req);
+  // No local `emails` fallback here: a broken connection should show as
+  // broken, not as stale mail.
   if (!graphToken) {
-    try {
-      const folder = req.query.folder || 'inbox';
-      const result = await pool.query('SELECT * FROM emails WHERE folder=$1 ORDER BY created_at DESC LIMIT 100', [folder]);
-      return res.json(result.rows);
-    } catch (dbErr) { return res.json([]); }
+    console.error('Outlook fetch: no Graph token available for the shared mailbox');
+    return res.status(503).json({ error: MAILBOX_DISCONNECTED });
   }
   try {
     const folder = req.query.folder || 'inbox';
@@ -2116,18 +2128,15 @@ app.get('/api/outlook/emails', authMiddleware, async (req, res) => {
     }));
     res.json(emails);
   } catch (err) {
-    console.error('Outlook fetch error:', err.message);
-    try {
-      const folder = req.query.folder || 'inbox';
-      const result = await pool.query('SELECT * FROM emails WHERE folder=$1 ORDER BY created_at DESC LIMIT 100', [folder]);
-      return res.json(result.rows);
-    } catch (dbErr) { res.json([]); }
+    console.error('Outlook fetch error:', err.response?.status || '', err.response?.data?.error?.message || err.message);
+    res.status(503).json({ error: MAILBOX_DISCONNECTED });
   }
 });
 
-app.post('/api/outlook/send', authMiddleware, async (req, res) => {
+app.post('/api/outlook/send', authMiddleware, requireStaff, async (req, res) => {
   const { to, cc, subject, body } = req.body;
-  const graphToken = getGraphToken(req);
+  const graphToken = await getGraphToken(req);
+  if (!graphToken) console.error('Outlook send: no Graph token available for the shared mailbox');
   try {
     if (!graphToken) throw new Error('No Microsoft Graph token available');
     const emailData = { message: { subject, body: { contentType: 'HTML', content: body }, toRecipients: to.split(',').map(email => ({ emailAddress: { address: email.trim() } })) } };
@@ -2149,23 +2158,23 @@ app.post('/api/outlook/send', authMiddleware, async (req, res) => {
   }
 });
 
-app.post('/api/outlook/read/:id', authMiddleware, async (req, res) => {
-  const graphToken = getGraphToken(req);
+app.post('/api/outlook/read/:id', authMiddleware, requireStaff, async (req, res) => {
+  const graphToken = await getGraphToken(req);
   if (!graphToken) return res.status(503).json({ error: 'No Microsoft Graph token available' });
   try { await axios.patch(`https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/messages/${req.params.id}`, { isRead: true }, { headers: { Authorization: `Bearer ${graphToken}`, 'Content-Type': 'application/json' }, timeout: 8000 }); res.json({ success: true }); }
   catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.post('/api/outlook/flag/:id', authMiddleware, async (req, res) => {
+app.post('/api/outlook/flag/:id', authMiddleware, requireStaff, async (req, res) => {
   const { flagged } = req.body;
-  const graphToken = getGraphToken(req);
+  const graphToken = await getGraphToken(req);
   if (!graphToken) return res.status(503).json({ error: 'No Microsoft Graph token available' });
   try { await axios.patch(`https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/messages/${req.params.id}`, { flag: flagged ? { flagStatus: 'flagged' } : { flagStatus: 'notFlagged' } }, { headers: { Authorization: `Bearer ${graphToken}`, 'Content-Type': 'application/json' }, timeout: 8000 }); res.json({ success: true }); }
   catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.post('/api/outlook/delete/:id', authMiddleware, async (req, res) => {
-  const graphToken = getGraphToken(req);
+app.post('/api/outlook/delete/:id', authMiddleware, requireStaff, async (req, res) => {
+  const graphToken = await getGraphToken(req);
   if (!graphToken) return res.status(503).json({ error: 'No Microsoft Graph token available' });
   try { await axios.post(`https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/messages/${req.params.id}/move`, { destinationId: 'deleteditems' }, { headers: { Authorization: `Bearer ${graphToken}`, 'Content-Type': 'application/json' }, timeout: 8000 }); res.json({ success: true }); }
   catch (err) { res.status(500).json({ error: err.message }); }
@@ -2174,6 +2183,9 @@ app.post('/api/outlook/delete/:id', authMiddleware, async (req, res) => {
 // ============================================================
 // FILES — MICROSOFT GRAPH ONEDRIVE
 // ============================================================
+// These read each person's own drive, so they stay on req.user.msToken.
+// That token has the same one-hour expiry the inbox used to hit: after an
+// hour these fail until the person signs in with Microsoft again.
 
 app.get('/api/files/graph', authMiddleware, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
