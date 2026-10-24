@@ -159,6 +159,11 @@ pool.connect((err, client, release) => {
     console.log('✅ DB Connected');
     dbConnected = true;
     release();
+    // Schema change for client full logos (also in migrations/004). Safe to
+    // re-run; a failure is logged and the server keeps running.
+    pool.query('ALTER TABLE clients ADD COLUMN IF NOT EXISTS logo_full_url TEXT')
+      .then(() => console.log('✅ clients.logo_full_url column ready'))
+      .catch(e => console.error('❌ Could not add clients.logo_full_url:', e.message));
   }
 });
 
@@ -1672,17 +1677,47 @@ app.get('/api/clients', authMiddleware, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
   if (!dbConnected) return res.json([]);
   try {
-    const result = await pool.query('SELECT id,name,email,phone,address,logo_url FROM clients');
+    const result = await pool.query('SELECT id,name,email,phone,address,logo_url,logo_full_url FROM clients');
     res.json(result.rows);
   } catch (err) { res.json([]); }
 });
 
+// The signed-in client's own name and logos, for their top bar and avatar.
+app.get('/api/my-client', authMiddleware, async (req, res) => {
+  if (!isClientAccount(req)) return res.status(403).json({ error: 'Client accounts only' });
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  try {
+    const result = await pool.query('SELECT id,name,logo_url,logo_full_url FROM clients WHERE id=$1', [req.user.client_id]);
+    if (!result.rows[0]) return res.status(404).json({ error: 'Client not found' });
+    res.json(result.rows[0]);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Client logos are PNG data URLs made by the dashboard's logo processing.
+const CLIENT_LOGO_MAX_BYTES = 400 * 1024;
+const LOGO_FIELDS = ['logo_url', 'logo_full_url'];
+// Returns an error message, or null when every logo field present is
+// empty/null or a PNG data URL of at most 400 KB.
+function invalidClientLogo(body) {
+  for (const key of LOGO_FIELDS) {
+    const v = body[key];
+    if (v == null || v === '') continue;
+    const m = typeof v === 'string' && v.match(/^data:image\/png;base64,([A-Za-z0-9+/]+={0,2})$/);
+    if (!m) return `${key} must be a PNG image (data:image/png;base64,…).`;
+    const bytes = Math.floor(m[1].length * 3 / 4) - (m[1].endsWith('==') ? 2 : m[1].endsWith('=') ? 1 : 0);
+    if (bytes > CLIENT_LOGO_MAX_BYTES) return `${key} is too large — logos must be at most 400 KB.`;
+  }
+  return null;
+}
+
 app.post('/api/clients', authMiddleware, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
-  const { name, email, phone, address, logo_url } = req.body;
+  const { name, email, phone, address } = req.body;
+  const badLogo = invalidClientLogo(req.body);
+  if (badLogo) return res.status(400).json({ error: badLogo });
   try {
-    const result = await pool.query('INSERT INTO clients (name,email,phone,address,logo_url) VALUES ($1,$2,$3,$4,$5) RETURNING *', [name,email,phone,address,logo_url]);
+    const result = await pool.query('INSERT INTO clients (name,email,phone,address,logo_url,logo_full_url) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *', [name,email,phone,address,req.body.logo_url||null,req.body.logo_full_url||null]);
     await logActivity(1, req.user.username, 'Created', 'Client ' + name + ' added');
     res.json(result.rows[0]);
   } catch (err) { res.status(500).json({ error: err.message }); }
@@ -1692,9 +1727,18 @@ app.put('/api/clients/:name', authMiddleware, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { name } = req.params;
-  const { email, phone, address, logo_url } = req.body;
+  const { email, phone, address } = req.body;
+  const badLogo = invalidClientLogo(req.body);
+  if (badLogo) return res.status(400).json({ error: badLogo });
+  // A logo only changes when its key is in the body, so a normal edit
+  // never wipes the logos.
+  const sets = ['email=$1', 'phone=$2', 'address=$3'], params = [email||'', phone||'', address||''];
+  for (const key of LOGO_FIELDS) {
+    if (Object.prototype.hasOwnProperty.call(req.body, key)) { params.push(req.body[key] || null); sets.push(`${key}=$${params.length}`); }
+  }
+  params.push(name);
   try {
-    const result = await pool.query('UPDATE clients SET email=$1,phone=$2,address=$3,logo_url=$4,updated_at=CURRENT_TIMESTAMP WHERE name=$5 RETURNING *', [email||'',phone||'',address||'',logo_url||'',name]);
+    const result = await pool.query(`UPDATE clients SET ${sets.join(',')},updated_at=CURRENT_TIMESTAMP WHERE name=$${params.length} RETURNING *`, params);
     if (result.rowCount === 0) return res.status(404).json({ error: 'Client not found' });
     await logActivity(1, req.user.username, 'Updated', 'Client ' + name + ' updated');
     res.json(result.rows[0]);
