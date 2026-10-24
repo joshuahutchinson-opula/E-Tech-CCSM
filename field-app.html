@@ -51,7 +51,7 @@
       --header-h: 56px;
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       /* the tab bar's real height, inset included; measured by measureTabbar() */
-      --tabbar-actual: calc(53px + var(--safe-bottom));
+      --tabbar-actual: calc(53px + max(0px, calc(var(--safe-bottom) - 18px)));
       --safe-top: env(safe-area-inset-top, 0px);
       --radius: 14px;
       --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -451,7 +451,7 @@
     /* ---------- Tab bar ---------- */
     .tabbar {
       flex-shrink: 0; position: relative; z-index: 30;
-      display: flex; padding-bottom: var(--safe-bottom);
+      display: flex; padding-bottom: max(0px, calc(var(--safe-bottom) - 18px));
       background: var(--surface); border-top: 1px solid var(--border);
     }
     .tabbar button {
