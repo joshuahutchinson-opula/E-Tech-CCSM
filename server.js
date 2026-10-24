@@ -279,6 +279,49 @@ async function sendEmailNotification(to, subject, body, authHeader) {
   }
 }
 
+// Every active user of a client, lowercased and de-duplicated.
+async function getClientUserEmails(clientId) {
+  const result = await pool.query("SELECT DISTINCT LOWER(email) AS email FROM users WHERE client_id=$1 AND status='active'", [clientId]);
+  return result.rows.map(r => r.email);
+}
+
+// One email per client user (never a shared To/CC). Returns how many were
+// sent; skips without a client or token, and never throws.
+async function notifyClientUsers(clientId, subject, html, token) {
+  if (!clientId || !token) return 0;
+  let sent = 0;
+  try {
+    for (const email of await getClientUserEmails(clientId)) {
+      if (await sendEmailNotification(email, subject, html, `Bearer ${token}`)) sent++;
+    }
+  } catch (err) {
+    console.error('Could not notify client users:', err.message);
+  }
+  return sent;
+}
+
+// Client-facing SR emails: every SR value is escaped; internal notes are never included.
+const isRealTech = name => typeof name === 'string' && name.trim() !== '' && name.trim() !== 'Unassigned';
+function srClientEmailHtml(heading, rows, closing) {
+  const appUrl = process.env.APP_URL || "https://e-tech-cams.up.railway.app";
+  return `<h2>${escapeHtml(heading)}</h2>` +
+    rows.map(([label, value]) => `<p><strong>${label}:</strong> ${escapeHtml(value == null || value === '' ? '—' : value)}</p>`).join('') +
+    (closing ? `<p>${escapeHtml(closing)}</p>` : '') +
+    `<hr><p>View in CAMS: <a href="${appUrl}">Open CAMS</a></p>`;
+}
+function notifyRequestReceived(sr, token) {
+  if (!sr || !sr.client_id) return Promise.resolve(0);
+  return notifyClientUsers(sr.client_id, `[CAMS] Request received: ${sr.sr_id} — ${sr.subject}`,
+    srClientEmailHtml(`Request received: ${sr.sr_id}`, [['SR ID', sr.sr_id], ['Subject', sr.subject], ['Site', sr.site], ['Priority', sr.priority]],
+      'E-Tech has been notified and will assign a technician.'), token);
+}
+function notifyTechnicianAssigned(sr, tech, priority, token) {
+  if (!sr || !sr.client_id || !isRealTech(tech)) return Promise.resolve(0);
+  return notifyClientUsers(sr.client_id, `[CAMS] Technician assigned: ${sr.sr_id} — ${sr.subject}`,
+    srClientEmailHtml(`Technician assigned: ${sr.sr_id}`, [['SR ID', sr.sr_id], ['Subject', sr.subject], ['Site', sr.site], ['Priority', priority || sr.priority], ['Technician', tech]],
+      `${tech} from E-Tech has been assigned to your request.`), token);
+}
+
 // ============================================================
 // AUTH MIDDLEWARE
 // ============================================================
@@ -1390,8 +1433,9 @@ app.post('/api/service-requests', authMiddleware, async (req, res) => {
         const techEmailBody = `<h2>You've been assigned a Service Request</h2><p><strong>SR ID:</strong> ${srId}</p><p><strong>Subject:</strong> ${subject}</p><p><strong>Client:</strong> ${client}</p><p><strong>Site:</strong> ${site}</p><p><strong>Priority:</strong> ${priority}</p><hr><p>View in CAMS: <a href="${process.env.APP_URL || "https://e-tech-cams.up.railway.app"}">Open Dashboard</a></p>`;
         await sendEmailNotification(TECH_EMAILS[assigned_to], `[CAMS] Assigned: ${srId} — ${subject}`, techEmailBody, `Bearer ${msToken}`);
       }
+      await notifyRequestReceived(result.rows[0], msToken);
     }
-    
+
     res.json(result.rows[0]);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -1448,6 +1492,7 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
         const techEmailBody = `<h2>You've been assigned a Service Request</h2><p><strong>SR ID:</strong> ${oldSr.sr_id}</p><p><strong>Subject:</strong> ${oldSr.subject}</p><p><strong>Client:</strong> ${oldSr.client}</p><p><strong>Site:</strong> ${oldSr.site}</p><p><strong>Priority:</strong> ${priority || oldSr.priority}</p><hr><p>View in CAMS: <a href="${process.env.APP_URL || "https://e-tech-cams.up.railway.app"}">Open Dashboard</a></p>`;
         await sendEmailNotification(TECH_EMAILS[assigned_to], `[CAMS] Assigned: ${oldSr.sr_id} — ${oldSr.subject}`, techEmailBody, `Bearer ${msToken}`);
       }
+      if (msToken && updateResult.rowCount > 0) await notifyTechnicianAssigned(oldSr, assigned_to, priority, msToken);
     }
     
     // One timeline entry per field that actually changed (an assignee change
@@ -1493,18 +1538,7 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
         // users yet (still on the shared KFTL/KWL/PAJ-style logins), so
         // this is expected to no-op for now — that's fine, the support@
         // email above always goes out regardless.
-        let clientUsersNotified = 0;
-        if (sr.client_id) {
-          try {
-            const clientUsers = await pool.query("SELECT email FROM users WHERE client_id=$1 AND status='active'", [sr.client_id]);
-            for (const u of clientUsers.rows) {
-              const sent = await sendEmailNotification(u.email, resolvedSubject, reportBody, authHeader);
-              if (sent) clientUsersNotified++;
-            }
-          } catch (notifyErr) {
-            console.error('Could not notify client users of SR resolution:', notifyErr.message);
-          }
-        }
+        const clientUsersNotified = await notifyClientUsers(sr.client_id, resolvedSubject, reportBody, graphToken);
         await logActivity(logClientId, req.user.username, 'Notified', `SR ${sr.sr_id} resolution emailed to support@e-techsystemsja.com` + (clientUsersNotified > 0 ? ` and ${clientUsersNotified} registered client user${clientUsersNotified === 1 ? '' : 's'}` : ' (no registered client users to notify)'));
       } else {
         console.error('Cannot send SR-resolved email — no Graph token available for the shared mailbox');
@@ -1534,6 +1568,7 @@ app.post('/api/service-requests/:id/transfer', authMiddleware, async (req, res) 
       const techEmailBody = `<h2>You've been assigned a Service Request</h2><p><strong>SR ID:</strong> ${sr.sr_id}</p><p><strong>Subject:</strong> ${sr.subject}</p><p><strong>Client:</strong> ${sr.client}</p><p><strong>Site:</strong> ${sr.site}</p><p><strong>Priority:</strong> ${sr.priority}</p><hr><p>View in CAMS: <a href="${process.env.APP_URL || "https://e-tech-cams.up.railway.app"}">Open Dashboard</a></p>`;
       await sendEmailNotification(TECH_EMAILS[assigned_to], `[CAMS] Assigned: ${sr.sr_id} — ${sr.subject}`, techEmailBody, `Bearer ${msToken}`);
     }
+    if (msToken && assigned_to !== oldAssigned) await notifyTechnicianAssigned(current.rows[0], assigned_to, null, msToken);
     
     const updated = await pool.query('SELECT * FROM service_requests WHERE id=$1', [id]);
     res.json({ success: true, data: updated.rows[0] });
@@ -2585,7 +2620,14 @@ function formatDateRange(start, end) {
   return `${start.toLocaleDateString('en-GB', options)} — ${end.toLocaleDateString('en-GB', options)}`;
 }
 
-async function generateClientReport(clientId, clientName, clientEmail, msToken) {
+// Monthly report recipients: the client's contact email plus every active
+// client user, lowercased and de-duplicated.
+async function clientReportRecipients(client) {
+  const all = [client.email, ...(await getClientUserEmails(client.id))];
+  return [...new Set(all.filter(e => typeof e === 'string' && e.trim()).map(e => e.trim().toLowerCase()))];
+}
+
+async function generateClientReport(clientId, clientName, recipients, msToken) {
   const { start, end } = getMonthRange();
   const dateRangeStr = formatDateRange(start, end);
 
@@ -2660,10 +2702,12 @@ async function generateClientReport(clientId, clientName, clientEmail, msToken) 
       <p style="color:#666;font-size:12px;">— E-Tech Systems Support</p>
     </div>`;
 
-  if (clientEmail) {
-    await sendEmailNotification(clientEmail, `[CAMS] Monthly Report — ${clientName} — ${dateRangeStr}`, emailBody, `Bearer ${msToken}`);
-    console.log(`✅ Client report sent to ${clientName} (${clientEmail})`);
+  // One email per recipient, never a shared To/CC.
+  let sent = 0;
+  for (const to of recipients) {
+    if (await sendEmailNotification(to, `[CAMS] Monthly Report — ${clientName} — ${dateRangeStr}`, emailBody, `Bearer ${msToken}`)) sent++;
   }
+  console.log(`✅ Client report for ${clientName} sent to ${sent} of ${recipients.length} recipient(s)`);
 }
 
 async function generateAdminReport(msToken) {
@@ -2827,13 +2871,18 @@ async function runMonthlyReports() {
     
     await generateAdminReport(msToken);
     
-    const clients = await pool.query('SELECT id,name,email FROM clients WHERE email IS NOT NULL AND email != \'\'');
+    // Every client with at least one recipient (contact email or active user).
+    const clients = await pool.query('SELECT id,name,email FROM clients ORDER BY id');
+    let clientsEmailed = 0;
     for (const client of clients.rows) {
-      await generateClientReport(client.id, client.name, client.email, msToken);
+      const recipients = await clientReportRecipients(client);
+      if (!recipients.length) continue;
+      await generateClientReport(client.id, client.name, recipients, msToken);
+      clientsEmailed++;
     }
-    
+
     console.log('✅ Monthly reports completed');
-    return { sent: true, clientsEmailed: clients.rows.length };
+    return { sent: true, clientsEmailed };
   } catch (err) {
     console.error('❌ Report generation failed:', err.message);
     return { sent: false, reason: err.message };
