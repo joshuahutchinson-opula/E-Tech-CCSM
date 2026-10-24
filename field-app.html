@@ -49,8 +49,9 @@
       --shadow: 0 -8px 32px rgba(0, 0, 0, 0.45);
       --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       --header-h: 56px;
-      --tabbar-h: 60px;
       --safe-bottom: env(safe-area-inset-bottom, 0px);
+      /* the tab bar's real height, inset included; measured by measureTabbar() */
+      --tabbar-actual: calc(53px + var(--safe-bottom));
       --safe-top: env(safe-area-inset-top, 0px);
       --radius: 14px;
       --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -193,7 +194,9 @@
     }
     .ptr span { padding-bottom: 10px; display: inline-flex; align-items: center; gap: 6px; }
 
-    .tab-page { display: none; padding: 12px 16px 96px; }
+    /* The tab bar sits below .field-content in the column, never over it,
+       so pages only need ordinary bottom padding. */
+    .tab-page { display: none; padding: 12px 16px 16px; }
     .tab-page.active { display: block; animation: pageIn 200ms var(--ease); }
     @keyframes pageIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
@@ -452,8 +455,8 @@
       background: var(--surface); border-top: 1px solid var(--border);
     }
     .tabbar button {
-      flex: 1; min-height: var(--tabbar-h); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-      font-size: 12px; font-weight: 600; color: var(--text-3); position: relative; white-space: nowrap; min-width: 0;
+      flex: 1; min-height: 44px; padding: 6px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+      font-size: 12px; font-weight: 600; line-height: 1.2; color: var(--text-3); position: relative; white-space: nowrap; min-width: 0;
     }
     .tabbar button i { font-size: 24px; transition: transform 150ms var(--ease); }
     .tabbar button[aria-current="page"] { color: var(--accent); }
@@ -469,7 +472,7 @@
     /* ---------- Toasts ---------- */
     .toast-container {
       position: fixed; left: 50%; transform: translateX(-50%); z-index: 90;
-      bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 16px);
+      bottom: calc(var(--tabbar-actual) + 16px);
       width: calc(100% - 32px); max-width: 420px;
       display: flex; flex-direction: column; gap: 8px; pointer-events: none;
     }
@@ -2934,9 +2937,23 @@ document.addEventListener('input', function(e) {
 });
 
 // ============================================================
+// TAB BAR HEIGHT
+// ============================================================
+// --tabbar-actual = the bar's rendered height (content + home-indicator
+// inset), for things positioned just above it (toasts). The bar is hidden
+// until sign-in, so it's re-measured whenever its size changes.
+function measureTabbar() {
+  var bar = document.querySelector('.tabbar');
+  if (bar && bar.offsetHeight) document.documentElement.style.setProperty('--tabbar-actual', bar.offsetHeight + 'px');
+}
+if (window.ResizeObserver) new ResizeObserver(measureTabbar).observe(document.querySelector('.tabbar'), { box: 'border-box' });
+window.addEventListener('resize', measureTabbar);
+
+// ============================================================
 // START
 // ============================================================
 setTheme(localStorage.getItem('ccsm_theme') || 'dark');
+measureTabbar();
 checkLogin();
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(function(err) { console.log('Service worker not registered:', err.message); });
