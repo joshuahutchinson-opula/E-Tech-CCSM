@@ -170,9 +170,14 @@ pool.connect((err, client, release) => {
       .catch(e => console.error('❌ Could not add users.onboarded_at:', e.message));
     // Stored monthly reports (also in migrations/006). Once ready, sends a
     // missed monthly report and retries failed deliveries.
+    // Password reset links (also in migrations/007).
+    runSchema(PASSWORD_RESET_SCHEMA)
+      .then(() => console.log('✅ Password reset tables ready'))
+      .catch(e => console.error('❌ Could not create password reset tables:', e.message));
     ensureReportTables()
-      .then(() => { console.log('✅ Report tables ready'); return runReportMaintenance(); })
-      .catch(e => console.error('❌ Could not create report tables:', e.message));
+      .then(() => { console.log('✅ Report tables ready'); return runSchema(EXPIRY_ALERT_SCHEMA); })
+      .then(() => { console.log('✅ Expiry alert tables ready'); return runReportMaintenance(); })
+      .catch(e => console.error('❌ Could not create report or expiry alert tables:', e.message));
   }
 });
 
@@ -380,10 +385,14 @@ function notifyTechnicianAssigned(sr, tech, priority, token) {
 // DB on every request. Staff token shapes (admin, technician) already carry
 // client_id directly in the token and are left untouched — they don't hit
 // the DB here at all.
+const PASSWORD_CHANGED = Symbol('password changed');
+
 async function loadFreshUserPermissions(decoded) {
-  const result = await pool.query('SELECT id,email,client_id,role,status FROM users WHERE id=$1', [decoded.id]);
+  const result = await pool.query('SELECT id,email,client_id,role,status,password_changed_at FROM users WHERE id=$1', [decoded.id]);
   const u = result.rows[0];
   if (!u || u.status !== 'active') return null;
+  // A password reset signs out every session issued before it.
+  if (u.password_changed_at && (decoded.iat || 0) * 1000 < new Date(u.password_changed_at).getTime()) return PASSWORD_CHANGED;
   const user = { id: u.id, username: u.email, email: u.email, client_id: u.client_id, role: u.role };
   if (u.role === 'client_user') {
     const zoneRows = await pool.query('SELECT z.name FROM user_zone_access uza JOIN zones z ON z.id=uza.zone_id WHERE uza.user_id=$1', [u.id]);
@@ -426,6 +435,7 @@ async function authMiddleware(req, res, next) {
       // A database hiccup is not a reason to sign the person out.
       return res.status(503).json({ error: 'Service temporarily unavailable' });
     }
+    if (user === PASSWORD_CHANGED) return res.status(401).json({ error: 'Your password was changed.' });
     if (!user) return res.status(401).json({ error: 'Account no longer active' });
     req.user = user;
   } else {
@@ -489,6 +499,15 @@ const loginRateLimit = rateLimit({
 });
 
 const inviteRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many attempts. Try again in a few minutes.' }
+});
+
+// Forgot password and reset links (kept apart from the invite counter).
+const passwordResetRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
   standardHeaders: true,
@@ -2026,6 +2045,112 @@ app.post('/api/auth/invite/:token/accept', inviteRateLimit, async (req, res) => 
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// ---- Forgot password (client accounts) ----
+// Same token scheme as invites: the email carries a random token, only its
+// SHA-256 is stored. A link lasts an hour and works once; asking again
+// replaces any earlier unused link. Resetting signs out older sessions (see
+// loadFreshUserPermissions).
+
+const PASSWORD_RESET_MINUTES = 60;
+const FORGOT_PASSWORD_MESSAGE = 'If that email has a CAMS account, a reset link is on its way.';
+
+async function sendPasswordResetEmail(user) {
+  const { token, tokenHash } = generateInviteToken();
+  const expiresAt = new Date(Date.now() + PASSWORD_RESET_MINUTES * 60 * 1000);
+  await pool.query('DELETE FROM password_resets WHERE user_id=$1 AND used_at IS NULL', [user.id]);
+  await pool.query('INSERT INTO password_resets (user_id, token_hash, expires_at) VALUES ($1, $2, $3)', [user.id, tokenHash, expiresAt]);
+  const appUrl = process.env.APP_URL || 'https://e-tech-cams.up.railway.app';
+  const link = `${appUrl}/reset-password.html?token=${token}`;
+  const expiry = expiresAt.toLocaleString('en-GB', { timeZone: 'America/Jamaica', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
+  const body = `<h2>Reset your CAMS password</h2><p>Someone asked to reset the password for <strong>${escapeHtml(user.email)}</strong> on E-Tech's Client Asset Management System.</p><p><a href="${escapeHtml(link)}">Click here to choose a new password</a></p><p>This link expires in 1 hour (${escapeHtml(expiry)}, Jamaica time) and works once.</p><hr><p style="color:#888;font-size:12px;">If you didn't ask for this, ignore this email. Your password won't change.</p>`;
+  const graphToken = await getValidGraphToken();
+  if (!graphToken) {
+    console.error('Cannot send password reset email — no Graph token available for the shared mailbox');
+    return false;
+  }
+  return sendEmailNotification(user.email, '[CAMS] Reset your password', body, `Bearer ${graphToken}`);
+}
+
+// Returns { reset } or { status, error } for a reset link token.
+async function findPasswordReset(token) {
+  const tokenHash = crypto.createHash('sha256').update(String(token)).digest('hex');
+  const result = await pool.query(
+    `SELECT r.id, r.user_id, r.expires_at, r.used_at, u.email, u.role, u.client_id, u.status
+     FROM password_resets r JOIN users u ON u.id = r.user_id WHERE r.token_hash=$1`,
+    [tokenHash]
+  );
+  const reset = result.rows[0];
+  if (!reset) return { status: 404, error: 'This reset link was not found. Ask for a new one from the sign-in page.' };
+  if (reset.used_at) return { status: 410, error: 'This reset link has already been used. Ask for a new one from the sign-in page.' };
+  if (new Date(reset.expires_at) < new Date() || reset.status !== 'active') return { status: 410, error: 'This reset link has expired. Ask for a new one from the sign-in page.' };
+  return { reset };
+}
+
+// Always the same answer, sent before any lookup, so it never reveals
+// whether an email has an account.
+app.post('/api/auth/forgot-password', passwordResetRateLimit, async (req, res) => {
+  const email = typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
+  res.json({ message: FORGOT_PASSWORD_MESSAGE });
+  if (!dbConnected || !EMAIL_ADDRESS_RE.test(email)) return;
+  try {
+    const result = await pool.query("SELECT id, email, client_id FROM users WHERE LOWER(email)=$1 AND status='active'", [email]);
+    if (!result.rows[0]) return;
+    await sendPasswordResetEmail(result.rows[0]);
+    await logActivity(result.rows[0].client_id, result.rows[0].email, 'Password reset', 'Password reset link requested');
+  } catch (err) {
+    console.error('Forgot password failed:', err.message);
+  }
+});
+
+app.get('/api/auth/reset-password/:token', passwordResetRateLimit, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  try {
+    const found = await findPasswordReset(req.params.token);
+    if (found.error) return res.status(found.status).json({ error: found.error });
+    res.json({ email: found.reset.email });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/auth/reset-password/:token', passwordResetRateLimit, async (req, res) => {
+  if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
+  const { password } = req.body || {};
+  if (typeof password !== 'string' || password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
+  try {
+    const found = await findPasswordReset(req.params.token);
+    if (found.error) return res.status(found.status).json({ error: found.error });
+    const reset = found.reset;
+    // Claim the link first so two submissions can't both use it.
+    const claim = await pool.query('UPDATE password_resets SET used_at=CURRENT_TIMESTAMP WHERE id=$1 AND used_at IS NULL RETURNING id', [reset.id]);
+    if (!claim.rowCount) return res.status(410).json({ error: 'This reset link has already been used. Ask for a new one from the sign-in page.' });
+    const passwordHash = await bcrypt.hash(password, 12);
+    // Whole seconds, because JWT iat is in seconds: the session issued below
+    // is not older than this, so it stays signed in.
+    const changedAt = new Date(Math.floor(Date.now() / 1000) * 1000);
+    await pool.query('UPDATE users SET password_hash=$1, password_changed_at=$2 WHERE id=$3', [passwordHash, changedAt, reset.user_id]);
+    await pool.query('DELETE FROM password_resets WHERE user_id=$1 AND used_at IS NULL', [reset.user_id]);
+    await logActivity(reset.client_id, reset.email, 'Password reset', 'Password changed with a reset link');
+
+    const token = jwt.sign({ id: reset.user_id, role: reset.role }, process.env.JWT_SECRET, { expiresIn: '42d' });
+    const clientName = await getClientNameById(reset.client_id);
+    const user = await pool.query('SELECT * FROM users WHERE id=$1', [reset.user_id]);
+    res.json({ token, onboarding_required: onboardingRequired(user.rows[0]), user: { id: reset.user_id, username: reset.email, email: reset.email, client_id: reset.client_id, client_name: clientName, role: reset.role, photo_url: null } });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/users/:id/send-password-reset', authMiddleware, requireAdmin, async (req, res) => {
+  const id = parseReportId(req.params.id);
+  if (!id) return res.status(404).json({ error: 'User not found' });
+  try {
+    const result = await pool.query('SELECT id, email, client_id, status FROM users WHERE id=$1', [id]);
+    const u = result.rows[0];
+    if (!u) return res.status(404).json({ error: 'User not found' });
+    if (u.status !== 'active') return res.status(400).json({ error: 'Only active users can be sent a password reset.' });
+    if (!(await sendPasswordResetEmail(u))) return res.status(502).json({ error: "Couldn't send the email — check the support mailbox connection." });
+    await logActivity(u.client_id, req.user.username, 'Password reset', `Sent a password reset link to ${u.email}`);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 // ---- E-Tech admin "Users" panel — cross-client ----
 
 app.get('/api/users', authMiddleware, async (req, res) => {
@@ -2725,9 +2850,50 @@ const REPORT_SCHEMA = [
   `INSERT INTO report_admin_settings (id) VALUES (1) ON CONFLICT (id) DO NOTHING`,
 ];
 
-async function ensureReportTables() {
-  for (const sql of REPORT_SCHEMA) await pool.query(sql);
+async function runSchema(statements) {
+  for (const sql of statements) await pool.query(sql);
 }
+
+function ensureReportTables() {
+  return runSchema(REPORT_SCHEMA);
+}
+
+// Same statements as migrations/007_password_reset_expiry_alerts.sql.
+const PASSWORD_RESET_SCHEMA = [
+  `CREATE TABLE IF NOT EXISTS password_resets (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash TEXT NOT NULL UNIQUE,
+    expires_at TIMESTAMP NOT NULL,
+    used_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`,
+  `CREATE INDEX IF NOT EXISTS password_resets_user_idx ON password_resets (user_id)`,
+  `ALTER TABLE users ADD COLUMN IF NOT EXISTS password_changed_at TIMESTAMP`,
+];
+
+const EXPIRY_ALERT_SCHEMA = [
+  `CREATE TABLE IF NOT EXISTS expiry_alerts_sent (
+    id SERIAL PRIMARY KEY,
+    asset_table TEXT NOT NULL,
+    asset_id INTEGER NOT NULL,
+    kind TEXT NOT NULL CHECK (kind IN ('warranty', 'licence')),
+    expiry_date DATE NOT NULL,
+    threshold INTEGER NOT NULL CHECK (threshold IN (60, 30)),
+    report_id INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (asset_table, asset_id, kind, expiry_date, threshold)
+  )`,
+  `ALTER TABLE client_report_settings ADD COLUMN IF NOT EXISTS expiry_alerts BOOLEAN NOT NULL DEFAULT TRUE`,
+  `ALTER TABLE report_admin_settings ADD COLUMN IF NOT EXISTS expiry_last_run DATE`,
+  // reports.kind gains 'expiry' (the daily warranty and licence digests).
+  `DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'reports_kind_check' AND pg_get_constraintdef(oid) LIKE '%expiry%') THEN
+      ALTER TABLE reports DROP CONSTRAINT IF EXISTS reports_kind_check;
+      ALTER TABLE reports ADD CONSTRAINT reports_kind_check CHECK (kind IN ('admin', 'client', 'expiry'));
+    END IF;
+  END $$`,
+];
 
 function jamaicaParts(date = new Date()) {
   const parts = {};
@@ -3214,12 +3380,229 @@ async function retryFailedReportDeliveries() {
   }
 }
 
+// ============================================================
+// WARRANTY & LICENCE EXPIRY ALERTS
+// ============================================================
+// Daily from 8:00 AM Jamaica (the hourly checker below, so a missed 8:00 is
+// caught up): any item whose warranty or licence is 60 or fewer days away
+// gets one alert at 60 days and one at 30, each recorded in
+// expiry_alerts_sent against that expiry date — so a changed date starts
+// fresh. An item already inside a window gets only its most urgent
+// threshold; expired items get nothing. Alerts go out as one digest per
+// client plus one staff digest, saved in `reports` as kind 'expiry' and sent
+// with sendReport (so deliveries, retries and resends work like reports).
+
+const EXPIRY_HOUR = 8;
+const EXPIRY_WINDOW_DAYS = 60;
+const EXPIRY_SOURCES = [
+  { table: 'cameras', type: 'Camera', column: 'warranty', kind: 'warranty' },
+  { table: 'doors', type: 'Door', column: 'warranty_expiry', kind: 'warranty' },
+  { table: 'servers', type: 'Server', column: 'warranty_expiry', kind: 'warranty' },
+  { table: 'switches', type: 'Switch', column: 'warranty_expiry', kind: 'warranty' },
+  { table: 'storage', type: 'Storage device', column: 'warranty_expiry', kind: 'warranty' },
+  { table: 'intrusion', type: 'Intrusion point', column: 'warranty_expiry', kind: 'warranty' },
+  { table: 'stations', type: 'Station', column: 'warranty_expiry', kind: 'warranty' },
+  { table: 'monitors', type: 'Monitor', column: 'warranty_expiry', kind: 'warranty' },
+  { table: 'software', type: 'Software', column: 'expiry_date', kind: 'licence' },
+  { table: 'software', type: 'Software', column: 'warranty_expiry', kind: 'warranty' },
+];
+
+function ymdString(y, m, d) {
+  const date = new Date(Date.UTC(y, m - 1, d));
+  if (y < 1900 || y > 2200 || date.getUTCFullYear() !== y || date.getUTCMonth() !== m - 1 || date.getUTCDate() !== d) return null;
+  return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+}
+
+// 'YYYY-MM-DD' from a date or timestamp column, or text typed in as
+// 2027-03-12, 12/03/2027 (day first unless that's impossible) or
+// 12 March 2027. Anything else is null.
+function parseExpiryDate(value) {
+  const s = String(value).trim();
+  let m = /^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})(?:$|[T\s])/.exec(s);
+  if (m) return ymdString(+m[1], +m[2], +m[3]);
+  m = /^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/.exec(s);
+  if (m) return +m[2] > 12 ? ymdString(+m[3], +m[1], +m[2]) : ymdString(+m[3], +m[2], +m[1]);
+  if (/[a-z]{3}/i.test(s) && /\d{4}/.test(s)) {
+    const t = new Date(s);
+    if (!isNaN(t)) return ymdString(t.getFullYear(), t.getMonth() + 1, t.getDate());
+  }
+  return null;
+}
+
+function daysUntil(fromYmd, toYmd) {
+  return Math.round((Date.parse(toYmd + 'T00:00:00Z') - Date.parse(fromYmd + 'T00:00:00Z')) / 86400000);
+}
+
+function jamaicaToday(now = new Date()) {
+  const j = jamaicaParts(now);
+  return ymdString(j.year, j.month, j.day);
+}
+
+function formatYmd(ymd) {
+  return new Date(ymd + 'T12:00:00Z').toLocaleDateString('en-GB', { timeZone: 'UTC', day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+// Every warranty and licence date that parses, with days left from today.
+// Rows are read as JSON so a missing column or a text date never breaks it.
+async function loadExpiryItems(today) {
+  const clients = await pool.query('SELECT id, name FROM clients');
+  const clientNames = Object.fromEntries(clients.rows.map(c => [c.id, c.name]));
+  const rowsByTable = {};
+  const items = [];
+  let skipped = 0;
+  for (const src of EXPIRY_SOURCES) {
+    if (!rowsByTable[src.table]) {
+      try {
+        rowsByTable[src.table] = (await pool.query(`SELECT to_jsonb(t) AS r FROM ${src.table} t`)).rows.map(x => x.r);
+      } catch (err) {
+        console.error(`⚠️ Expiry check could not read ${src.table}:`, err.message);
+        rowsByTable[src.table] = [];
+      }
+    }
+    for (const r of rowsByTable[src.table]) {
+      const raw = r[src.column];
+      if (raw == null || String(raw).trim() === '') continue;
+      const expiry = parseExpiryDate(raw);
+      if (!expiry) { skipped++; continue; }
+      items.push({
+        asset_table: src.table, asset_id: r.id, client_id: r.client_id ?? null,
+        client_name: clientNames[r.client_id] || r.client || 'Unknown client',
+        name: r.name || `${src.type} #${r.id}`, type: src.type, site: r.zone || r.site || '',
+        kind: src.kind, expiry_date: expiry, days_left: daysUntil(today, expiry)
+      });
+    }
+  }
+  if (skipped) console.log(`⚠️ Expiry check skipped ${skipped} date${skipped === 1 ? '' : 's'} it couldn't read`);
+  return { items, skipped };
+}
+
+function sortExpiryItems(items) {
+  return items.sort((a, b) => a.days_left - b.days_left || a.client_name.localeCompare(b.client_name) || a.name.localeCompare(b.name));
+}
+
+function expiryTableHtml(items) {
+  let html = `<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;margin-top:12px;">
+      <tr style="background:#f0f0f0;"><th>Name</th><th>Type</th><th>Site</th><th>Expiring</th><th>Expiry date</th><th>Days left</th></tr>`;
+  for (const i of items) {
+    html += `<tr><td>${escapeHtml(i.name)}</td><td>${escapeHtml(i.type)}</td><td>${escapeHtml(i.site || '—')}</td><td>${i.kind === 'licence' ? 'Licence' : 'Warranty'}</td><td>${escapeHtml(formatYmd(i.expiry_date))}</td><td>${i.days_left === 0 ? 'Today' : i.days_left}</td></tr>`;
+  }
+  return html + '</table>';
+}
+
+function buildExpiryDigest(clientName, items, today) {
+  const appUrl = process.env.APP_URL || 'https://e-tech-cams.up.railway.app';
+  let body;
+  if (clientName) {
+    body = `<p><strong>Client:</strong> ${escapeHtml(clientName)}</p>
+      <p>These warranties and licences expire soon:</p>
+      ${expiryTableHtml(items)}`;
+  } else {
+    const groups = {};
+    for (const i of items) (groups[i.client_name] = groups[i.client_name] || []).push(i);
+    body = `<p>Warranties and licences reaching 60 or 30 days left today, across all clients:</p>` +
+      Object.keys(groups).sort((a, b) => a.localeCompare(b)).map(name => `<h3 style="color:#1a3a5c;">${escapeHtml(name)}</h3>${expiryTableHtml(groups[name])}`).join('');
+  }
+  const html = `
+    <div style="font-family:Arial,sans-serif;max-width:650px;margin:0 auto;">
+      <h2 style="color:#1a3a5c;">Warranty &amp; licence reminders</h2>
+      <p><strong>Date:</strong> ${escapeHtml(formatYmd(today))}</p>
+      ${body}
+      <p>Contact E-Tech to discuss renewals.</p>
+      <p>View full dashboard: <a href="${escapeHtml(appUrl)}">Open CAMS</a></p>
+      <p style="color:#666;font-size:12px;">— E-Tech Systems Support</p>
+    </div>`;
+  return {
+    subject: `[CAMS] Warranty & licence reminders — ${clientName || 'All clients'}`,
+    html,
+    summary: { date: today, items: items.length, warranty: items.filter(i => i.kind === 'warranty').length, licence: items.filter(i => i.kind === 'licence').length }
+  };
+}
+
+// Saves a scheduled expiry digest (claimed through the unique index, so one
+// per client per day) and sends it. Returns the report id, or null.
+async function saveExpiryDigest(clientId, clientName, items, today, recipients) {
+  const built = buildExpiryDigest(clientName, items, today);
+  const claim = await pool.query(
+    `INSERT INTO reports (kind, client_id, period_start, period_end, subject, html, summary, source, created_by)
+     VALUES ('expiry', $1, $2, $2, $3, $4, $5, 'scheduled', 'Scheduled') ON CONFLICT DO NOTHING RETURNING id`,
+    [clientId, today, built.subject, built.html, JSON.stringify(built.summary)]
+  );
+  const id = claim.rows[0]?.id;
+  if (!id) return null;
+  await sendReport(id, recipients, 'Scheduled');
+  return id;
+}
+
+let expiryAlertsRunning = false;
+
+async function runExpiryAlerts(now = new Date()) {
+  if (!dbConnected || expiryAlertsRunning || jamaicaParts(now).hour < EXPIRY_HOUR) return null;
+  const today = jamaicaToday(now);
+  // Claim today, so the check runs once a day across restarts and instances.
+  const claim = await pool.query(
+    'UPDATE report_admin_settings SET expiry_last_run=$1 WHERE id=1 AND (expiry_last_run IS NULL OR expiry_last_run < $1::date) RETURNING id',
+    [today]
+  );
+  if (!claim.rowCount) return null;
+  expiryAlertsRunning = true;
+  try {
+    const { items } = await loadExpiryItems(today);
+    const inWindow = items.filter(i => i.days_left >= 0 && i.days_left <= EXPIRY_WINDOW_DAYS);
+    const already = await pool.query(
+      "SELECT asset_table, asset_id, kind, to_char(expiry_date, 'YYYY-MM-DD') AS expiry_date, threshold FROM expiry_alerts_sent WHERE expiry_date >= $1::date",
+      [today]
+    );
+    const key = (i, t) => [i.asset_table, i.asset_id, i.kind, i.expiry_date, t].join('|');
+    const sentKeys = new Set(already.rows.map(r => key(r, r.threshold)));
+    const due = sortExpiryItems(inWindow.filter(i => !sentKeys.has(key(i, i.days_left <= 30 ? 30 : 60))));
+    if (!due.length) return { items: 0 };
+
+    const byClient = {};
+    for (const i of due) if (i.client_id != null) (byClient[i.client_id] = byClient[i.client_id] || []).push(i);
+    const optedOut = new Set((await pool.query('SELECT client_id FROM client_report_settings WHERE expiry_alerts = FALSE')).rows.map(r => r.client_id));
+    let clientDigests = 0;
+    for (const clientId of Object.keys(byClient).map(Number)) {
+      if (optedOut.has(clientId)) continue;
+      try {
+        const recipients = await clientRecipients(clientId);
+        if (!recipients.length) continue;
+        if (await saveExpiryDigest(clientId, byClient[clientId][0].client_name, byClient[clientId], today, recipients)) clientDigests++;
+      } catch (err) {
+        console.error(`❌ Expiry digest for client ${clientId} failed:`, err.message);
+      }
+    }
+    const staffReportId = await saveExpiryDigest(null, null, due, today, await adminRecipients());
+
+    // Record the alert; an item that went straight to 30 days also counts as
+    // alerted at 60, so it never gets a late 60-day alert.
+    for (const i of due) {
+      const thresholds = i.days_left <= 30 ? [30, 60] : [60];
+      for (const t of thresholds) {
+        await pool.query(
+          `INSERT INTO expiry_alerts_sent (asset_table, asset_id, kind, expiry_date, threshold, report_id)
+           VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT DO NOTHING`,
+          [i.asset_table, i.asset_id, i.kind, i.expiry_date, t, staffReportId]
+        );
+      }
+    }
+    console.log(`✅ Expiry alerts: ${due.length} item(s), ${clientDigests} client digest(s)`);
+    return { items: due.length, clientDigests };
+  } finally {
+    expiryAlertsRunning = false;
+  }
+}
+
 async function runReportMaintenance() {
   if (!dbConnected) return;
   try {
     await catchUpMonthlyReports();
   } catch (err) {
     console.error('❌ Monthly report catch-up failed:', err.message);
+  }
+  try {
+    await runExpiryAlerts();
+  } catch (err) {
+    console.error('❌ Expiry alerts failed:', err.message);
   }
   try {
     await retryFailedReportDeliveries();
@@ -3411,7 +3794,7 @@ app.get('/api/reports', authMiddleware, requireAdmin, async (req, res) => {
     params.push(`${month}-01`); where.push(`period_start = $${params.length}::date`);
   }
   if (kind) {
-    if (kind !== 'admin' && kind !== 'client') return res.status(400).json({ error: 'kind must be admin or client' });
+    if (!['admin', 'client', 'expiry'].includes(kind)) return res.status(400).json({ error: 'kind must be admin, client or expiry' });
     params.push(kind); where.push(`kind = $${params.length}`);
   }
   if (client_id) {
@@ -3449,13 +3832,13 @@ app.get('/api/reports/overview', authMiddleware, requireAdmin, async (req, res) 
   try {
     const last = await pool.query(
       `SELECT to_char(period_start, 'YYYY-MM-DD') AS period_start, MIN(created_at) AS at FROM reports
-       WHERE source = 'scheduled' GROUP BY period_start ORDER BY period_start DESC LIMIT 1`
+       WHERE source = 'scheduled' AND kind IN ('admin', 'client') GROUP BY period_start ORDER BY period_start DESC LIMIT 1`
     );
     let lastReport = null;
     if (last.rows[0]) {
       const counts = await pool.query(
         `SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE d.status = 'sent')::int AS sent, COUNT(*) FILTER (WHERE d.status = 'failed')::int AS failed
-         FROM report_deliveries d JOIN reports r ON r.id = d.report_id WHERE r.source = 'scheduled' AND r.period_start = $1::date`,
+         FROM report_deliveries d JOIN reports r ON r.id = d.report_id WHERE r.source = 'scheduled' AND r.kind IN ('admin', 'client') AND r.period_start = $1::date`,
         [last.rows[0].period_start]
       );
       lastReport = { ...last.rows[0], ...counts.rows[0] };
@@ -3507,6 +3890,14 @@ app.post('/api/reports/generate', authMiddleware, requireAdmin, async (req, res)
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// Every warranty or licence expiring within 60 days, across all clients.
+app.get('/api/reports/expiring', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const { items, skipped } = await loadExpiryItems(jamaicaToday());
+    res.json({ items: sortExpiryItems(items.filter(i => i.days_left >= 0 && i.days_left <= EXPIRY_WINDOW_DAYS)), skipped });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.get('/api/reports/:id', authMiddleware, requireAdmin, async (req, res) => {
   const id = parseReportId(req.params.id);
   if (!id) return res.status(404).json({ error: 'Report not found' });
@@ -3535,7 +3926,7 @@ app.post('/api/reports/:id/send', authMiddleware, requireAdmin, async (req, res)
     } else {
       // Everyone it went to before; a report never sent goes to the current recipients.
       recipients = report.deliveries.length ? report.deliveries.map(d => d.recipient)
-        : report.kind === 'admin' ? await adminRecipients() : await clientRecipients(report.client_id);
+        : report.client_id ? await clientRecipients(report.client_id) : await adminRecipients();
     }
     if (!recipients.length) return res.status(400).json({ error: mode === 'failed' ? 'No failed recipients to retry.' : 'No recipients to send to.' });
     const result = await sendReport(id, recipients, req.user.username);
@@ -3567,7 +3958,7 @@ app.post('/api/reports/run', authMiddleware, requireAdmin, async (req, res) => {
 
 async function loadClientReportSettings(clientId) {
   const result = await pool.query(
-    `SELECT c.id, c.name, c.email, s.enabled, s.include_users, s.excluded_user_ids, s.extra_recipients
+    `SELECT c.id, c.name, c.email, s.enabled, s.include_users, s.excluded_user_ids, s.extra_recipients, s.expiry_alerts
      FROM clients c LEFT JOIN client_report_settings s ON s.client_id = c.id WHERE c.id = $1`,
     [clientId]
   );
@@ -3576,7 +3967,7 @@ async function loadClientReportSettings(clientId) {
   const users = await pool.query("SELECT id, email, role FROM users WHERE client_id=$1 AND status='active' ORDER BY LOWER(email)", [clientId]);
   return {
     client_id: row.id, client_name: row.name, contact_email: row.email || '',
-    enabled: row.enabled !== false, include_users: row.include_users !== false,
+    enabled: row.enabled !== false, include_users: row.include_users !== false, expiry_alerts: row.expiry_alerts !== false,
     excluded_user_ids: row.excluded_user_ids || [], extra_recipients: row.extra_recipients || [],
     users: users.rows, recipients: await clientRecipients(clientId)
   };
@@ -3618,8 +4009,9 @@ app.get('/api/report-settings/:clientId', authMiddleware, requireAdmin, async (r
 app.put('/api/report-settings/:clientId', authMiddleware, requireAdmin, async (req, res) => {
   const id = parseReportId(req.params.clientId);
   if (!id) return res.status(404).json({ error: 'Client not found' });
-  const { enabled, include_users, excluded_user_ids, extra_recipients } = req.body || {};
+  const { enabled, include_users, excluded_user_ids, extra_recipients, expiry_alerts } = req.body || {};
   if (typeof enabled !== 'boolean' || typeof include_users !== 'boolean') return res.status(400).json({ error: 'enabled and include_users must be true or false.' });
+  if (expiry_alerts != null && typeof expiry_alerts !== 'boolean') return res.status(400).json({ error: 'expiry_alerts must be true or false.' });
   if (excluded_user_ids != null && (!Array.isArray(excluded_user_ids) || excluded_user_ids.some(u => !parseReportId(u)))) {
     return res.status(400).json({ error: 'excluded_user_ids must be a list of user ids.' });
   }
@@ -3630,10 +4022,11 @@ app.put('/api/report-settings/:clientId', authMiddleware, requireAdmin, async (r
     if (!client.rows[0]) return res.status(404).json({ error: 'Client not found' });
     const excluded = [...new Set((excluded_user_ids || []).map(Number))];
     await pool.query(
-      `INSERT INTO client_report_settings (client_id, enabled, include_users, excluded_user_ids, extra_recipients, updated_at)
-       VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)
-       ON CONFLICT (client_id) DO UPDATE SET enabled = $2, include_users = $3, excluded_user_ids = $4, extra_recipients = $5, updated_at = CURRENT_TIMESTAMP`,
-      [id, enabled, include_users, excluded, v.emails]
+      `INSERT INTO client_report_settings (client_id, enabled, include_users, excluded_user_ids, extra_recipients, expiry_alerts, updated_at)
+       VALUES ($1, $2, $3, $4, $5, COALESCE($6, TRUE), CURRENT_TIMESTAMP)
+       ON CONFLICT (client_id) DO UPDATE SET enabled = $2, include_users = $3, excluded_user_ids = $4, extra_recipients = $5,
+         expiry_alerts = COALESCE($6, client_report_settings.expiry_alerts), updated_at = CURRENT_TIMESTAMP`,
+      [id, enabled, include_users, excluded, v.emails, typeof expiry_alerts === 'boolean' ? expiry_alerts : null]
     );
     const settings = await loadClientReportSettings(id);
     await logActivity(id, req.user.username, 'Report', `Monthly report recipients for ${client.rows[0].name} updated: ` +
@@ -3645,9 +4038,9 @@ app.put('/api/report-settings/:clientId', authMiddleware, requireAdmin, async (r
 // Client logins: their own client's reports that reached at least one
 // recipient. No delivery details or addresses.
 const MY_REPORTS_SQL = `SELECT r.id, to_char(r.period_start, 'YYYY-MM-DD') AS period_start, to_char(r.period_end, 'YYYY-MM-DD') AS period_end,
-    r.subject, r.created_at%s
+    r.kind, r.subject, r.created_at%s
   FROM reports r
-  WHERE r.kind = 'client' AND r.client_id = $1
+  WHERE r.kind IN ('client', 'expiry') AND r.client_id = $1
     AND EXISTS (SELECT 1 FROM report_deliveries d WHERE d.report_id = r.id AND d.status = 'sent')`;
 
 app.get('/api/my-reports', authMiddleware, async (req, res) => {
