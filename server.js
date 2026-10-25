@@ -168,6 +168,11 @@ pool.connect((err, client, release) => {
     pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarded_at TIMESTAMP')
       .then(() => console.log('✅ users.onboarded_at column ready'))
       .catch(e => console.error('❌ Could not add users.onboarded_at:', e.message));
+    // Stored monthly reports (also in migrations/006). Once ready, sends a
+    // missed monthly report and retries failed deliveries.
+    ensureReportTables()
+      .then(() => { console.log('✅ Report tables ready'); return runReportMaintenance(); })
+      .catch(e => console.error('❌ Could not create report tables:', e.message));
   }
 });
 
@@ -260,18 +265,23 @@ async function describeClientsForLog(rows) {
 // EMAIL NOTIFICATION HELPER
 // ============================================================
 
+// Sends through the shared mailbox; throws on failure.
+async function postGraphMail(to, subject, body, authHeader) {
+  const emailData = {
+    message: {
+      subject: subject,
+      body: { contentType: 'HTML', content: body },
+      toRecipients: to.split(',').map(email => ({ emailAddress: { address: email.trim() } }))
+    }
+  };
+  await axios.post(`https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/sendMail`, emailData, {
+    headers: { Authorization: authHeader, 'Content-Type': 'application/json' }
+  });
+}
+
 async function sendEmailNotification(to, subject, body, authHeader) {
   try {
-    const emailData = {
-      message: {
-        subject: subject,
-        body: { contentType: 'HTML', content: body },
-        toRecipients: to.split(',').map(email => ({ emailAddress: { address: email.trim() } }))
-      }
-    };
-    await axios.post(`https://graph.microsoft.com/v1.0/users/${SHARED_MAILBOX}/sendMail`, emailData, {
-      headers: { Authorization: authHeader, 'Content-Type': 'application/json' }
-    });
+    await postGraphMail(to, subject, body, authHeader);
     return true;
   } catch (err) {
     console.error('Email notification failed:', err.message);
@@ -2648,14 +2658,117 @@ app.put('/api/monitors/:id', authMiddleware, blockAssetEdit, async (req, res) =>
 // MONTHLY REPORTS
 // ============================================================
 
-// Covers the previous full calendar month — e.g. a report sent on the 1st
-// of February covers all of January. Date's month arithmetic handles the
-// January/December year rollover on its own.
-function getMonthRange() {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
-  const end = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
-  return { start, end };
+// ============================================================
+// MONTHLY REPORTS
+// ============================================================
+// Every report is built once, saved in `reports` (so it can be viewed,
+// printed or re-sent later), then emailed one recipient at a time with a
+// `report_deliveries` row per recipient. The scheduled set (1st of the month,
+// 5:00 PM Jamaica, covering the previous month) is claimed through a partial
+// unique index before anything is sent, so each client gets at most one
+// scheduled report per month across restarts and multiple app instances.
+
+const REPORT_TZ = 'America/Jamaica';
+const REPORT_HOUR = 17;
+const JAMAICA_UTC_OFFSET_HOURS = 5; // Jamaica has no daylight saving: always UTC-5
+const MAX_REPORT_ATTEMPTS = 3;
+const MAX_REPORT_RECIPIENTS = 20;
+
+// Same statements as migrations/006_reports.sql.
+const REPORT_SCHEMA = [
+  `CREATE TABLE IF NOT EXISTS reports (
+    id SERIAL PRIMARY KEY,
+    kind TEXT NOT NULL CHECK (kind IN ('admin', 'client')),
+    client_id INTEGER,
+    period_start DATE NOT NULL,
+    period_end DATE NOT NULL,
+    subject TEXT NOT NULL DEFAULT '',
+    html TEXT NOT NULL DEFAULT '',
+    summary JSONB NOT NULL DEFAULT '{}',
+    source TEXT NOT NULL CHECK (source IN ('scheduled', 'manual')),
+    created_by TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS reports_one_scheduled_per_month ON reports (kind, COALESCE(client_id, 0), period_start) WHERE source = 'scheduled'`,
+  `CREATE INDEX IF NOT EXISTS reports_created_at_idx ON reports (created_at DESC)`,
+  `CREATE INDEX IF NOT EXISTS reports_client_idx ON reports (client_id, period_start DESC)`,
+  `CREATE TABLE IF NOT EXISTS report_deliveries (
+    id SERIAL PRIMARY KEY,
+    report_id INTEGER NOT NULL REFERENCES reports(id) ON DELETE CASCADE,
+    recipient TEXT NOT NULL,
+    status TEXT NOT NULL CHECK (status IN ('sent', 'failed')),
+    error TEXT,
+    attempts INTEGER NOT NULL DEFAULT 1,
+    sent_by TEXT,
+    last_attempt_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS report_deliveries_report_recipient ON report_deliveries (report_id, recipient)`,
+  `CREATE INDEX IF NOT EXISTS report_deliveries_status_idx ON report_deliveries (status, created_at)`,
+  `CREATE TABLE IF NOT EXISTS client_report_settings (
+    client_id INTEGER PRIMARY KEY REFERENCES clients(id) ON DELETE CASCADE,
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    include_users BOOLEAN NOT NULL DEFAULT TRUE,
+    excluded_user_ids INTEGER[] NOT NULL DEFAULT '{}',
+    extra_recipients TEXT[] NOT NULL DEFAULT '{}',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`,
+  `CREATE TABLE IF NOT EXISTS report_admin_settings (
+    id INTEGER PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+    extra_recipients TEXT[] NOT NULL DEFAULT '{}',
+    installed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`,
+  // installed_at marks when stored reports began. Catch-up only sends months
+  // that fell due after it, so the first deploy doesn't re-send a month the
+  // old code already emailed.
+  `INSERT INTO report_admin_settings (id) VALUES (1) ON CONFLICT (id) DO NOTHING`,
+];
+
+async function ensureReportTables() {
+  for (const sql of REPORT_SCHEMA) await pool.query(sql);
+}
+
+function jamaicaParts(date = new Date()) {
+  const parts = {};
+  new Intl.DateTimeFormat('en-US', { timeZone: REPORT_TZ, year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', hourCycle: 'h23' })
+    .formatToParts(date).forEach(p => { parts[p.type] = Number(p.value); });
+  return { year: parts.year, month: parts.month, day: parts.day, hour: parts.hour };
+}
+
+// 5:00 PM Jamaica on the 1st of the month after the given one (month is
+// 1-based; Date.UTC rolls month 12 over into January).
+function monthlyReportDueAt(year, month) {
+  return new Date(Date.UTC(year, month, 1, REPORT_HOUR + JAMAICA_UTC_OFFSET_HOURS));
+}
+
+function nextMonthlyReportAt(now = new Date()) {
+  const j = jamaicaParts(now);
+  const thisMonth = monthlyReportDueAt(j.year, j.month - 1);
+  return thisMonth > now ? thisMonth : monthlyReportDueAt(j.year, j.month);
+}
+
+// A calendar month (month is 1-based). With no arguments it is the previous
+// month — e.g. a report sent on the 1st of February covers all of January.
+// Date's month arithmetic handles the January/December year rollover.
+function getMonthRange(year, month) {
+  if (year == null || month == null) {
+    const now = new Date();
+    year = now.getFullYear();
+    month = now.getMonth(); // 0-based current month = 1-based previous month
+  }
+  const start = new Date(year, month - 1, 1, 0, 0, 0, 0);
+  const end = new Date(year, month, 0, 23, 59, 59, 999);
+  const pad = n => String(n).padStart(2, '0');
+  const y = start.getFullYear(), m = start.getMonth() + 1;
+  return { start, end, year: y, month: m, period: `${y}-${pad(m)}`, periodStart: `${y}-${pad(m)}-01`, periodEnd: `${y}-${pad(m)}-${pad(end.getDate())}` };
+}
+
+// The month the scheduled reports cover right now: the one before the
+// current Jamaica month.
+function previousReportPeriod(now = new Date()) {
+  const j = jamaicaParts(now);
+  return getMonthRange(j.year, j.month - 1);
 }
 
 function formatDateRange(start, end) {
@@ -2663,22 +2776,68 @@ function formatDateRange(start, end) {
   return `${start.toLocaleDateString('en-GB', options)} — ${end.toLocaleDateString('en-GB', options)}`;
 }
 
-// Monthly report recipients: the client's contact email plus every active
-// client user, lowercased and de-duplicated.
-async function clientReportRecipients(client) {
-  const all = [client.email, ...(await getClientUserEmails(client.id))];
-  return [...new Set(all.filter(e => typeof e === 'string' && e.trim()).map(e => e.trim().toLowerCase()))];
+// Lowercased, trimmed and de-duplicated, keeping the first occurrence's order.
+function normaliseEmails(list) {
+  return [...new Set((list || []).filter(e => typeof e === 'string' && e.trim()).map(e => e.trim().toLowerCase()))];
 }
 
-async function generateClientReport(clientId, clientName, recipients, msToken) {
-  const { start, end } = getMonthRange();
+// Returns { emails } or { error } for a list of addresses typed by an admin.
+function validateReportEmails(v) {
+  if (v != null && !Array.isArray(v) && typeof v !== 'string') return { error: 'Recipients must be a list of email addresses.' };
+  const emails = normaliseEmails(parseRecipients(v));
+  const bad = emails.filter(a => !EMAIL_ADDRESS_RE.test(a));
+  if (bad.length) return { error: `Not a valid email address: ${bad.join(', ')}` };
+  if (emails.length > MAX_REPORT_RECIPIENTS) return { error: `Too many addresses — the limit is ${MAX_REPORT_RECIPIENTS}.` };
+  return { emails };
+}
+
+// A client's monthly report recipients under its settings (no settings row =
+// the defaults): nobody if reports are off; otherwise the contact email, the
+// client's active users unless include_users is off (minus any excluded
+// ones), plus any extra recipients.
+async function clientRecipients(clientId) {
+  const result = await pool.query(
+    `SELECT c.email, s.enabled, s.include_users, s.excluded_user_ids, s.extra_recipients
+     FROM clients c LEFT JOIN client_report_settings s ON s.client_id = c.id WHERE c.id = $1`,
+    [clientId]
+  );
+  const row = result.rows[0];
+  if (!row || row.enabled === false) return [];
+  let users = [];
+  if (row.include_users !== false) {
+    const u = await pool.query(
+      "SELECT DISTINCT LOWER(email) AS email FROM users WHERE client_id=$1 AND status='active' AND id <> ALL($2::int[])",
+      [clientId, row.excluded_user_ids || []]
+    );
+    users = u.rows.map(r => r.email);
+  }
+  return normaliseEmails([row.email, ...users, ...(row.extra_recipients || [])]);
+}
+
+// support@ always gets the admin report, plus any extra recipients.
+async function adminReportExtras() {
+  const result = await pool.query('SELECT extra_recipients FROM report_admin_settings WHERE id = 1');
+  return result.rows[0]?.extra_recipients || [];
+}
+
+async function adminRecipients() {
+  return normaliseEmails([ADMIN_EMAIL, ...(await adminReportExtras())]);
+}
+
+async function buildClientReport(clientId, range) {
+  const { start, end } = range;
   const dateRangeStr = formatDateRange(start, end);
+
+  const clientResult = await pool.query('SELECT name FROM clients WHERE id=$1', [clientId]);
+  if (!clientResult.rows[0]) throw new Error(`Client ${clientId} not found`);
+  const clientName = clientResult.rows[0].name;
+  const clientNameHtml = escapeHtml(clientName);
 
   const cameras = await pool.query('SELECT status FROM cameras WHERE client_id=$1', [clientId]);
   const doors = await pool.query('SELECT status FROM doors WHERE client_id=$1', [clientId]);
   const servers = await pool.query('SELECT status FROM servers WHERE client_id=$1', [clientId]);
   const switches = await pool.query('SELECT status FROM switches WHERE client_id=$1', [clientId]);
-  
+
   const totalAssets = cameras.rowCount + doors.rowCount + servers.rowCount + switches.rowCount;
   const onlineAssets = cameras.rows.filter(c => c.status === 'Online' || c.status === 'Working').length +
                        doors.rows.filter(d => d.status === 'Online' || d.status === 'Working').length +
@@ -2691,15 +2850,15 @@ async function generateClientReport(clientId, clientName, recipients, msToken) {
     'SELECT * FROM service_requests WHERE client_id=$1 AND created_at >= $2 AND created_at <= $3 ORDER BY created_at DESC',
     [clientId, start.toISOString(), end.toISOString()]
   );
-  
+
   const srsCreated = srsPeriod.rows.length;
   const srsResolved = srsPeriod.rows.filter(sr => sr.status === 'Resolved').length;
-  
+
   const openSRs = await pool.query(
     "SELECT * FROM service_requests WHERE client_id=$1 AND status != 'Resolved' ORDER BY created_at DESC",
     [clientId]
   );
-  
+
   const highPriorityOpen = openSRs.rows.filter(sr => sr.priority === 'High').length;
 
   let srTable = '';
@@ -2708,20 +2867,20 @@ async function generateClientReport(clientId, clientName, recipients, msToken) {
       <tr style="background:#f0f0f0;"><th>SR ID</th><th>Subject</th><th>Priority</th><th>Status</th><th>Assigned</th><th>Created</th></tr>`;
     srsPeriod.rows.forEach(sr => {
       const createdDate = new Date(sr.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
-      srTable += `<tr><td>${sr.sr_id}</td><td>${sr.subject}</td><td>${sr.priority}</td><td>${sr.status}</td><td>${sr.assigned_to || 'Unassigned'}</td><td>${createdDate}</td></tr>`;
+      srTable += `<tr><td>${escapeHtml(sr.sr_id)}</td><td>${escapeHtml(sr.subject)}</td><td>${escapeHtml(sr.priority)}</td><td>${escapeHtml(sr.status)}</td><td>${escapeHtml(sr.assigned_to || 'Unassigned')}</td><td>${createdDate}</td></tr>`;
     });
     srTable += '</table>';
   } else {
     srTable = '<p>No service requests were created or updated during this period.</p>';
   }
 
-  const emailBody = `
+  const html = `
     <div style="font-family:Arial,sans-serif;max-width:650px;margin:0 auto;">
       <h2 style="color:#1a3a5c;">CAMS Monthly Report</h2>
-      <p><strong>Client:</strong> ${clientName}</p>
+      <p><strong>Client:</strong> ${clientNameHtml}</p>
       <p><strong>Period:</strong> ${dateRangeStr}</p>
       <hr>
-      <p>Dear ${clientName} Team,</p>
+      <p>Dear ${clientNameHtml} Team,</p>
       <p>Here is your monthly asset management summary from E-Tech Systems.</p>
       <h3 style="color:#1a3a5c;">Overview</h3>
       <p>Over the past month, <strong>${srsCreated} service requests</strong> were raised for your sites and <strong>${srsResolved} were resolved</strong>. You currently have <strong>${openSRs.rows.length} open requests</strong>, <strong>${highPriorityOpen} of which ${highPriorityOpen === 1 ? 'is' : 'are'} high priority</strong>${highPriorityOpen > 0 ? ' and require immediate attention' : ''}.</p>
@@ -2745,16 +2904,15 @@ async function generateClientReport(clientId, clientName, recipients, msToken) {
       <p style="color:#666;font-size:12px;">— E-Tech Systems Support</p>
     </div>`;
 
-  // One email per recipient, never a shared To/CC.
-  let sent = 0;
-  for (const to of recipients) {
-    if (await sendEmailNotification(to, `[CAMS] Monthly Report — ${clientName} — ${dateRangeStr}`, emailBody, `Bearer ${msToken}`)) sent++;
-  }
-  console.log(`✅ Client report for ${clientName} sent to ${sent} of ${recipients.length} recipient(s)`);
+  return {
+    subject: `[CAMS] Monthly Report — ${clientName} — ${dateRangeStr}`,
+    html,
+    summary: { clientName, srsCreated, srsResolved, openSRs: openSRs.rows.length, highPriorityOpen, totalAssets, onlineAssets, offlineAssets, healthPct: Number(healthPct) }
+  };
 }
 
-async function generateAdminReport(msToken) {
-  const { start, end } = getMonthRange();
+async function buildAdminReport(range) {
+  const { start, end } = range;
   const dateRangeStr = formatDateRange(start, end);
 
   const clientsResult = await pool.query('SELECT id,name,email FROM clients');
@@ -2764,7 +2922,7 @@ async function generateAdminReport(msToken) {
   const totalDoors = await pool.query('SELECT status FROM doors');
   const totalServers = await pool.query('SELECT status FROM servers');
   const totalSwitches = await pool.query('SELECT status FROM switches');
-  
+
   const totalAssets = totalCameras.rowCount + totalDoors.rowCount + totalServers.rowCount + totalSwitches.rowCount;
   const onlineAssets = totalCameras.rows.filter(c => c.status === 'Online' || c.status === 'Working').length +
                        totalDoors.rows.filter(d => d.status === 'Online' || d.status === 'Working').length +
@@ -2779,7 +2937,7 @@ async function generateAdminReport(msToken) {
   );
   const srsCreated = allSRsPeriod.rows.length;
   const srsResolved = allSRsPeriod.rows.filter(sr => sr.status === 'Resolved').length;
-  
+
   const openSRs = await pool.query("SELECT * FROM service_requests WHERE status != 'Resolved' ORDER BY created_at DESC");
   const highPriorityOpen = openSRs.rows.filter(sr => sr.priority === 'High');
 
@@ -2827,7 +2985,7 @@ async function generateAdminReport(msToken) {
     const cSRsResolved = allSRsPeriod.rows.filter(sr => sr.client_id === client.id && sr.status === 'Resolved').length;
     const cOpen = openSRs.rows.filter(sr => sr.client_id === client.id).length;
 
-    clientTable += `<tr><td>${client.name}</td><td>${cTotal}</td><td>${cOnline}</td><td>${cOffline}</td><td>${cHealth}%</td><td>${cSRsCreated}</td><td>${cSRsResolved}</td><td>${cOpen}</td></tr>`;
+    clientTable += `<tr><td>${escapeHtml(client.name)}</td><td>${cTotal}</td><td>${cOnline}</td><td>${cOffline}</td><td>${cHealth}%</td><td>${cSRsCreated}</td><td>${cSRsResolved}</td><td>${cOpen}</td></tr>`;
 
     if (cHealthNum < lowestHealth) {
       lowestHealth = cHealthNum;
@@ -2841,7 +2999,7 @@ async function generateAdminReport(msToken) {
       <tr style="background:#f0f0f0;"><th>SR ID</th><th>Client</th><th>Subject</th><th>Assigned</th><th>Created</th></tr>`;
     highPriorityOpen.forEach(sr => {
       const createdDate = new Date(sr.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
-      hpTable += `<tr><td>${sr.sr_id}</td><td>${sr.client}</td><td>${sr.subject}</td><td>${sr.assigned_to || 'Unassigned'}</td><td>${createdDate}</td></tr>`;
+      hpTable += `<tr><td>${escapeHtml(sr.sr_id)}</td><td>${escapeHtml(sr.client)}</td><td>${escapeHtml(sr.subject)}</td><td>${escapeHtml(sr.assigned_to || 'Unassigned')}</td><td>${createdDate}</td></tr>`;
     });
     hpTable += '</table>';
   }
@@ -2850,19 +3008,19 @@ async function generateAdminReport(msToken) {
     'SELECT * FROM activity_log WHERE created_at >= $1 AND created_at <= $2 ORDER BY created_at DESC LIMIT 20',
     [start.toISOString(), end.toISOString()]
   );
-  
+
   let activityTable = '';
   if (activityLog.rows.length > 0) {
     activityTable = `<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;margin-top:12px;">
       <tr style="background:#f0f0f0;"><th>Date</th><th>User</th><th>Action</th><th>Detail</th></tr>`;
     activityLog.rows.forEach(log => {
       const logDate = new Date(log.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
-      activityTable += `<tr><td>${logDate}</td><td>${log.username}</td><td>${log.action}</td><td>${log.detail}</td></tr>`;
+      activityTable += `<tr><td>${logDate}</td><td>${escapeHtml(log.username)}</td><td>${escapeHtml(log.action)}</td><td>${escapeHtml(log.detail)}</td></tr>`;
     });
     activityTable += '</table>';
   }
 
-  const emailBody = `
+  const html = `
     <div style="font-family:Arial,sans-serif;max-width:650px;margin:0 auto;">
       <h2 style="color:#1a3a5c;">CAMS Monthly Admin Report</h2>
       <p><strong>Period:</strong> ${dateRangeStr}</p>
@@ -2886,58 +3044,203 @@ async function generateAdminReport(msToken) {
         <tr style="background:#f0f0f0;"><th>Client</th><th>Assets</th><th>Online</th><th>Offline</th><th>Health</th><th>SRs Created</th><th>Resolved</th><th>Open</th></tr>
         ${clientTable}
       </table>
-      ${lowestHealthClient && lowestHealth < 95 ? `<p><strong>${lowestHealthClient}</strong> has the lowest asset health at <strong>${lowestHealth}%</strong> and may need additional attention.</p>` : ''}
+      ${lowestHealthClient && lowestHealth < 95 ? `<p><strong>${escapeHtml(lowestHealthClient)}</strong> has the lowest asset health at <strong>${lowestHealth}%</strong> and may need additional attention.</p>` : ''}
       ${highPriorityOpen.length > 0 ? `<h3 style="color:#cc0000;">Open High Priority SRs</h3><p>These require immediate action:</p>${hpTable}` : '<p>No high priority SRs are currently open.</p>'}
       ${activityLog.rows.length > 0 ? `<h3 style="color:#1a3a5c;">Notable Activity (Last Month)</h3>${activityTable}` : ''}
       <p>View full dashboard: <a href="${process.env.APP_URL || "https://e-tech-cams.up.railway.app"}">Open CAMS</a></p>
     </div>`;
 
-  await sendEmailNotification(ADMIN_EMAIL, `[CAMS] Monthly Admin Report — ${dateRangeStr}`, emailBody, `Bearer ${msToken}`);
-  console.log(`✅ Admin report sent to ${ADMIN_EMAIL}`);
+  return {
+    subject: `[CAMS] Monthly Admin Report — ${dateRangeStr}`,
+    html,
+    summary: { totalClients: clients.length, srsCreated, srsResolved, openSRs: openSRs.rows.length, highPriorityOpen: highPriorityOpen.length, totalAssets, onlineAssets, offlineAssets, healthPct: Number(healthPct) }
+  };
 }
 
-async function runMonthlyReports() {
+function buildReport(kind, clientId, range) {
+  return kind === 'admin' ? buildAdminReport(range) : buildClientReport(clientId, range);
+}
+
+// Sends one stored report to one address. Returns null on success, or the error.
+async function sendStoredReport(report, to, token) {
+  try {
+    if (!token) throw new Error('Shared mailbox not connected');
+    await postGraphMail(to, report.subject, report.html, `Bearer ${token}`);
+    return null;
+  } catch (err) {
+    const error = err.response?.data?.error?.message || err.message || 'Send failed';
+    console.error(`Report ${report.id} to ${to} failed:`, error);
+    return String(error).slice(0, 500);
+  }
+}
+
+// One email per recipient via the shared mailbox token, recording a delivery
+// row for each (a repeat send to the same address updates its row).
+async function sendReport(reportId, recipients, sentBy) {
+  const result = await pool.query('SELECT id, subject, html FROM reports WHERE id=$1', [reportId]);
+  const report = result.rows[0];
+  if (!report) throw new Error('Report not found');
+  const list = normaliseEmails(recipients);
+  const token = list.length ? await getValidGraphToken() : null;
+  let sent = 0;
+  for (const to of list) {
+    const error = await sendStoredReport(report, to, token);
+    if (!error) sent++;
+    await pool.query(
+      `INSERT INTO report_deliveries (report_id, recipient, status, error, attempts, sent_by, last_attempt_at)
+       VALUES ($1, $2, $3, $4, 1, $5, CURRENT_TIMESTAMP)
+       ON CONFLICT (report_id, recipient) DO UPDATE SET status = EXCLUDED.status, error = EXCLUDED.error,
+         attempts = report_deliveries.attempts + 1, sent_by = EXCLUDED.sent_by, last_attempt_at = CURRENT_TIMESTAMP`,
+      [report.id, to, error ? 'failed' : 'sent', error, sentBy]
+    );
+  }
+  return { sent, total: list.length };
+}
+
+async function saveReport(kind, clientId, range, source, createdBy) {
+  const built = await buildReport(kind, clientId, range);
+  const result = await pool.query(
+    `INSERT INTO reports (kind, client_id, period_start, period_end, subject, html, summary, source, created_by)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+    [kind, clientId, range.periodStart, range.periodEnd, built.subject, built.html, JSON.stringify(built.summary), source, createdBy]
+  );
+  return { id: result.rows[0].id, ...built };
+}
+
+// Scheduled report for one client (or the admin report): claim the month via
+// the unique index, build, save, send. Returns null if it was already claimed.
+async function runScheduledReport(kind, clientId, range, recipients) {
+  const claim = await pool.query(
+    `INSERT INTO reports (kind, client_id, period_start, period_end, source, created_by)
+     VALUES ($1, $2, $3, $4, 'scheduled', 'Scheduled') ON CONFLICT DO NOTHING RETURNING id`,
+    [kind, clientId, range.periodStart, range.periodEnd]
+  );
+  const id = claim.rows[0]?.id;
+  if (!id) return null;
+  try {
+    const built = await buildReport(kind, clientId, range);
+    await pool.query('UPDATE reports SET subject=$2, html=$3, summary=$4 WHERE id=$1', [id, built.subject, built.html, JSON.stringify(built.summary)]);
+  } catch (err) {
+    // Release the claim so the hourly catch-up can try again.
+    await pool.query('DELETE FROM reports WHERE id=$1', [id]).catch(() => {});
+    throw err;
+  }
+  return sendReport(id, recipients, 'Scheduled');
+}
+
+let monthlyReportsRunning = false;
+
+// The scheduled monthly set: the admin report, then each client with at
+// least one recipient.
+async function runMonthlyReports(range = previousReportPeriod()) {
   if (!dbConnected) {
     console.log('⚠️ Reports skipped: DB not connected');
     return { sent: false, reason: 'Database not connected' };
   }
-
-  console.log('📊 Running monthly reports...');
-  
+  if (monthlyReportsRunning) return { sent: false, reason: 'Monthly reports are already being sent' };
+  monthlyReportsRunning = true;
+  console.log(`📊 Running monthly reports for ${range.period}...`);
+  let clientsEmailed = 0;
   try {
-    const msToken = await getValidGraphToken();
-    
-    if (!msToken) {
-      console.log('⚠️ Shared mailbox has never been connected — reports skipped. Use POST /api/admin/graph-auth/connect once to set this up.');
-      return { sent: false, reason: 'Shared mailbox not connected yet — this needs a one-time setup via /api/admin/graph-auth/connect, not just an env var' };
+    try {
+      const admin = await runScheduledReport('admin', null, range, await adminRecipients());
+      if (admin) console.log(`✅ Admin report sent to ${admin.sent} of ${admin.total} recipient(s)`);
+    } catch (err) {
+      console.error('❌ Admin report failed:', err.message);
     }
-    
-    await generateAdminReport(msToken);
-    
-    // Every client with at least one recipient (contact email or active user).
-    const clients = await pool.query('SELECT id,name,email FROM clients ORDER BY id');
-    let clientsEmailed = 0;
+    const clients = await pool.query('SELECT id,name FROM clients ORDER BY id');
     for (const client of clients.rows) {
-      const recipients = await clientReportRecipients(client);
-      if (!recipients.length) continue;
-      await generateClientReport(client.id, client.name, recipients, msToken);
-      clientsEmailed++;
+      try {
+        const recipients = await clientRecipients(client.id);
+        if (!recipients.length) continue;
+        const result = await runScheduledReport('client', client.id, range, recipients);
+        if (!result) continue;
+        clientsEmailed++;
+        console.log(`✅ Client report for ${client.name} sent to ${result.sent} of ${result.total} recipient(s)`);
+      } catch (err) {
+        console.error(`❌ Client report for ${client.name} failed:`, err.message);
+      }
     }
-
     console.log('✅ Monthly reports completed');
     return { sent: true, clientsEmailed };
   } catch (err) {
     console.error('❌ Report generation failed:', err.message);
     return { sent: false, reason: err.message };
+  } finally {
+    monthlyReportsRunning = false;
+  }
+}
+
+// After 5:00 PM on the 1st (Jamaica), sends the previous month's scheduled
+// reports if they haven't gone yet — e.g. the app was down at 5:00 PM. Only
+// months that fell due after stored reports began are caught up.
+async function catchUpMonthlyReports(now = new Date()) {
+  const range = previousReportPeriod(now);
+  const dueAt = monthlyReportDueAt(range.year, range.month);
+  if (now < dueAt) return;
+  const check = await pool.query(
+    `SELECT (SELECT installed_at FROM report_admin_settings WHERE id = 1) AS installed_at,
+            EXISTS (SELECT 1 FROM reports WHERE source='scheduled' AND kind='admin' AND period_start=$1) AS done`,
+    [range.periodStart]
+  );
+  const { installed_at, done } = check.rows[0];
+  if (done || !installed_at || new Date(installed_at) > dueAt) return;
+  console.log(`⏰ Catching up the ${range.period} monthly reports`);
+  await runMonthlyReports(range);
+}
+
+// Re-sends failed deliveries from the last 48 hours, up to MAX_REPORT_ATTEMPTS
+// attempts in all. Each row is claimed by bumping its attempt count first, so
+// two app instances never send the same retry. Waits while the mailbox is
+// disconnected rather than using up attempts.
+async function retryFailedReportDeliveries() {
+  const token = await getValidGraphToken();
+  if (!token) return;
+  const due = await pool.query(
+    `SELECT d.id, d.attempts, d.recipient, r.id AS report_id, r.subject, r.html
+     FROM report_deliveries d JOIN reports r ON r.id = d.report_id
+     WHERE d.status = 'failed' AND d.attempts < $1 AND d.created_at > CURRENT_TIMESTAMP - INTERVAL '48 hours'
+     ORDER BY d.id`,
+    [MAX_REPORT_ATTEMPTS]
+  );
+  for (const d of due.rows) {
+    const claim = await pool.query(
+      "UPDATE report_deliveries SET attempts = attempts + 1, last_attempt_at = CURRENT_TIMESTAMP WHERE id=$1 AND status='failed' AND attempts=$2 RETURNING id",
+      [d.id, d.attempts]
+    );
+    if (!claim.rowCount) continue;
+    const error = await sendStoredReport({ id: d.report_id, subject: d.subject, html: d.html }, d.recipient, token);
+    await pool.query('UPDATE report_deliveries SET status=$2, error=$3 WHERE id=$1', [d.id, error ? 'failed' : 'sent', error]);
+  }
+}
+
+async function runReportMaintenance() {
+  if (!dbConnected) return;
+  try {
+    await catchUpMonthlyReports();
+  } catch (err) {
+    console.error('❌ Monthly report catch-up failed:', err.message);
+  }
+  try {
+    await retryFailedReportDeliveries();
+  } catch (err) {
+    console.error('❌ Report retries failed:', err.message);
   }
 }
 
 // 5:00 PM Jamaica time on the 1st of every month — by then the previous
-// calendar month (the period getMonthRange() reports on) has fully ended.
+// calendar month has fully ended.
 cron.schedule('0 17 1 * *', () => {
   runMonthlyReports();
 }, {
-  timezone: "America/Jamaica"
+  timezone: REPORT_TZ
+});
+
+// Hourly: catch up a missed monthly send and retry failed deliveries.
+cron.schedule('0 * * * *', () => {
+  runReportMaintenance();
+}, {
+  timezone: REPORT_TZ
 });
 
 console.log('📅 Monthly reports scheduled: 1st of each month at 5:00 PM Jamaica time');
@@ -3035,25 +3338,335 @@ app.post('/api/admin/graph-auth/connect', authMiddleware, async (req, res) => {
   }
 });
 
+async function graphAuthStatus() {
+  const stored = await getStoredGraphAuth();
+  if (!stored || !stored.access_token) return { connected: false };
+  return { connected: true, expiresAt: stored.expires_at, hasRefreshToken: !!stored.refresh_token };
+}
+
 app.get('/api/admin/graph-auth/status', authMiddleware, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
-  const stored = await getStoredGraphAuth();
-  if (!stored || !stored.access_token) return res.json({ connected: false });
-  res.json({ connected: true, expiresAt: stored.expires_at, hasRefreshToken: !!stored.refresh_token });
+  res.json(await graphAuthStatus());
 });
 
-app.post('/api/reports/run', authMiddleware, async (req, res) => {
+// ============================================================
+// REPORTS API
+// ============================================================
+
+function requireAdmin(req, res, next) {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  next();
+}
+
+function parseReportId(v) {
+  return /^\d{1,9}$/.test(String(v)) ? Number(v) : null;
+}
+
+function reportPeriodLabel(range) {
+  return range.start.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+}
+
+const REPORT_STATUS_SQL = `CASE WHEN COALESCE(d.total, 0) = 0 THEN 'not_sent' WHEN d.sent = d.total THEN 'sent' WHEN d.sent = 0 THEN 'failed' ELSE 'partial' END`;
+const REPORT_STATUSES = ['sent', 'partial', 'failed', 'not_sent'];
+
+async function loadReport(id) {
+  const result = await pool.query(
+    `SELECT r.id, r.kind, r.client_id, c.name AS client_name, to_char(r.period_start, 'YYYY-MM-DD') AS period_start,
+            to_char(r.period_end, 'YYYY-MM-DD') AS period_end, r.subject, r.html, r.summary, r.source, r.created_by, r.created_at
+     FROM reports r LEFT JOIN clients c ON c.id = r.client_id WHERE r.id = $1`,
+    [id]
+  );
+  if (!result.rows[0]) return null;
+  const deliveries = await pool.query(
+    'SELECT id, recipient, status, error, attempts, sent_by, last_attempt_at, created_at FROM report_deliveries WHERE report_id=$1 ORDER BY created_at, id',
+    [id]
+  );
+  return { ...result.rows[0], deliveries: deliveries.rows };
+}
+
+// Manual reports for one past month: the admin report and/or the given
+// clients, each saved and, if send is set, emailed to its current recipients.
+async function generateReports({ range, clients, includeAdmin, send, createdBy, skipClientsWithoutRecipients }) {
+  const created = [];
+  if (includeAdmin) {
+    const report = await saveReport('admin', null, range, 'manual', createdBy);
+    const delivery = send ? await sendReport(report.id, await adminRecipients(), createdBy) : null;
+    created.push({ ...report, kind: 'admin', client_id: null, client_name: null, period_start: range.periodStart, delivery });
+  }
+  for (const client of clients) {
+    const recipients = await clientRecipients(client.id);
+    if (skipClientsWithoutRecipients && !recipients.length) continue;
+    const report = await saveReport('client', client.id, range, 'manual', createdBy);
+    const delivery = send ? await sendReport(report.id, recipients, createdBy) : null;
+    created.push({ ...report, kind: 'client', client_id: client.id, client_name: client.name, period_start: range.periodStart, delivery });
+  }
+  return created;
+}
+
+app.get('/api/reports', authMiddleware, requireAdmin, async (req, res) => {
+  const where = [], params = [];
+  const { month, kind, client_id, status } = req.query;
+  if (month) {
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) return res.status(400).json({ error: 'month must be YYYY-MM' });
+    params.push(`${month}-01`); where.push(`period_start = $${params.length}::date`);
+  }
+  if (kind) {
+    if (kind !== 'admin' && kind !== 'client') return res.status(400).json({ error: 'kind must be admin or client' });
+    params.push(kind); where.push(`kind = $${params.length}`);
+  }
+  if (client_id) {
+    const id = parseReportId(client_id);
+    if (!id) return res.status(400).json({ error: 'Invalid client_id' });
+    params.push(id); where.push(`client_id = $${params.length}`);
+  }
+  if (status) {
+    if (!REPORT_STATUSES.includes(status)) return res.status(400).json({ error: 'Invalid status' });
+    params.push(status); where.push(`status = $${params.length}`);
+  }
+  const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+  const pageSize = Math.min(100, Math.max(1, parseInt(req.query.page_size, 10) || 25));
+  params.push(pageSize, (page - 1) * pageSize);
   try {
-    const result = await runMonthlyReports();
-    if (result.sent) {
-      res.json({ success: true, message: `Reports actually sent to admin + ${result.clientsEmailed} client(s)` });
+    const result = await pool.query(
+      `SELECT *, COUNT(*) OVER()::int AS full_count FROM (
+         SELECT r.id, r.kind, r.client_id, c.name AS client_name, r.period_start, to_char(r.period_start, 'YYYY-MM-DD') AS period,
+                r.subject, r.source, r.created_by, r.created_at, COALESCE(d.sent, 0)::int AS sent, COALESCE(d.total, 0)::int AS total,
+                ${REPORT_STATUS_SQL} AS status
+         FROM reports r
+         LEFT JOIN clients c ON c.id = r.client_id
+         LEFT JOIN (SELECT report_id, COUNT(*) AS total, COUNT(*) FILTER (WHERE status = 'sent') AS sent FROM report_deliveries GROUP BY report_id) d ON d.report_id = r.id
+       ) x ${where.length ? 'WHERE ' + where.join(' AND ') : ''}
+       ORDER BY created_at DESC, id DESC LIMIT $${params.length - 1} OFFSET $${params.length}`,
+      params
+    );
+    const total = result.rows[0]?.full_count || 0;
+    const reports = result.rows.map(({ full_count, period_start, period, ...r }) => ({ ...r, period_start: period }));
+    res.json({ reports, total, page, pageSize });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/reports/overview', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const last = await pool.query(
+      `SELECT to_char(period_start, 'YYYY-MM-DD') AS period_start, MIN(created_at) AS at FROM reports
+       WHERE source = 'scheduled' GROUP BY period_start ORDER BY period_start DESC LIMIT 1`
+    );
+    let lastReport = null;
+    if (last.rows[0]) {
+      const counts = await pool.query(
+        `SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE d.status = 'sent')::int AS sent, COUNT(*) FILTER (WHERE d.status = 'failed')::int AS failed
+         FROM report_deliveries d JOIN reports r ON r.id = d.report_id WHERE r.source = 'scheduled' AND r.period_start = $1::date`,
+        [last.rows[0].period_start]
+      );
+      lastReport = { ...last.rows[0], ...counts.rows[0] };
+    }
+    const failures = await pool.query(
+      `SELECT COUNT(*)::int AS failures_30d,
+              COUNT(*) FILTER (WHERE d.last_attempt_at > CURRENT_TIMESTAMP - INTERVAL '7 days')::int AS failures_7d,
+              COUNT(*) FILTER (WHERE d.last_attempt_at > CURRENT_TIMESTAMP - INTERVAL '7 days' AND r.source = 'scheduled')::int AS scheduled_failures_7d
+       FROM report_deliveries d JOIN reports r ON r.id = d.report_id
+       WHERE d.status = 'failed' AND d.last_attempt_at > CURRENT_TIMESTAMP - INTERVAL '30 days'`
+    );
+    res.json({
+      last: lastReport,
+      next_at: nextMonthlyReportAt().toISOString(),
+      mailbox: await graphAuthStatus(),
+      ...failures.rows[0]
+    });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/reports/generate', authMiddleware, requireAdmin, async (req, res) => {
+  const { period, client_ids, include_admin, send } = req.body || {};
+  const m = /^(\d{4})-(0[1-9]|1[0-2])$/.exec(String(period || ''));
+  if (!m || Number(m[1]) < 2000) return res.status(400).json({ error: 'Pick a month (YYYY-MM).' });
+  const now = jamaicaParts();
+  if (Number(m[1]) * 12 + Number(m[2]) >= now.year * 12 + now.month) {
+    return res.status(400).json({ error: 'Reports can only be made for a month that has ended.' });
+  }
+  try {
+    let clients = [];
+    if (client_ids === 'all') {
+      clients = (await pool.query('SELECT id, name FROM clients ORDER BY name')).rows;
+    } else if (Array.isArray(client_ids)) {
+      const ids = [...new Set(client_ids.map(parseReportId))];
+      if (ids.some(id => !id)) return res.status(400).json({ error: 'Invalid client id.' });
+      clients = ids.length ? (await pool.query('SELECT id, name FROM clients WHERE id = ANY($1::int[]) ORDER BY name', [ids])).rows : [];
+      if (clients.length !== ids.length) return res.status(400).json({ error: 'Unknown client id.' });
+    } else if (client_ids != null) {
+      return res.status(400).json({ error: "client_ids must be a list of ids or 'all'." });
+    }
+    if (!clients.length && include_admin !== true) return res.status(400).json({ error: 'Choose at least one client or the admin report.' });
+
+    const range = getMonthRange(Number(m[1]), Number(m[2]));
+    const reports = await generateReports({ range, clients, includeAdmin: include_admin === true, send: send === true, createdBy: req.user.username });
+    const names = reports.map(r => r.kind === 'admin' ? 'admin' : r.client_name).join(', ');
+    const failed = reports.reduce((n, r) => n + (r.delivery ? r.delivery.total - r.delivery.sent : 0), 0);
+    await logActivity(1, req.user.username, 'Report', `${send === true ? 'Generated and sent' : 'Generated (not sent)'} ${reportPeriodLabel(range)} report${reports.length === 1 ? '' : 's'}: ${names}` + (failed ? ` — ${failed} deliver${failed === 1 ? 'y' : 'ies'} failed` : ''));
+    res.json({ reports });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/reports/:id', authMiddleware, requireAdmin, async (req, res) => {
+  const id = parseReportId(req.params.id);
+  if (!id) return res.status(404).json({ error: 'Report not found' });
+  try {
+    const report = await loadReport(id);
+    if (!report) return res.status(404).json({ error: 'Report not found' });
+    res.json(report);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/reports/:id/send', authMiddleware, requireAdmin, async (req, res) => {
+  const id = parseReportId(req.params.id);
+  if (!id) return res.status(404).json({ error: 'Report not found' });
+  const { mode, extra } = req.body || {};
+  if (!['all', 'failed', 'extra'].includes(mode)) return res.status(400).json({ error: "mode must be 'all', 'failed' or 'extra'" });
+  try {
+    const report = await loadReport(id);
+    if (!report) return res.status(404).json({ error: 'Report not found' });
+    let recipients;
+    if (mode === 'extra') {
+      const v = validateReportEmails(extra);
+      if (v.error) return res.status(400).json({ error: v.error });
+      recipients = v.emails;
+    } else if (mode === 'failed') {
+      recipients = report.deliveries.filter(d => d.status === 'failed').map(d => d.recipient);
     } else {
-      res.status(200).json({ success: false, message: 'Reports were NOT sent', reason: result.reason });
+      // Everyone it went to before; a report never sent goes to the current recipients.
+      recipients = report.deliveries.length ? report.deliveries.map(d => d.recipient)
+        : report.kind === 'admin' ? await adminRecipients() : await clientRecipients(report.client_id);
+    }
+    if (!recipients.length) return res.status(400).json({ error: mode === 'failed' ? 'No failed recipients to retry.' : 'No recipients to send to.' });
+    const result = await sendReport(id, recipients, req.user.username);
+    const label = mode === 'failed' ? 'Resent failed deliveries of' : mode === 'extra' ? 'Sent' : report.deliveries.length ? 'Resent' : 'Sent';
+    await logActivity(report.client_id || 1, req.user.username, 'Report', `${label} "${report.subject}"${mode === 'extra' ? ' to ' + recipients.join(', ') : ''} — ${result.sent} of ${result.total} sent`);
+    res.json({ ...result, report: await loadReport(id) });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Kept for existing callers: the previous month's admin report and every
+// client with recipients, generated and sent like a manual report.
+app.post('/api/reports/run', authMiddleware, requireAdmin, async (req, res) => {
+  try {
+    const clients = (await pool.query('SELECT id, name FROM clients ORDER BY id')).rows;
+    const range = previousReportPeriod();
+    const reports = await generateReports({ range, clients, includeAdmin: true, send: true, createdBy: req.user.username, skipClientsWithoutRecipients: true });
+    const clientsEmailed = reports.filter(r => r.kind === 'client').length;
+    const failed = reports.reduce((n, r) => n + r.delivery.total - r.delivery.sent, 0);
+    await logActivity(1, req.user.username, 'Report', `Generated and sent ${reportPeriodLabel(range)} reports: admin + ${clientsEmailed} client(s)` + (failed ? ` — ${failed} deliver${failed === 1 ? 'y' : 'ies'} failed` : ''));
+    if (!failed) {
+      res.json({ success: true, message: `Reports actually sent to admin + ${clientsEmailed} client(s)` });
+    } else {
+      res.status(200).json({ success: false, message: 'Some reports were NOT sent', reason: `${failed} deliver${failed === 1 ? 'y' : 'ies'} failed — they are retried hourly; see Tools → Reports` });
     }
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+async function loadClientReportSettings(clientId) {
+  const result = await pool.query(
+    `SELECT c.id, c.name, c.email, s.enabled, s.include_users, s.excluded_user_ids, s.extra_recipients
+     FROM clients c LEFT JOIN client_report_settings s ON s.client_id = c.id WHERE c.id = $1`,
+    [clientId]
+  );
+  const row = result.rows[0];
+  if (!row) return null;
+  const users = await pool.query("SELECT id, email, role FROM users WHERE client_id=$1 AND status='active' ORDER BY LOWER(email)", [clientId]);
+  return {
+    client_id: row.id, client_name: row.name, contact_email: row.email || '',
+    enabled: row.enabled !== false, include_users: row.include_users !== false,
+    excluded_user_ids: row.excluded_user_ids || [], extra_recipients: row.extra_recipients || [],
+    users: users.rows, recipients: await clientRecipients(clientId)
+  };
+}
+
+async function loadAdminReportSettings() {
+  return { always: [ADMIN_EMAIL], extra_recipients: await adminReportExtras(), recipients: await adminRecipients() };
+}
+
+app.get('/api/report-settings/admin', authMiddleware, requireAdmin, async (req, res) => {
+  try { res.json(await loadAdminReportSettings()); } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/report-settings/admin', authMiddleware, requireAdmin, async (req, res) => {
+  const v = validateReportEmails((req.body || {}).extra_recipients);
+  if (v.error) return res.status(400).json({ error: v.error });
+  const extras = v.emails.filter(e => e !== ADMIN_EMAIL.toLowerCase());
+  try {
+    await pool.query(
+      `INSERT INTO report_admin_settings (id, extra_recipients, updated_at) VALUES (1, $1, CURRENT_TIMESTAMP)
+       ON CONFLICT (id) DO UPDATE SET extra_recipients = $1, updated_at = CURRENT_TIMESTAMP`,
+      [extras]
+    );
+    await logActivity(1, req.user.username, 'Report', `Admin report extra recipients set to ${extras.length ? extras.join(', ') : 'none'}`);
+    res.json(await loadAdminReportSettings());
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/report-settings/:clientId', authMiddleware, requireAdmin, async (req, res) => {
+  const id = parseReportId(req.params.clientId);
+  if (!id) return res.status(404).json({ error: 'Client not found' });
+  try {
+    const settings = await loadClientReportSettings(id);
+    if (!settings) return res.status(404).json({ error: 'Client not found' });
+    res.json(settings);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/report-settings/:clientId', authMiddleware, requireAdmin, async (req, res) => {
+  const id = parseReportId(req.params.clientId);
+  if (!id) return res.status(404).json({ error: 'Client not found' });
+  const { enabled, include_users, excluded_user_ids, extra_recipients } = req.body || {};
+  if (typeof enabled !== 'boolean' || typeof include_users !== 'boolean') return res.status(400).json({ error: 'enabled and include_users must be true or false.' });
+  if (excluded_user_ids != null && (!Array.isArray(excluded_user_ids) || excluded_user_ids.some(u => !parseReportId(u)))) {
+    return res.status(400).json({ error: 'excluded_user_ids must be a list of user ids.' });
+  }
+  const v = validateReportEmails(extra_recipients);
+  if (v.error) return res.status(400).json({ error: v.error });
+  try {
+    const client = await pool.query('SELECT name FROM clients WHERE id=$1', [id]);
+    if (!client.rows[0]) return res.status(404).json({ error: 'Client not found' });
+    const excluded = [...new Set((excluded_user_ids || []).map(Number))];
+    await pool.query(
+      `INSERT INTO client_report_settings (client_id, enabled, include_users, excluded_user_ids, extra_recipients, updated_at)
+       VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)
+       ON CONFLICT (client_id) DO UPDATE SET enabled = $2, include_users = $3, excluded_user_ids = $4, extra_recipients = $5, updated_at = CURRENT_TIMESTAMP`,
+      [id, enabled, include_users, excluded, v.emails]
+    );
+    const settings = await loadClientReportSettings(id);
+    await logActivity(id, req.user.username, 'Report', `Monthly report recipients for ${client.rows[0].name} updated: ` +
+      (enabled ? `${settings.recipients.length} recipient${settings.recipients.length === 1 ? '' : 's'}` : 'reports turned off'));
+    res.json(settings);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Client logins: their own client's reports that reached at least one
+// recipient. No delivery details or addresses.
+const MY_REPORTS_SQL = `SELECT r.id, to_char(r.period_start, 'YYYY-MM-DD') AS period_start, to_char(r.period_end, 'YYYY-MM-DD') AS period_end,
+    r.subject, r.created_at%s
+  FROM reports r
+  WHERE r.kind = 'client' AND r.client_id = $1
+    AND EXISTS (SELECT 1 FROM report_deliveries d WHERE d.report_id = r.id AND d.status = 'sent')`;
+
+app.get('/api/my-reports', authMiddleware, async (req, res) => {
+  if (!isClientAccount(req)) return res.status(403).json({ error: 'Not authorized' });
+  try {
+    const result = await pool.query(MY_REPORTS_SQL.replace('%s', '') + ' ORDER BY r.period_start DESC, r.created_at DESC', [req.user.client_id]);
+    res.json(result.rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/my-reports/:id', authMiddleware, async (req, res) => {
+  if (!isClientAccount(req)) return res.status(403).json({ error: 'Not authorized' });
+  const id = parseReportId(req.params.id);
+  if (!id) return res.status(404).json({ error: 'Report not found' });
+  try {
+    const result = await pool.query(MY_REPORTS_SQL.replace('%s', ', r.html') + ' AND r.id = $2', [req.user.client_id, id]);
+    if (!result.rows[0]) return res.status(404).json({ error: 'Report not found' });
+    res.json(result.rows[0]);
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 // ============================================================
