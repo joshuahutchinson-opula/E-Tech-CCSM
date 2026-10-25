@@ -300,6 +300,42 @@ async function notifyClientUsers(clientId, subject, html, token) {
   return sent;
 }
 
+// ---- Multiple technicians per SR ----
+// service_requests.assigned_to holds a comma-separated list ("Roger, Akeem");
+// empty or "Unassigned" means nobody. Tech names never contain commas.
+function parseAssignees(v) {
+  const list = Array.isArray(v) ? v : String(v == null ? '' : v).split(',');
+  return [...new Set(list.map(s => String(s == null ? '' : s).trim()).filter(s => s && s !== 'Unassigned'))];
+}
+function formatAssignees(arr) { return arr.length ? arr.join(', ') : 'Unassigned'; }
+// Request body assigned_to (array or string) -> { list, value } or { error };
+// {} when it wasn't sent.
+function normaliseAssignedTo(v) {
+  if (v === undefined || v === null) return {};
+  const list = parseAssignees(v);
+  const unknown = list.find(n => !Object.prototype.hasOwnProperty.call(TECH_EMAILS, n));
+  if (unknown) return { error: `Unknown technician: ${unknown}` };
+  return { list, value: formatAssignees(list) };
+}
+// Compares sets, not strings. msg is null when nothing changed.
+function assignmentChange(oldValue, newList, by) {
+  const old = parseAssignees(oldValue);
+  const added = newList.filter(n => !old.includes(n)), removed = old.filter(n => !newList.includes(n));
+  let msg = null;
+  if (added.length && removed.length) msg = `Added ${added.join(', ')}, removed ${removed.join(', ')} by ${by}`;
+  else if (added.length) msg = `${old.length ? 'Added' : 'Assigned'} ${added.join(', ')} by ${by}`;
+  else if (removed.length) msg = `Removed ${removed.join(', ')} by ${by}`;
+  return { added, removed, msg };
+}
+// "[CAMS] Assigned" email to each newly added tech only.
+async function emailNewAssignees(sr, added, priority, token) {
+  if (!token || !sr) return;
+  for (const tech of added) {
+    const techEmailBody = `<h2>You've been assigned a Service Request</h2><p><strong>SR ID:</strong> ${sr.sr_id}</p><p><strong>Subject:</strong> ${sr.subject}</p><p><strong>Client:</strong> ${sr.client}</p><p><strong>Site:</strong> ${sr.site}</p><p><strong>Priority:</strong> ${priority || sr.priority}</p><hr><p>View in CAMS: <a href="${process.env.APP_URL || "https://e-tech-cams.up.railway.app"}">Open Dashboard</a></p>`;
+    await sendEmailNotification(TECH_EMAILS[tech], `[CAMS] Assigned: ${sr.sr_id} — ${sr.subject}`, techEmailBody, `Bearer ${token}`);
+  }
+}
+
 // Client-facing SR emails: every SR value is escaped; internal notes are never included.
 const isRealTech = name => typeof name === 'string' && name.trim() !== '' && name.trim() !== 'Unassigned';
 function srClientEmailHtml(heading, rows, closing) {
@@ -318,8 +354,8 @@ function notifyRequestReceived(sr, token) {
 function notifyTechnicianAssigned(sr, tech, priority, token) {
   if (!sr || !sr.client_id || !isRealTech(tech)) return Promise.resolve(0);
   return notifyClientUsers(sr.client_id, `[CAMS] Technician assigned: ${sr.sr_id} — ${sr.subject}`,
-    srClientEmailHtml(`Technician assigned: ${sr.sr_id}`, [['SR ID', sr.sr_id], ['Subject', sr.subject], ['Site', sr.site], ['Priority', priority || sr.priority], ['Technician', tech]],
-      `${tech} from E-Tech has been assigned to your request.`), token);
+    srClientEmailHtml(`Technician assigned: ${sr.sr_id}`, [['SR ID', sr.sr_id], ['Subject', sr.subject], ['Site', sr.site], ['Priority', priority || sr.priority], [tech.includes(',') ? 'Technicians' : 'Technician', tech]],
+      `${tech} from E-Tech ${tech.includes(',') ? 'have' : 'has'} been assigned to your request.`), token);
 }
 
 // ============================================================
@@ -1312,7 +1348,8 @@ app.get('/api/service-requests/search', authMiddleware, async (req, res) => {
   if (val('assigned_to') === 'Unassigned') {
     where.push(`(assigned_to IS NULL OR assigned_to IN ('', 'Unassigned'))`);
   } else if (val('assigned_to')) {
-    where.push(`assigned_to = ${add(val('assigned_to'))}`);
+    // assigned_to is a comma-separated list; match the name anywhere in it.
+    where.push(`${add(val('assigned_to'))} = ANY(regexp_split_to_array(assigned_to, '\\s*,\\s*'))`);
   }
 
   // from/to are whole days in Jamaica time, both inclusive.
@@ -1393,7 +1430,10 @@ app.get('/api/service-requests/search', authMiddleware, async (req, res) => {
 
 app.post('/api/service-requests', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
-  const { subject, site, category, priority, assigned_to, body, related_hardware } = req.body;
+  const { subject, site, category, priority, body, related_hardware } = req.body;
+  const assignees = normaliseAssignedTo(req.body.assigned_to);
+  if (assignees.error) return res.status(400).json({ error: assignees.error });
+  const assigned_to = assignees.value || 'Unassigned';
   const srId = `SR-${String(Math.floor(Math.random() * 9000) + 1000)}`;
   try {
     // File the SR under a real client, with client_id and the client name
@@ -1429,10 +1469,7 @@ app.post('/api/service-requests', authMiddleware, async (req, res) => {
       const emailBody = `<h2>New Service Request: ${srId}</h2><p><strong>Client:</strong> ${client}</p><p><strong>Site:</strong> ${site}</p><p><strong>Category:</strong> ${category}</p><p><strong>Priority:</strong> ${priority}</p><p><strong>Assigned To:</strong> ${assigned_to}</p><p><strong>Subject:</strong> ${subject}</p><p><strong>Description:</strong> ${body || 'No description'}</p><hr><p>View in CAMS: <a href="${process.env.APP_URL || "https://e-tech-cams.up.railway.app"}">Open Dashboard</a></p>`;
       await sendEmailNotification('support@e-techsystemsja.com', `[CAMS] New SR: ${srId} — ${subject}`, emailBody, `Bearer ${msToken}`);
       
-      if (assigned_to && assigned_to !== 'Unassigned' && TECH_EMAILS[assigned_to]) {
-        const techEmailBody = `<h2>You've been assigned a Service Request</h2><p><strong>SR ID:</strong> ${srId}</p><p><strong>Subject:</strong> ${subject}</p><p><strong>Client:</strong> ${client}</p><p><strong>Site:</strong> ${site}</p><p><strong>Priority:</strong> ${priority}</p><hr><p>View in CAMS: <a href="${process.env.APP_URL || "https://e-tech-cams.up.railway.app"}">Open Dashboard</a></p>`;
-        await sendEmailNotification(TECH_EMAILS[assigned_to], `[CAMS] Assigned: ${srId} — ${subject}`, techEmailBody, `Bearer ${msToken}`);
-      }
+      await emailNewAssignees(result.rows[0], parseAssignees(assigned_to), priority, msToken);
       await notifyRequestReceived(result.rows[0], msToken);
     }
 
@@ -1452,8 +1489,11 @@ function srNoteStamp(date) {
 app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
-  const { priority, assigned_to, status } = req.body;
+  const { priority, status } = req.body;
   let { notes } = req.body;
+  const assignees = normaliseAssignedTo(req.body.assigned_to);
+  if (assignees.error) return res.status(400).json({ error: assignees.error });
+  const assigned_to = assignees.value; // undefined = leave as is
   const clientId = req.user.role === 'admin' ? null : req.user.client_id;
   try {
     const current = await pool.query('SELECT * FROM service_requests WHERE id=$1', [id]);
@@ -1483,16 +1523,15 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
       await pool.query('UPDATE service_requests SET resolved_at = CURRENT_TIMESTAMP WHERE id = $1', [id]);
     }
     
-    if (assigned_to && assigned_to !== oldAssigned) {
-      await pool.query('INSERT INTO sr_history (sr_id,time,msg) VALUES ($1,$2,$3)', [id, new Date().toLocaleTimeString(), `Transferred from ${oldAssigned||'Unassigned'} to ${assigned_to} by ${req.user.username}`]);
-      
-      const msToken = await getValidGraphToken();
-      if (!msToken) console.error('Cannot send assigned email — no Graph token available for the shared mailbox');
-      if (msToken && assigned_to !== 'Unassigned' && TECH_EMAILS[assigned_to]) {
-        const techEmailBody = `<h2>You've been assigned a Service Request</h2><p><strong>SR ID:</strong> ${oldSr.sr_id}</p><p><strong>Subject:</strong> ${oldSr.subject}</p><p><strong>Client:</strong> ${oldSr.client}</p><p><strong>Site:</strong> ${oldSr.site}</p><p><strong>Priority:</strong> ${priority || oldSr.priority}</p><hr><p>View in CAMS: <a href="${process.env.APP_URL || "https://e-tech-cams.up.railway.app"}">Open Dashboard</a></p>`;
-        await sendEmailNotification(TECH_EMAILS[assigned_to], `[CAMS] Assigned: ${oldSr.sr_id} — ${oldSr.subject}`, techEmailBody, `Bearer ${msToken}`);
+    const change = assignees.list && oldSr && updateResult.rowCount > 0 ? assignmentChange(oldAssigned, assignees.list, req.user.username) : null;
+    if (change && change.msg) {
+      await pool.query('INSERT INTO sr_history (sr_id,time,msg) VALUES ($1,$2,$3)', [id, new Date().toLocaleTimeString(), change.msg]);
+      if (change.added.length) {
+        const msToken = await getValidGraphToken();
+        if (!msToken) console.error('Cannot send assigned email — no Graph token available for the shared mailbox');
+        await emailNewAssignees(oldSr, change.added, priority, msToken);
+        if (msToken) await notifyTechnicianAssigned(oldSr, assigned_to, priority, msToken);
       }
-      if (msToken && updateResult.rowCount > 0) await notifyTechnicianAssigned(oldSr, assigned_to, priority, msToken);
     }
     
     // One timeline entry per field that actually changed (an assignee change
@@ -1553,22 +1592,26 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
 app.post('/api/service-requests/:id/transfer', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
-  const { assigned_to } = req.body;
+  const assignees = normaliseAssignedTo(req.body.assigned_to);
+  if (assignees.error) return res.status(400).json({ error: assignees.error });
+  if (!assignees.list) return res.status(400).json({ error: 'assigned_to is required' });
+  const assigned_to = assignees.value;
   try {
     const current = await pool.query('SELECT * FROM service_requests WHERE id=$1', [id]);
-    const oldAssigned = current.rows[0]?.assigned_to;
+    if (!current.rows[0]) return res.status(404).json({ error: 'Service request not found' });
+    const oldAssigned = current.rows[0].assigned_to;
     await pool.query('UPDATE service_requests SET assigned_to=$1,updated_at=CURRENT_TIMESTAMP WHERE id=$2', [assigned_to, id]);
-    await pool.query('INSERT INTO sr_history (sr_id,time,msg) VALUES ($1,$2,$3)', [id, new Date().toLocaleTimeString(), `Transferred from ${oldAssigned||'Unassigned'} to ${assigned_to} by ${req.user.username}`]);
-    await logActivity(1, req.user.username, 'Assigned', 'SR ' + id + ' transferred to ' + assigned_to);
-    
-    const msToken = await getValidGraphToken();
-    if (!msToken) console.error('Cannot send assigned email — no Graph token available for the shared mailbox');
-    if (msToken && assigned_to !== 'Unassigned' && TECH_EMAILS[assigned_to]) {
-      const sr = current.rows[0];
-      const techEmailBody = `<h2>You've been assigned a Service Request</h2><p><strong>SR ID:</strong> ${sr.sr_id}</p><p><strong>Subject:</strong> ${sr.subject}</p><p><strong>Client:</strong> ${sr.client}</p><p><strong>Site:</strong> ${sr.site}</p><p><strong>Priority:</strong> ${sr.priority}</p><hr><p>View in CAMS: <a href="${process.env.APP_URL || "https://e-tech-cams.up.railway.app"}">Open Dashboard</a></p>`;
-      await sendEmailNotification(TECH_EMAILS[assigned_to], `[CAMS] Assigned: ${sr.sr_id} — ${sr.subject}`, techEmailBody, `Bearer ${msToken}`);
+    const change = assignmentChange(oldAssigned, assignees.list, req.user.username);
+    if (change.msg) {
+      await pool.query('INSERT INTO sr_history (sr_id,time,msg) VALUES ($1,$2,$3)', [id, new Date().toLocaleTimeString(), change.msg]);
+      await logActivity(1, req.user.username, 'Assigned', 'SR ' + id + ' assigned to ' + assigned_to);
     }
-    if (msToken && assigned_to !== oldAssigned) await notifyTechnicianAssigned(current.rows[0], assigned_to, null, msToken);
+    if (change.added.length) {
+      const msToken = await getValidGraphToken();
+      if (!msToken) console.error('Cannot send assigned email — no Graph token available for the shared mailbox');
+      await emailNewAssignees(current.rows[0], change.added, null, msToken);
+      if (msToken) await notifyTechnicianAssigned(current.rows[0], assigned_to, null, msToken);
+    }
     
     const updated = await pool.query('SELECT * FROM service_requests WHERE id=$1', [id]);
     res.json({ success: true, data: updated.rows[0] });

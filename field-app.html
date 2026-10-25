@@ -1410,9 +1410,15 @@ async function refreshNow() {
 // TICKET HELPERS
 // ============================================================
 function getFieldTechName() { return (currentUser && currentUser.username) || ''; }
+// assigned_to can list several technicians ("Roger, Akeem").
+function parseAssignees(v) {
+  var out = [];
+  String(v == null ? '' : v).split(',').forEach(function(x) { x = x.trim(); if (x && x !== 'Unassigned' && out.indexOf(x) === -1) out.push(x); });
+  return out;
+}
 function isMine(r) {
   var uname = lc(getFieldTechName());
-  return !!uname && lc(r.assigned_to).trim() === uname;
+  return !!uname && parseAssignees(r.assigned_to).some(function(n) { return lc(n) === uname; });
 }
 function isOpenTicket(r) { return r.status !== 'Resolved' && r.status !== 'Retracted'; }
 function isUrgent(r) { return lc(r.priority).indexOf('high') !== -1 && isOpenTicket(r); }
