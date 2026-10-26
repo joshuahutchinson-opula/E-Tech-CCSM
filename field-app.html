@@ -780,7 +780,8 @@ var ASSET_TYPES = [
   { key: 'cameras', label: 'Camera', plural: 'Cameras', icon: 'ti-video', warranty: 'warranty', comments: true,
     fields: [['IP address', 'ip_address'], ['Model', 'model'], ['Manufacturer', 'manufacturer'], ['Resolution', 'resolution'], ['Archiver', 'archiver'], ['MAC address', 'mac_address']],
     dates: [['Last cleaned', 'date_cleaned']] },
-  { key: 'doors', label: 'Door', plural: 'Doors', icon: 'ti-door', warranty: 'warranty_expiry', comments: true,
+  { key: 'doors', label: 'Door', plural: 'Doors', icon: 'ti-door', comments: true,
+    warranties: [['Controller warranty', 'controller_warranty_expiry'], ['Reader warranty', 'reader_warranty_expiry'], ['Lock warranty', 'lock_warranty_expiry']],
     fields: [['IP address', 'ip_address'], ['Reader', 'reader'], ['Lock type', 'lock_type'], ['Controller', 'controller_type'], ['Door swing', 'door_swing'], ['Access type', 'access_type'], ['Anti-passback', 'anti_passback'], ['Technology', 'tech']],
     dates: [['Installed', 'install_date']] },
   { key: 'servers', label: 'Server', plural: 'Servers', icon: 'ti-server', warranty: 'warranty_expiry', comments: true,
@@ -2634,7 +2635,9 @@ function deviceDetailHtml(type, d) {
   var network = [['IP address', d.ip_address], ['MAC address', d.mac_address]].filter(function(r) { return hasValue(r[1]); });
   if (network.length) html += '<section class="detail-section"><h3>Network</h3>' + kvRows(network) + '</section>';
   var dates = t.dates.filter(function(f) { return fmtDate(d[f[1]]); }).map(function(f) { return [f[0], esc(fmtDate(d[f[1]])), true]; });
-  if (parseDateValue(d[t.warranty])) dates.push(['Warranty', getWarrantyDisplay(d[t.warranty]), true]);
+  // Doors list every part's warranty, showing Not recorded when it's empty.
+  if (t.warranties) t.warranties.forEach(function(f) { dates.push([f[0], getWarrantyDisplay(d[f[1]]), true]); });
+  else if (parseDateValue(d[t.warranty])) dates.push(['Warranty', getWarrantyDisplay(d[t.warranty]), true]);
   if (dates.length) html += '<section class="detail-section"><h3>Warranty &amp; dates</h3>' + kvRows(dates) + '</section>';
   if (t.comments) {
     html += '<section class="detail-section"><div class="field" style="margin-bottom:8px;"><label for="device-comment-input">Comment</label>' +

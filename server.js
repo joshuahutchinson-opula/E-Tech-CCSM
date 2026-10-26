@@ -168,6 +168,10 @@ pool.connect((err, client, release) => {
     pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarded_at TIMESTAMP')
       .then(() => console.log('✅ users.onboarded_at column ready'))
       .catch(e => console.error('❌ Could not add users.onboarded_at:', e.message));
+    // Separate controller, reader and lock warranties on doors (also in migrations/008).
+    runSchema(DOOR_WARRANTY_SCHEMA)
+      .then(() => console.log('✅ Door part warranty columns ready'))
+      .catch(e => console.error('❌ Could not add door part warranty columns:', e.message));
     // Stored monthly reports (also in migrations/006). Once ready, sends a
     // missed monthly report and retries failed deliveries.
     // Password reset links (also in migrations/007).
@@ -780,8 +784,10 @@ app.post('/api/import/doors', authMiddleware, async (req, res) => {
     const clientIds = await validateImportClients(doors, res);
     if (!clientIds) return;
     for (const [idx, door] of doors.entries()) {
-      await pool.query(`INSERT INTO doors (client_id,name,zone,status,tech,reader,lock_type,ip_address,controller_type,door_swing,access_type,anti_passback,install_date,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`,
-        [clientIds[idx], door.name||'', door.zone||door.site||'', door.status||'Online', door.tech||'', door.reader||'', door.lock_type||'', door.ip_address||'', door.controller_type||'', door.door_swing||'', door.access_type||'', door.anti_passback||'', door.install_date||null, door.warranty_expiry||null, door.comments||'']);
+      await pool.query(`INSERT INTO doors (client_id,name,zone,status,tech,reader,lock_type,ip_address,controller_type,door_swing,access_type,anti_passback,install_date,controller_warranty_expiry,reader_warranty_expiry,lock_warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)`,
+        [clientIds[idx], door.name||'', door.zone||door.site||'', door.status||'Online', door.tech||'', door.reader||'', door.lock_type||'', door.ip_address||'', door.controller_type||'', door.door_swing||'', door.access_type||'', door.anti_passback||'', door.install_date||null,
+          // An old-style warranty_expiry column fills any part not given.
+          door.controller_warranty_expiry||door.warranty_expiry||null, door.reader_warranty_expiry||door.warranty_expiry||null, door.lock_warranty_expiry||door.warranty_expiry||null, door.comments||'']);
       imported++;
     }
     const { clientIdForLog, clientLabel } = await describeClientsForLog(doors);
@@ -941,7 +947,7 @@ app.get('/api/doors', authMiddleware, async (req, res) => {
 app.put('/api/doors/:id', authMiddleware, blockAssetEdit, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
-  const { status, comments, name, zone, tech, reader, lock_type, ip_address, controller_type, door_swing, access_type, anti_passback, install_date, warranty_expiry } = req.body;
+  const { status, comments, name, zone, tech, reader, lock_type, ip_address, controller_type, door_swing, access_type, anti_passback, install_date, controller_warranty_expiry, reader_warranty_expiry, lock_warranty_expiry } = req.body;
   try {
     const userClientId = req.user.role === 'admin' ? null : req.user.client_id;
     const asset = await pool.query('SELECT name, client_id FROM doors WHERE id=$1', [id]);
@@ -949,8 +955,8 @@ app.put('/api/doors/:id', authMiddleware, blockAssetEdit, async (req, res) => {
     const assetClientId = asset.rows[0]?.client_id;
     const assetClient = await getClientNameById(assetClientId);
     if (req.user.role === 'admin') {
-      const query = userClientId ? `UPDATE doors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),tech=COALESCE($4,tech),reader=COALESCE($5,reader),lock_type=COALESCE($6,lock_type),ip_address=COALESCE($7,ip_address),controller_type=COALESCE($8,controller_type),door_swing=COALESCE($9,door_swing),access_type=COALESCE($10,access_type),anti_passback=COALESCE($11,anti_passback),install_date=$12,warranty_expiry=$13,comments=COALESCE($14,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$15 AND client_id=$16` : `UPDATE doors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),tech=COALESCE($4,tech),reader=COALESCE($5,reader),lock_type=COALESCE($6,lock_type),ip_address=COALESCE($7,ip_address),controller_type=COALESCE($8,controller_type),door_swing=COALESCE($9,door_swing),access_type=COALESCE($10,access_type),anti_passback=COALESCE($11,anti_passback),install_date=$12,warranty_expiry=$13,comments=COALESCE($14,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$15`;
-      const params = userClientId ? [name,zone,status,tech,reader,lock_type,ip_address,controller_type,door_swing,access_type,anti_passback,install_date,warranty_expiry,comments,id,userClientId] : [name,zone,status,tech,reader,lock_type,ip_address,controller_type,door_swing,access_type,anti_passback,install_date,warranty_expiry,comments,id];
+      const query = userClientId ? `UPDATE doors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),tech=COALESCE($4,tech),reader=COALESCE($5,reader),lock_type=COALESCE($6,lock_type),ip_address=COALESCE($7,ip_address),controller_type=COALESCE($8,controller_type),door_swing=COALESCE($9,door_swing),access_type=COALESCE($10,access_type),anti_passback=COALESCE($11,anti_passback),install_date=$12,controller_warranty_expiry=$13,reader_warranty_expiry=$14,lock_warranty_expiry=$15,comments=COALESCE($16,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$17 AND client_id=$18` : `UPDATE doors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),tech=COALESCE($4,tech),reader=COALESCE($5,reader),lock_type=COALESCE($6,lock_type),ip_address=COALESCE($7,ip_address),controller_type=COALESCE($8,controller_type),door_swing=COALESCE($9,door_swing),access_type=COALESCE($10,access_type),anti_passback=COALESCE($11,anti_passback),install_date=$12,controller_warranty_expiry=$13,reader_warranty_expiry=$14,lock_warranty_expiry=$15,comments=COALESCE($16,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$17`;
+      const params = userClientId ? [name,zone,status,tech,reader,lock_type,ip_address,controller_type,door_swing,access_type,anti_passback,install_date,controller_warranty_expiry,reader_warranty_expiry,lock_warranty_expiry,comments,id,userClientId] : [name,zone,status,tech,reader,lock_type,ip_address,controller_type,door_swing,access_type,anti_passback,install_date,controller_warranty_expiry,reader_warranty_expiry,lock_warranty_expiry,comments,id];
       await pool.query(query, params);
     } else {
       const query = userClientId ? 'UPDATE doors SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3 AND client_id=$4' : 'UPDATE doors SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3';
@@ -1156,7 +1162,7 @@ app.put('/api/intrusion/:id', authMiddleware, blockAssetEdit, async (req, res) =
 // scoped exactly like the matching list route; staff may add ?client_id=.
 const EXPORT_TYPES = {
   cameras: { table: 'cameras', order: 'zone, name', zoned: true, columns: ['name','zone','status','comments','model','manufacturer','resolution','archiver','ip_address','mac_address','warranty','date_cleaned'] },
-  doors: { table: 'doors', order: 'zone,name', zoned: true, columns: ['name','zone','status','tech','reader','lock_type','door_swing','access_type','anti_passback','controller_type','ip_address','install_date','warranty_expiry','comments'] },
+  doors: { table: 'doors', order: 'zone,name', zoned: true, columns: ['name','zone','status','tech','reader','lock_type','door_swing','access_type','anti_passback','controller_type','ip_address','install_date','controller_warranty_expiry','reader_warranty_expiry','lock_warranty_expiry','comments'] },
   servers: { table: 'servers', order: 'zone,name', zoned: true, columns: ['name','zone','status','make','model','capacity','used','health','apps','serial','warranty_expiry','comments'] },
   switches: { table: 'switches', order: 'zone,name', zoned: true, columns: ['name','zone','status','model','firmware','ip_address','mac','warranty_expiry','comments'] },
   storage: { table: 'storage', order: 'zone,name', zoned: true, columns: ['name','zone','status','type','make','model','capacity','used','serial','warranty_expiry','comments'] },
@@ -2975,7 +2981,7 @@ const EXPIRY_ALERT_SCHEMA = [
     id SERIAL PRIMARY KEY,
     asset_table TEXT NOT NULL,
     asset_id INTEGER NOT NULL,
-    kind TEXT NOT NULL CHECK (kind IN ('warranty', 'licence')),
+    kind TEXT NOT NULL CHECK (kind IN ('warranty', 'licence', 'warranty-controller', 'warranty-reader', 'warranty-lock')),
     expiry_date DATE NOT NULL,
     threshold INTEGER NOT NULL CHECK (threshold IN (60, 30)),
     report_id INTEGER,
@@ -2991,6 +2997,47 @@ const EXPIRY_ALERT_SCHEMA = [
       ALTER TABLE reports ADD CONSTRAINT reports_kind_check CHECK (kind IN ('admin', 'client', 'expiry'));
     END IF;
   END $$`,
+  // Door parts are alerted separately (also in migrations/008): a kind CHECK
+  // from before the split is replaced with one that allows the part kinds.
+  `DO $$
+  DECLARE c RECORD; dropped BOOLEAN := FALSE;
+  BEGIN
+    FOR c IN SELECT conname FROM pg_constraint WHERE conrelid = 'expiry_alerts_sent'::regclass AND contype = 'c'
+        AND pg_get_constraintdef(oid) LIKE '%kind%' AND pg_get_constraintdef(oid) NOT LIKE '%warranty-lock%' LOOP
+      EXECUTE format('ALTER TABLE expiry_alerts_sent DROP CONSTRAINT %I', c.conname);
+      dropped := TRUE;
+    END LOOP;
+    IF dropped THEN
+      ALTER TABLE expiry_alerts_sent ADD CONSTRAINT expiry_alerts_sent_kind_check
+        CHECK (kind IN ('warranty', 'licence', 'warranty-controller', 'warranty-reader', 'warranty-lock'));
+    END IF;
+  END $$`,
+];
+
+// Same statements as migrations/008_door_component_warranties.sql. The copy of
+// the old single warranty_expiry into the three part columns runs only in the
+// run that creates them, so a part cleared later is never refilled; a value
+// that isn't a readable YYYY-MM-DD date is left for staff to enter by hand.
+const DOOR_WARRANTY_SCHEMA = [
+  `DO $$
+  DECLARE r RECORD;
+  BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = 'doors' AND column_name = 'controller_warranty_expiry') THEN
+      ALTER TABLE doors ADD COLUMN controller_warranty_expiry DATE;
+      ALTER TABLE doors ADD COLUMN IF NOT EXISTS reader_warranty_expiry DATE;
+      ALTER TABLE doors ADD COLUMN IF NOT EXISTS lock_warranty_expiry DATE;
+      FOR r IN SELECT id, substring(warranty_expiry::text from '^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}') AS w FROM doors
+          WHERE warranty_expiry IS NOT NULL AND controller_warranty_expiry IS NULL AND reader_warranty_expiry IS NULL AND lock_warranty_expiry IS NULL LOOP
+        CONTINUE WHEN r.w IS NULL;
+        BEGIN
+          UPDATE doors SET controller_warranty_expiry = r.w::date, reader_warranty_expiry = r.w::date, lock_warranty_expiry = r.w::date WHERE id = r.id;
+        EXCEPTION WHEN others THEN NULL;
+        END;
+      END LOOP;
+    END IF;
+  END $$`,
+  `ALTER TABLE doors ADD COLUMN IF NOT EXISTS reader_warranty_expiry DATE`,
+  `ALTER TABLE doors ADD COLUMN IF NOT EXISTS lock_warranty_expiry DATE`,
 ];
 
 function jamaicaParts(date = new Date()) {
@@ -3494,7 +3541,9 @@ const EXPIRY_HOUR = 8;
 const EXPIRY_WINDOW_DAYS = 60;
 const EXPIRY_SOURCES = [
   { table: 'cameras', type: 'Camera', column: 'warranty', kind: 'warranty' },
-  { table: 'doors', type: 'Door', column: 'warranty_expiry', kind: 'warranty' },
+  { table: 'doors', type: 'Door', column: 'controller_warranty_expiry', kind: 'warranty-controller', part: 'controller' },
+  { table: 'doors', type: 'Door', column: 'reader_warranty_expiry', kind: 'warranty-reader', part: 'reader' },
+  { table: 'doors', type: 'Door', column: 'lock_warranty_expiry', kind: 'warranty-lock', part: 'lock' },
   { table: 'servers', type: 'Server', column: 'warranty_expiry', kind: 'warranty' },
   { table: 'switches', type: 'Switch', column: 'warranty_expiry', kind: 'warranty' },
   { table: 'storage', type: 'Storage device', column: 'warranty_expiry', kind: 'warranty' },
@@ -3565,7 +3614,7 @@ async function loadExpiryItems(today) {
       items.push({
         asset_table: src.table, asset_id: r.id, client_id: r.client_id ?? null,
         client_name: clientNames[r.client_id] || r.client || 'Unknown client',
-        name: r.name || `${src.type} #${r.id}`, type: src.type, site: r.zone || r.site || '',
+        name: (r.name || `${src.type} #${r.id}`) + (src.part ? ` — ${src.part} warranty` : ''), type: src.type, site: r.zone || r.site || '',
         kind: src.kind, expiry_date: expiry, days_left: daysUntil(today, expiry)
       });
     }
@@ -3612,7 +3661,7 @@ function buildExpiryDigest(clientName, items, today) {
   return {
     subject: `[CAMS] Warranty & licence reminders — ${clientName || 'All clients'}`,
     html,
-    summary: { date: today, items: items.length, warranty: items.filter(i => i.kind === 'warranty').length, licence: items.filter(i => i.kind === 'licence').length }
+    summary: { date: today, items: items.length, warranty: items.filter(i => i.kind !== 'licence').length, licence: items.filter(i => i.kind === 'licence').length }
   };
 }
 
@@ -3652,6 +3701,12 @@ async function runExpiryAlerts(now = new Date()) {
     );
     const key = (i, t) => [i.asset_table, i.asset_id, i.kind, i.expiry_date, t].join('|');
     const sentKeys = new Set(already.rows.map(r => key(r, r.threshold)));
+    // A door alert sent before the per-part split covers each part with that date.
+    for (const r of already.rows) {
+      if (r.asset_table === 'doors' && r.kind === 'warranty') {
+        for (const k of ['warranty-controller', 'warranty-reader', 'warranty-lock']) sentKeys.add(key({ ...r, kind: k }, r.threshold));
+      }
+    }
     const due = sortExpiryItems(inWindow.filter(i => !sentKeys.has(key(i, i.days_left <= 30 ? 30 : 60))));
     if (!due.length) return { items: 0 };
 
