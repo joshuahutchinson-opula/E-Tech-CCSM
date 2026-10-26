@@ -1235,6 +1235,7 @@ function parseCSV(text){
 function csvEscape(v){
   if(v===null||v===undefined)v='';
   v=String(v);
+  if(/^[=+\-@\t\r]/.test(v))v="'"+v; // stop spreadsheets treating the cell as a formula
   if(/[",\n\r]/.test(v))return'"'+v.replace(/"/g,'""')+'"';
   return v;
 }
@@ -1291,7 +1292,7 @@ function importCSV(type){
           var values=rows[i];
           if(values.every(function(v){return v.trim()==='';})){skipped++;continue;}
           var row={};
-          headers.forEach(function(h,idx){row[h]=(values[idx]!==undefined?values[idx]:'').trim();});
+          headers.forEach(function(h,idx){row[h]=(values[idx]!==undefined?values[idx]:'').replace(/^'(?=[=+\-@\t\r])/,'').trim();});
           if(!row.name){skipped++;continue;}
           row.client_id=importClientId;
           data.push(row);
