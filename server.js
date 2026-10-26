@@ -1164,7 +1164,9 @@ const EXPORT_TYPES = {
   cameras: { table: 'cameras', order: 'zone, name', zoned: true, columns: ['name','zone','status','comments','model','manufacturer','resolution','archiver','ip_address','mac_address','warranty','date_cleaned'] },
   doors: { table: 'doors', order: 'zone,name', zoned: true, columns: ['name','zone','status','tech','reader','lock_type','door_swing','access_type','anti_passback','controller_type','ip_address','install_date','controller_warranty_expiry','reader_warranty_expiry','lock_warranty_expiry','comments'] },
   servers: { table: 'servers', order: 'zone,name', zoned: true, columns: ['name','zone','status','make','model','capacity','used','health','apps','serial','warranty_expiry','comments'] },
-  switches: { table: 'switches', order: 'zone,name', zoned: true, columns: ['name','zone','status','model','firmware','ip_address','mac','warranty_expiry','comments'] },
+  switches: { table: 'switches', order: 'zone,name', zoned: true, columns: ['name','zone','status','model','firmware','ip_address','mac','warranty_expiry','comments'],
+    // The CSV header stays 'mac' (what the importer reads); the column is mac_address.
+    source: { mac: 'mac_address' } },
   storage: { table: 'storage', order: 'zone,name', zoned: true, columns: ['name','zone','status','type','make','model','capacity','used','serial','warranty_expiry','comments'] },
   intrusion: { table: 'intrusion', order: 'zone,name', zoned: true, columns: ['name','zone','status','module','sensor_type','ip_address','warranty_expiry','comments'] },
   stations: { table: 'stations', order: 'zone,name', zoned: true, columns: ['name','zone','status','make','model','apps','ip_address','install_date','warranty_expiry'] },
@@ -1174,6 +1176,24 @@ const EXPORT_TYPES = {
 };
 const EXPORT_LINK_TTL_MS = 60 * 1000;
 const exportLinks = new Map(); // token -> { type, template, filename, csv, expires }
+const EXPORT_DATE_COLUMNS = new Set(['warranty', 'warranty_expiry', 'controller_warranty_expiry', 'reader_warranty_expiry', 'lock_warranty_expiry', 'install_date', 'expiry_date', 'date_cleaned', 'received']);
+const exportJamaicaDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Jamaica', year: 'numeric', month: '2-digit', day: '2-digit' });
+
+// Dates go out as YYYY-MM-DD. pg reads a DATE column as local midnight, so a
+// midnight value is that calendar day whatever the server's time zone; any
+// other moment is the Jamaica day it falls on. Text that isn't a readable
+// date is written unchanged.
+function exportDate(v) {
+  if (v === null || v === undefined || v === '') return '';
+  if (v instanceof Date) {
+    if (isNaN(v)) return '';
+    if (!v.getHours() && !v.getMinutes() && !v.getSeconds() && !v.getMilliseconds()) {
+      return v.getFullYear() + '-' + String(v.getMonth() + 1).padStart(2, '0') + '-' + String(v.getDate()).padStart(2, '0');
+    }
+    return exportJamaicaDate.format(v);
+  }
+  return parseExpiryDate(v) || String(v);
+}
 
 // A cell starting with = + - @ tab or CR gets a leading apostrophe so
 // spreadsheets don't run it as a formula; the dashboard importer strips it.
@@ -1199,8 +1219,11 @@ async function buildExport(req, type, template) {
     clientId ? [clientId] : []
   );
   const rows = def.zoned ? filterByZoneAccess(result.rows, req) : result.rows;
-  // Values are written as the list route's JSON would show them (dates as ISO strings).
-  const out = [def.columns].concat(JSON.parse(JSON.stringify(rows)).map(r => def.columns.map(c => r[c] ?? '')));
+  const out = [def.columns].concat(rows.map(r => def.columns.map(c => {
+    const v = r[(def.source && def.source[c]) || c];
+    if (EXPORT_DATE_COLUMNS.has(c)) return exportDate(v);
+    return v !== null && typeof v === 'object' ? JSON.stringify(v) : v ?? '';
+  })));
   const suffix = clientId ? '-' + String(await getClientNameById(clientId)).toLowerCase().replace(/[^a-z0-9]+/g, '') : '';
   return { filename: file + suffix + '-export.csv', csv: csvFile(out), rows: rows.length };
 }
