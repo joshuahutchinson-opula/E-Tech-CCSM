@@ -661,7 +661,7 @@ input[type="month"] { color-scheme:dark; } :root.light-theme input[type="month"]
   <div class="modal-field"><label>Status</label><select id="add-swlic-status"><option value="Good">Good</option><option value="Warning">Warning</option><option value="Expired">Expired</option></select></div>
   <div class="modal-field"><label>Vendor</label><input type="text" id="add-swlic-vendor"></div>
   <div class="modal-field"><label>Version</label><input type="text" id="add-swlic-version"></div>
-  <div class="modal-field"><label>License Type</label><input type="text" id="add-swlic-license" placeholder="Perpetual, Subscription…"></div>
+  <div class="modal-field"><label>License Type</label><select id="add-swlic-license"><option value="Perpetual">Perpetual</option><option value="Subscription">Subscription</option><option value="Term">Term</option><option value="Per-device">Per-device</option><option value="Per-user">Per-user</option><option value="Trial">Trial</option></select></div>
   <div class="modal-field"><label>Expiry Date</label><input type="date" id="add-swlic-expiry"></div>
   <div class="modal-field"><label>Purchase Date</label><input type="date" id="add-swlic-purchase"></div>
   <div class="modal-field"><label>Warranty Expiry</label><input type="date" id="add-swlic-warranty"></div>
@@ -1356,6 +1356,7 @@ function openAddAssetModal(type){
   // clear fields from any prior use
   m.querySelectorAll('input[type="text"],input[type="date"],input[type="number"],textarea').forEach(function(el){el.value='';});
   var statusSel=document.getElementById('add-'+prefix+'-status');if(statusSel)statusSel.value=(type==='software'?'Good':'Online');
+  var licSel=document.getElementById('add-'+prefix+'-license');if(licSel)licSel.selectedIndex=0;
   var dl=document.getElementById('add-'+prefix+'-zone-list');if(dl)dl.innerHTML='';
   var clientSel=document.getElementById('add-'+prefix+'-client');
   if(clientSel){
