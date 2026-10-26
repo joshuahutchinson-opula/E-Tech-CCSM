@@ -1146,6 +1146,102 @@ app.put('/api/intrusion/:id', authMiddleware, blockAssetEdit, async (req, res) =
 });
 
 // ============================================================
+// CSV EXPORTS
+// ============================================================
+// Built here rather than in the browser (antivirus flagged the old Blob
+// downloads). The dashboard calls .../link with its Authorization header and
+// gets back a one-time URL (60 s, single use) holding the finished file, then
+// navigates to it so the browser does a normal download. Calling the export
+// URL itself with an Authorization header returns the CSV directly. Rows are
+// scoped exactly like the matching list route; staff may add ?client_id=.
+const EXPORT_TYPES = {
+  cameras: { table: 'cameras', order: 'zone, name', zoned: true, columns: ['name','zone','status','comments','model','manufacturer','resolution','archiver','ip_address','mac_address','warranty','date_cleaned'] },
+  doors: { table: 'doors', order: 'zone,name', zoned: true, columns: ['name','zone','status','tech','reader','lock_type','door_swing','access_type','anti_passback','controller_type','ip_address','install_date','warranty_expiry','comments'] },
+  servers: { table: 'servers', order: 'zone,name', zoned: true, columns: ['name','zone','status','make','model','capacity','used','health','apps','serial','warranty_expiry','comments'] },
+  switches: { table: 'switches', order: 'zone,name', zoned: true, columns: ['name','zone','status','model','firmware','ip_address','mac','warranty_expiry','comments'] },
+  storage: { table: 'storage', order: 'zone,name', zoned: true, columns: ['name','zone','status','type','make','model','capacity','used','serial','warranty_expiry','comments'] },
+  intrusion: { table: 'intrusion', order: 'zone,name', zoned: true, columns: ['name','zone','status','module','sensor_type','ip_address','warranty_expiry','comments'] },
+  stations: { table: 'stations', order: 'zone,name', zoned: true, columns: ['name','zone','status','make','model','apps','ip_address','install_date','warranty_expiry'] },
+  monitors: { table: 'monitors', order: 'zone,name', zoned: true, columns: ['name','zone','status','make','model','size','install_date','warranty_expiry'] },
+  software: { table: 'software', order: 'name', zoned: false, columns: ['name','vendor','version','license_type','status','expiry_date','warranty_expiry','comments'] },
+  servicerequests: { table: 'service_requests', order: 'created_at DESC', zoned: false, file: 'service-requests', columns: ['sr_id','client','site','subject','category','priority','assigned_to','status','notes','received'] },
+};
+const EXPORT_LINK_TTL_MS = 60 * 1000;
+const exportLinks = new Map(); // token -> { type, template, filename, csv, expires }
+
+// A cell starting with = + - @ tab or CR gets a leading apostrophe so
+// spreadsheets don't run it as a formula; the dashboard importer strips it.
+function csvCell(v) {
+  if (v === null || v === undefined) v = '';
+  v = String(v);
+  if (/^[=+\-@\t\r]/.test(v)) v = "'" + v;
+  if (/[",\n\r]/.test(v)) return '"' + v.replace(/"/g, '""') + '"';
+  return v;
+}
+function csvFile(rows) {
+  return '﻿' + rows.map(r => r.map(csvCell).join(',')).join('\r\n');
+}
+
+async function buildExport(req, type, template) {
+  const def = EXPORT_TYPES[type];
+  const file = def.file || type;
+  if (template) return { filename: file + '-template.csv', csv: csvFile([def.columns]), rows: 0 };
+  let clientId = req.user.role === 'admin' ? null : req.user.client_id;
+  if (!clientId && !isClientAccount(req) && /^\d+$/.test(String(req.query.client_id || ''))) clientId = Number(req.query.client_id);
+  const result = await pool.query(
+    `SELECT * FROM ${def.table}${clientId ? ' WHERE client_id=$1' : ''} ORDER BY ${def.order}`,
+    clientId ? [clientId] : []
+  );
+  const rows = def.zoned ? filterByZoneAccess(result.rows, req) : result.rows;
+  // Values are written as the list route's JSON would show them (dates as ISO strings).
+  const out = [def.columns].concat(JSON.parse(JSON.stringify(rows)).map(r => def.columns.map(c => r[c] ?? '')));
+  const suffix = clientId ? '-' + String(await getClientNameById(clientId)).toLowerCase().replace(/[^a-z0-9]+/g, '') : '';
+  return { filename: file + suffix + '-export.csv', csv: csvFile(out), rows: rows.length };
+}
+
+function sendCsv(res, filename, csv) {
+  res.set('Content-Type', 'text/csv; charset=utf-8');
+  res.set('Content-Disposition', `attachment; filename="${filename}"`);
+  res.set('Cache-Control', 'no-store');
+  res.send(csv);
+}
+
+function exportRoutes(template) {
+  const path = '/api/export/:type' + (template ? '/template' : '');
+  app.get(path + '/link', authMiddleware, async (req, res) => {
+    if (!EXPORT_TYPES[req.params.type]) return res.status(404).json({ error: 'Unknown export type' });
+    if (!dbConnected && !template) return res.status(503).json({ error: 'DB not connected' });
+    try {
+      const built = await buildExport(req, req.params.type, template);
+      const now = Date.now();
+      for (const [t, l] of exportLinks) if (l.expires <= now) exportLinks.delete(t);
+      const token = crypto.randomBytes(24).toString('hex');
+      exportLinks.set(token, { type: req.params.type, template, filename: built.filename, csv: built.csv, expires: now + EXPORT_LINK_TTL_MS });
+      res.json({ url: path.replace(':type', req.params.type) + '?dl=' + token, rows: built.rows, filename: built.filename });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+  });
+  app.get(path, async (req, res, next) => {
+    if (!EXPORT_TYPES[req.params.type]) return res.status(404).json({ error: 'Unknown export type' });
+    if (req.query.dl === undefined) return next();
+    const token = String(req.query.dl);
+    const link = exportLinks.get(token);
+    exportLinks.delete(token);
+    if (!link || link.expires <= Date.now() || link.type !== req.params.type || link.template !== template) {
+      return res.status(410).type('text/plain').send('This download link has expired or was already used. Export again from CAMS.');
+    }
+    sendCsv(res, link.filename, link.csv);
+  }, authMiddleware, async (req, res) => {
+    if (!dbConnected && !template) return res.status(503).json({ error: 'DB not connected' });
+    try {
+      const built = await buildExport(req, req.params.type, template);
+      sendCsv(res, built.filename, built.csv);
+    } catch (err) { res.status(500).json({ error: err.message }); }
+  });
+}
+exportRoutes(false);
+exportRoutes(true);
+
+// ============================================================
 // FIELD APP DEVICE UPDATES
 // ============================================================
 // Comments only. The full PUT /api/<type>/:id routes write every date

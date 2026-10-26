@@ -1197,8 +1197,6 @@ var ASSET_CSV_COLUMNS={
   storage:['name','zone','status','type','make','model','capacity','used','serial','warranty_expiry','comments'],
   servicerequests:['sr_id','client','site','subject','category','priority','assigned_to','status','notes','received']
 };
-var ASSET_ARRAYS={cameras:function(){return CAMERAS;},doors:function(){return DOORS;},servers:function(){return SERVERS;},switches:function(){return SWITCHES;},software:function(){return SOFTWARE;},stations:function(){return STATIONS;},monitors:function(){return MONITORS;},intrusion:function(){return INTRUSION;},storage:function(){return STORAGE;},servicerequests:function(){return SERVICE_REQUESTS;}};
-var ASSET_FILENAMES={cameras:'cameras',doors:'doors',servers:'servers',switches:'switches',software:'software',stations:'stations',monitors:'monitors',intrusion:'intrusion',storage:'storage',servicerequests:'service-requests'};
 
 // Proper CSV line parser: handles quoted fields, embedded commas, escaped "" quotes, and \r\n / \n line endings.
 function parseCSV(text){
@@ -1224,45 +1222,28 @@ function parseCSV(text){
   return rows.filter(function(r){return!(r.length===1&&r[0].trim()==='');});
 }
 
-function csvEscape(v){
-  if(v===null||v===undefined)v='';
-  v=String(v);
-  if(/^[=+\-@\t\r]/.test(v))v="'"+v; // stop spreadsheets treating the cell as a formula
-  if(/[",\n\r]/.test(v))return'"'+v.replace(/"/g,'""')+'"';
-  return v;
-}
-
-function downloadCSVFile(filename,rows){
-  var csv=rows.map(function(r){return r.map(csvEscape).join(',');}).join('\r\n');
-  var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
-  var url=URL.createObjectURL(blob);
+// Exports are built by the server. The dashboard fetches a one-time link with
+// its Authorization header, then navigates to it for a normal browser download.
+function openExportLink(url){
   var a=document.createElement('a');
-  a.href=url;a.download=filename;document.body.appendChild(a);a.click();document.body.removeChild(a);
-  setTimeout(function(){URL.revokeObjectURL(url);},1000);
+  a.href=API_URL+url;document.body.appendChild(a);a.click();document.body.removeChild(a);
 }
 
-function downloadCSVTemplate(type){
-  var cols=ASSET_CSV_COLUMNS[type];
-  if(!cols)return;
-  downloadCSVFile(ASSET_FILENAMES[type]+'-template.csv',[cols]);
-  toast('Template downloaded','success');
+async function downloadCSVTemplate(type){
+  if(!ASSET_CSV_COLUMNS[type])return;
+  try{openExportLink((await apiCall('/export/'+type+'/template/link')).url);toast('Template downloaded','success');}
+  catch(err){toast('Template download failed: '+err.message,'error');}
 }
 
-function genericExportCSV(type){
-  var cols=ASSET_CSV_COLUMNS[type];
-  var getter=ASSET_ARRAYS[type];
-  if(!cols||!getter)return;
-  var rows=getter().slice();
-  if(currentClientFilter){
-    if(type==='servicerequests')rows=rows.filter(function(a){return(a.client||'').toLowerCase()===currentClientFilter.toLowerCase();});
-    else rows=rows.filter(function(a){return getClient(a.zone,a.client_id)===currentClientFilter;});
-  }
-  if(rows.length===0){toast('Nothing to export','warning');return;}
-  var out=[cols];
-  rows.forEach(function(a){out.push(cols.map(function(c){return a[c]!==undefined&&a[c]!==null?a[c]:'';}));});
-  var suffix=currentClientFilter?'-'+currentClientFilter.toLowerCase().replace(/\s+/g,''):'';
-  downloadCSVFile(ASSET_FILENAMES[type]+suffix+'-export.csv',out);
-  toast('Exported '+rows.length+' '+type,'success');
+async function genericExportCSV(type){
+  if(!ASSET_CSV_COLUMNS[type])return;
+  var cid=currentClientFilter?CLIENT_IDS[currentClientFilter]:null;
+  try{
+    var r=await apiCall('/export/'+type+'/link'+(cid?'?client_id='+encodeURIComponent(cid):''));
+    if(!r.rows){toast('Nothing to export','warning');return;}
+    openExportLink(r.url);
+    toast('Exported '+r.rows+' '+type,'success');
+  }catch(err){toast('Export failed: '+err.message,'error');}
 }
 
 function importCSV(type){
