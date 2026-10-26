@@ -1861,7 +1861,7 @@ app.post('/api/clients', authMiddleware, async (req, res) => {
   const badLogo = invalidClientLogo(req.body);
   if (badLogo) return res.status(400).json({ error: badLogo });
   try {
-    const result = await pool.query('INSERT INTO clients (name,email,phone,address,logo_url,logo_full_url) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *', [name,email,phone,address,req.body.logo_url||null,req.body.logo_full_url||null]);
+    const result = await pool.query('INSERT INTO clients (name,email,phone,address,logo_url,logo_full_url) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *', [name,email ?? null,phone,address,req.body.logo_url||null,req.body.logo_full_url||null]);
     await logActivity(1, req.user.username, 'Created', 'Client ' + name + ' added');
     res.json(result.rows[0]);
   } catch (err) { res.status(500).json({ error: err.message }); }
@@ -1874,9 +1874,10 @@ app.put('/api/clients/:name', authMiddleware, async (req, res) => {
   const { email, phone, address } = req.body;
   const badLogo = invalidClientLogo(req.body);
   if (badLogo) return res.status(400).json({ error: badLogo });
-  // A logo only changes when its key is in the body, so a normal edit
-  // never wipes the logos.
-  const sets = ['email=$1', 'phone=$2', 'address=$3'], params = [email||'', phone||'', address||''];
+  // Email and logos only change when their key is in the body, so a normal
+  // edit never wipes them.
+  const sets = ['phone=$1', 'address=$2'], params = [phone||'', address||''];
+  if (Object.prototype.hasOwnProperty.call(req.body, 'email')) { params.push(email||''); sets.push(`email=$${params.length}`); }
   for (const key of LOGO_FIELDS) {
     if (Object.prototype.hasOwnProperty.call(req.body, key)) { params.push(req.body[key] || null); sets.push(`${key}=$${params.length}`); }
   }
