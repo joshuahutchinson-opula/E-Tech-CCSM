@@ -695,10 +695,11 @@ app.get('/api/cameras', authMiddleware, async (req, res) => {
   }
 });
 
+// The purchase_date columns on asset tables are kept but unused (no route reads or writes them).
 app.put('/api/cameras/:id', authMiddleware, blockAssetEdit, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
-  const { status, comments, name, zone, model, manufacturer, resolution, archiver, ip_address, mac_address, warranty, purchase_date, date_cleaned } = req.body;
+  const { status, comments, name, zone, model, manufacturer, resolution, archiver, ip_address, mac_address, warranty, date_cleaned } = req.body;
   try {
     const userClientId = req.user.role === 'admin' ? null : req.user.client_id;
     const asset = await pool.query('SELECT name, client_id FROM cameras WHERE id=$1', [id]);
@@ -708,9 +709,9 @@ app.put('/api/cameras/:id', authMiddleware, blockAssetEdit, async (req, res) => 
     
     if (req.user.role === 'admin') {
       const query = userClientId ? 
-        `UPDATE cameras SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),model=COALESCE($4,model),manufacturer=COALESCE($5,manufacturer),resolution=COALESCE($6,resolution),archiver=COALESCE($7,archiver),ip_address=COALESCE($8,ip_address),mac_address=COALESCE($9,mac_address),warranty=$10,purchase_date=$11,date_cleaned=$12,comments=COALESCE($13,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$14 AND client_id=$15` :
-        `UPDATE cameras SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),model=COALESCE($4,model),manufacturer=COALESCE($5,manufacturer),resolution=COALESCE($6,resolution),archiver=COALESCE($7,archiver),ip_address=COALESCE($8,ip_address),mac_address=COALESCE($9,mac_address),warranty=$10,purchase_date=$11,date_cleaned=$12,comments=COALESCE($13,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$14`;
-      const params = userClientId ? [name,zone,status,model,manufacturer,resolution,archiver,ip_address,mac_address,warranty,purchase_date,date_cleaned,comments,id,userClientId] : [name,zone,status,model,manufacturer,resolution,archiver,ip_address,mac_address,warranty,purchase_date,date_cleaned,comments,id];
+        `UPDATE cameras SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),model=COALESCE($4,model),manufacturer=COALESCE($5,manufacturer),resolution=COALESCE($6,resolution),archiver=COALESCE($7,archiver),ip_address=COALESCE($8,ip_address),mac_address=COALESCE($9,mac_address),warranty=$10,date_cleaned=$11,comments=COALESCE($12,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$13 AND client_id=$14` :
+        `UPDATE cameras SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),model=COALESCE($4,model),manufacturer=COALESCE($5,manufacturer),resolution=COALESCE($6,resolution),archiver=COALESCE($7,archiver),ip_address=COALESCE($8,ip_address),mac_address=COALESCE($9,mac_address),warranty=$10,date_cleaned=$11,comments=COALESCE($12,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$13`;
+      const params = userClientId ? [name,zone,status,model,manufacturer,resolution,archiver,ip_address,mac_address,warranty,date_cleaned,comments,id,userClientId] : [name,zone,status,model,manufacturer,resolution,archiver,ip_address,mac_address,warranty,date_cleaned,comments,id];
       await pool.query(query, params);
     } else {
       const query = userClientId ? 'UPDATE cameras SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3 AND client_id=$4' : 'UPDATE cameras SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3';
@@ -760,8 +761,8 @@ app.post('/api/import/cameras', authMiddleware, async (req, res) => {
     const clientIds = await validateImportClients(cameras, res);
     if (!clientIds) return;
     for (const [idx, cam] of cameras.entries()) {
-      await pool.query(`INSERT INTO cameras (client_id,name,zone,status,comments,model,manufacturer,resolution,archiver,ip_address,mac_address,warranty,purchase_date,date_cleaned) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
-        [clientIds[idx],cam.name||'',cam.zone||'',cam.status||'Working',cam.comments||'',cam.model||'',cam.manufacturer||'',cam.resolution||'',cam.archiver||'',cam.ip_address||'',cam.mac_address||'',cam.warranty||null,cam.purchase_date||null,cam.date_cleaned||null]);
+      await pool.query(`INSERT INTO cameras (client_id,name,zone,status,comments,model,manufacturer,resolution,archiver,ip_address,mac_address,warranty,date_cleaned) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
+        [clientIds[idx],cam.name||'',cam.zone||'',cam.status||'Working',cam.comments||'',cam.model||'',cam.manufacturer||'',cam.resolution||'',cam.archiver||'',cam.ip_address||'',cam.mac_address||'',cam.warranty||null,cam.date_cleaned||null]);
       imported++;
     }
     const { clientIdForLog, clientLabel } = await describeClientsForLog(cameras);
@@ -798,8 +799,8 @@ app.post('/api/import/servers', authMiddleware, async (req, res) => {
     const clientIds = await validateImportClients(servers, res);
     if (!clientIds) return;
     for (const [idx, srv] of servers.entries()) {
-      await pool.query(`INSERT INTO servers (client_id,name,zone,status,make,model,capacity,used,health,apps,serial,purchase_date,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
-        [clientIds[idx],srv.name||srv.serial||'',srv.zone||srv.location||'',srv.status||'Online',srv.make||'',srv.model||'',srv.capacity||'',srv.used||'',srv.health||'',srv.apps||'',srv.serial||'',srv.purchase_date||null,srv.warranty_expiry||null,srv.comments||'']);
+      await pool.query(`INSERT INTO servers (client_id,name,zone,status,make,model,capacity,used,health,apps,serial,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
+        [clientIds[idx],srv.name||srv.serial||'',srv.zone||srv.location||'',srv.status||'Online',srv.make||'',srv.model||'',srv.capacity||'',srv.used||'',srv.health||'',srv.apps||'',srv.serial||'',srv.warranty_expiry||null,srv.comments||'']);
       imported++;
     }
     const { clientIdForLog, clientLabel } = await describeClientsForLog(servers);
@@ -817,8 +818,8 @@ app.post('/api/import/switches', authMiddleware, async (req, res) => {
     const clientIds = await validateImportClients(switches, res);
     if (!clientIds) return;
     for (const [idx, sw] of switches.entries()) {
-      await pool.query(`INSERT INTO switches (client_id,name,zone,status,model,firmware,ip_address,mac_address,purchase_date,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
-        [clientIds[idx],sw.name||'',sw.zone||sw.location||'',sw.status||'Online',sw.model||'',sw.firmware||'',sw.ip_address||'',sw.mac||'',sw.purchase_date||null,sw.warranty_expiry||null,sw.comments||'']);
+      await pool.query(`INSERT INTO switches (client_id,name,zone,status,model,firmware,ip_address,mac_address,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+        [clientIds[idx],sw.name||'',sw.zone||sw.location||'',sw.status||'Online',sw.model||'',sw.firmware||'',sw.ip_address||'',sw.mac||'',sw.warranty_expiry||null,sw.comments||'']);
       imported++;
     }
     const { clientIdForLog, clientLabel } = await describeClientsForLog(switches);
@@ -836,8 +837,8 @@ app.post('/api/import/software', authMiddleware, async (req, res) => {
     const clientIds = await validateImportClients(software, res);
     if (!clientIds) return;
     for (const [idx, sw] of software.entries()) {
-      await pool.query(`INSERT INTO software (client_id, name, vendor, version, license_type, status, expiry_date, purchase_date, warranty_expiry, comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-        [clientIds[idx], sw.name||'', sw.vendor||'', sw.version||'', sw.license_type||'', sw.status||'Good', sw.expiry_date||null, sw.purchase_date||null, sw.warranty_expiry||null, sw.comments||'']);
+      await pool.query(`INSERT INTO software (client_id, name, vendor, version, license_type, status, expiry_date, warranty_expiry, comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+        [clientIds[idx], sw.name||'', sw.vendor||'', sw.version||'', sw.license_type||'', sw.status||'Good', sw.expiry_date||null, sw.warranty_expiry||null, sw.comments||'']);
       imported++;
     }
     const { clientIdForLog, clientLabel } = await describeClientsForLog(software);
@@ -855,8 +856,8 @@ app.post('/api/import/stations', authMiddleware, async (req, res) => {
     const clientIds = await validateImportClients(stations, res);
     if (!clientIds) return;
     for (const [idx, s] of stations.entries()) {
-      await pool.query(`INSERT INTO stations (client_id,name,zone,status,make,model,apps,ip_address,install_date,purchase_date,warranty_expiry) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
-        [clientIds[idx], s.name||'', s.zone||'', s.status||'Online', s.make||'', s.model||'', s.apps||'', s.ip_address||'', s.install_date||null, s.purchase_date||null, s.warranty_expiry||null]);
+      await pool.query(`INSERT INTO stations (client_id,name,zone,status,make,model,apps,ip_address,install_date,warranty_expiry) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+        [clientIds[idx], s.name||'', s.zone||'', s.status||'Online', s.make||'', s.model||'', s.apps||'', s.ip_address||'', s.install_date||null, s.warranty_expiry||null]);
       imported++;
     }
     const { clientIdForLog, clientLabel } = await describeClientsForLog(stations);
@@ -874,8 +875,8 @@ app.post('/api/import/monitors', authMiddleware, async (req, res) => {
     const clientIds = await validateImportClients(monitors, res);
     if (!clientIds) return;
     for (const [idx, m] of monitors.entries()) {
-      await pool.query(`INSERT INTO monitors (client_id,name,zone,status,make,model,size,install_date,purchase_date,warranty_expiry) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-        [clientIds[idx], m.name||'', m.zone||'', m.status||'Online', m.make||'', m.model||'', m.size||'', m.install_date||null, m.purchase_date||null, m.warranty_expiry||null]);
+      await pool.query(`INSERT INTO monitors (client_id,name,zone,status,make,model,size,install_date,warranty_expiry) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+        [clientIds[idx], m.name||'', m.zone||'', m.status||'Online', m.make||'', m.model||'', m.size||'', m.install_date||null, m.warranty_expiry||null]);
       imported++;
     }
     const { clientIdForLog, clientLabel } = await describeClientsForLog(monitors);
@@ -893,8 +894,8 @@ app.post('/api/import/intrusion', authMiddleware, async (req, res) => {
     const clientIds = await validateImportClients(points, res);
     if (!clientIds) return;
     for (const [idx, i] of points.entries()) {
-      await pool.query(`INSERT INTO intrusion (client_id,name,zone,status,module,sensor_type,ip_address,purchase_date,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-        [clientIds[idx], i.name||'', i.zone||'', i.status||'Online', i.module||'', i.sensor_type||'', i.ip_address||'', i.purchase_date||null, i.warranty_expiry||null, i.comments||'']);
+      await pool.query(`INSERT INTO intrusion (client_id,name,zone,status,module,sensor_type,ip_address,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+        [clientIds[idx], i.name||'', i.zone||'', i.status||'Online', i.module||'', i.sensor_type||'', i.ip_address||'', i.warranty_expiry||null, i.comments||'']);
       imported++;
     }
     const { clientIdForLog, clientLabel } = await describeClientsForLog(points);
@@ -912,8 +913,8 @@ app.post('/api/import/storage', authMiddleware, async (req, res) => {
     const clientIds = await validateImportClients(devices, res);
     if (!clientIds) return;
     for (const [idx, s] of devices.entries()) {
-      await pool.query(`INSERT INTO storage (client_id,name,zone,status,type,make,model,capacity,used,serial,purchase_date,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
-        [clientIds[idx], s.name||'', s.zone||'', s.status||'Online', s.type||'', s.make||'', s.model||'', s.capacity||'', s.used||'', s.serial||'', s.purchase_date||null, s.warranty_expiry||null, s.comments||'']);
+      await pool.query(`INSERT INTO storage (client_id,name,zone,status,type,make,model,capacity,used,serial,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
+        [clientIds[idx], s.name||'', s.zone||'', s.status||'Online', s.type||'', s.make||'', s.model||'', s.capacity||'', s.used||'', s.serial||'', s.warranty_expiry||null, s.comments||'']);
       imported++;
     }
     const { clientIdForLog, clientLabel } = await describeClientsForLog(devices);
@@ -979,7 +980,7 @@ app.get('/api/servers', authMiddleware, async (req, res) => {
 app.put('/api/servers/:id', authMiddleware, blockAssetEdit, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
-  const { status, comments, name, zone, make, model, capacity, used, health, apps, serial, purchase_date, warranty_expiry } = req.body;
+  const { status, comments, name, zone, make, model, capacity, used, health, apps, serial, warranty_expiry } = req.body;
   try {
     const userClientId = req.user.role === 'admin' ? null : req.user.client_id;
     const asset = await pool.query('SELECT name, client_id FROM servers WHERE id=$1', [id]);
@@ -988,11 +989,11 @@ app.put('/api/servers/:id', authMiddleware, blockAssetEdit, async (req, res) => 
     const assetClient = await getClientNameById(assetClientId);
     if (req.user.role === 'admin') {
       const query = userClientId ? 
-        `UPDATE servers SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),capacity=COALESCE($6,capacity),used=COALESCE($7,used),health=COALESCE($8,health),apps=COALESCE($9,apps),serial=COALESCE($10,serial),purchase_date=$11,warranty_expiry=$12,comments=COALESCE($13,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$14 AND client_id=$15` :
-        `UPDATE servers SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),capacity=COALESCE($6,capacity),used=COALESCE($7,used),health=COALESCE($8,health),apps=COALESCE($9,apps),serial=COALESCE($10,serial),purchase_date=$11,warranty_expiry=$12,comments=COALESCE($13,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$14`;
+        `UPDATE servers SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),capacity=COALESCE($6,capacity),used=COALESCE($7,used),health=COALESCE($8,health),apps=COALESCE($9,apps),serial=COALESCE($10,serial),warranty_expiry=$11,comments=COALESCE($12,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$13 AND client_id=$14` :
+        `UPDATE servers SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),capacity=COALESCE($6,capacity),used=COALESCE($7,used),health=COALESCE($8,health),apps=COALESCE($9,apps),serial=COALESCE($10,serial),warranty_expiry=$11,comments=COALESCE($12,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$13`;
       const params = userClientId ? 
-        [name,zone,status,make,model,capacity,used,health,apps,serial,purchase_date,warranty_expiry,comments,id,userClientId] : 
-        [name,zone,status,make,model,capacity,used,health,apps,serial,purchase_date,warranty_expiry,comments,id];
+        [name,zone,status,make,model,capacity,used,health,apps,serial,warranty_expiry,comments,id,userClientId] : 
+        [name,zone,status,make,model,capacity,used,health,apps,serial,warranty_expiry,comments,id];
       await pool.query(query, params);
     } else {
       const query = userClientId ? 'UPDATE servers SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3 AND client_id=$4' : 'UPDATE servers SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3';
@@ -1022,7 +1023,7 @@ app.get('/api/storage', authMiddleware, async (req, res) => {
 app.put('/api/storage/:id', authMiddleware, blockAssetEdit, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
-  const { status, comments, name, zone, type, make, model, capacity, used, serial, purchase_date, warranty_expiry } = req.body;
+  const { status, comments, name, zone, type, make, model, capacity, used, serial, warranty_expiry } = req.body;
   try {
     const userClientId = req.user.role === 'admin' ? null : req.user.client_id;
     const asset = await pool.query('SELECT name, client_id FROM storage WHERE id=$1', [id]);
@@ -1031,11 +1032,11 @@ app.put('/api/storage/:id', authMiddleware, blockAssetEdit, async (req, res) => 
     const assetClient = await getClientNameById(assetClientId);
     if (req.user.role === 'admin') {
       const query = userClientId ?
-        `UPDATE storage SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),type=COALESCE($4,type),make=COALESCE($5,make),model=COALESCE($6,model),capacity=COALESCE($7,capacity),used=COALESCE($8,used),serial=COALESCE($9,serial),purchase_date=$10,warranty_expiry=$11,comments=COALESCE($12,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$13 AND client_id=$14` :
-        `UPDATE storage SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),type=COALESCE($4,type),make=COALESCE($5,make),model=COALESCE($6,model),capacity=COALESCE($7,capacity),used=COALESCE($8,used),serial=COALESCE($9,serial),purchase_date=$10,warranty_expiry=$11,comments=COALESCE($12,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$13`;
+        `UPDATE storage SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),type=COALESCE($4,type),make=COALESCE($5,make),model=COALESCE($6,model),capacity=COALESCE($7,capacity),used=COALESCE($8,used),serial=COALESCE($9,serial),warranty_expiry=$10,comments=COALESCE($11,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$12 AND client_id=$13` :
+        `UPDATE storage SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),type=COALESCE($4,type),make=COALESCE($5,make),model=COALESCE($6,model),capacity=COALESCE($7,capacity),used=COALESCE($8,used),serial=COALESCE($9,serial),warranty_expiry=$10,comments=COALESCE($11,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$12`;
       const params = userClientId ?
-        [name,zone,status,type,make,model,capacity,used,serial,purchase_date,warranty_expiry,comments,id,userClientId] :
-        [name,zone,status,type,make,model,capacity,used,serial,purchase_date,warranty_expiry,comments,id];
+        [name,zone,status,type,make,model,capacity,used,serial,warranty_expiry,comments,id,userClientId] :
+        [name,zone,status,type,make,model,capacity,used,serial,warranty_expiry,comments,id];
       await pool.query(query, params);
     } else {
       const query = userClientId ? 'UPDATE storage SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3 AND client_id=$4' : 'UPDATE storage SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3';
@@ -1065,7 +1066,7 @@ app.get('/api/switches', authMiddleware, async (req, res) => {
 app.put('/api/switches/:id', authMiddleware, blockAssetEdit, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
-  const { status, comments, name, zone, model, firmware, ip_address, mac, purchase_date, warranty_expiry } = req.body;
+  const { status, comments, name, zone, model, firmware, ip_address, mac, warranty_expiry } = req.body;
   try {
     const userClientId = req.user.role === 'admin' ? null : req.user.client_id;
     const asset = await pool.query('SELECT name, client_id FROM switches WHERE id=$1', [id]);
@@ -1073,8 +1074,8 @@ app.put('/api/switches/:id', authMiddleware, blockAssetEdit, async (req, res) =>
     const assetClientId = asset.rows[0]?.client_id;
     const assetClient = await getClientNameById(assetClientId);
     if (req.user.role === 'admin') {
-      const query = userClientId ? `UPDATE switches SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),model=COALESCE($4,model),firmware=COALESCE($5,firmware),ip_address=COALESCE($6,ip_address),mac_address=COALESCE($7,mac_address),purchase_date=$8,warranty_expiry=$9,comments=COALESCE($10,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$11 AND client_id=$12` : `UPDATE switches SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),model=COALESCE($4,model),firmware=COALESCE($5,firmware),ip_address=COALESCE($6,ip_address),mac_address=COALESCE($7,mac_address),purchase_date=$8,warranty_expiry=$9,comments=COALESCE($10,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$11`;
-      const params = userClientId ? [name,zone,status,model,firmware,ip_address,mac,purchase_date,warranty_expiry,comments,id,userClientId] : [name,zone,status,model,firmware,ip_address,mac,purchase_date,warranty_expiry,comments,id];
+      const query = userClientId ? `UPDATE switches SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),model=COALESCE($4,model),firmware=COALESCE($5,firmware),ip_address=COALESCE($6,ip_address),mac_address=COALESCE($7,mac_address),warranty_expiry=$8,comments=COALESCE($9,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$10 AND client_id=$11` : `UPDATE switches SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),model=COALESCE($4,model),firmware=COALESCE($5,firmware),ip_address=COALESCE($6,ip_address),mac_address=COALESCE($7,mac_address),warranty_expiry=$8,comments=COALESCE($9,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$10`;
+      const params = userClientId ? [name,zone,status,model,firmware,ip_address,mac,warranty_expiry,comments,id,userClientId] : [name,zone,status,model,firmware,ip_address,mac,warranty_expiry,comments,id];
       await pool.query(query, params);
     } else {
       const query = userClientId ? 'UPDATE switches SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3 AND client_id=$4' : 'UPDATE switches SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3';
@@ -1119,7 +1120,7 @@ app.get('/api/intrusion', authMiddleware, async (req, res) => {
 app.put('/api/intrusion/:id', authMiddleware, blockAssetEdit, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
-  const { status, comments, name, zone, module, sensor_type, ip_address, purchase_date, warranty_expiry } = req.body;
+  const { status, comments, name, zone, module, sensor_type, ip_address, warranty_expiry } = req.body;
   try {
     const userClientId = req.user.role === 'admin' ? null : req.user.client_id;
     const asset = await pool.query('SELECT name, client_id FROM intrusion WHERE id=$1', [id]);
@@ -1129,11 +1130,11 @@ app.put('/api/intrusion/:id', authMiddleware, blockAssetEdit, async (req, res) =
     let query, params;
     if (req.user.role === 'admin') {
       query = userClientId ?
-        'UPDATE intrusion SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),module=COALESCE($4,module),sensor_type=COALESCE($5,sensor_type),ip_address=COALESCE($6,ip_address),purchase_date=$7,warranty_expiry=$8,comments=COALESCE($9,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$10 AND client_id=$11' :
-        'UPDATE intrusion SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),module=COALESCE($4,module),sensor_type=COALESCE($5,sensor_type),ip_address=COALESCE($6,ip_address),purchase_date=$7,warranty_expiry=$8,comments=COALESCE($9,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$10';
+        'UPDATE intrusion SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),module=COALESCE($4,module),sensor_type=COALESCE($5,sensor_type),ip_address=COALESCE($6,ip_address),warranty_expiry=$7,comments=COALESCE($8,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$9 AND client_id=$10' :
+        'UPDATE intrusion SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),module=COALESCE($4,module),sensor_type=COALESCE($5,sensor_type),ip_address=COALESCE($6,ip_address),warranty_expiry=$7,comments=COALESCE($8,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$9';
       params = userClientId ?
-        [name,zone,status,module,sensor_type,ip_address,purchase_date,warranty_expiry,comments,id,userClientId] :
-        [name,zone,status,module,sensor_type,ip_address,purchase_date,warranty_expiry,comments,id];
+        [name,zone,status,module,sensor_type,ip_address,warranty_expiry,comments,id,userClientId] :
+        [name,zone,status,module,sensor_type,ip_address,warranty_expiry,comments,id];
     } else {
       query = userClientId ? 'UPDATE intrusion SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3 AND client_id=$4' : 'UPDATE intrusion SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3';
       params = userClientId ? [status,comments,id,userClientId] : [status,comments,id];
@@ -2716,7 +2717,7 @@ app.get('/api/stations', authMiddleware, async (req, res) => {
 app.put('/api/stations/:id', authMiddleware, blockAssetEdit, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
-  const { status, name, zone, make, model, apps, ip_address, install_date, purchase_date, warranty_expiry } = req.body;
+  const { status, name, zone, make, model, apps, ip_address, install_date, warranty_expiry } = req.body;
   try {
     const userClientId = req.user.role === 'admin' ? null : req.user.client_id;
     const asset = await pool.query('SELECT name, client_id FROM stations WHERE id=$1', [id]);
@@ -2732,9 +2733,9 @@ app.put('/api/stations/:id', authMiddleware, blockAssetEdit, async (req, res) =>
       return res.json({ success: true });
     }
     const query = userClientId ? 
-      'UPDATE stations SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),apps=COALESCE($6,apps),ip_address=COALESCE($7,ip_address),install_date=$8,purchase_date=$9,warranty_expiry=$10,updated_at=CURRENT_TIMESTAMP WHERE id=$11 AND client_id=$12' :
-      'UPDATE stations SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),apps=COALESCE($6,apps),ip_address=COALESCE($7,ip_address),install_date=$8,purchase_date=$9,warranty_expiry=$10,updated_at=CURRENT_TIMESTAMP WHERE id=$11';
-    const params = userClientId ? [name,zone,status,make,model,apps,ip_address,install_date,purchase_date,warranty_expiry,id,userClientId] : [name,zone,status,make,model,apps,ip_address,install_date,purchase_date,warranty_expiry,id];
+      'UPDATE stations SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),apps=COALESCE($6,apps),ip_address=COALESCE($7,ip_address),install_date=$8,warranty_expiry=$9,updated_at=CURRENT_TIMESTAMP WHERE id=$10 AND client_id=$11' :
+      'UPDATE stations SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),apps=COALESCE($6,apps),ip_address=COALESCE($7,ip_address),install_date=$8,warranty_expiry=$9,updated_at=CURRENT_TIMESTAMP WHERE id=$10';
+    const params = userClientId ? [name,zone,status,make,model,apps,ip_address,install_date,warranty_expiry,id,userClientId] : [name,zone,status,make,model,apps,ip_address,install_date,warranty_expiry,id];
     await pool.query(query, params);
     await logActivity(assetClientId || userClientId || 1, req.user.username, 'Updated', `Station ${assetName} updated (${assetClient})`);
     res.json({ success: true });
@@ -2755,7 +2756,7 @@ app.get('/api/monitors', authMiddleware, async (req, res) => {
 app.put('/api/monitors/:id', authMiddleware, blockAssetEdit, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
-  const { status, name, zone, make, model, size, install_date, purchase_date, warranty_expiry } = req.body;
+  const { status, name, zone, make, model, size, install_date, warranty_expiry } = req.body;
   try {
     const userClientId = req.user.role === 'admin' ? null : req.user.client_id;
     const asset = await pool.query('SELECT name, client_id FROM monitors WHERE id=$1', [id]);
@@ -2771,9 +2772,9 @@ app.put('/api/monitors/:id', authMiddleware, blockAssetEdit, async (req, res) =>
       return res.json({ success: true });
     }
     const query = userClientId ?
-      'UPDATE monitors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),size=COALESCE($6,size),install_date=$7,purchase_date=$8,warranty_expiry=$9,updated_at=CURRENT_TIMESTAMP WHERE id=$10 AND client_id=$11' :
-      'UPDATE monitors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),size=COALESCE($6,size),install_date=$7,purchase_date=$8,warranty_expiry=$9,updated_at=CURRENT_TIMESTAMP WHERE id=$10';
-    const params = userClientId ? [name,zone,status,make,model,size,install_date,purchase_date,warranty_expiry,id,userClientId] : [name,zone,status,make,model,size,install_date,purchase_date,warranty_expiry,id];
+      'UPDATE monitors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),size=COALESCE($6,size),install_date=$7,warranty_expiry=$8,updated_at=CURRENT_TIMESTAMP WHERE id=$9 AND client_id=$10' :
+      'UPDATE monitors SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),make=COALESCE($4,make),model=COALESCE($5,model),size=COALESCE($6,size),install_date=$7,warranty_expiry=$8,updated_at=CURRENT_TIMESTAMP WHERE id=$9';
+    const params = userClientId ? [name,zone,status,make,model,size,install_date,warranty_expiry,id,userClientId] : [name,zone,status,make,model,size,install_date,warranty_expiry,id];
     await pool.query(query, params);
     await logActivity(assetClientId || userClientId || 1, req.user.username, 'Updated', `Monitor ${assetName} updated (${assetClient})`);
     res.json({ success: true });

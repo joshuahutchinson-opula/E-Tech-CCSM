@@ -779,28 +779,28 @@ function timeAgo(dateStr) {
 var ASSET_TYPES = [
   { key: 'cameras', label: 'Camera', plural: 'Cameras', icon: 'ti-video', warranty: 'warranty', comments: true,
     fields: [['IP address', 'ip_address'], ['Model', 'model'], ['Manufacturer', 'manufacturer'], ['Resolution', 'resolution'], ['Archiver', 'archiver'], ['MAC address', 'mac_address']],
-    dates: [['Purchased', 'purchase_date'], ['Last cleaned', 'date_cleaned']] },
+    dates: [['Last cleaned', 'date_cleaned']] },
   { key: 'doors', label: 'Door', plural: 'Doors', icon: 'ti-door', warranty: 'warranty_expiry', comments: true,
     fields: [['IP address', 'ip_address'], ['Reader', 'reader'], ['Lock type', 'lock_type'], ['Controller', 'controller_type'], ['Door swing', 'door_swing'], ['Access type', 'access_type'], ['Anti-passback', 'anti_passback'], ['Technology', 'tech']],
     dates: [['Installed', 'install_date']] },
   { key: 'servers', label: 'Server', plural: 'Servers', icon: 'ti-server', warranty: 'warranty_expiry', comments: true,
     fields: [['Make', 'make'], ['Model', 'model'], ['Serial', 'serial'], ['Capacity', 'capacity'], ['Used', 'used'], ['Health', 'health'], ['Applications', 'apps']],
-    dates: [['Purchased', 'purchase_date']] },
+    dates: [] },
   { key: 'storage', label: 'Storage', plural: 'Storage', icon: 'ti-database', warranty: 'warranty_expiry', comments: true,
     fields: [['Type', 'type'], ['Make', 'make'], ['Model', 'model'], ['Serial', 'serial'], ['Capacity', 'capacity'], ['Used', 'used']],
-    dates: [['Purchased', 'purchase_date']] },
+    dates: [] },
   { key: 'switches', label: 'Switch', plural: 'Switches', icon: 'ti-router', warranty: 'warranty_expiry', comments: true,
     fields: [['IP address', 'ip_address'], ['Model', 'model'], ['Firmware', 'firmware'], ['MAC address', 'mac_address']],
-    dates: [['Purchased', 'purchase_date']] },
+    dates: [] },
   { key: 'intrusion', label: 'Intrusion point', plural: 'Intrusion', icon: 'ti-shield', warranty: 'warranty_expiry', comments: true,
     fields: [['Module', 'module'], ['Sensor type', 'sensor_type'], ['IP address', 'ip_address']],
-    dates: [['Purchased', 'purchase_date']] },
+    dates: [] },
   { key: 'stations', label: 'Workstation', plural: 'Workstations', icon: 'ti-device-desktop', warranty: 'warranty_expiry', comments: false,
     fields: [['Make', 'make'], ['Model', 'model'], ['Applications', 'apps'], ['IP address', 'ip_address']],
-    dates: [['Installed', 'install_date'], ['Purchased', 'purchase_date']] },
+    dates: [['Installed', 'install_date']] },
   { key: 'monitors', label: 'Monitor', plural: 'Monitors', icon: 'ti-device-tv', warranty: 'warranty_expiry', comments: false,
     fields: [['Make', 'make'], ['Model', 'model'], ['Size', 'size']],
-    dates: [['Installed', 'install_date'], ['Purchased', 'purchase_date']] }
+    dates: [['Installed', 'install_date']] }
 ];
 var ASSET_TYPE = {};
 ASSET_TYPES.forEach(function(t) { ASSET_TYPE[t.key] = t; });
