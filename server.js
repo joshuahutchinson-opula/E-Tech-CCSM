@@ -191,6 +191,16 @@ pool.connect((err, client, release) => {
 
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
+// The app folder is served as static files, so server-only files are
+// refused first (404), matched on the decoded, normalised path, any case.
+const SERVER_ONLY_PATHS = /^\/(?:server\.js|package\.json|package-lock\.json|(?:migrations|node_modules|uploads|\.github)(?:\/|$))|\.(?:md|sql)$/i;
+app.use((req, res, next) => {
+  let p;
+  try { p = decodeURIComponent(req.path); } catch (e) { return res.status(404).send('Not found'); }
+  p = path.posix.normalize('/' + p.replace(/\\/g, '/'));
+  if (SERVER_ONLY_PATHS.test(p)) return res.status(404).send('Not found');
+  next();
+});
 app.use(express.static(__dirname));
 
 // ============================================================
@@ -575,11 +585,20 @@ app.post('/api/auth/login', loginRateLimit, async (req, res) => {
 // ============================================================
 
 app.post('/api/auth/microsoft-callback', async (req, res) => {
-  const { msId, displayName, email, msToken } = req.body;
-  
-  if (!email) {
-    return res.status(400).json({ error: 'No email provided' });
+  // Only the Microsoft token is trusted: who signed in comes from Graph's
+  // /me for that token, never from the email, name or id in the body.
+  const msToken = typeof req.body?.msToken === 'string' ? req.body.msToken : '';
+  if (!msToken) return res.status(401).json({ error: 'Microsoft sign-in could not be verified.' });
+  let me;
+  try {
+    me = (await axios.get('https://graph.microsoft.com/v1.0/me', { headers: { Authorization: `Bearer ${msToken}` } })).data;
+  } catch (err) {
+    return res.status(401).json({ error: 'Microsoft sign-in could not be verified.' });
   }
+  const email = String(me?.mail || me?.userPrincipalName || '').trim();
+  const msId = me?.id;
+  const displayName = me?.displayName || '';
+  if (!email || !msId) return res.status(401).json({ error: 'Microsoft sign-in could not be verified.' });
 
   // Microsoft login is restricted to E-Tech staff — clients always use their
   // manual username/password. Anyone outside the E-Tech domain is rejected
@@ -623,7 +642,7 @@ app.post('/api/auth/microsoft-callback', async (req, res) => {
     { expiresIn: '42d' }
   );
 
-  await logActivity(1, username, 'Login', `Microsoft login — ${email} (${role})`);
+  await logActivity(1, username, 'Login', `Microsoft login — ${displayName ? displayName + ' ' : ''}<${email}> (${role})`);
 
   res.json({
     token: jwtToken,
@@ -646,25 +665,25 @@ app.get('/api/dashboard/stats', authMiddleware, async (req, res) => {
     let cameras, doors, servers, switches, srs;
     
     if (req.user.role === 'admin') {
-      cameras = await pool.query('SELECT status FROM cameras');
-      doors = await pool.query('SELECT status FROM doors');
-      servers = await pool.query('SELECT status FROM servers');
-      switches = await pool.query('SELECT status FROM switches');
+      cameras = await pool.query('SELECT status, zone FROM cameras');
+      doors = await pool.query('SELECT status, zone FROM doors');
+      servers = await pool.query('SELECT status, zone FROM servers');
+      switches = await pool.query('SELECT status, zone FROM switches');
       srs = await pool.query("SELECT status FROM service_requests WHERE status != 'Resolved'");
     } else {
       const clientId = req.user.client_id;
-      cameras = await pool.query('SELECT status FROM cameras WHERE client_id = $1', [clientId]);
-      doors = await pool.query('SELECT status FROM doors WHERE client_id = $1', [clientId]);
-      servers = await pool.query('SELECT status FROM servers WHERE client_id = $1', [clientId]);
-      switches = await pool.query('SELECT status FROM switches WHERE client_id = $1', [clientId]);
+      cameras = await pool.query('SELECT status, zone FROM cameras WHERE client_id = $1', [clientId]);
+      doors = await pool.query('SELECT status, zone FROM doors WHERE client_id = $1', [clientId]);
+      servers = await pool.query('SELECT status, zone FROM servers WHERE client_id = $1', [clientId]);
+      switches = await pool.query('SELECT status, zone FROM switches WHERE client_id = $1', [clientId]);
       srs = await pool.query("SELECT status FROM service_requests WHERE client_id = $1 AND status != 'Resolved'", [clientId]);
     }
 
-    const totalDevices = cameras.rowCount + doors.rowCount + servers.rowCount + switches.rowCount;
-    const offline = cameras.rows.filter(c => c.status !== 'Online' && c.status !== 'Working').length +
-                    doors.rows.filter(d => d.status !== 'Online' && d.status !== 'Working').length +
-                    servers.rows.filter(s => s.status !== 'ONLINE').length +
-                    switches.rows.filter(s => s.status !== 'Online').length;
+    // A client_user counts only devices in their zones, like the device lists.
+    const devices = [cameras, doors, servers, switches].flatMap(r => filterByZoneAccess(r.rows, req));
+    const isOnline = d => ['online', 'working'].includes(String(d.status || '').toLowerCase());
+    const totalDevices = devices.length;
+    const offline = devices.filter(d => !isOnline(d)).length;
     const online = totalDevices - offline;
     const health = totalDevices > 0 ? Math.round((online / totalDevices) * 100) : 100;
 
@@ -1583,14 +1602,24 @@ app.get('/api/service-requests/search', authMiddleware, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// SR-1000..SR-9999 at random, retried until unused; after 20 clashes it
+// falls back to SR- and five digits.
+async function newSrId() {
+  for (let i = 0; i < 20; i++) {
+    const srId = `SR-${Math.floor(Math.random() * 9000) + 1000}`;
+    if (!(await pool.query('SELECT 1 FROM service_requests WHERE sr_id=$1 LIMIT 1', [srId])).rowCount) return srId;
+  }
+  return `SR-${Math.floor(Math.random() * 90000) + 10000}`;
+}
+
 app.post('/api/service-requests', authMiddleware, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { subject, site, category, priority, body, related_hardware } = req.body;
   const assignees = normaliseAssignedTo(req.body.assigned_to);
   if (assignees.error) return res.status(400).json({ error: assignees.error });
   const assigned_to = assignees.value || 'Unassigned';
-  const srId = `SR-${String(Math.floor(Math.random() * 9000) + 1000)}`;
   try {
+    const srId = await newSrId();
     // File the SR under a real client, with client_id and the client name
     // always agreeing. Client accounts get their own client whatever the body
     // says; staff pick one on the form (client_id if valid, else its name).
@@ -1611,8 +1640,9 @@ app.post('/api/service-requests', authMiddleware, async (req, res) => {
     const clientId = clientRow.id;
     const client = clientRow.name;
     const result = await pool.query(
-      `INSERT INTO service_requests (client_id,sr_id,subject,client,site,category,priority,assigned_to,body,received,created_by,related_hardware) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,CURRENT_DATE,$10,$11) RETURNING *`,
-      [clientId, srId, subject, client, site, category, priority, assigned_to, body, req.user.username, JSON.stringify(related_hardware || [])]
+      `INSERT INTO service_requests (client_id,sr_id,subject,client,site,category,priority,assigned_to,body,received,created_by,related_hardware) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *`,
+      // received is today's date in Jamaica, not the database's (UTC) CURRENT_DATE.
+      [clientId, srId, subject, client, site, category, priority, assigned_to, body, jamaicaToday(), req.user.username, JSON.stringify(related_hardware || [])]
     );
     await pool.query('INSERT INTO sr_history (sr_id,time,msg) VALUES ($1,$2,$3)', [result.rows[0].id, new Date().toLocaleTimeString(), 'Created by ' + req.user.username]);
     await logActivity(clientId, req.user.username, 'Created', 'SR ' + srId + ' created for ' + client);
@@ -1653,6 +1683,8 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
   try {
     const current = await pool.query('SELECT * FROM service_requests WHERE id=$1', [id]);
     const oldSr = current.rows[0];
+    // A client account may only touch its own client's SRs.
+    if (isClientAccount(req) && oldSr && oldSr.client_id !== req.user.client_id) return res.status(404).json({ error: 'Service request not found' });
     const oldAssigned = oldSr?.assigned_to;
     const oldStatus = oldSr?.status;
     // append_note (field app) adds one stamped line to the existing notes
@@ -1745,6 +1777,7 @@ app.put('/api/service-requests/:id', authMiddleware, async (req, res) => {
 });
 
 app.post('/api/service-requests/:id/transfer', authMiddleware, async (req, res) => {
+  if (req.user.role !== 'admin' && req.user.role !== 'technician') return res.status(403).json({ error: 'E-Tech staff only' });
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
   const assignees = normaliseAssignedTo(req.body.assigned_to);
@@ -2000,6 +2033,9 @@ app.put('/api/clients/:name', authMiddleware, async (req, res) => {
   const { email, phone, address } = req.body;
   const badLogo = invalidClientLogo(req.body);
   if (badLogo) return res.status(400).json({ error: badLogo });
+  const newName = typeof req.body.name === 'string' ? req.body.name.trim() : req.body.name;
+  if (newName !== undefined && !newName) return res.status(400).json({ error: 'Client name is required' });
+  const renaming = typeof newName === 'string' && newName !== name;
   // Email and logos only change when their key is in the body, so a normal
   // edit never wipes them.
   const sets = ['phone=$1', 'address=$2'], params = [phone||'', address||''];
@@ -2007,13 +2043,27 @@ app.put('/api/clients/:name', authMiddleware, async (req, res) => {
   for (const key of LOGO_FIELDS) {
     if (Object.prototype.hasOwnProperty.call(req.body, key)) { params.push(req.body[key] || null); sets.push(`${key}=$${params.length}`); }
   }
+  if (renaming) { params.push(newName); sets.push(`name=$${params.length}`); }
   params.push(name);
+  // A rename also moves SRs that store the client by name, in one transaction.
+  const db = await pool.connect();
   try {
-    const result = await pool.query(`UPDATE clients SET ${sets.join(',')},updated_at=CURRENT_TIMESTAMP WHERE name=$${params.length} RETURNING *`, params);
-    if (result.rowCount === 0) return res.status(404).json({ error: 'Client not found' });
-    await logActivity(1, req.user.username, 'Updated', 'Client ' + name + ' updated');
+    await db.query('BEGIN');
+    if (renaming) {
+      const taken = await db.query('SELECT 1 FROM clients WHERE LOWER(name)=LOWER($1) AND name<>$2 LIMIT 1', [newName, name]);
+      if (taken.rowCount) { await db.query('ROLLBACK'); return res.status(409).json({ error: 'Another client already has that name' }); }
+    }
+    const result = await db.query(`UPDATE clients SET ${sets.join(',')},updated_at=CURRENT_TIMESTAMP WHERE name=$${params.length} RETURNING *`, params);
+    if (result.rowCount === 0) { await db.query('ROLLBACK'); return res.status(404).json({ error: 'Client not found' }); }
+    if (renaming) await db.query('UPDATE service_requests SET client=$1 WHERE client=$2', [newName, name]);
+    await db.query('COMMIT');
+    await logActivity(1, req.user.username, 'Updated', renaming ? `Client ${name} renamed to ${newName}` : 'Client ' + name + ' updated');
     res.json(result.rows[0]);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) {
+    await db.query('ROLLBACK').catch(() => {});
+    if (err.code === '23505') return res.status(409).json({ error: 'Another client already has that name' });
+    res.status(500).json({ error: err.message });
+  } finally { db.release(); }
 });
 
 app.delete('/api/clients/:name', authMiddleware, async (req, res) => {
@@ -3818,32 +3868,46 @@ console.log('📅 Monthly reports scheduled: 1st of each month at 5:00 PM Jamaic
 function base64URLEncode(buffer) {
   return buffer.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
-let pendingGraphAuthVerifier = null; // rare, single-admin, one-time action — in-memory is fine
+// state -> { verifier, expires }: each sign-in started here must come back
+// with its own state within 10 minutes. In memory: a rare, one-off action.
+const pendingGraphAuth = new Map();
+const GRAPH_AUTH_TTL_MS = 10 * 60 * 1000;
+function graphAuthPage(title, message) {
+  return `<html><body style="font-family:sans-serif;padding:40px;"><h2>${escapeHtml(title)}</h2>${message ? `<p>${escapeHtml(message)}</p>` : ''}</body></html>`;
+}
 
 // Visit this URL directly (no manual URL-building needed) to start connecting
 // the shared mailbox. Generates the required PKCE challenge and redirects to
 // Microsoft automatically.
 app.get('/api/admin/graph-auth/start', (req, res) => {
   const verifier = base64URLEncode(crypto.randomBytes(32));
-  pendingGraphAuthVerifier = verifier;
+  const state = base64URLEncode(crypto.randomBytes(24));
+  const now = Date.now();
+  for (const [s, p] of pendingGraphAuth) if (p.expires <= now) pendingGraphAuth.delete(s);
+  pendingGraphAuth.set(state, { verifier, expires: now + GRAPH_AUTH_TTL_MS });
   const challenge = base64URLEncode(crypto.createHash('sha256').update(verifier).digest());
   const redirectUri = `${req.protocol}://${req.get('host')}/api/admin/graph-auth/callback`;
   const authUrl = `https://login.microsoftonline.com/${MS_TENANT_ID_SERVER}/oauth2/v2.0/authorize?` +
     `client_id=${MS_CLIENT_ID_SERVER}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}` +
     `&scope=${encodeURIComponent(GRAPH_SCOPES)}&response_mode=query` +
-    `&code_challenge=${challenge}&code_challenge_method=S256`;
+    `&code_challenge=${challenge}&code_challenge_method=S256&state=${encodeURIComponent(state)}`;
   res.redirect(authUrl);
 });
 
 app.get('/api/admin/graph-auth/callback', async (req, res) => {
-  const { code, error, error_description } = req.query;
+  const { code, error, error_description, state } = req.query;
   const redirectUri = `${req.protocol}://${req.get('host')}/api/admin/graph-auth/callback`;
 
+  const pending = typeof state === 'string' ? pendingGraphAuth.get(state) : null;
+  if (pending) pendingGraphAuth.delete(state);
+  if (!pending || pending.expires <= Date.now()) {
+    return res.status(400).send(graphAuthPage('❌ Sign-in link expired or invalid', 'Start connecting the mailbox again.'));
+  }
   if (error) {
-    return res.send(`<html><body style="font-family:sans-serif;padding:40px;"><h2>❌ Microsoft returned an error</h2><p>${error}: ${error_description || ''}</p></body></html>`);
+    return res.send(graphAuthPage('❌ Microsoft returned an error', `${error}: ${error_description || ''}`));
   }
   if (!code) {
-    return res.send(`<html><body style="font-family:sans-serif;padding:40px;"><h2>No authorization code received</h2></body></html>`);
+    return res.send(graphAuthPage('No authorization code received'));
   }
 
   try {
@@ -3855,18 +3919,24 @@ app.get('/api/admin/graph-auth/callback', async (req, res) => {
         code,
         redirect_uri: redirectUri,
         scope: GRAPH_SCOPES,
-        code_verifier: pendingGraphAuthVerifier || ''
+        code_verifier: pending.verifier
       }),
       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
     );
     const { access_token, refresh_token, expires_in } = response.data;
     if (!refresh_token) {
-      return res.send(`<html><body style="font-family:sans-serif;padding:40px;"><h2>⚠️ No refresh_token returned</h2><p>Make sure the sign-in request included the offline_access scope.</p></body></html>`);
+      return res.send(graphAuthPage('⚠️ No refresh_token returned', 'Make sure the sign-in request included the offline_access scope.'));
+    }
+    // Only the shared mailbox's own tokens are saved.
+    const me = (await axios.get('https://graph.microsoft.com/v1.0/me', { headers: { Authorization: `Bearer ${access_token}` } })).data;
+    const signedIn = String(me?.mail || me?.userPrincipalName || '').trim().toLowerCase();
+    if (signedIn !== SHARED_MAILBOX.toLowerCase()) {
+      return res.status(403).send(graphAuthPage(`Sign in as ${SHARED_MAILBOX}`, `You signed in as ${signedIn || 'an unknown account'}. Nothing was saved.`));
     }
     await saveGraphAuth(access_token, refresh_token, expires_in);
-    res.send(`<html><body style="font-family:sans-serif;padding:40px;"><h2>✅ Shared mailbox connected</h2><p>Reports will now refresh their own Graph access automatically. You can close this tab.</p></body></html>`);
+    res.send(graphAuthPage('✅ Shared mailbox connected', 'Reports will now refresh their own Graph access automatically. You can close this tab.'));
   } catch (err) {
-    res.send(`<html><body style="font-family:sans-serif;padding:40px;"><h2>❌ Token exchange failed</h2><p>${err.response?.data?.error_description || err.message}</p></body></html>`);
+    res.send(graphAuthPage('❌ Token exchange failed', err.response?.data?.error_description || err.message));
   }
 });
 
