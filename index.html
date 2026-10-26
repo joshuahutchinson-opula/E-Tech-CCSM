@@ -567,7 +567,7 @@ input[type="month"] { color-scheme:dark; } :root.light-theme input[type="month"]
   <div class="modal-field"><label>Anti-Passback</label><input type="text" id="add-door-antipass"></div>
   <div class="modal-field"><label>Reader</label><input type="text" id="add-door-reader"></div>
   <div class="modal-field"><label>Lock Type</label><select id="add-door-lock"><option value="Maglock">Maglock</option><option value="Wireless">Wireless</option><option value="Door Stripe">Door Stripe</option></select></div>
-  <div class="modal-field"><label>Controller Type</label><select id="add-door-controller"><option value="1DBC">1DBC</option><option value="2DBC">2DBC</option><option value="4DBC">4DBC</option><option value="8DBC">8DBC</option><option value="8DC">8DC</option><option value="Area Controller">Area Controller</option><option value="Door Controller">Door Controller</option><option value="ISC">ISC</option><option value="RIM">RIM</option></select></div>
+  <div class="modal-field"><label>Controller Type</label><select id="add-door-controller"><option value="1DBC">1DBC</option><option value="2DBC">2DBC</option><option value="4DBC">4DBC</option><option value="8DBC">8DBC</option><option value="8DC">8DC</option><option value="Area Controller">Area Controller</option><option value="Door Controller">Door Controller</option><option value="ISC">ISC</option><option value="RIM">RIM</option><option value="Gateway">Gateway</option></select></div>
   <div class="modal-field"><label>IP Address</label><input type="text" id="add-door-ip" placeholder="10.0.0.1"></div>
   <div class="modal-field"><label>Install Date</label><input type="date" id="add-door-install"></div>
   <div class="modal-field"><label>Warranty Expiry</label><input type="date" id="add-door-warranty"></div>
@@ -1375,7 +1375,7 @@ function openAddAssetModal(type){
 
 function gfv(id){var el=document.getElementById(id);return el?el.value.trim():'';}
 var LOCK_TYPE_OPTIONS=['Maglock','Wireless','Door Stripe'];
-var CONTROLLER_TYPE_OPTIONS=['1DBC','2DBC','4DBC','8DBC','8DC','Area Controller','Door Controller','ISC','RIM'];
+var CONTROLLER_TYPE_OPTIONS=['1DBC','2DBC','4DBC','8DBC','8DC','Area Controller','Door Controller','ISC','RIM','Gateway'];
 // Builds <option> tags from a fixed list, preserving a stored value that doesn't match any
 // of them (legacy free-text, CSV imports, typos) as its own selected option instead of
 // silently dropping it — so an existing value never appears blank just because it predates
