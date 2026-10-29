@@ -719,6 +719,15 @@ app.get('/api/cameras', authMiddleware, async (req, res) => {
 });
 
 // The purchase_date columns on asset tables are kept but unused (no route reads or writes them).
+// MACs with 12 hex digits are stored as XX:XX:XX:XX:XX:XX; anything else is kept
+// (trimmed) so partial or odd values aren't lost. undefined/null pass through.
+function formatMac(v) {
+  if (v === undefined || v === null) return v;
+  const s = String(v).trim();
+  const hex = s.replace(/[^0-9a-f]/gi, '');
+  return hex.length === 12 ? hex.toUpperCase().match(/../g).join(':') : s;
+}
+
 app.put('/api/cameras/:id', authMiddleware, blockAssetEdit, async (req, res) => {
   if (!dbConnected) return res.status(503).json({ error: 'DB not connected' });
   const { id } = req.params;
@@ -734,7 +743,7 @@ app.put('/api/cameras/:id', authMiddleware, blockAssetEdit, async (req, res) => 
       const query = userClientId ? 
         `UPDATE cameras SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),model=COALESCE($4,model),manufacturer=COALESCE($5,manufacturer),resolution=COALESCE($6,resolution),archiver=COALESCE($7,archiver),ip_address=COALESCE($8,ip_address),mac_address=COALESCE($9,mac_address),warranty=$10,date_cleaned=$11,comments=COALESCE($12,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$13 AND client_id=$14` :
         `UPDATE cameras SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),model=COALESCE($4,model),manufacturer=COALESCE($5,manufacturer),resolution=COALESCE($6,resolution),archiver=COALESCE($7,archiver),ip_address=COALESCE($8,ip_address),mac_address=COALESCE($9,mac_address),warranty=$10,date_cleaned=$11,comments=COALESCE($12,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$13`;
-      const params = userClientId ? [name,zone,status,model,manufacturer,resolution,archiver,ip_address,mac_address,warranty,date_cleaned,comments,id,userClientId] : [name,zone,status,model,manufacturer,resolution,archiver,ip_address,mac_address,warranty,date_cleaned,comments,id];
+      const params = userClientId ? [name,zone,status,model,manufacturer,resolution,archiver,ip_address,formatMac(mac_address),warranty,date_cleaned,comments,id,userClientId] : [name,zone,status,model,manufacturer,resolution,archiver,ip_address,formatMac(mac_address),warranty,date_cleaned,comments,id];
       await pool.query(query, params);
     } else {
       const query = userClientId ? 'UPDATE cameras SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3 AND client_id=$4' : 'UPDATE cameras SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3';
@@ -785,7 +794,7 @@ app.post('/api/import/cameras', authMiddleware, async (req, res) => {
     if (!clientIds) return;
     for (const [idx, cam] of cameras.entries()) {
       await pool.query(`INSERT INTO cameras (client_id,name,zone,status,comments,model,manufacturer,resolution,archiver,ip_address,mac_address,warranty,date_cleaned) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
-        [clientIds[idx],cam.name||'',cam.zone||'',cam.status||'Working',cam.comments||'',cam.model||'',cam.manufacturer||'',cam.resolution||'',cam.archiver||'',cam.ip_address||'',cam.mac_address||'',cam.warranty||null,cam.date_cleaned||null]);
+        [clientIds[idx],cam.name||'',cam.zone||'',cam.status||'Working',cam.comments||'',cam.model||'',cam.manufacturer||'',cam.resolution||'',cam.archiver||'',cam.ip_address||'',formatMac(cam.mac_address)||'',cam.warranty||null,cam.date_cleaned||null]);
       imported++;
     }
     const { clientIdForLog, clientLabel } = await describeClientsForLog(cameras);
@@ -844,7 +853,7 @@ app.post('/api/import/switches', authMiddleware, async (req, res) => {
     if (!clientIds) return;
     for (const [idx, sw] of switches.entries()) {
       await pool.query(`INSERT INTO switches (client_id,name,zone,status,model,firmware,ip_address,mac_address,warranty_expiry,comments) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-        [clientIds[idx],sw.name||'',sw.zone||sw.location||'',sw.status||'Online',sw.model||'',sw.firmware||'',sw.ip_address||'',sw.mac||'',sw.warranty_expiry||null,sw.comments||'']);
+        [clientIds[idx],sw.name||'',sw.zone||sw.location||'',sw.status||'Online',sw.model||'',sw.firmware||'',sw.ip_address||'',formatMac(sw.mac)||'',sw.warranty_expiry||null,sw.comments||'']);
       imported++;
     }
     const { clientIdForLog, clientLabel } = await describeClientsForLog(switches);
@@ -1100,7 +1109,7 @@ app.put('/api/switches/:id', authMiddleware, blockAssetEdit, async (req, res) =>
     const assetClient = await getClientNameById(assetClientId);
     if (req.user.role === 'admin') {
       const query = userClientId ? `UPDATE switches SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),model=COALESCE($4,model),firmware=COALESCE($5,firmware),ip_address=COALESCE($6,ip_address),mac_address=COALESCE($7,mac_address),warranty_expiry=$8,comments=COALESCE($9,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$10 AND client_id=$11` : `UPDATE switches SET name=COALESCE($1,name),zone=COALESCE($2,zone),status=COALESCE($3,status),model=COALESCE($4,model),firmware=COALESCE($5,firmware),ip_address=COALESCE($6,ip_address),mac_address=COALESCE($7,mac_address),warranty_expiry=$8,comments=COALESCE($9,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$10`;
-      const params = userClientId ? [name,zone,status,model,firmware,ip_address,mac,warranty_expiry,comments,id,userClientId] : [name,zone,status,model,firmware,ip_address,mac,warranty_expiry,comments,id];
+      const params = userClientId ? [name,zone,status,model,firmware,ip_address,formatMac(mac),warranty_expiry,comments,id,userClientId] : [name,zone,status,model,firmware,ip_address,formatMac(mac),warranty_expiry,comments,id];
       await pool.query(query, params);
     } else {
       const query = userClientId ? 'UPDATE switches SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3 AND client_id=$4' : 'UPDATE switches SET status=COALESCE($1,status),comments=COALESCE($2,comments),updated_at=CURRENT_TIMESTAMP WHERE id=$3';

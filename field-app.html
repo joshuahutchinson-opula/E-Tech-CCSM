@@ -2197,7 +2197,8 @@ function instFormChanges(layer, d) {
   var notes = layer.querySelector('#inst-notes').value.trim();
   if (notes !== (d.notes || '').trim()) body.notes = notes;
   AS_BUILT_FIELDS.forEach(function(fl) {
-    var v = layer.querySelector('#inst-' + fl.key).value.trim();
+    var input = layer.querySelector('#inst-' + fl.key), v = input.value.trim();
+    if (fl.key === 'macAddress') v = input.value = formatMac(v);
     if (v !== (cur[fl.key] || '')) ab[fl.key] = v;
   });
   if (Object.keys(ab).length) body.asBuilt = ab;
@@ -2209,6 +2210,11 @@ function instIpValid(ip) {
   var v4 = ip.split('.');
   if (v4.length === 4 && v4.every(function(p) { return /^\d{1,3}$/.test(p) && Number(p) <= 255; })) return true;
   return ip.indexOf(':') !== -1 && /^[0-9a-fA-F:.]+$/.test(ip) && ip.length <= 45;
+}
+// Same rule as the dashboard and server: 12 hex digits become XX:XX:XX:XX:XX:XX, anything else is kept as typed.
+function formatMac(v) {
+  var s = String(v == null ? '' : v).trim(), hex = s.replace(/[^0-9a-f]/gi, '');
+  return hex.length === 12 ? hex.toUpperCase().match(/../g).join(':') : s;
 }
 function instValidate(body) {
   var ab = body.asBuilt || {};
