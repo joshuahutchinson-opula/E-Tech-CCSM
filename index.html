@@ -1364,8 +1364,8 @@ function buildDropdownOptions(options,currentValue){
   return html;
 }
 
-var ASSET_RENDER_FN={cameras:function(){renderStatusFilters();renderCamerasOptimized();},doors:renderDoorsEnhanced,servers:function(){renderServersEnhanced();renderComputeStorage();},switches:renderSwitchesEnhanced,stations:renderStations,monitors:renderMonitors,intrusion:renderIntrusion,storage:renderComputeStorage};
-var ASSET_SETTER={cameras:function(d){CAMERAS=d||[];},doors:function(d){DOORS=d||[];},servers:function(d){SERVERS=d||[];},switches:function(d){SWITCHES=d||[];},stations:function(d){STATIONS=d||[];},monitors:function(d){MONITORS=d||[];},intrusion:function(d){INTRUSION=d||[];},storage:function(d){STORAGE=d||[];}};
+var ASSET_RENDER_FN={cameras:function(){renderStatusFilters();renderCamerasOptimized();},doors:renderDoorsEnhanced,servers:function(){renderServersEnhanced();renderComputeStorage();},switches:renderSwitchesEnhanced,stations:renderStations,monitors:renderMonitors,intrusion:renderIntrusion,storage:renderComputeStorage,software:renderSoftware};
+var ASSET_SETTER={cameras:function(d){CAMERAS=d||[];},doors:function(d){DOORS=d||[];},servers:function(d){SERVERS=d||[];},switches:function(d){SWITCHES=d||[];},stations:function(d){STATIONS=d||[];},monitors:function(d){MONITORS=d||[];},intrusion:function(d){INTRUSION=d||[];},storage:function(d){STORAGE=d||[];},software:function(d){SOFTWARE=d||[];}};
 
 // Refreshes just one asset type's table instead of reloading the entire app
 // (dashboard, inbox, every other tab, etc.) — used after adding/importing so
